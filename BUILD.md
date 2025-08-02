@@ -61,7 +61,7 @@ the build:
 
 	make system
 
-You now have a working OpenBSD system, but we are still using 
+You now have a working system, but we are still using 
 the MSYS commands. To make sure we are using our brand new 
 OpenBSD binaries, you will need to mount the */opt/minc* 
 directory. This is done by running the **mount** script:
@@ -87,11 +87,11 @@ re-mount the */mingw* directory:
 
 For this step, you need to be Administrator. Close the MSYS 
 terminal and open it again as Administrator. Change to your 
-*minc-devel* directory and and run the **install** target:
+*minc-devel* directory and run the **install** target:
 
 	make install
 
-**Note**: By default, MinC will be installed in the 
+**Warning**: By default, MinC will be installed in the 
 **C:\minc-release** directory. If you want another install 
 location, uncomment and change the 'DESTDIR' variable 
 in config.inc. It is not advisable to create the MinC root 

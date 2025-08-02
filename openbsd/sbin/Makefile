@@ -2,7 +2,8 @@ ROOTDIR= ../..
 
 include ${ROOTDIR}/Makefile.inc
 
-PROGS= wrc mkent wtrace mount_refs mknod
+PROGS= mknod wtrace
+OBJECTS= ${PROGS} wrc mkent mount_refs
 TRACEDIR= ${ROOTDIR}/libtrace
 SBINSRC= ${SRCDIR}/sbin
 SBINDIR= /sbin
@@ -26,6 +27,12 @@ ${BINDIR}: ${PROGS}
 	@/bin/mkdir -p ${BINDIR}
 	/bin/cp -vu mknod ${BINDIR}/
 
+libwtrace.o: libwtrace.c
+	${CC} -c ${CFLAGS} -I${ROOTDIR}/include -o $@ $<
+
+version.o: bsd.rc
+	${XWINDRES} -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@
+
 wrc: wrc.exe
 
 mknod: ${SBINSRC}/mknod/mknod.c
@@ -34,17 +41,11 @@ mknod: ${SBINSRC}/mknod/mknod.c
 mkent: mkent.o
 	${XGCC} -s ${CFLAGS} -I${SRCDIR}/sys -o $@ $< ${MINGW}/lib/libiphlpapi.a
 
-version.o: bsd.rc
-	${XWINDRES} -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@
-
 bsd.o: bsd.c
 	${XGCC} -c ${CFLAGS} -DNOPIE -I${SRCDIR}/sys -o $@ $<
 
 bsd.exe: bsd.o version.o
 	${XGCC} -s -static ${CFLAGS} -o $@ $^
-
-libwtrace.o: libwtrace.c
-	${XGCC} -c ${CFLAGS} -I${MINGW}/include -I${ROOTDIR}/include -o $@ $<
 
 wtrace: libwtrace.o wtrace.o
 	${XGCC} -s ${CFLAGS} -o $@ -L${TRACEDIR} $^ -ltrace \
@@ -57,7 +58,7 @@ install-local: ${BINDIR}
 
 install: ${DESTDIR}
 	@mkdir -p ${DESTDIR}${SBINDIR}
-	${INSTALL} ${PROGS} ${DESTDIR}${SBINDIR}/
+	${INSTALL} ${OBJECTS} ${DESTDIR}${SBINDIR}/
 	${INSTALL} -m 02555 -o 0 -g 0 bsd.exe ${DESTDIR}${SBINDIR}/
 	${INSTALL} -m 00754 -o 0 -g 0 setup.sh ${DESTDIR}${SBINDIR}/
 

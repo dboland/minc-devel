@@ -19,4 +19,4 @@ ${SHAREDIR}/mk:
 	cp -R ${SHARESRC}/mk ${SHAREDIR}/
 	TMPDIR=/tmp patch --posix --silent -p 1 -d ${SHAREDIR} <../share.patch
 
-install-comp: ${SHARESRC} ${SHAREDIR}/mk
+install: ${SHARESRC} ${SHAREDIR}/mk

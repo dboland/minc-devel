@@ -50,10 +50,11 @@ install-local: ${SRCDIR} ${MACHINEDIR} ${HEADERS}
 install: ${INSTALL}
 	@sh ${ROOTDIR}/mkroot.sh ${DESTDIR}
 	@${MAKE} -C bin install
+	@${MAKE} -C sbin install
 	@${MAKE} -C lib install
 	@${MAKE} -C usr.bin install
-	@${MAKE} -C sbin install
 	@${MAKE} -C usr.sbin install
+	@${MAKE} -C share install
 	@${MAKE} -C etc install
 
 install-cross: ${_INCDIR}
