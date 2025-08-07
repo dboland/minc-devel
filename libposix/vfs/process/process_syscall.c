@@ -47,6 +47,7 @@ ProcCreateTask(DWORD Offset)
 			pwTask->Processor = KeGetCurrentProcessorNumber();
 			GetSystemTimeAsFileTime(&pwTask->Started);
 			win_clock_gettime_MONOTONIC(&pwTask->ClockTime);
+			pwTask->Heap = HeapCreate(0, __Globals->PageSize, 0);
 			return(pwTask);
 		}else if (pwTask->Flags & WIN_PS_NOZOMBIE){
 			ZeroMemory(pwTask, sizeof(WIN_TASK));

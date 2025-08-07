@@ -287,6 +287,7 @@ main(int argc, char *argv[], char *envp[])
 	diskconf(root);
 	setenv("MINCROOT", root, 1);
 	setenv("PATH", _PATH_DEFPATH, 1);
+	setenv("TMP", "/tmp", 1);	/* GNU CC */
 	args(argc, argv);
 	sysctl(mib, 2, &level, &size, NULL, 0);
 	switch (pid = fork()){

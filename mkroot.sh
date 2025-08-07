@@ -1,21 +1,21 @@
 #!/bin/sh
 
-DESTROOT="$1"
+DESTDIR="$1"
 
-if [ -z "${DESTROOT}" ]; then
+if [ -z "${DESTDIR}" ]; then
 	echo "Usage: $0 DESTDIR"
-	exit 15
+	exit 1
 fi
 
 echo " ---------------------------------------------------"
-echo -n "| Installing in ${DESTROOT} for "
+echo -n "| Installing in ${DESTDIR} for "
 
-if id 'NT SERVICE\TrustedInstaller' >/dev/null 2>&1; then
+if id -u 'NT SERVICE\TrustedInstaller' >/dev/null 2>&1; then
 	echo "Windows Vista"
-	/bin/mkdir -p ${DESTROOT}
+	/bin/mkdir -p ${DESTDIR}
 else
 	echo "Windows NT"
-	mkdir -p ${DESTROOT}
+	mkdir -p ${DESTDIR}
 fi
 
 echo " ---------------------------------------------------"

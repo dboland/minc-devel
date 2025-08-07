@@ -45,12 +45,25 @@
 
 /* Use both _thread_sys_{syscall} and [weak] {syscall}. */
 
+#define SYSCALL_ERROR		\
+	cmp $0,%eax;		\
+	jge 1f;			\
+	neg %eax;		\
+	push %eax;		\
+	call ___errno;		\
+	pop %edx; 		\
+	mov %edx,(%eax);	\
+	mov $-1,%eax;		\
+	mov $-1,%edx;		\
+1:;
+
 #define	SYSENTRY(x)					\
 	ENTRY(x);					\
 	pop %ecx;					\
 	mov $(SYS_ ## x),%eax;				\
 	call ___kernel;					\
 	push %ecx;					\
+	SYSCALL_ERROR					\
 	ret;						\
 	.global _C_LABEL(_thread_sys_ ## x);		\
 	_C_LABEL(_thread_sys_ ## x) = _C_LABEL(x)

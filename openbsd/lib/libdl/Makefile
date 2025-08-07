@@ -4,7 +4,7 @@ include ${ROOTDIR}/Makefile.inc
 
 OBJECTS= libdl.o
 IMPLIB= libdl.dll.a
-LDFLAGS= -shared -s
+LDFLAGS+= -shared -s
 LIBDL= ld.so
 ULIBXDIR= /usr/libexec
 
@@ -14,7 +14,7 @@ all: ${LIBDL} libdl.a
 	${XGCC} -c -g ${CFLAGS} -I${ROOTDIR}/include -I${SRCDIR}/sys $<
 
 version.o: version.rc
-	${XWINDRES} -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@
+	windres -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@
 
 libdl.a: ${OBJECTS}
 	@/bin/echo "Making static library $@"
@@ -37,7 +37,7 @@ install-cross:
 	/bin/cp -vu ${IMPLIB} ${_LIBDIR}/libdl.so
 
 install: ${DESTDIR}
-	@mkdir -p ${DESTDIR}${ULIBXDIR}
+	@${MKDIR} -p ${DESTDIR}${ULIBXDIR}
 	${INSTALL} ld.so ${DESTDIR}${ULIBXDIR}/
 	${INSTALL} ${IMPLIB} ${DESTDIR}/usr/lib/libdl.a
 

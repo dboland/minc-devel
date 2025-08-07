@@ -38,7 +38,7 @@ void *
 dlopen(const char *path, int mode)
 {
 	void *result = NULL;
-	WIN_NAMEIDATA wPath;
+	WIN_NAMEIDATA wPath = {0};
 
 	if (!path){
 		result = win_dlopen(NULL);

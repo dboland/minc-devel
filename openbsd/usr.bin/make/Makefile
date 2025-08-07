@@ -59,6 +59,6 @@ install: ${DESTDIR}
 	${INSTALL} make.out ${DESTDIR}${UBINDIR}/make
 
 clean:
-	rm -f *.h *.o *.out *.tmp
+	/bin/rm -f *.h *.tmp *.exe ${OBJECTS} make.out
 	@${MAKE} -C lst.lib clean
 

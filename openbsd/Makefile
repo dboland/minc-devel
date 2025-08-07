@@ -22,6 +22,9 @@ ${MACHINEDIR}:
 	/bin/cp -ru ${SRCDIR}/sys/sys ${XINCDIR}/
 	/bin/cp -ru ${SRCDIR}/sys/arch/${ARCH}/include/* ${MACHINEDIR}/
 	/bin/patch -p 0 -d ${XPREFIX} <include.patch
+	/bin/cp -ru ${SRCDIR}/sys/net ${XINCDIR}/
+	/bin/cp -ru ${SRCDIR}/sys/netinet ${XINCDIR}/
+	/bin/cp -ru ${SRCDIR}/sys/netinet6 ${XINCDIR}/
 
 ${XINCDIR}/fcntl.h:
 	@/bin/cp -vu fcntl.h ${XINCDIR}/
@@ -65,9 +68,11 @@ release:
 	@${MAKE} -C lib release
 	@${MAKE} -C sbin release
 	
-clean:
-	@${MAKE} -C lib clean
+bin-clean:
 	@${MAKE} -C bin clean
 	@${MAKE} -C usr.bin clean
+
+clean: bin-clean
+	@${MAKE} -C lib clean
 	@${MAKE} -C sbin clean
 	@${MAKE} -C usr.sbin clean

@@ -39,7 +39,7 @@
 ___kernel:
 	# setup call_t struct
 	cmp $SYS_MAXSYSCALL,%eax
-	jg 1f
+	jge 1f
 	push %eax		# syscall code
 	push $-1		# WIN_TASK
 	push %ecx
@@ -61,10 +61,6 @@ ___kernel:
 	pop %ecx
 	add $4,%esp		# WIN_TASK
 	add $4,%esp		# code
-	cmp $0,%eax
-	jge 1f
-	mov $-1,%edx		# lseek()
-	mov $-1,%eax
 1:
 	ret
 

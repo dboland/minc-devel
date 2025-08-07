@@ -28,11 +28,11 @@ OBJECTS= assert.o \
 	telldir.o closedir.o exec.o
 
 OBJECTS+= getpwent.c.o getgrent.c.o setproctitle.c.o setprogname.c.o \
-	getprogname.c.o signal.c.o getgrouplist.c.o
+	getprogname.c.o signal.c.o getgrouplist.c.o errno.c.o
 #OBJECTS+= _exit.S.o _getlogin.S.o _setlogin.S.o
 OBJECTS+= syslog_r.o syslog.o auth_subr.o login_cap.o authenticate.o
 
-#OBJECTS+= elf_hash.o posix_spawn.o shm_open.o errno.o
+#OBJECTS+= elf_hash.o posix_spawn.o shm_open.o
 
 .SUFFIXES:
 .DEFAULT:

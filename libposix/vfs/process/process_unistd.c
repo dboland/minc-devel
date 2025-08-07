@@ -115,6 +115,11 @@ proc_close(WIN_TASK *Task)
 	 * actually *faster* than CreateThread() (building perl.exe)
 	 */
 	Task->ParentId = 0;		/* relinquish ownership */
+	if (!HeapDestroy(Task->Heap)){
+		WIN_ERR("HeapDestroy(%d): %s\n", Task->Heap, win_strerror(GetLastError()));
+	}else{
+		Task->Heap = NULL;
+	}
 	if (!Task->Handle){
 		SetLastError(ERROR_INVALID_THREAD_ID);
 	}else if (CloseHandle(Task->Handle)){
@@ -167,8 +172,8 @@ proc_execve(WIN_TASK *Task, LPSTR Command, PVOID Environ)
 	}else{
 		WIN_ERR("CreateProcessAsUser(%s): Handle(%d): %s\n", Command, hToken, win_strerror(GetLastError()));
 	}
-	win_free(Command);
-	win_free(Environ);
+	proc_free(Task, Command);
+	proc_free(Task, Environ);
 	return(bResult);
 }
 BOOL 

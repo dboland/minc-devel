@@ -16,6 +16,7 @@ install-cross:
 	@${MAKE} -C libc install-cross
 	@${MAKE} -C libdl install-cross
 	@${MAKE} -C libsocket install-cross
+	@${MAKE} -C libcurses install-cross
 
 release:
 	@${MAKE} -C libdl release-clean lib

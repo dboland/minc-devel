@@ -49,7 +49,7 @@
  .  endfor
  .endif
 --- share/mk/bsd.own.mk	2014-05-19 17:05:13 +0200
-+++ share/mk/bsd.own.mk	2025-06-05 09:00:32 +0200
++++ share/mk/bsd.own.mk	2025-08-06 13:17:13 +0200
 @@ -40,8 +40,7 @@
  .endif
  
@@ -60,6 +60,16 @@
  PIE_DEFAULT?=${DEFAULT_PIE_DEF}
  .else
  NOPIE_FLAGS?=
+@@ -153,9 +152,7 @@
+ 
+ # don't try to generate PROFILED versions of libraries on machines
+ # which don't support profiling.
+-.if 0
+ NOPROFILE=
+-.endif
+ 
+ BSD_OWN_MK=Done
+ 
 --- share/mk/sys.mk	2014-05-19 17:05:13 +0200
 +++ share/mk/sys.mk	2025-07-20 06:42:35 +0200
 @@ -32,7 +32,7 @@

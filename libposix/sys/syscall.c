@@ -34,12 +34,12 @@
 /****************************************************/
 
 PVOID 
-env_win(char *const envp[])
+env_win(WIN_TASK *Task, char *const envp[])
 {
 	int size = 0;
 	int len;
 	char *entry = NULL;
-	PVOID pvResult = win_malloc(PATH_MAX);
+	PVOID pvResult = proc_malloc(Task, PATH_MAX);
 	char *p;
 
 	/* Keep Windows "Path" variable on top (login_passwd.exe).
@@ -55,11 +55,11 @@ env_win(char *const envp[])
 		}
 		size = p - (char *)pvResult;
 		len = strlen(entry) + 2;	/* assume being last entry */
-		if (win_realloc(size + len, pvResult, &pvResult)){
+		if (proc_realloc(Task, size + len, pvResult, &pvResult)){
 			p = pvResult + size;
 			p = win_stpcpy(p, entry) + 1;
 		}else{
-			WIN_ERR("+ warning: Environment too large\n");
+			WIN_ERR("+ warning: Environment too large\a\n");
 			break;
 		}
 	}
@@ -70,28 +70,21 @@ argv_win(WIN_TASK *Task, const char *command, char *const argv[])
 {
 	int size = 0;
 	int len;
-	int maxbuf = MAX_ARGBUF - (MAX_ARGBUF % __Globals->PageSize);
-	LPSTR pszResult = win_malloc(PATH_MAX);
+	LPSTR pszResult = proc_malloc(Task, PATH_MAX);
 	char *arg = *argv++;		/* skip first argument (unresolved command) */
 	char *p;
 
+	/* Test: find /mnt/d/openbsd-master -name Makefile | xargs grep chown
+	 */
 	p = win_stpcpy(pszResult, command);
 	while (arg = *argv++){
 		size = p - pszResult;
 		len = strlen(arg) + 3;
-		/* maximum for CreateProcess(), 
-		 * rounded to nearest block (xargs.exe)
-		 * find /mnt/d/openbsd-master -name Makefile | xargs grep chown
-		 */
-		if ((size + len) > 0x3000){
-			WIN_ERR("+ warning: %s: Too many arguments\n", command);
-			break;
-		}
-		if (win_realloc(size + len, pszResult, (PVOID *)&pszResult)){
+		if (proc_realloc(Task, size + len, pszResult, (PVOID *)&pszResult)){
 			p = pszResult + size;
 			p = stpquot(p, arg);
 		}else{
-			WIN_ERR("+ warning: %s[0x%x]: Too many arguments\n", command, size + len);
+			WIN_ERR("+ warning: %s [0x%x]: Too many arguments\a\n", command, size + len);
 			break;
 		}
 	}
@@ -595,7 +588,7 @@ sys_execve(call_t call, const char *path, char *const argv[], char *const envp[]
 		result -= errno_posix(GetLastError());
 	}else if (!shebang_win(pwTask, &vNode, &wPath, path, szCommand)){
 		result -= errno_posix(GetLastError());
-	}else if (!proc_execve(pwTask, argv_win(pwTask, szCommand, argv), env_win(envp))){
+	}else if (!proc_execve(pwTask, argv_win(pwTask, szCommand, argv), env_win(pwTask, envp))){
 		result -= errno_posix(GetLastError());
 	}else{
 		proc_exit(0);

@@ -47,12 +47,11 @@ install-local:
 	/bin/cp -vu ksh ${BINDIR}/sh
 
 install: ${DESTDIR}
-	@mkdir -p ${DESTDIR}/bin
 	${INSTALL} ksh ${DESTDIR}/bin/
 	ln -f ${DESTDIR}/bin/ksh ${DESTDIR}/bin/sh
-	@mkdir -p ${DESTDIR}/usr/share/man/man1
+	@${MKDIR} -p ${DESTDIR}/usr/share/man/man1
 	${INSTALL} sh.1 ksh.1 ${DESTDIR}/usr/share/man/man1/
 
 clean:
-	rm -f *.o *.exe
+	/bin/rm -f *.o *.exe
 

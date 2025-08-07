@@ -28,11 +28,28 @@
  *
  */
 
+#include <stdlib.h>
+
+#define NTAPI __attribute__((stdcall))
+#define DLL_PROCESS_ATTACH    1
+
 extern unsigned char __tls_start__;
+extern unsigned char __tls_end__;
 
-/* wintls.c */
+typedef void VOID, *PVOID, *LPVOID;
+typedef unsigned long DWORD,*PDWORD,*LPDWORD;
+typedef VOID (NTAPI *PIMAGE_TLS_CALLBACK)(PVOID,DWORD,PVOID);
 
-extern unsigned int __tls_index__;
+static VOID NTAPI TlsMainCRTStartup(LPVOID hinstDLL, DWORD fdwReason, LPVOID lpvReserved);
+
+typedef struct _IMAGE_TLS_DIRECTORY {
+        LPVOID StartAddressOfRawData;
+        LPVOID EndAddressOfRawData;
+        LPVOID AddressOfIndex;
+        LPVOID AddressOfCallBacks;
+        LPVOID SizeOfZeroFill;
+        LPVOID Characteristics;
+} IMAGE_TLS_DIRECTORY,*PIMAGE_TLS_DIRECTORY;
 
 typedef unsigned int word __attribute__((mode(word)));
 typedef unsigned int pointer __attribute__((mode(pointer)));
@@ -50,8 +67,29 @@ struct __emutls_object
 
 unsigned char *__tls_get(int index);
 
-/****************************************************/
+DWORD __tls_index__ = -1;
+PIMAGE_TLS_CALLBACK __tls_init__[2] = {&TlsMainCRTStartup, NULL};
 
+const IMAGE_TLS_DIRECTORY _tls_used = {
+	&__tls_start__,	/* start of tls data */
+	&__tls_end__,	/* end of tls data */
+	&__tls_index__,	/* offset into thread-local storage array */
+	&__tls_init__,	/* pointer to call back array */
+	0,			/* size of tls zero fill */
+	0			/* characteristics */
+};
+
+void __tls_attach(const IMAGE_TLS_DIRECTORY *Image);
+
+/************************************************************/
+
+VOID NTAPI 
+TlsMainCRTStartup(LPVOID lpvDLL, DWORD fdwReason, LPVOID lpvReserved)
+{
+	if (fdwReason == DLL_PROCESS_ATTACH){
+		__tls_attach(&_tls_used);
+	}
+}
 void *
 __emutls_get_address(struct __emutls_object *obj)
 {

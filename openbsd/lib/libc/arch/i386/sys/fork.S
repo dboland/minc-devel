@@ -7,5 +7,6 @@ ENTRY(fork)
 	pop %ecx
 	mov $SYS_fork,%eax
 	call ___kernel
+	SYSCALL_ERROR
 	push %ecx
 	ret

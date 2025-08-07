@@ -7,5 +7,6 @@ ENTRY(vfork)
 	pop %ecx
 	mov $SYS_vfork,%eax
 	call ___kernel
+	SYSCALL_ERROR
 	push %ecx
 	ret

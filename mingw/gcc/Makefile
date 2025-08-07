@@ -29,7 +29,7 @@ ${MINGW}${GCCDIR}:
 # we need alloca(), which belongs in libgcc.a
 # btw: there is a chkstk() in ntdll.dll
 
-libgcc.a: wintls.o emutls.o
+libgcc.a: emutls.o
 	ar xv ${MINGW}${GCCDIR}/libgcc.a ${GCCOBJ}
 	ar cru $@ ${GCCOBJ} $^
 
@@ -41,16 +41,16 @@ libgcc.a: wintls.o emutls.o
 crt0_tls.o: crt0.o win_tls.o
 	ld -r -o $@ crt0.o win_tls.o
 
-#${GPREFIX}${GCCDIR}/include:
+#${XPREFIX}${GCCDIR}/include:
 #	@/bin/mkdir -p $@
 #	/bin/cp -ru ${MINGW}${GCCDIR}/include/c++ $@/
 #	/bin/cp -ru ${MINGW}${GCCDIR}/include/ssp $@/
 
-#${GPREFIX}${GCCDIR}: ${MINGW}${GCCDIR}
+#${XPREFIX}${GCCDIR}: ${MINGW}${GCCDIR}
 #	@/bin/mkdir -p $@
-#	/bin/cp -vu ${MINGW}${GCCDIR}/libgcc.a ${GPREFIX}${GCCDIR}/
-#	/bin/cp -vu ${MINGW}${GCCDIR}/libssp.a ${GPREFIX}${GCCDIR}/
-#	/bin/cp -vu ${MINGW}${GCCDIR}/libstdc++.a ${GPREFIX}${GCCDIR}/
+#	/bin/cp -vu ${MINGW}${GCCDIR}/libgcc.a ${XPREFIX}${GCCDIR}/
+#	/bin/cp -vu ${MINGW}${GCCDIR}/libssp.a ${XPREFIX}${GCCDIR}/
+#	/bin/cp -vu ${MINGW}${GCCDIR}/libstdc++.a ${XPREFIX}${GCCDIR}/
 
 install-local:
 	@/bin/mkdir -p ${XPREFIX}${GCCDIR}

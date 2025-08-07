@@ -15,7 +15,7 @@ ${SHARESRC}:
 # BSD patch needs /tmp
 
 ${SHAREDIR}/mk:
-	@mkdir -p $@
+	@${MKDIR} -p $@
 	cp -R ${SHARESRC}/mk ${SHAREDIR}/
 	TMPDIR=/tmp patch --posix --silent -p 1 -d ${SHAREDIR} <../share.patch
 

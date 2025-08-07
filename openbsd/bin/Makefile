@@ -7,7 +7,7 @@ OBJECTS= ${PROGS} cat ln
 CFLAGS+= -DNOPIE
 BINSRC= ${SRCDIR}/bin
 
-all: ${BINSRC} ${PROGS}
+all: ${BINSRC} ${OBJECTS}
 	@${MAKE} -C ksh
 
 ${BINSRC}:
@@ -18,6 +18,7 @@ ${BINSRC}:
 	@exit 1
 
 ${BINDIR}: ${PROGS}
+	@/bin/mkdir -p ${BINDIR}
 	/bin/cp -vu ${PROGS} ${BINDIR}/
 
 chmod: ${BINSRC}/chmod/chmod.c
@@ -60,7 +61,7 @@ cp: ${BINSRC}/cp/utils.c ${BINSRC}/cp/cp.c
 install-local: ${BINDIR}
 
 install: ${DESTDIR} ${OBJECTS}
-	@mkdir -p ${DESTDIR}/bin
+	@${MKDIR} -p ${DESTDIR}/bin
 	${INSTALL} ${OBJECTS} ${DESTDIR}/bin/
 	@${MAKE} -C ksh install
 

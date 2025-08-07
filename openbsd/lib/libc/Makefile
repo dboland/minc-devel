@@ -17,7 +17,7 @@ NLS=    C.msg Pig.msg da.ISO8859-1.msg da.UTF-8.msg de.ISO8859-1.msg \
         nl.ISO8859-1.msg nl.UTF-8.msg no.ISO8859-1.msg no.UTF-8.msg \
         ru.KOI8-R.msg ru.UTF-8.msg sv.ISO8859-1.msg sv.UTF-8.msg
 
-all: include lib
+all: include objects lib
 
 %.d: %
 	@CFLAGS="${CFLAGS}" ${MAKE} -C $< XGCC="${XGCC}" ROOTDIR="${ROOTDIR}/.." \
@@ -31,10 +31,10 @@ libc.a:
 	@ar cru $@ ${OBJECTS} ${SHOBJECTS}
 
 version.o: version.rc
-	${XWINDRES} -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@
+	windres -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@
 
-${LIBC}: objects ${OBJECTS} version.o
-	${LD} -shared ${LDFLAGS} -e _DllMainCRTStartup@12 --out-implib=${IMPLIB} \
+${LIBC}: ${OBJECTS} version.o
+	${LD} -s -shared ${LDFLAGS} -e _DllMainCRTStartup@12 --out-implib=${IMPLIB} \
 	-o $@ --image-base=${IMGBASE_LIBC} ${XLIBDIR}/dllcrt2.o ${OBJECTS} ${SHOBJECTS} version.o \
 	-L${XLIBDIR} -L${GCCDIR} -lmingw32 -lmsvcrt -lgcc
 
@@ -71,7 +71,7 @@ install-cross:
 	/bin/cp -vu ${IMPLIB} ${_LIBDIR}/libc.so
 
 install: ${DESTDIR}
-	@mkdir -p ${DESTDIR}${ULIBDIR}
+	@${MKDIR} -p ${DESTDIR}${ULIBDIR}
 	${INSTALL} ${LIBC} libc.a ${DESTDIR}${ULIBDIR}/
 
 clean: objects-clean lib-clean

@@ -34,7 +34,7 @@ libposix.o: libposix.c
 	${XGCC} -c ${CFLAGS} -I${SRCDIR}/sys -DTTYDEFCHARS -DKTRACE -DSYSVSEM $<
 
 version.o: version.rc
-	${XWINDRES} -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@
+	windres -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@
 
 arch/%.o: arch/${PROCESSOR_ARCHITECTURE}/%.S
 	${XGCC} -c ${CFLAGS} -o $@ $<

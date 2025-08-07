@@ -23,7 +23,7 @@ pwd_mkdb: ${USBINSRC}/pwd_mkdb/pwd_mkdb.c
 	${XGCC} -s ${CFLAGS} -o $@ $< -lutil
 
 install: ${DESTDIR}
-	@mkdir -p ${DESTDIR}${USBINDIR}
+	@${MKDIR} -p ${DESTDIR}${USBINDIR}
 	${INSTALL} ${OBJECTS} ${DESTDIR}${USBINDIR}/
 
 clean:

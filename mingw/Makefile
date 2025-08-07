@@ -31,9 +31,6 @@ ${XBINDIR}/%.exe: ${MINGW}/bin/%.exe
 ${XBINDIR}:
 	@/bin/mkdir -p $@
 
-${XLIBDIR}:
-	@/bin/mkdir -p $@
-
 ${XLIBXDIR}:
 	@/bin/mkdir -p $@
 	/bin/cp -ru ${MINGW}/libexec/gcc $@/
@@ -42,15 +39,14 @@ GCCBIN+= ${XBINDIR}/gcc.exe ${XBINDIR}/cpp.exe
 GCCBIN+= ${XBINDIR}/g++.exe ${XBINDIR}/c++.exe
 #GCCBIN+=  ${XBINDIR}/gdb.exe
 
-GCCLIB+= ${BINDIR}/libgmp-10.dll ${BINDIR}/libmpc-3.dll ${BINDIR}/libmpfr-4.dll \
+#GCCLIB+= ${BINDIR}/libgmp-10.dll ${BINDIR}/libmpc-3.dll ${BINDIR}/libmpfr-4.dll \
 	${BINDIR}/zlib1.dll ${BINDIR}/libgcc_s_dw2-1.dll
-GCCLIB+= ${BINDIR}/libintl-8.dll ${BINDIR}/libiconv-2.dll ${BINDIR}/libstdc++-6.dll
+#GCCLIB+= ${BINDIR}/libintl-8.dll ${BINDIR}/libiconv-2.dll ${BINDIR}/libstdc++-6.dll
 
-BINUTILS= ${XBINDIR}/windres.exe
-BINUTILS+= ${BINDIR}/ld.exe ${BINDIR}/ar.exe ${BINDIR}/as.exe ${BINDIR}/nm.exe \
+#BINUTILS= ${BINDIR}/ld.exe ${BINDIR}/ar.exe ${BINDIR}/as.exe ${BINDIR}/nm.exe \
 	${BINDIR}/dlltool.exe
-#BINUTILS+= ${BINDIR}/objdump.exe ${BINDIR}/ranlib.exe ${BINDIR}/size.exe \
-	${BINDIR}/strip.exe ${BINDIR}/gprof.exe \
+#BINUTILS+= ${BINDIR}/windres.exe ${BINDIR}/objdump.exe ${BINDIR}/ranlib.exe \
+	${BINDIR}/size.exe ${BINDIR}/strip.exe ${BINDIR}/gprof.exe \
 	${BINDIR}/addr2line.exe ${BINDIR}/dllwrap.exe ${BINDIR}/elfedit.exe \
 	${BINDIR}/objcopy.exe ${BINDIR}/strings.exe ${BINDIR}/windmc.exe \
 	${BINDIR}/c++filt.exe
@@ -58,14 +54,15 @@ BINUTILS+= ${BINDIR}/ld.exe ${BINDIR}/ar.exe ${BINDIR}/as.exe ${BINDIR}/nm.exe \
 #MSGBIN= ${BINDIR}/msgfmt.exe ${BINDIR}/libgettextsrc-0-18-3.dll \
 	${BINDIR}/libgettextlib-0-18-3.dll
 
-install-gcc: ${XBINDIR} ${GCCBIN} ${BINDIR} ${GCCLIB}
-install-ld: ${XBINDIR} ${BINUTILS}
+install-gcc: ${XBINDIR} ${GCCBIN}
+install-binutils: ${XBINDIR} ${BINUTILS}
 install-tools: ${MSGBIN}
 
 # tip: create dummy /libexec/ld.so for configure scripts to detect shared libs
 # GetIpStatisticsEx() is missing in vanilla MinGW (libiphlpapi.dll.a)
 
-install-local: ${MINGW} install-gcc install-ld ${XLIBXDIR} ${XLIBDIR}
+install-local: ${MINGW} install-gcc ${XLIBXDIR}
+	@/bin/mkdir -p ${XLIBDIR}
 	/bin/cp -vu ${LIBS} ${XLIBDIR}/
 	/bin/cp -vu libiphlpapi.dll.a ${MINGW}/lib/
 	@${MAKE} -C gcc install-local
@@ -76,6 +73,7 @@ install-cross:
 
 install: ${INSTALL}
 	@sh ${ROOTDIR}/mkroot.sh ${DESTDIR}
+	${MKDIR} -p ${DESTDIR}${ULIBDIR}
 	${INSTALL} libmsvcrt.a ${DESTDIR}${ULIBDIR}/
 	@${MAKE} -C gcc install
 

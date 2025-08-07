@@ -2,15 +2,16 @@ ROOTDIR= ../..
 
 include ${ROOTDIR}/Makefile.inc
 
-PROGS= arch uname touch id
-OBJECTS= ${PROGS} grep du env
+PROGS= touch id patch
+XPROGS= arch uname
+OBJECTS= ${PROGS} ${XPROGS} grep du env find xargs gzip
 CFLAGS+= -I${SRCDIR}/sys
 UBINSRC= ${SRCDIR}/usr.bin
 UBINDIR= /usr/bin
 
 # GNU make can't cd into make if make/make.exe exists?!?!
 
-all: ${UBINSRC} ${PROGS} install.exe patch.exe gzip.exe
+all: ${UBINSRC} ${OBJECTS} install.exe
 	@${MAKE} -C make UBINSRC="${UBINSRC}"
 
 ${UBINSRC}:
@@ -20,11 +21,13 @@ ${UBINSRC}:
 	@echo " ---------------------------------------------------"
 	@exit 1
 
-${BINDIR}: ${PROGS} install.exe patch.exe gzip.exe
+${BINDIR}: ${PROGS} ${XPROGS} install.exe
 	@/bin/mkdir -p ${BINDIR}
-	/bin/cp -vu $^ ${BINDIR}/
+	/bin/cp -vu ${PROGS} install ${BINDIR}/
 	/bin/cp -vu manifest ${BINDIR}/install.exe.manifest
 	/bin/cp -vu manifest ${BINDIR}/patch.exe.manifest
+	/bin/cp -vu ${XPROGS} install ${XBINDIR}/
+	/bin/cp -vu manifest ${XBINDIR}/install.exe.manifest
 
 uname: ${UBINSRC}/uname/uname.c
 	${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $<
@@ -46,11 +49,11 @@ id: ${UBINSRC}/id/id.c
 install.exe: xinstall.c
 	${XGCC} -s -static ${CFLAGS} -DNOPIE -I${UBINSRC}/xinstall -o $@ $<
 
-patch.exe: ${UBINSRC}/patch/patch.c ${UBINSRC}/patch/pch.c ${UBINSRC}/patch/inp.c \
+patch: ${UBINSRC}/patch/patch.c ${UBINSRC}/patch/pch.c ${UBINSRC}/patch/inp.c \
 	${UBINSRC}/patch/util.c ${UBINSRC}/patch/backupfile.c ${UBINSRC}/patch/mkpath.c
 	${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $^
 
-gzip.exe: ${UBINSRC}/compress/main.c ${UBINSRC}/compress/zopen.c \
+gzip: ${UBINSRC}/compress/main.c ${UBINSRC}/compress/zopen.c \
 	${UBINSRC}/compress/gzopen.c ${UBINSRC}/compress/nullopen.c
 	${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $^ -lz
 
@@ -58,19 +61,27 @@ grep: grep.c ${UBINSRC}/grep/binary.c ${UBINSRC}/grep/file.c ${UBINSRC}/grep/mmf
 	${UBINSRC}/grep/queue.c ${UBINSRC}/grep/util.c
 	${XGCC} -s ${CFLAGS} -I${UBINSRC}/grep -o $@ $^ -lz
 
-du: ${UBINSRC}/du/du.c
-	${XGCC} -s ${CFLAGS} -o $@ $< -lutil
-
 env: env.c
 	${XGCC} -s ${CFLAGS} -o $@ $<
 
+du: ${UBINSRC}/du/du.c
+	${XGCC} -s ${CFLAGS} -o $@ $< -lutil
+
+find: ${UBINSRC}/find/find.c ${UBINSRC}/find/function.c ${UBINSRC}/find/ls.c \
+	${UBINSRC}/find/main.c ${UBINSRC}/find/misc.c ${UBINSRC}/find/operator.c \
+	${UBINSRC}/find/option.c
+	${XGCC} -s ${CFLAGS} -o $@ $^
+
+xargs: ${UBINSRC}/xargs/xargs.c ${UBINSRC}/xargs/strnsubst.c
+	${XGCC} -s ${CFLAGS} -o $@ $^
+
 install-local: ${BINDIR}
 
-install: ${DESTDIR} ${OBJECTS}
-	@mkdir -p ${DESTDIR}${UBINDIR}
-	${INSTALL} ${OBJECTS} ${DESTDIR}${UBINDIR}/
-	${INSTALL} manifest ${DESTDIR}${UBINDIR}/install.manifest
-	${INSTALL} manifest ${DESTDIR}${UBINDIR}/patch.manifest
+install: ${DESTDIR} ${OBJECTS} install.exe
+	@${MKDIR} -p ${DESTDIR}${UBINDIR}
+	${INSTALL} ${OBJECTS} install ${DESTDIR}${UBINDIR}/
+	${INSTALL} -m 00644 manifest ${DESTDIR}${UBINDIR}/install.manifest
+	${INSTALL} -m 00644 manifest ${DESTDIR}${UBINDIR}/patch.manifest
 	@${MAKE} -C make install UBINDIR="${UBINDIR}"
 
 clean:

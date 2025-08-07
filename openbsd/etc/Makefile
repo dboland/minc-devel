@@ -16,7 +16,7 @@ ${ETCSRC}:
 	@exit 1
 
 ${ETCDIR}: ${FILES}
-	@mkdir -p ${ETCDIR}
+	@${MKDIR} -p ${ETCDIR}
 	${INSTALL} ${FILES} ttys MAKEDEV ${ETCDIR}/
 
 %: ${ETCSRC}/%

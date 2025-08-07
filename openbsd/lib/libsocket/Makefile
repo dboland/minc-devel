@@ -17,7 +17,7 @@ libsocket.a:
 	@ar cru $@ $(shell ls */*.o)
 
 version.o: version.rc
-	${XWINDRES} -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@
+	windres -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@
 
 ${LIBSOCKET}: crt1.o version.o
 	${LD} -s -shared ${LDFLAGS} -e _DllMainCRTStartup@12 --out-implib=${IMPLIB} \

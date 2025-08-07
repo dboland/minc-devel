@@ -249,12 +249,3 @@ errno_win(VOID)
 {
 	return(GetLastError());
 }
-
-/****************************************************/
-
-int *
-__errno(void)
-{
-	return(&__Tasks[CURRENT].Error);
-}
-

@@ -203,6 +203,9 @@ BOOL proc_poll(WIN_TASK *Task);
 DECLSPEC_NORETURN VOID proc_exit(DWORD ExitCode);
 BOOL proc_execve(WIN_TASK *Task, LPSTR Command, PVOID Environ);
 BOOL proc_orphanize(WIN_TASK *Task);
+PVOID proc_malloc(WIN_TASK *Task, ULONG Size);
+BOOL proc_realloc(WIN_TASK *Task, ULONG Size, PVOID Buffer, PVOID *Result);
+VOID proc_free(WIN_TASK *Task, PVOID Buffer);
 
 /* drive.c */
 

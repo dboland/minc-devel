@@ -120,3 +120,46 @@ proc_exit(DWORD ExitCode)
 		ExitProcess(ExitCode);
 	}
 }
+PVOID 
+proc_malloc(WIN_TASK *Task, ULONG Size)
+{
+	ULONG ulSize = 0;
+	PVOID pvResult = NULL;
+
+	Size += sizeof(ULONG);
+	while (ulSize < Size){
+		ulSize += __Globals->PageSize;
+	}
+//msvc_printf("proc_malloc(%d): enter(%d)\n", Task->Heap, ulSize);
+	pvResult = HeapAlloc(Task->Heap, HEAP_ZERO_MEMORY, ulSize);
+//msvc_printf("proc_malloc(%d): leave\n", Task->Heap);
+	*(ULONG *)pvResult = ulSize;
+	return(pvResult + sizeof(ULONG));
+}
+BOOL 
+proc_realloc(WIN_TASK *Task, ULONG Size, PVOID Buffer, PVOID *Result)
+{
+	BOOL bResult = TRUE;
+	PVOID pvResult = Buffer - sizeof(ULONG);
+	ULONG ulSize = *(ULONG *)pvResult;
+
+	Size += sizeof(ULONG);
+	if (Size > ulSize){
+		while (ulSize < Size){
+			ulSize += __Globals->PageSize;
+		}
+		if (pvResult = HeapReAlloc(Task->Heap, 0, pvResult, ulSize)){
+			*(ULONG *)pvResult = ulSize;
+			*Result = pvResult + sizeof(ULONG);
+		}else{
+//			WIN_ERR("HeapReAlloc(0x%x): %s\n", ulSize, win_strerror(GetLastError()));
+			bResult = FALSE;
+		}
+	}
+	return(bResult);
+}
+VOID 
+proc_free(WIN_TASK *Task, PVOID Buffer)
+{
+	HeapFree(Task->Heap, 0, Buffer - sizeof(ULONG));
+}

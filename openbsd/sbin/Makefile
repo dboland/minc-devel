@@ -8,7 +8,7 @@ TRACEDIR= ${ROOTDIR}/libtrace
 SBINSRC= ${SRCDIR}/sbin
 SBINDIR= /sbin
 
-all: ${SBINSRC} ${PROGS} bsd.exe
+all: ${SBINSRC} ${OBJECTS} bsd.exe
 
 ${SBINSRC}:
 	@echo " ---------------------------------------------------"
@@ -31,7 +31,7 @@ libwtrace.o: libwtrace.c
 	${CC} -c ${CFLAGS} -I${ROOTDIR}/include -o $@ $<
 
 version.o: bsd.rc
-	${XWINDRES} -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@
+	windres -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@
 
 wrc: wrc.exe
 
@@ -56,8 +56,8 @@ mount_refs: ${SBINSRC}/mount_ntfs/mount_ntfs.c ${SBINSRC}/mount/getmntopts.c
 
 install-local: ${BINDIR}
 
-install: ${DESTDIR}
-	@mkdir -p ${DESTDIR}${SBINDIR}
+install: ${DESTDIR} ${OBJECTS}
+	@${MKDIR} -p ${DESTDIR}${SBINDIR}
 	${INSTALL} ${OBJECTS} ${DESTDIR}${SBINDIR}/
 	${INSTALL} -m 02555 -o 0 -g 0 bsd.exe ${DESTDIR}${SBINDIR}/
 	${INSTALL} -m 00754 -o 0 -g 0 setup.sh ${DESTDIR}${SBINDIR}/
@@ -69,4 +69,3 @@ release: release-clean all
 
 clean:
 	/bin/rm -f *.exe *.o
-

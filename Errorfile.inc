@@ -20,7 +20,7 @@ ${ROOTDIR}/config.inc:
 
 ${INSTALL}:
 	@echo " ---------------------------------------------------"
-	@echo "| The system must be installed by the system itself."
-	@echo "| Run the 'mount' script to switch to the OpenBSD system."
+	@echo "| BSD install program ($@) not found."
+	@echo "| Your build is incomplete."
 	@echo " ---------------------------------------------------"
 	@exit 1

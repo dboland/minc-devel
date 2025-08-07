@@ -7,7 +7,7 @@ ROOTDIR=$(dirname $0)
 # Hello Earnie Boyd #
 
 MINGWROOT=$(cmd //c echo ${MINGW})
-MINCROOT=$(cmd //c echo ${PREFIX})
+MINCROOT=$(cmd //c echo ${PREFIX}/cross)
 FSTAB=/etc/fstab
 
 if ! [ -d ${MINGWROOT} ]; then
@@ -17,7 +17,8 @@ elif [ "$1" == "mingw" ]; then
 elif ! [ -d ${MINCROOT} ]; then
 	echo "${MINCROOT}: No such directory"
 elif [ "$1" == "minc" ]; then
-	echo "${MINCROOT} /mingw" >$FSTAB
+	echo "${MINGWROOT} /mingw" >$FSTAB
+	echo "${MINCROOT} /usr/local" >>$FSTAB
 else
 	echo "Usage $0 COMPILER"
 	echo
