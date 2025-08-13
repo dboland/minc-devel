@@ -1,8 +1,8 @@
-if ! cd "$PKGROOT/eMail-release"; then
+if ! cd "$PKGROOT/eMail"; then
         exit 1
 fi
 
-echo -n "Inpakken email32.tgz... "
+echo -n "Compressing email32.tgz... "
 tar -zcf $DISTROOT/email32.tgz *
-echo gereed.
+echo done.
 

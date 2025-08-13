@@ -1,4 +1,4 @@
-if ! cd "$PKGROOT/../minc-comp"; then
+if ! cd "$PKGROOT/minc-comp"; then
         exit 1
 fi
 
@@ -10,9 +10,10 @@ cp -p /usr/lib/libc.a ./usr/lib/
 cp -p /usr/lib/libsocket.a ./usr/lib/
 
 # don't overwrite base libs
-rm -f ./usr/lib/libcrypto.so.27.0
-rm -f ./usr/lib/libssl.so.24.1
-rm -f ./usr/lib/libutil.so.12.1
+rm -f ./usr/lib/libcrypto.so.*
+rm -f ./usr/lib/libssl.so.*
+rm -f ./usr/lib/libutil.so.*
+rm -f ./usr/lib/libedit.so.*
 
 echo -n "Compressing comp61.tgz... "
 tar -zcf $DISTROOT/comp61.tgz *

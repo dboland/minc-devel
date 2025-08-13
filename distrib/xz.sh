@@ -1,8 +1,8 @@
-if ! cd "$PKGROOT/xz-release"; then
+if ! cd "$PKGROOT/xz"; then
         exit 1
 fi
 
-echo -n "Inpakken xz52.tgz... "
+echo -n "Compressing xz52.tgz... "
 tar -zcf $DISTROOT/xz52.tgz usr/bin usr/share/man
-echo gereed.
+echo done.
 

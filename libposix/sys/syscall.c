@@ -69,7 +69,7 @@ LPSTR
 argv_win(WIN_TASK *Task, const char *command, char *const argv[])
 {
 	int size = 0;
-	int len;
+	int len = 0;
 	LPSTR pszResult = proc_malloc(Task, PATH_MAX);
 	char *arg = *argv++;		/* skip first argument (unresolved command) */
 	char *p;
@@ -79,7 +79,7 @@ argv_win(WIN_TASK *Task, const char *command, char *const argv[])
 	p = win_stpcpy(pszResult, command);
 	while (arg = *argv++){
 		size = p - pszResult;
-		len = strlen(arg) + 3;
+		len = strlen(arg) * 2;		/* assume every char is quoted */
 		if (proc_realloc(Task, size + len, pszResult, (PVOID *)&pszResult)){
 			p = pszResult + size;
 			p = stpquot(p, arg);
@@ -89,6 +89,7 @@ argv_win(WIN_TASK *Task, const char *command, char *const argv[])
 		}
 	}
 	if (Task->TracePoints & KTRFAC_NAMEI){
+		size = p - pszResult;
 		ktrace_NAMEI(Task, pszResult, size);
 	}
 	return(pszResult);

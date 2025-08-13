@@ -1,3 +1,9 @@
+ROOTDIR= ../..
+
+include ${ROOTDIR}/Makefile.inc
+
+LIBS= ${XLIBDIR}/libcrypto.so ${XLIBDIR}/libssl.so
+
 all:
 	@${MAKE} -C libpthread install-local
 	@${MAKE} -C libz all install-local

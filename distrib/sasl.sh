@@ -1,11 +1,10 @@
-if ! cd "$PKGROOT/cyrus-sasl-release"; then
+if ! cd "$PKGROOT/cyrus-sasl"; then
         exit 1
 fi
 
-chmod +x ./usr/lib/libsasl2.so.3.0
-ls ./usr/lib/sasl2/*.so.* | xargs chmod +x
-ln -s libsasl2.so.3.0 ./usr/lib/libsasl2.so 2>/dev/null
+find ./usr/lib/sasl2 -name '*.a' | xargs rm -f
+ln -sf libsasl2.so.3.0 ./usr/lib/libsasl2.so
 
-echo -n "Inpakken sasl2128.tgz... "
+echo -n "Compressing sasl2128.tgz... "
 tar -zcf $DISTROOT/sasl2128.tgz *
-echo gereed.
+echo done.

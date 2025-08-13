@@ -17,6 +17,6 @@ ${SHARESRC}:
 ${SHAREDIR}/mk:
 	@${MKDIR} -p $@
 	cp -R ${SHARESRC}/mk ${SHAREDIR}/
-	TMPDIR=/tmp patch --posix --silent -p 1 -d ${SHAREDIR} <../share.patch
+	TMPDIR=/tmp ${PATCH} --posix --silent -p 1 -d ${SHAREDIR} <../share.patch
 
 install: ${SHARESRC} ${SHAREDIR}/mk

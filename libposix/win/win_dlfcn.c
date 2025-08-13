@@ -39,8 +39,8 @@ win_dlopen(LPCWSTR FileName)
 
 	if (!FileName){
 		hResult = GetModuleHandle(NULL);
-	}else if (!(hResult = LoadLibraryW(FileName))){
-		WIN_ERR("LoadLibrary(%ls): %s\n", FileName, win_strerror(GetLastError()));
+	}else{
+		hResult = LoadLibraryW(FileName);
 	}
 	return(hResult);
 }

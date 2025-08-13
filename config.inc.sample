@@ -13,15 +13,21 @@ BINDIR=${PREFIX}/bin
 LIBDIR=${PREFIX}/lib
 INCDIR=${PREFIX}/include
 LIBXDIR=${PREFIX}/libexec
-GCCLIB=${BINDIR}/libisl-15.dll
-GCCLIB+=${BINDIR}/libmingwex-0.dll
+GCCLIB=
+MKDIR=${BINDIR}/mkdir
+INSTALL=${BINDIR}/install
+PATCH=${BINDIR}/patch
+ID=${BINDIR}/id
 
-# locations for GNU cross-compiler
+# locations for Poor Man's Cross Compiler
 
-_PREFIX=/usr/i686-openbsd-pe
-_LIBDIR=${_PREFIX}/lib
-_INCDIR=${_PREFIX}/include
+XPREFIX=${PREFIX}/cross
+XBINDIR=${XPREFIX}/bin
+XLIBDIR=${XPREFIX}/lib
+XINCDIR=${XPREFIX}/include
+XLIBXDIR=${XPREFIX}/libexec
+XGCC=${XBINDIR}/gcc
 
-# native location of packages (release.sh)
+# native (OpenBSD) location of packages (release.sh)
 
-PKGROOT=/mnt/d/source
+PKGROOT=/mnt/d/release

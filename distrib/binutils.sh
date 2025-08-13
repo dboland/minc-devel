@@ -1,4 +1,4 @@
-if ! cd "$PKGROOT/binutils-release"; then
+if ! cd "$PKGROOT/binutils"; then
         exit 1
 fi
 

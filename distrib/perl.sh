@@ -1,4 +1,4 @@
-if ! cd "$PKGROOT/perl-release"; then
+if ! cd "$PKGROOT/perl"; then
         exit 1
 fi
 

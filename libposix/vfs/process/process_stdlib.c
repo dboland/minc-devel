@@ -104,6 +104,7 @@ proc_start(WIN_SIGPROC SignalProc)
 		win_getegid(&__Process->GroupSid);
 		ProcInitChannels(__Process->Node);
 		ProcInitLimits(__Process->Limit);
+//		SetErrorMode(SEM_FAILCRITICALERRORS);
 	}
 	if (proc_setugid(__Process)){
 		__Process->IsSetUGid = 1;
@@ -126,13 +127,12 @@ proc_malloc(WIN_TASK *Task, ULONG Size)
 	ULONG ulSize = 0;
 	PVOID pvResult = NULL;
 
+	Task->Heap = GetProcessHeap();
 	Size += sizeof(ULONG);
 	while (ulSize < Size){
 		ulSize += __Globals->PageSize;
 	}
-//msvc_printf("proc_malloc(%d): enter(%d)\n", Task->Heap, ulSize);
 	pvResult = HeapAlloc(Task->Heap, HEAP_ZERO_MEMORY, ulSize);
-//msvc_printf("proc_malloc(%d): leave\n", Task->Heap);
 	*(ULONG *)pvResult = ulSize;
 	return(pvResult + sizeof(ULONG));
 }
@@ -148,7 +148,7 @@ proc_realloc(WIN_TASK *Task, ULONG Size, PVOID Buffer, PVOID *Result)
 		while (ulSize < Size){
 			ulSize += __Globals->PageSize;
 		}
-		if (pvResult = HeapReAlloc(Task->Heap, 0, pvResult, ulSize)){
+		if (pvResult = HeapReAlloc(Task->Heap, HEAP_ZERO_MEMORY, pvResult, ulSize)){
 			*(ULONG *)pvResult = ulSize;
 			*Result = pvResult + sizeof(ULONG);
 		}else{

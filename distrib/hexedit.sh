@@ -1,8 +1,8 @@
-if ! cd "$PKGROOT/hexedit-release"; then
+if ! cd "$PKGROOT/hexedit"; then
         exit 1
 fi
 
-echo -n "Inpakken hexedit12.tgz... "
+echo -n "Compressing hexedit12.tgz... "
 tar -zcf $DISTROOT/hexedit12.tgz *
-echo gereed.
+echo done.
 

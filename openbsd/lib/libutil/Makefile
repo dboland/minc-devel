@@ -16,23 +16,25 @@ OBJECTS+= getmaxpartitions.o
 OBJECTS+=passwd.o check_expire.o login_fbtab.o imsg.o imsg-buffer.o login.o
 
 HEADERS= ${XINCDIR}/util.h ${XINCDIR}/imsg.h ${XINCDIR}/ohash.h
-CFLAGS+= -I${SRCDIR}/sys
+CFLAGS+= -DNOPIE -I${SRCDIR}/sys
+ULIBDIR= /usr/lib
 
 all: ${HEADERS} libutil.a
 
 %.o: ${SRCDIR}/lib/libutil/%.c
-	@/bin/echo -n "$@ "
+	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -o $@ $<
 
 ${XINCDIR}/%.h: ${SRCDIR}/lib/libutil/%.h
 	@/bin/cp -vu $< $@
 
 pidfile.o: pidfile.c
-	${XGCC} -c ${CFLAGS} -o $@ $<
+	@echo -n "$@ "
+	@${XGCC} -c ${CFLAGS} -o $@ $<
 
 libutil.a: ${OBJECTS}
-	@/bin/echo "done."
-	@/bin/echo "Making static library $@"
+	@echo "done."
+	@echo "Making static library $@"
 	@ar cru $@ ${OBJECTS}
 
 clean:
@@ -40,3 +42,6 @@ clean:
 
 install-local:
 	/bin/cp -vu libutil.a ${XLIBDIR}/
+
+install:
+	/bin/cp -vu libutil.a ${DESTDIR}${ULIBDIR}/

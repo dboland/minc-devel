@@ -1,8 +1,8 @@
-if ! cd "$PKGROOT/wget-release"; then
+if ! cd "$PKGROOT/wget"; then
         exit 1
 fi
 
-echo -n "Inpakken wget118.tgz... "
+echo -n "Compressing wget118.tgz... "
 tar -zcf $DISTROOT/wget118.tgz *
-echo gereed.
+echo done.
 

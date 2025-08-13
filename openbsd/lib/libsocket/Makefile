@@ -44,6 +44,7 @@ release-clean:
 # Perl needs libsocket.so
 
 install-local:
+	/bin/cp -vu ${LIBSOCKET} ${XBINDIR}/
 	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libsocket.so
 	/bin/cp -vu libsocket.a ${XLIBDIR}/
 	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/

@@ -27,32 +27,32 @@ if ! [ -d "${PKGROOT}" ]; then
 fi
 
 . $DISTROOT/miniroot.sh
-#. $DISTROOT/test.sh
-#. $DISTROOT/comp.sh
 . $DISTROOT/base.sh
+. $DISTROOT/comp.sh
+#. $DISTROOT/test.sh
 
 #. $DISTROOT/vista.sh
-#. $DISTROOT/vim.sh
-#. $DISTROOT/nano.sh
-#. $DISTROOT/lynx.sh
-#. $DISTROOT/wget.sh
-#. $DISTROOT/curl.sh
-#. $DISTROOT/unzip.sh
-#. $DISTROOT/bzip2.sh
-#. $DISTROOT/email.sh
-#. $DISTROOT/hexedit.sh
+. $DISTROOT/vim.sh
+. $DISTROOT/nano.sh
+. $DISTROOT/lynx.sh
+. $DISTROOT/wget.sh
+. $DISTROOT/curl.sh
+. $DISTROOT/unzip.sh
+. $DISTROOT/bzip2.sh
+. $DISTROOT/email.sh
+. $DISTROOT/hexedit.sh
 . $DISTROOT/xz.sh
-#. $DISTROOT/mutt.sh
-#. $DISTROOT/bitchx.sh
-#. $DISTROOT/git.sh
-#. $DISTROOT/magick.sh
+. $DISTROOT/sasl.sh
+. $DISTROOT/mutt.sh
+. $DISTROOT/bitchx.sh
+. $DISTROOT/git.sh
+. $DISTROOT/magick.sh
 #. $DISTROOT/rsync.sh
 . $DISTROOT/binutils.sh
 . $DISTROOT/gcc.sh
-#. $DISTROOT/gmake.sh
+. $DISTROOT/gmake.sh
 #. $DISTROOT/perl.sh
-#. $DISTROOT/bind.sh
-#. $DISTROOT/sasl.sh
+. $DISTROOT/bind.sh
 
 if ! cd ${DISTROOT}; then
 	exit 1

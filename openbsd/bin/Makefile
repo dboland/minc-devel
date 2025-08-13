@@ -2,9 +2,10 @@ ROOTDIR= ../..
 
 include ${ROOTDIR}/Makefile.inc
 
-PROGS= chmod mv rm mkdir rmdir test chown chgrp ls cp
-OBJECTS= ${PROGS} cat ln
-CFLAGS+= -DNOPIE
+PROGS= ln mkdir chmod
+XPROGS= ${PROGS} mv rm rmdir test chown chgrp ls cp
+OBJECTS= ${XPROGS} cat
+CFLAGS+= -DNOPIE -s -static
 BINSRC= ${SRCDIR}/bin
 
 all: ${BINSRC} ${OBJECTS}
@@ -21,8 +22,12 @@ ${BINDIR}: ${PROGS}
 	@/bin/mkdir -p ${BINDIR}
 	/bin/cp -vu ${PROGS} ${BINDIR}/
 
+${XBINDIR}: ${XPROGS}
+	@/bin/mkdir -p ${XBINDIR}
+	/bin/cp -vu ${XPROGS} ${XBINDIR}/
+
 chmod: ${BINSRC}/chmod/chmod.c
-	${XGCC} -s -static ${CFLAGS} -o $@ $<
+	${XGCC} ${CFLAGS} -o $@ $<
 
 chown: chmod.exe
 	/bin/cp -vu $< $@.exe
@@ -31,34 +36,34 @@ chgrp: chmod.exe
 	/bin/cp -vu $< $@.exe
 
 ln: ${BINSRC}/ln/ln.c
-	${XGCC} -s -static ${CFLAGS} -o $@ $<
+	${XGCC} ${CFLAGS} -o $@ $<
 
 mkdir: ${BINSRC}/mkdir/mkdir.c
-	${XGCC} -s -static ${CFLAGS} -o $@ $<
+	${XGCC} ${CFLAGS} -o $@ $<
 
 mv: ${BINSRC}/mv/mv.c
-	${XGCC} -s -static ${CFLAGS} -o $@ $<
+	${XGCC} ${CFLAGS} -o $@ $<
 
 rm: ${BINSRC}/rm/rm.c
-	${XGCC} -s -static ${CFLAGS} -o $@ $<
+	${XGCC} ${CFLAGS} -o $@ $<
 
 rmdir: ${BINSRC}/rmdir/rmdir.c
-	${XGCC} -s -static ${CFLAGS} -o $@ $<
+	${XGCC} ${CFLAGS} -o $@ $<
 
 test: ${BINSRC}/test/test.c
-	${XGCC} -s -static ${CFLAGS} -o $@ $<
+	${XGCC} ${CFLAGS} -o $@ $<
 
 cat: ${BINSRC}/cat/cat.c
-	${XGCC} -s -static ${CFLAGS} -o $@ $<
+	${XGCC} ${CFLAGS} -o $@ $<
 
 ls: ls-main.c ${BINSRC}/ls/print.c ${BINSRC}/ls/cmp.c ${BINSRC}/ls/util.c \
 	${BINSRC}/ls/ls.c
-	${XGCC} -s -static ${CFLAGS} -o $@ $^ -lutil
+	${XGCC} ${CFLAGS} -o $@ $^ -lutil
 
 cp: ${BINSRC}/cp/utils.c ${BINSRC}/cp/cp.c
-	${XGCC} -s -static ${CFLAGS} -o $@ $^
+	${XGCC} ${CFLAGS} -o $@ $^
 
-install-local: ${BINDIR}
+install-local: ${BINDIR} ${XBINDIR}
 
 install: ${DESTDIR} ${OBJECTS}
 	@${MKDIR} -p ${DESTDIR}/bin

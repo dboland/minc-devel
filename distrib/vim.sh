@@ -1,4 +1,4 @@
-if ! cd "$PKGROOT/vim-release"; then
+if ! cd "$PKGROOT/vim"; then
 	exit 1
 fi
 

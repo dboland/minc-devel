@@ -61,7 +61,7 @@ win_realloc(ULONG Size, PVOID Buffer, PVOID *Result)
 		/* I know this was allocated as LMEM_FIXED, but I would like you 
 		 * to move it anyway. Trust me on this. (Raymond Chen, Stack Overflow, 2013)
 		 */
-		if (hLocal = LocalReAlloc(hLocal, ulSize, LMEM_MOVEABLE)){
+		if (hLocal = LocalReAlloc(hLocal, ulSize, LMEM_MOVEABLE | LMEM_ZEROINIT)){
 			*(ULONG *)hLocal = ulSize;
 			*Result = hLocal + sizeof(ULONG);
 		}else{

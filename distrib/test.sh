@@ -5,6 +5,6 @@ fi
 copy_file /sbin "$SBIN"
 copy_file /etc "$ETC"
 
-echo -n "Inpakken test61.tgz... "
+echo -n "Compressing test61.tgz... "
 tar -zcf $DISTROOT/test61.tgz *
-echo gereed.
+echo done.

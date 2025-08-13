@@ -2,10 +2,10 @@ ROOTDIR= ../..
 
 include ${ROOTDIR}/Makefile.inc
 
-PROGS= touch id patch
-XPROGS= arch uname
-OBJECTS= ${PROGS} ${XPROGS} grep du env find xargs gzip
-CFLAGS+= -I${SRCDIR}/sys
+PROGS= gzip id patch
+XPROGS= arch uname touch
+OBJECTS= ${PROGS} ${XPROGS} grep du env find xargs
+#CFLAGS+= -I${SRCDIR}/sys
 UBINSRC= ${SRCDIR}/usr.bin
 UBINDIR= /usr/bin
 
@@ -21,11 +21,14 @@ ${UBINSRC}:
 	@echo " ---------------------------------------------------"
 	@exit 1
 
-${BINDIR}: ${PROGS} ${XPROGS} install.exe
+${BINDIR}: ${PROGS} install.exe
 	@/bin/mkdir -p ${BINDIR}
 	/bin/cp -vu ${PROGS} install ${BINDIR}/
 	/bin/cp -vu manifest ${BINDIR}/install.exe.manifest
 	/bin/cp -vu manifest ${BINDIR}/patch.exe.manifest
+
+${XBINDIR}: ${XPROGS} install.exe
+	@/bin/mkdir -p ${XBINDIR}
 	/bin/cp -vu ${XPROGS} install ${XBINDIR}/
 	/bin/cp -vu manifest ${XBINDIR}/install.exe.manifest
 
@@ -75,13 +78,13 @@ find: ${UBINSRC}/find/find.c ${UBINSRC}/find/function.c ${UBINSRC}/find/ls.c \
 xargs: ${UBINSRC}/xargs/xargs.c ${UBINSRC}/xargs/strnsubst.c
 	${XGCC} -s ${CFLAGS} -o $@ $^
 
-install-local: ${BINDIR}
+install-local: ${BINDIR} ${XBINDIR}
 
 install: ${DESTDIR} ${OBJECTS} install.exe
 	@${MKDIR} -p ${DESTDIR}${UBINDIR}
 	${INSTALL} ${OBJECTS} install ${DESTDIR}${UBINDIR}/
-	${INSTALL} -m 00644 manifest ${DESTDIR}${UBINDIR}/install.manifest
-	${INSTALL} -m 00644 manifest ${DESTDIR}${UBINDIR}/patch.manifest
+	${INSTALL} -m 00444 manifest ${DESTDIR}${UBINDIR}/install.manifest
+	${INSTALL} -m 00444 manifest ${DESTDIR}${UBINDIR}/patch.manifest
 	@${MAKE} -C make install UBINDIR="${UBINDIR}"
 
 clean:

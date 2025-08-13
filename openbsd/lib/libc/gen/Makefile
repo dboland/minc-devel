@@ -25,14 +25,14 @@ OBJECTS= assert.o \
 	getnetgrent.o ttyname.o ualarm.o raise.o nlist.o \
 	vwarn.o vwarnc.o vwarnx.o verr.o verrc.o verrx.o \
 	opendir.o readdir.o readdir_r.o rewinddir.o seekdir.o dirfd.o \
-	telldir.o closedir.o exec.o
+	telldir.o closedir.o exec.o posix_spawn.o shm_open.o
 
 OBJECTS+= getpwent.c.o getgrent.c.o setproctitle.c.o setprogname.c.o \
 	getprogname.c.o signal.c.o getgrouplist.c.o errno.c.o
 #OBJECTS+= _exit.S.o _getlogin.S.o _setlogin.S.o
 OBJECTS+= syslog_r.o syslog.o auth_subr.o login_cap.o authenticate.o
 
-#OBJECTS+= elf_hash.o posix_spawn.o shm_open.o
+#OBJECTS+= elf_hash.o
 
 .SUFFIXES:
 .DEFAULT:

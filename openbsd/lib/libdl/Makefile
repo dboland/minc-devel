@@ -8,7 +8,7 @@ LDFLAGS+= -shared -s
 LIBDL= ld.so
 ULIBXDIR= /usr/libexec
 
-all: ${LIBDL} libdl.a
+all: lib
 
 %.o: %.c
 	${XGCC} -c -g ${CFLAGS} -I${ROOTDIR}/include -I${SRCDIR}/sys $<
@@ -28,6 +28,8 @@ ${LIBDL}: ${OBJECTS} version.o
 ${LIBXDIR}:
 	/bin/mkdir -p ${LIBXDIR}
 
+lib: ${LIBDL} libdl.a
+
 install-local: ${LIBXDIR}
 	/bin/cp -vu ld.so ${LIBXDIR}/
 	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/
@@ -37,7 +39,6 @@ install-cross:
 	/bin/cp -vu ${IMPLIB} ${_LIBDIR}/libdl.so
 
 install: ${DESTDIR}
-	@${MKDIR} -p ${DESTDIR}${ULIBXDIR}
 	${INSTALL} ld.so ${DESTDIR}${ULIBXDIR}/
 	${INSTALL} ${IMPLIB} ${DESTDIR}/usr/lib/libdl.a
 

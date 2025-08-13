@@ -1,12 +1,9 @@
-if ! cd "$PKGROOT/BitchX-release"; then
+if ! cd "$PKGROOT/BitchX"; then
         exit 1
 fi
 
 bunzip2 ./usr/share/man/man1/BitchX.1.bz2 2>/dev/null
 
-#rm -f ./usr/bin/BitchX
-#cp -p /usr/bin/BitchX ./usr/bin/BitchX
-
-echo -n "Inpakken bitchx12.tgz... "
+echo -n "Compressing bitchx12.tgz... "
 tar -zcf $DISTROOT/bitchx12.tgz *
-echo gereed.
+echo done.

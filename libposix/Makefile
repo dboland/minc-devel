@@ -11,7 +11,6 @@ CFLAGS+= -DRELEASE=\"${RELEASE}\" -DVERSION=\"${VERSION}\" -DBUILD=${BUILD}
 GCCDIR= ${ROOTDIR}/mingw/gcc
 TRACEDIR= ${ROOTDIR}/libtrace
 SBINDIR= /sbin
-UBINDIR= /usr/bin
 ULIBDIR= /usr/lib
 
 all: ${LIBPOSIX}
@@ -48,10 +47,10 @@ ${LIBPOSIX}: ${OBJECTS}
 ${XLIBDIR}:
 	/bin/mkdir -p ${XLIBDIR}
 
-# LIBPOSIX must be accessible within both MinC and MinGW, so UBINDIR
+# make sure we always have access to the kernel
 
-install-local: ${XLIBDIR} ${UBINDIR}
-	/bin/cp -vu ${LIBPOSIX} ${UBINDIR}/
+install-local:
+	/bin/cp -vu ${LIBPOSIX} /usr/bin/
 	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libmingw32.a
 
 install-cross:

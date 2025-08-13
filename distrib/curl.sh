@@ -1,9 +1,9 @@
-if ! cd "$PKGROOT/curl-release"; then
+if ! cd "$PKGROOT/curl"; then
         exit 1
 fi
 
-ln -s libcurl.so.10.0 ./usr/lib/libcurl.so 2>/dev/null
+ln -sf libcurl.so.10.0 ./usr/lib/libcurl.so
 
-echo -n "Inpakken curl772.tgz... "
+echo -n "Compressing curl772.tgz... "
 tar -zcf $DISTROOT/curl772.tgz *
-echo gereed.
+echo done.

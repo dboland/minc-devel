@@ -17,5 +17,4 @@ else
 	echo "Windows NT"
 	mkdir -p ${DESTDIR}
 fi
-
 echo " ---------------------------------------------------"

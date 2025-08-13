@@ -1,10 +1,10 @@
-if ! cd "$PKGROOT/mutt-release"; then
+if ! cd "$PKGROOT/mutt"; then
         exit 1
 fi
 
 cp /etc/Muttrc ./etc/Muttrc
 
-echo -n "Inpakken mutt20.tgz... "
+echo -n "Compressing mutt20.tgz... "
 tar -zcf $DISTROOT/mutt20.tgz *
-echo gereed.
+echo done.
 

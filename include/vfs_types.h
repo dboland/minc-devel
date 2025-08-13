@@ -540,7 +540,7 @@ typedef struct _WIN_TASK {
 	BOOL IsSetUGid;
 	UINT RealUid, SavedUid;
 	UINT RealGid, SavedGid;
-	HANDLE Heap;			/* virtual address space per thread */
+	HANDLE Heap;			/* process heap */
 	DWORDLONG Limit[WIN_RLIM_NLIMITS];
 	WIN_ATEXITPROC AtExit[WIN_ATEXIT_MAX];
 	WIN_SIGACTION Action[WIN_NSIG];

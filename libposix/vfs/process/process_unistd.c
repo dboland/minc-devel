@@ -115,11 +115,6 @@ proc_close(WIN_TASK *Task)
 	 * actually *faster* than CreateThread() (building perl.exe)
 	 */
 	Task->ParentId = 0;		/* relinquish ownership */
-	if (!HeapDestroy(Task->Heap)){
-		WIN_ERR("HeapDestroy(%d): %s\n", Task->Heap, win_strerror(GetLastError()));
-	}else{
-		Task->Heap = NULL;
-	}
 	if (!Task->Handle){
 		SetLastError(ERROR_INVALID_THREAD_ID);
 	}else if (CloseHandle(Task->Handle)){

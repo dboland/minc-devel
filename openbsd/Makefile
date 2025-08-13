@@ -3,7 +3,7 @@ ROOTDIR= ..
 include ${ROOTDIR}/Makefile.inc
 
 HEADERS= ${XINCDIR}/fcntl.h ${XINCDIR}/stdarg.h ${XINCDIR}/stdint.h \
-	${XINCDIR}/sched.h ${XINCDIR}/syslog.h ${XINCDIR}/termios.h
+	${XINCDIR}/syslog.h ${XINCDIR}/termios.h
 MACHINEDIR= ${XINCDIR}/machine
 
 all: ${SRCDIR}
@@ -28,9 +28,6 @@ ${MACHINEDIR}:
 
 ${XINCDIR}/fcntl.h:
 	@/bin/cp -vu fcntl.h ${XINCDIR}/
-
-${XINCDIR}/sched.h:
-	@/bin/cp -vu sched.h ${XINCDIR}/
 
 ${XINCDIR}/stdarg.h:
 	@/bin/cp -vu stdarg.h ${XINCDIR}/

@@ -1,8 +1,8 @@
-if ! cd "$PKGROOT/make-release"; then
+if ! cd "$PKGROOT/make"; then
         exit 1
 fi
 
-echo -n "Inpakken gmake42.tgz... "
+echo -n "Compressing gmake42.tgz... "
 tar -zcf $DISTROOT/gmake42.tgz *
-echo gereed.
+echo done.
 
