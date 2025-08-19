@@ -1,4 +1,4 @@
-if ! cd "$PKGROOT/bzip"; then
+if ! cd "$PKGROOT/bzip2"; then
         exit 1
 fi
 

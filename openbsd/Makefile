@@ -48,7 +48,6 @@ ${_INCDIR}:
 install-local: ${SRCDIR} ${MACHINEDIR} ${HEADERS}
 
 install: ${INSTALL}
-	@sh ${ROOTDIR}/mkroot.sh ${DESTDIR}
 	@${MAKE} -C bin install
 	@${MAKE} -C sbin install
 	@${MAKE} -C lib install

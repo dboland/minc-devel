@@ -58,7 +58,6 @@ install-gcc: ${XBINDIR} ${GCCBIN}
 install-binutils: ${XBINDIR} ${BINUTILS}
 install-tools: ${MSGBIN}
 
-# tip: create dummy /libexec/ld.so for configure scripts to detect shared libs
 # GetIpStatisticsEx() is missing in vanilla MinGW (libiphlpapi.dll.a)
 
 install-local: ${MINGW} install-gcc ${XLIBXDIR}

@@ -29,7 +29,7 @@
  
  # all .do files...
 --- share/mk/bsd.man.mk	2014-05-19 17:05:13 +0200
-+++ share/mk/bsd.man.mk	2025-08-13 07:10:36 +0200
++++ share/mk/bsd.man.mk	2025-08-14 05:35:05 +0200
 @@ -54,7 +54,7 @@
  .for page in ${MAN}
  .  for sub in ${MANSUBDIR}
@@ -39,7 +39,7 @@
  	${INSTALL} ${INSTALL_COPY} -o ${MANOWN} -g ${MANGRP} -m ${MANMODE} \
  		${.ALLSRC} ${.TARGET}
  
-@@ -64,7 +64,7 @@
+@@ -64,15 +64,15 @@
  .  endfor
  .endfor
  
@@ -48,8 +48,9 @@
  maninstall:
  .if defined(MLINKS) && !empty(MLINKS)
  .  for sub in ${MANSUBDIR}
-@@ -72,7 +72,7 @@
- 	@l=${DESTDIR}${MANDIR}${lnk:E}${sub}${lnk}; \
+ .     for lnk file in ${MLINKS}
+-	@l=${DESTDIR}${MANDIR}${lnk:E}${sub}${lnk}; \
++	@l=${MANDIR}${lnk:E}${sub}${lnk}; \
  	t=${DESTDIR}${MANDIR}${file:E}${sub}${file}; \
  	echo $$t -\> $$l; \
 -	rm -f $$t; ln $$l $$t;

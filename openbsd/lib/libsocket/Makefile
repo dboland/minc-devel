@@ -6,6 +6,7 @@ RELEASE=75.0
 LIBSOCKET= libsocket.so.${RELEASE}
 IMPLIB= libsocket.dll.a
 GCCDIR= ${XLIBDIR}/gcc/mingw32/${GCCVER}
+ULIBDIR= /usr/lib
 
 all: objects lib
 
@@ -54,8 +55,8 @@ install-cross:
 	/bin/cp -vu libsocket.a ${_LIBDIR}/
 
 install: ${DESTDIR}
-	${INSTALL} ${LIBSOCKET} libsocket.a ${DESTDIR}/usr/lib/
-	@#${LN} -s ${LIBSOCKET} ${DESTDIR}/usr/lib/libsocket.so
+	${INSTALL} ${LIBSOCKET} libsocket.a ${DESTDIR}${ULIBDIR}/
+	@#${LN} -s ${LIBSOCKET} ${DESTDIR}${ULIBDIR}/libsocket.so
 
 clean: objects-clean lib-clean
 

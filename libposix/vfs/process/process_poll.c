@@ -33,21 +33,6 @@
 /****************************************************/
 
 BOOL 
-proc_poll_OLD(WIN_TASK *Task)
-{
-	MSG msg;
-	BOOL bResult = TRUE;
-
-	if (!PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)){
-		return(FALSE);
-	}else if (vfs_raise(msg.message, msg.wParam, msg.lParam)){
-		SetLastError(ERROR_SIGNAL_PENDING);
-	}else{
-		bResult = FALSE;
-	}
-	return(bResult);
-}
-BOOL 
 proc_poll(WIN_TASK *Task)
 {
 	BOOL bResult = FALSE;

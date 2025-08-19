@@ -178,7 +178,7 @@ ScreenPutString(HANDLE Handle, LPCSTR Buffer, DWORD Count, CONSOLE_SCREEN_BUFFER
 {
 	DWORD dwWidth = 0;
 
-	/* On Vista, when emitting multibyte (utf8),
+	/* On Vista, when emitting multibyte (ansi/utf8),
 	 * dwWidth will be zero.
 	 */
 	if (WriteFile(Handle, Buffer, Count, &dwWidth, NULL)){
@@ -211,6 +211,7 @@ screen_write(HANDLE Handle, LPCSTR Buffer, DWORD Size, DWORD *Result)
 			Buffer++;
 			dwCount = 0;
 		}else if (__Char < 32){
+			/* Hello David Cuttler */
 			ScreenPutString(Handle, Buffer, dwCount, psbInfo);
 			Buffer += dwCount;
 			dwCount = 0;

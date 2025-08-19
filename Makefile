@@ -7,7 +7,6 @@ usage:
 	@echo " kernel			build libtrace and libposix"
 	@echo " system			build OpenBSD system binaries"
 	@echo " release		update version info in shared libraries"
-	@echo " install		install OpenBSD into 'DESTDIR'"
 	@echo " help			show build instructions"
 
 all: kernel system
@@ -31,10 +30,6 @@ config.inc:
 
 help:
 	@less BUILD.md
-
-install:
-	@${MAKE} -C openbsd install
-	@${MAKE} -C libposix install
 
 release:
 	@${MAKE} -C libposix release

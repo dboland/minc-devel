@@ -15,7 +15,7 @@ LDFLAGS= -Wl,--disable-auto-import -s
 LDSTATIC= -static -DNOPIE
 CFLAGS+= -DNOPIE
 
-all: lst.lib.d beforedepend make.out
+all: liblst.a beforedepend make.out
 
 CDEFS+=-DHAS_BOOL_H
 CDEFS+=-DHAS_PATHS_H
@@ -23,7 +23,7 @@ CDEFS+=-DHAS_EXTENDED_GETCWD
 #CDEFS+=-DHAS_STATS
 
 DPADD += ${LIBUTIL}
-LDADD += lst.lib/liblst.a -lutil
+LDADD += liblst.a -lutil
 CFLAGS+=${CDEFS} -I${.OBJDIR} -g
 HOSTCFLAGS+=${CDEFS} -I${.OBJDIR}
 
@@ -31,8 +31,8 @@ HOSTCFLAGS+=${CDEFS} -I${.OBJDIR}
 	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -o $@ $<
 
-%.d: %
-	@${MAKE} -C $< XGCC="${XGCC}" CFLAGS="${CFLAGS}" UBINSRC="${UBINSRC}"
+liblst.a:
+	@${MAKE} -C lst.lib XGCC="${XGCC}" CFLAGS="${CFLAGS}" UBINSRC="${UBINSRC}"
 
 beforedepend: varhashconsts.h condhashconsts.h nodehashconsts.h
 # may need tweaking if you add variable synonyms or change the hash function
@@ -55,7 +55,7 @@ make.out: ${OBJECTS}
 	@echo "done."
 	${HOSTCC} ${LDSTATIC} -o $@ ${OBJECTS} ${LDFLAGS} ${LDADD}
 
-install: ${DESTDIR}
+install: ${DESTDIR} liblst.a make.out
 	${INSTALL} make.out ${DESTDIR}${UBINDIR}/make
 
 clean:

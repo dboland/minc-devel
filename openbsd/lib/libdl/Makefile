@@ -6,6 +6,7 @@ OBJECTS= libdl.o
 IMPLIB= libdl.dll.a
 LDFLAGS+= -shared -s
 LIBDL= ld.so
+ULIBDIR= /usr/lib
 ULIBXDIR= /usr/libexec
 
 all: lib
@@ -22,16 +23,19 @@ libdl.a: ${OBJECTS}
 
 ${LIBDL}: ${OBJECTS} version.o
 	${LD} ${LDFLAGS} -e _DllMainCRTStartup@12 --out-implib=${IMPLIB} \
-	-o $@ --image-base=${IMGBASE_LIBD} ${XLIBDIR}/dllcrt2.o ${OBJECTS} version.o \
+	-o $@ --image-base=${IMGBASE_LIBDL} ${XLIBDIR}/dllcrt2.o ${OBJECTS} version.o \
 	-L${XLIBDIR} -lmingw32
 
-${LIBXDIR}:
-	/bin/mkdir -p ${LIBXDIR}
+# create /usr/libexec/ld.so for configure scripts to detect shared libs
+
+${LIBXDIR}: ${LIBDL}
+	@/bin/mkdir -p ${LIBXDIR}
+	/bin/cp -vu ${LIBDL} ${LIBXDIR}/
 
 lib: ${LIBDL} libdl.a
 
 install-local: ${LIBXDIR}
-	/bin/cp -vu ld.so ${LIBXDIR}/
+	/bin/cp -vu libdl.a ${XLIBDIR}/
 	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/
 
 install-cross:
@@ -39,8 +43,9 @@ install-cross:
 	/bin/cp -vu ${IMPLIB} ${_LIBDIR}/libdl.so
 
 install: ${DESTDIR}
-	${INSTALL} ld.so ${DESTDIR}${ULIBXDIR}/
-	${INSTALL} ${IMPLIB} ${DESTDIR}/usr/lib/libdl.a
+	@${MKDIR} -p ${DESTDIR}${ULIBXDIR}
+	${INSTALL} ${LIBDL} ${DESTDIR}${ULIBXDIR}/
+	${INSTALL} libdl.a ${DESTDIR}${ULIBDIR}/
 
 release-clean:
 	/bin/rm -f version.o

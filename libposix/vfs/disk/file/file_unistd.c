@@ -63,8 +63,8 @@ file_rename(WIN_NAMEIDATA *Path, WIN_NAMEIDATA *Result)
 		SetLastError(ERROR_FILE_EXISTS);
 	}else if (DeleteFileW(Result->Resolved)){
 		bResult = MoveFileExW(Path->Resolved, Result->Resolved, dwFlags);
-	}else{
-		WIN_ERR("file_rename(%ls): %s\n", Result->Resolved, win_strerror(GetLastError()));
+//	}else{
+//		WIN_ERR("file_rename(%ls): %s\n", Result->Resolved, win_strerror(GetLastError()));
 	}
 	return(bResult);
 }

@@ -44,9 +44,10 @@ touch: ${UBINSRC}/touch/touch.c
 id: ${UBINSRC}/id/id.c
 	${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $<
 
-# In Windows, "install" and "patch" seem to be reserved 
-# words. When executed with such name, Vista checks if 
-# user is elevated, yields ERROR_ELEVATION_REQUIRED if not.
+# In Windows, "install", "setup" and "patch" seem to be reserved 
+# words. When executed with such name, Vista checks if user is
+# elevated, yields ERROR_ELEVATION_REQUIRED if not. XP just slows
+# down execution to a crawl.
 # see: https://irq5.io/2011/06/26/gnu-patch-and-windows-uac/
 
 install.exe: xinstall.c

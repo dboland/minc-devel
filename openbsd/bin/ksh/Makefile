@@ -46,9 +46,9 @@ ksh: ${OBJECTS}
 install-local:
 	/bin/cp -vu ksh ${BINDIR}/sh
 
-install: ${DESTDIR}
+install: ${DESTDIR} ksh
 	${INSTALL} ksh ${DESTDIR}/bin/
-	ln -f ${DESTDIR}/bin/ksh ${DESTDIR}/bin/sh
+	ln -f ${DESTDIR}/bin/ksh ${DESTDIR}/bin/sh.exe
 	@${MKDIR} -p ${DESTDIR}/usr/share/man/man1
 	${INSTALL} sh.1 ksh.1 ${DESTDIR}/usr/share/man/man1/
 

@@ -61,13 +61,24 @@ the build:
 
 	make system
 
-You now have a working system, but we are still using 
-the MSYS commands. To make sure we are using our brand new 
-OpenBSD binaries, you will need to mount the */opt/minc* 
-directory. This is done by running the **mount** script:
+## Step 3: install the system
 
-	./mount.sh minc
+For this step, you need to be Administrator. Close the MSYS 
+terminal and open it again as Administrator. Change to your 
+*minc-devel* directory and run the **mkroot** command:
 
+	./mkroot.sh
+
+**Note**: By default, MinC will be installed in the **C:\minc-release** 
+directory. If you want another install location, uncomment and change 
+the 'DESTDIR' variable in config.inc. It is not advisable to create 
+the MinC root directory in a location like *Program Files*. File 
+permissions in this kind of location are unsuitable for OpenBSD 
+to run properly.
+
+You now have a working system. Go to the new folder in Windows 
+Exporer and open the *sbin* folder. There should be a program 
+named *bsd.exe*. You can open a terminal by double-clicking it. 
 To test if the new system works, you can run the **uname** 
 command:
 
@@ -76,46 +87,6 @@ command:
 The result should be similar to the following output:
 
 	OpenBSD dimension.sassenheim.dmz 6.1.0 MINC#20250720 i386
-
-**Note**: if you want back to compiling Windows programs, simply 
-re-mount the */mingw* directory:
-
-	./mount.sh mingw
-
-
-## Step 3: install the system
-
-For this step, you need to be Administrator. Close the MSYS 
-terminal and open it again as Administrator. Change to your 
-*minc-devel* directory and run the **install** target:
-
-	make install
-
-**Warning**: By default, MinC will be installed in the 
-**C:\minc-release** directory. If you want another install 
-location, uncomment and change the 'DESTDIR' variable 
-in config.inc. It is not advisable to create the MinC root 
-directory in a location like *Program Files*. File permissions 
-in this kind of location are unsuitable for OpenBSD to run 
-properly.
-
-To finalize step 3, go to the new folder in Windows Exporer and 
-open the *sbin* folder. There should be a program named *bsd.exe*.
-Right-click it and run it as Administrator. You will see the 
-following message:
-
-	open(/dev/console): No such file or directory
-	/bin/ksh: No controlling tty (open /dev/tty: No such file or directory)
-	/bin/ksh: warning: won't have full job control
-
-This is because there is no */dev* file system yet. To create it,
-along with some of the other system directories like */home* and 
-*/tmp*, run the **setup** script:
-
-	/sbin/setup.sh
-
-When it is finished, you can close the window and open it again 
-by double-clicking. The above message should be gone.
 
 Double-clicking the *bsd.exe* program is not the right way to 
 start the MinC terminal. To make it start properly and in your 
