@@ -76,8 +76,8 @@ find: ${UBINSRC}/find/find.c ${UBINSRC}/find/function.c ${UBINSRC}/find/ls.c \
 	${UBINSRC}/find/option.c
 	${XGCC} -s ${CFLAGS} -o $@ $^
 
-xargs: ${UBINSRC}/xargs/xargs.c ${UBINSRC}/xargs/strnsubst.c
-	${XGCC} -s ${CFLAGS} -o $@ $^
+xargs: xargs.c ${UBINSRC}/xargs/strnsubst.c
+	${XGCC} -s ${CFLAGS} -I${UBINSRC}/xargs -o $@ $^
 
 install-local: ${BINDIR} ${XBINDIR}
 

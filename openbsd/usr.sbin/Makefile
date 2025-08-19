@@ -3,7 +3,6 @@ ROOTDIR= ../..
 include ${ROOTDIR}/Makefile.inc
 
 OBJECTS= dev_mkdb pwd_mkdb
-CFLAGS+= -I${SRCDIR}/sys
 USBINSRC= ${SRCDIR}/usr.sbin
 USBINDIR= /usr/bin
 
@@ -20,7 +19,7 @@ dev_mkdb: ${USBINSRC}/dev_mkdb/dev_mkdb.c
 	${XGCC} -s ${CFLAGS} -o $@ $<
 
 pwd_mkdb: ${USBINSRC}/pwd_mkdb/pwd_mkdb.c
-	${XGCC} -s ${CFLAGS} -o $@ $< -lutil
+	${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $< -lutil
 
 install: ${DESTDIR}
 	@${MKDIR} -p ${DESTDIR}${USBINDIR}

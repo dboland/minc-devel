@@ -63,9 +63,9 @@ the build:
 
 ## Step 3: install the system
 
-For this step, you need to be Administrator. Close the MSYS 
+For this step, you need to be **Administrator**. Close the MSYS 
 terminal and open it again as Administrator. Change to your 
-*minc-devel* directory and run the **mkroot** command:
+*minc-devel* directory and run the *mkroot* command:
 
 	./mkroot.sh
 
