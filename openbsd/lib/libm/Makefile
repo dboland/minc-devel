@@ -70,7 +70,7 @@ all: libm.a
 
 %.arch.o: ${SRCDIR}/lib/libm/arch/${ARCH}/%.c
 	@echo -n "$@ "
-	@${XGCC} -c ${CFLAGS} -I${SRCDIR}/sys -o $@ $<
+	@${XGCC} -c ${CFLAGS} -o $@ $<
 
 %.d: %
 	CFLAGS="${CFLAGS}" ${MAKE} -C $< XGCC="${XGCC}" SRCDIR="${SRCDIR}" ARCH="${ARCH}"

@@ -21,7 +21,7 @@ all: ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/stdlib/%.c
 	@/bin/echo -n "$@ "
-	@${XGCC} -c ${CFLAGS} -I${SRCDIR}/sys -I../include -o $@ $<
+	@${XGCC} -c ${CFLAGS} -I../include -o $@ $<
 
 %.c.o: %.c
 	@/bin/echo -n "$@ "

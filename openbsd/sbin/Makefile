@@ -18,7 +18,7 @@ ${SBINSRC}:
 	@exit 1
 
 %.o: %.c
-	${XGCC} -c ${CFLAGS} -I${ROOTDIR}/include -I${SRCDIR}/sys -o $@ $<
+	${XGCC} -c ${CFLAGS} -I${ROOTDIR}/include -o $@ $<
 
 %.exe: %.o
 	${XGCC} -s ${CFLAGS} -o $@ $<
@@ -39,10 +39,10 @@ mknod: ${SBINSRC}/mknod/mknod.c
 	${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $<
 
 mkent: mkent.o
-	${XGCC} -s ${CFLAGS} -I${SRCDIR}/sys -o $@ $< ${MINGW}/lib/libiphlpapi.a
+	${XGCC} -s ${CFLAGS} -o $@ $< ${MINGW}/lib/libiphlpapi.a
 
 bsd.o: bsd.c
-	${XGCC} -c ${CFLAGS} -DNOPIE -I${SRCDIR}/sys -o $@ $<
+	${XGCC} -c ${CFLAGS} -DNOPIE -o $@ $<
 
 bsd.exe: bsd.o version.o
 	${XGCC} -s -static ${CFLAGS} -o $@ $^

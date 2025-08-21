@@ -6,5 +6,5 @@ OBJECTS= send.o recv.o herror.o
 all: ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/net/%.c
-	${XGCC} -c ${CFLAGS} -I${SRCDIR}/sys -o $@ $<
+	${XGCC} -c ${CFLAGS} -o $@ $<
 

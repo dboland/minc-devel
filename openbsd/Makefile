@@ -4,7 +4,9 @@ include ${ROOTDIR}/Makefile.inc
 
 HEADERS= ${XINCDIR}/fcntl.h ${XINCDIR}/stdarg.h ${XINCDIR}/stdint.h \
 	${XINCDIR}/syslog.h ${XINCDIR}/termios.h
-MACHINEDIR= ${XINCDIR}/machine
+XMACHDIR= ${XINCDIR}/machine
+SYSDIRS= ${XINCDIR}/net ${XINCDIR}/netinet ${XINCDIR}/netinet6 ${XINCDIR}/uvm \
+	${XINCDIR}/dev/wscons
 
 all: ${SRCDIR}
 	@${MAKE} -C lib
@@ -16,15 +18,16 @@ all: ${SRCDIR}
 
 include ${ROOTDIR}/Errorfile.inc
 
-${MACHINEDIR}:
-	@/bin/mkdir -p ${MACHINEDIR}
+${XINCDIR}/%: ${SRCDIR}/sys/%
+	@/bin/mkdir -p $@
+	/bin/cp -u $</*.h $@/
+
+${XMACHDIR}:
+	@/bin/mkdir -p ${XMACHDIR}
 	/bin/cp -ru ${SRCDIR}/include/* ${XINCDIR}/
 	/bin/cp -ru ${SRCDIR}/sys/sys ${XINCDIR}/
-	/bin/cp -ru ${SRCDIR}/sys/arch/${ARCH}/include/* ${MACHINEDIR}/
+	/bin/cp -ru ${SRCDIR}/sys/arch/${ARCH}/include/* ${XMACHDIR}/
 	/bin/patch -p 0 -d ${XPREFIX} <include.patch
-	/bin/cp -ru ${SRCDIR}/sys/net ${XINCDIR}/
-	/bin/cp -ru ${SRCDIR}/sys/netinet ${XINCDIR}/
-	/bin/cp -ru ${SRCDIR}/sys/netinet6 ${XINCDIR}/
 
 ${XINCDIR}/fcntl.h:
 	@/bin/cp -vu fcntl.h ${XINCDIR}/
@@ -45,7 +48,7 @@ ${_INCDIR}:
 	@/bin/mkdir -p ${_INCDIR}
 	/bin/cp -ru ${XINCDIR}/* ${_INCDIR}/
 
-install-local: ${SRCDIR} ${MACHINEDIR} ${HEADERS}
+install-local: ${SRCDIR} ${XMACHDIR} ${HEADERS} ${SYSDIRS}
 
 install: ${INSTALL}
 	@${MAKE} -C bin install

@@ -10,13 +10,6 @@ cp -p /usr/lib/libc.a ./usr/lib/
 cp -p /usr/lib/libsocket.a ./usr/lib/
 cp -p /usr/lib/libdl.a ./usr/lib/
 
-# don't overwrite base libs
-rm -f ./usr/lib/libcrypto.so.*
-rm -f ./usr/lib/libssl.so.*
-rm -f ./usr/lib/libutil.so.*
-rm -f ./usr/lib/libedit.so.*
-rm -f ./usr/lib/libkvm.so.*
-
 echo -n "Compressing comp61.tgz... "
 tar -zcf $DISTROOT/comp61.tgz *
 echo done.

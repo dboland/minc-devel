@@ -8,5 +8,5 @@ all: ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/crypt/%.c
 	@echo -n "$@ "
-	@${XGCC} -c ${CFLAGS} -I${SRCDIR}/sys -I../include -o $@ $<
+	@${XGCC} -c ${CFLAGS} -I../include -o $@ $<
 

@@ -12,7 +12,7 @@ ULIBXDIR= /usr/libexec
 all: lib
 
 %.o: %.c
-	${XGCC} -c -g ${CFLAGS} -I${ROOTDIR}/include -I${SRCDIR}/sys $<
+	${XGCC} -c -g ${CFLAGS} -I${ROOTDIR}/include $<
 
 version.o: version.rc
 	windres -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@

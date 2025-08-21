@@ -30,7 +30,7 @@ vfs_posix.o: vfs/vfs.c
 	${CC} -c ${CFLAGS} -I${TRACEDIR} -o $@ $<
 
 libposix.o: libposix.c
-	${XGCC} -c ${CFLAGS} -I${SRCDIR}/sys -DTTYDEFCHARS -DKTRACE -DSYSVSEM $<
+	${XGCC} -c ${CFLAGS} -DTTYDEFCHARS -DKTRACE -DSYSVSEM $<
 
 version.o: version.rc
 	windres -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@

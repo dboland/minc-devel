@@ -27,7 +27,7 @@ ${LIBSOCKET}: crt1.o version.o
 
 %.d: %
 	@${MAKE} -C $< XGCC="${XGCC}" ROOTDIR="${ROOTDIR}/.." SRCDIR="${SRCDIR}" \
-	CFLAGS="${CFLAGS} -DLIBSOCK_IMPORT= -I${SRCDIR}/sys -I../../libc/include"
+	CFLAGS="${CFLAGS} -DLIBSOCK_IMPORT= -I../../libc/include"
 
 objects: asr.d net.d rpc.d
 

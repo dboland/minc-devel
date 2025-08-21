@@ -11,7 +11,7 @@ all: ${HELPER} ${OBJECTS}
 	/bin/cp -u $< $@
 
 %.o: %.c
-	${XGCC} -c ${CFLAGS} -I${SRCDIR}/sys -o $@ $<
+	${XGCC} -c ${CFLAGS} -o $@ $<
 
 clean:
 	rm -f ${HELPER} *.o *.dll *.a
