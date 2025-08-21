@@ -2,12 +2,6 @@ ROOTDIR= ..
 
 include ${ROOTDIR}/Makefile.inc
 
-HEADERS= ${XINCDIR}/fcntl.h ${XINCDIR}/stdarg.h ${XINCDIR}/stdint.h \
-	${XINCDIR}/syslog.h ${XINCDIR}/termios.h
-XMACHDIR= ${XINCDIR}/machine
-SYSDIRS= ${XINCDIR}/net ${XINCDIR}/netinet ${XINCDIR}/netinet6 ${XINCDIR}/uvm \
-	${XINCDIR}/dev/wscons
-
 all: ${SRCDIR}
 	@${MAKE} -C lib
 	@${MAKE} -C bin all install-local
@@ -18,37 +12,8 @@ all: ${SRCDIR}
 
 include ${ROOTDIR}/Errorfile.inc
 
-${XINCDIR}/%: ${SRCDIR}/sys/%
-	@/bin/mkdir -p $@
-	/bin/cp -u $</*.h $@/
-
-${XMACHDIR}:
-	@/bin/mkdir -p ${XMACHDIR}
-	/bin/cp -ru ${SRCDIR}/include/* ${XINCDIR}/
-	/bin/cp -ru ${SRCDIR}/sys/sys ${XINCDIR}/
-	/bin/cp -ru ${SRCDIR}/sys/arch/${ARCH}/include/* ${XMACHDIR}/
-	/bin/patch -p 0 -d ${XPREFIX} <include.patch
-
-${XINCDIR}/fcntl.h:
-	@/bin/cp -vu fcntl.h ${XINCDIR}/
-
-${XINCDIR}/stdarg.h:
-	@/bin/cp -vu stdarg.h ${XINCDIR}/
-
-${XINCDIR}/stdint.h:
-	@/bin/cp -vu stdint.h ${XINCDIR}/
-
-${XINCDIR}/syslog.h:
-	@/bin/cp -vu syslog.h ${XINCDIR}/
-
-${XINCDIR}/termios.h:
-	@/bin/cp -vu termios.h ${XINCDIR}/
-
-${_INCDIR}:
-	@/bin/mkdir -p ${_INCDIR}
-	/bin/cp -ru ${XINCDIR}/* ${_INCDIR}/
-
-install-local: ${SRCDIR} ${XMACHDIR} ${HEADERS} ${SYSDIRS}
+install-local: ${SRCDIR}
+	@${MAKE} -C include install-local
 
 install: ${INSTALL}
 	@${MAKE} -C bin install
@@ -59,7 +24,7 @@ install: ${INSTALL}
 	@${MAKE} -C share install
 	@${MAKE} -C etc install
 
-install-cross: ${_INCDIR}
+install-cross:
 	@#${MAKE} -C share install
 	@${MAKE} -C lib install-cross
 

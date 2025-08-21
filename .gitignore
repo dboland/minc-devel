@@ -9,7 +9,6 @@
 *.so.*
 *.pdf
 config.inc
-openbsd/include
 openbsd/lib/libc/sys/*.S
 openbsd/lib/libc/include
 openbsd/share/mk
