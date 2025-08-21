@@ -37,26 +37,8 @@ ${XLIBXDIR}:
 
 GCCBIN+= ${XBINDIR}/gcc.exe ${XBINDIR}/cpp.exe
 GCCBIN+= ${XBINDIR}/g++.exe ${XBINDIR}/c++.exe
-#GCCBIN+=  ${XBINDIR}/gdb.exe
-
-#GCCLIB+= ${BINDIR}/libgmp-10.dll ${BINDIR}/libmpc-3.dll ${BINDIR}/libmpfr-4.dll \
-	${BINDIR}/zlib1.dll ${BINDIR}/libgcc_s_dw2-1.dll
-#GCCLIB+= ${BINDIR}/libintl-8.dll ${BINDIR}/libiconv-2.dll ${BINDIR}/libstdc++-6.dll
-
-#BINUTILS= ${BINDIR}/ld.exe ${BINDIR}/ar.exe ${BINDIR}/as.exe ${BINDIR}/nm.exe \
-	${BINDIR}/dlltool.exe
-#BINUTILS+= ${BINDIR}/windres.exe ${BINDIR}/objdump.exe ${BINDIR}/ranlib.exe \
-	${BINDIR}/size.exe ${BINDIR}/strip.exe ${BINDIR}/gprof.exe \
-	${BINDIR}/addr2line.exe ${BINDIR}/dllwrap.exe ${BINDIR}/elfedit.exe \
-	${BINDIR}/objcopy.exe ${BINDIR}/strings.exe ${BINDIR}/windmc.exe \
-	${BINDIR}/c++filt.exe
-
-#MSGBIN= ${BINDIR}/msgfmt.exe ${BINDIR}/libgettextsrc-0-18-3.dll \
-	${BINDIR}/libgettextlib-0-18-3.dll
 
 install-gcc: ${XBINDIR} ${GCCBIN}
-install-binutils: ${XBINDIR} ${BINUTILS}
-install-tools: ${MSGBIN}
 
 # GetIpStatisticsEx() is missing in vanilla MinGW (libiphlpapi.dll.a)
 

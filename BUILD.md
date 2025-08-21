@@ -71,7 +71,7 @@ terminal and open it again as Administrator. Change to your
 
 **Note**: By default, MinC will be installed in the **C:\minc-release** 
 directory. If you want another install location, uncomment and change 
-the 'DESTDIR' variable in config.inc. It is not advisable to create 
+the *DESTDIR* variable in config.inc. It is not advisable to create 
 the MinC root directory in a location like *Program Files*. File 
 permissions in this kind of location are unsuitable for OpenBSD 
 to run properly.

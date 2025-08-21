@@ -4,15 +4,13 @@ include ${ROOTDIR}/Makefile.inc
 
 PROGS= gzip id patch
 XPROGS= arch uname touch
-OBJECTS= ${PROGS} ${XPROGS} grep du env find xargs
-#CFLAGS+= -I${SRCDIR}/sys
+OBJECTS= ${PROGS} ${XPROGS} grep du env find xargs sed sort
 UBINSRC= ${SRCDIR}/usr.bin
 UBINDIR= /usr/bin
 
 # GNU make can't cd into make if make/make.exe exists?!?!
 
 all: ${UBINSRC} ${OBJECTS} install.exe
-	@${MAKE} -C make UBINSRC="${UBINSRC}"
 
 ${UBINSRC}:
 	@echo " ---------------------------------------------------"
@@ -79,6 +77,15 @@ find: ${UBINSRC}/find/find.c ${UBINSRC}/find/function.c ${UBINSRC}/find/ls.c \
 xargs: xargs.c ${UBINSRC}/xargs/strnsubst.c
 	${XGCC} -s ${CFLAGS} -I${UBINSRC}/xargs -o $@ $^
 
+sed: ${UBINSRC}/sed/compile.c ${UBINSRC}/sed/main.c ${UBINSRC}/sed/misc.c \
+	${UBINSRC}/sed/process.c
+	${XGCC} -s ${CFLAGS} -o $@ $^
+
+sort: sort.c ${UBINSRC}/sort/append.c ${UBINSRC}/sort/fields.c \
+	${UBINSRC}/sort/files.c ${UBINSRC}/sort/fsort.c ${UBINSRC}/sort/init.c \
+	${UBINSRC}/sort/msort.c ${UBINSRC}/sort/tmp.c
+	${XGCC} -s ${CFLAGS} -I${UBINSRC}/sort -o $@ $^
+
 install-local: ${BINDIR} ${XBINDIR}
 
 install: ${DESTDIR} ${OBJECTS} install.exe
@@ -86,8 +93,7 @@ install: ${DESTDIR} ${OBJECTS} install.exe
 	${INSTALL} ${OBJECTS} install ${DESTDIR}${UBINDIR}/
 	${INSTALL} -m 00444 manifest ${DESTDIR}${UBINDIR}/install.manifest
 	${INSTALL} -m 00444 manifest ${DESTDIR}${UBINDIR}/patch.manifest
-	@${MAKE} -C make install UBINDIR="${UBINDIR}"
+	ln ${DESTDIR}${UBINDIR}/grep ${DESTDIR}${UBINDIR}/egrep
 
 clean:
 	/bin/rm -f *.exe *.o
-	@${MAKE} -C make clean
