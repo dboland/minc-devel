@@ -8,6 +8,8 @@ SYSDIRS= ${XINCDIR}/machine ${XINCDIR}/net ${XINCDIR}/netinet ${XINCDIR}/netinet
 	${XINCDIR}/uvm ${XINCDIR}/dev/wscons ${XINCDIR}/ufs/ffs
 INCSRC= ${SRCDIR}/include
 
+all: ${INCSRC}
+
 ${INCSRC}:
 	@echo " ---------------------------------------------------"
 	@echo "| OpenBSD 'include' directory ($@) not found. Make sure"
@@ -15,14 +17,19 @@ ${INCSRC}:
 	@echo " ---------------------------------------------------"
 	@exit 1
 
+${TMPDIR}:
+	@${MKDIR} -p ${TMPDIR}
+
 ${XINCDIR}/%: ${SRCDIR}/sys/%
 	@/bin/mkdir -p $@
 	/bin/cp -u $</*.h $@/
 
-${XINCDIR}/machine: ${SRCDIR}/sys/arch/${ARCH}/include
+# make patch.exe use local tmp directory
+
+${XINCDIR}/machine: ${TMPDIR}
 	@/bin/mkdir -p $@
-	/bin/cp -ru $</* $@/
-	/bin/patch -p 0 -d ${XPREFIX} <../include.patch
+	/bin/cp -ru  ${SRCDIR}/sys/arch/${ARCH}/include/* $@/
+	TMPDIR=${TMPDIR} /bin/patch -p 0 -d ${XPREFIX} <../include.patch
 
 ${XINCDIR}:
 	@/bin/mkdir -p ${XINCDIR}
@@ -30,19 +37,19 @@ ${XINCDIR}:
 	/bin/cp -ru ${SRCDIR}/sys/sys ${XINCDIR}/
 
 ${XINCDIR}/fcntl.h:
-	@/bin/cp -vu fcntl.h ${XINCDIR}/
+	@/bin/cp -vu ../fcntl.h ${XINCDIR}/
 
 ${XINCDIR}/stdarg.h:
-	@/bin/cp -vu stdarg.h ${XINCDIR}/
+	@/bin/cp -vu ../stdarg.h ${XINCDIR}/
 
 ${XINCDIR}/stdint.h:
-	@/bin/cp -vu stdint.h ${XINCDIR}/
+	@/bin/cp -vu ../stdint.h ${XINCDIR}/
 
 ${XINCDIR}/syslog.h:
-	@/bin/cp -vu syslog.h ${XINCDIR}/
+	@/bin/cp -vu ../syslog.h ${XINCDIR}/
 
 ${XINCDIR}/termios.h:
-	@/bin/cp -vu termios.h ${XINCDIR}/
+	@/bin/cp -vu ../termios.h ${XINCDIR}/
 
 ${_INCDIR}:
 	@/bin/mkdir -p ${_INCDIR}

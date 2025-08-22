@@ -11,9 +11,6 @@ usage:
 
 all: kernel system
 
-%.d: %
-	@${MAKE} -C $<
-
 opt: config.inc
 	@${MAKE} -C openbsd install-local
 	@${MAKE} -C mingw all install-local

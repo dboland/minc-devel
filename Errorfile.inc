@@ -18,9 +18,38 @@ ${ROOTDIR}/config.inc:
 	@echo " ---------------------------------------------------"
 	@exit 1
 
+${MKDIR}:
+	@echo " ---------------------------------------------------"
+	@echo "| BSD mkdir program ($@) not found."
+	@echo "| Your build is incomplete."
+	@echo " ---------------------------------------------------"
+	@exit 1
+
 ${INSTALL}:
 	@echo " ---------------------------------------------------"
 	@echo "| BSD install program ($@) not found."
 	@echo "| Your build is incomplete."
 	@echo " ---------------------------------------------------"
 	@exit 1
+
+${ID}:
+	@echo " ---------------------------------------------------"
+	@echo "| BSD id program ($@) not found."
+	@echo "| Your build is incomplete."
+	@echo " ---------------------------------------------------"
+	@exit 1
+
+${CP}:
+	@echo " ---------------------------------------------------"
+	@echo "| BSD cp program ($@) not found."
+	@echo "| Your build is incomplete."
+	@echo " ---------------------------------------------------"
+	@exit 1
+
+${LN}:
+	@echo " ---------------------------------------------------"
+	@echo "| BSD ln program ($@) not found."
+	@echo "| Your build is incomplete."
+	@echo " ---------------------------------------------------"
+	@exit 1
+

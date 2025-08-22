@@ -2,9 +2,9 @@ ROOTDIR= ../..
 
 include ${ROOTDIR}/Makefile.inc
 
-PROGS= gzip id patch
+PROGS= gzip id
 XPROGS= arch uname touch
-OBJECTS= ${PROGS} ${XPROGS} grep du env find xargs sed sort
+OBJECTS= ${PROGS} ${XPROGS} du env find xargs sed sort
 UBINSRC= ${SRCDIR}/usr.bin
 UBINDIR= /usr/bin
 
@@ -23,7 +23,6 @@ ${BINDIR}: ${PROGS} install.exe
 	@/bin/mkdir -p ${BINDIR}
 	/bin/cp -vu ${PROGS} install ${BINDIR}/
 	/bin/cp -vu manifest ${BINDIR}/install.exe.manifest
-	/bin/cp -vu manifest ${BINDIR}/patch.exe.manifest
 
 ${XBINDIR}: ${XPROGS} install.exe
 	@/bin/mkdir -p ${XBINDIR}
@@ -51,17 +50,9 @@ id: ${UBINSRC}/id/id.c
 install.exe: xinstall.c
 	${XGCC} -s -static ${CFLAGS} -DNOPIE -I${UBINSRC}/xinstall -o $@ $<
 
-patch: ${UBINSRC}/patch/patch.c ${UBINSRC}/patch/pch.c ${UBINSRC}/patch/inp.c \
-	${UBINSRC}/patch/util.c ${UBINSRC}/patch/backupfile.c ${UBINSRC}/patch/mkpath.c
-	${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $^
-
 gzip: ${UBINSRC}/compress/main.c ${UBINSRC}/compress/zopen.c \
 	${UBINSRC}/compress/gzopen.c ${UBINSRC}/compress/nullopen.c
 	${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $^ -lz
-
-grep: grep.c ${UBINSRC}/grep/binary.c ${UBINSRC}/grep/file.c ${UBINSRC}/grep/mmfile.c \
-	${UBINSRC}/grep/queue.c ${UBINSRC}/grep/util.c
-	${XGCC} -s ${CFLAGS} -I${UBINSRC}/grep -o $@ $^ -lz
 
 env: env.c
 	${XGCC} -s ${CFLAGS} -o $@ $<
@@ -93,7 +84,6 @@ install: ${DESTDIR} ${OBJECTS} install.exe
 	${INSTALL} ${OBJECTS} install ${DESTDIR}${UBINDIR}/
 	${INSTALL} -m 00444 manifest ${DESTDIR}${UBINDIR}/install.manifest
 	${INSTALL} -m 00444 manifest ${DESTDIR}${UBINDIR}/patch.manifest
-	ln ${DESTDIR}${UBINDIR}/grep ${DESTDIR}${UBINDIR}/egrep
 
 clean:
 	/bin/rm -f *.exe *.o

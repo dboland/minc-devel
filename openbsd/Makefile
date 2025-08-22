@@ -15,7 +15,9 @@ include ${ROOTDIR}/Errorfile.inc
 install-local: ${SRCDIR}
 	@${MAKE} -C include install-local
 
-install: ${INSTALL}
+build-check: ${MKDIR} ${INSTALL} ${ID} ${CP} ${LN}
+
+install:
 	@${MAKE} -C bin install
 	@${MAKE} -C sbin install
 	@${MAKE} -C lib install

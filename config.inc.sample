@@ -6,18 +6,23 @@ MINGW=/C/MinGW
 SRCDIR=/D/openbsd-master
 ARCH=i386
 
-# locations for BSD native binaries
+# locations for native BSD system
 
 PREFIX=/opt/minc
 BINDIR=${PREFIX}/bin
 LIBDIR=${PREFIX}/lib
 INCDIR=${PREFIX}/include
 LIBXDIR=${PREFIX}/libexec
-GCCLIB=
+SHDIR=${PREFIX}/share
+TMPDIR=${PREFIX}/tmp
+
+# locations of BSD install programs
+
 MKDIR=${BINDIR}/mkdir
 INSTALL=${BINDIR}/install
-PATCH=${BINDIR}/patch
 ID=${BINDIR}/id
+CP=${BINDIR}/cp
+LN=${BINDIR}/ln
 
 # locations for Poor Man's Cross Compiler
 
@@ -28,6 +33,6 @@ XINCDIR=${XPREFIX}/include
 XLIBXDIR=${XPREFIX}/libexec
 XGCC=${XBINDIR}/gcc
 
-# native (OpenBSD) location of packages (release.sh)
+# native location of packages (release.sh)
 
 PKGROOT=/mnt/d/release

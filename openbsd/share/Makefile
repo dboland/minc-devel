@@ -3,7 +3,9 @@ ROOTDIR= ../..
 include ${ROOTDIR}/Makefile.inc
 
 SHARESRC= ${SRCDIR}/share
-SHAREDIR= ${DESTDIR}/usr/share
+SHAREDEST= ${DESTDIR}/usr/share
+
+all: ${SHARESRC}
 
 ${SHARESRC}:
 	@echo " ---------------------------------------------------"
@@ -12,11 +14,21 @@ ${SHARESRC}:
 	@echo " ---------------------------------------------------"
 	@exit 1
 
-# BSD patch needs /tmp
+${TMPDIR}:
+	@${MKDIR} -p ${TMPDIR}
 
-${SHAREDIR}/mk:
-	@${MKDIR} -p $@
-	cp -R ${SHARESRC}/mk ${SHAREDIR}/
-	TMPDIR=/tmp ${PATCH} --posix --silent -p 1 -d ${SHAREDIR} <../share.patch
+# make patch.exe use local tmp directory
 
-install: ${SHARESRC} ${SHAREDIR}/mk
+${SHDIR}/mk: ${TMPDIR}
+	@${MKDIR} -p ${SHDIR}
+	/bin/cp -ru ${SHARESRC}/mk ${SHDIR}/
+	TMPDIR=${TMPDIR} /bin/patch -p 1 -d ${SHDIR} <../share.patch
+
+install-local: ${SHDIR}/mk
+
+install:
+	@${MKDIR} -p ${SHAREDEST}
+	${CP} -R ${SHDIR}/mk ${SHAREDEST}/
+
+clean:
+	/bin/rm -rf ${SHDIR}/mk

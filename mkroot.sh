@@ -8,6 +8,10 @@ if [ -z "${DESTDIR}" ]; then
 	DESTDIR=${SYSTEMDRIVE}/minc-release
 fi
 
+if ! make -C openbsd build-check; then
+	exit 1
+fi
+
 echo " ---------------------------------------------------"
 echo -n "| Installing in ${DESTDIR} for "
 
