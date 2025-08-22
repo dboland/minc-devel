@@ -18,7 +18,7 @@ ${INCSRC}:
 	@exit 1
 
 ${TMPDIR}:
-	@${MKDIR} -p ${TMPDIR}
+	@/bin/mkdir -p ${TMPDIR}
 
 ${XINCDIR}/%: ${SRCDIR}/sys/%
 	@/bin/mkdir -p $@

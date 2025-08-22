@@ -15,12 +15,12 @@ ${SHARESRC}:
 	@exit 1
 
 ${TMPDIR}:
-	@${MKDIR} -p ${TMPDIR}
+	@/bin/mkdir -p ${TMPDIR}
 
 # make patch.exe use local tmp directory
 
 ${SHDIR}/mk: ${TMPDIR}
-	@${MKDIR} -p ${SHDIR}
+	@/bin/mkdir -p ${SHDIR}
 	/bin/cp -ru ${SHARESRC}/mk ${SHDIR}/
 	TMPDIR=${TMPDIR} /bin/patch -p 1 -d ${SHDIR} <../share.patch
 
