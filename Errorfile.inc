@@ -12,6 +12,9 @@ ${SRCDIR}:
 	@echo " ---------------------------------------------------"
 	@exit 1
 
+${TMPDIR}:
+	@/bin/mkdir -p ${TMPDIR}
+
 ${ROOTDIR}/config.inc:
 	@echo " ---------------------------------------------------"
 	@echo "| Cross-compiler not set up. Please run 'make opt' first."
@@ -52,4 +55,3 @@ ${LN}:
 	@echo "| Your build is incomplete."
 	@echo " ---------------------------------------------------"
 	@exit 1
-

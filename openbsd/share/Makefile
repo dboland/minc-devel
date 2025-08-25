@@ -14,12 +14,9 @@ ${SHARESRC}:
 	@echo " ---------------------------------------------------"
 	@exit 1
 
-${TMPDIR}:
-	@/bin/mkdir -p ${TMPDIR}
+# make patch.exe use local tmp directory for proper ACL
 
-# make patch.exe use local tmp directory
-
-${SHDIR}/mk: ${TMPDIR}
+${SHDIR}/mk:
 	@/bin/mkdir -p ${SHDIR}
 	/bin/cp -ru ${SHARESRC}/mk ${SHDIR}/
 	TMPDIR=${TMPDIR} /bin/patch -p 1 -d ${SHDIR} <../share.patch

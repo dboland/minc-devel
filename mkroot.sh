@@ -12,6 +12,8 @@ if ! make -C openbsd build-check; then
 	exit 1
 fi
 
+PATH=${DESTDIR}/sbin
+
 echo " ---------------------------------------------------"
 echo -n "| Installing in ${DESTDIR} for "
 
@@ -24,14 +26,11 @@ else
 fi
 echo " ---------------------------------------------------"
 
-make -C openbsd install
-make -C libposix install
+/bin/rm -f ${DESTDIR}/dev/*
 
-rm -f ${DESTDIR}/dev/*
-cp ./distrib/setup.cmd ${DESTDIR}/
+/bin/make -C openbsd install
+/bin/make -C libposix install
 
 cd ${DESTDIR}
 
-cmd //c setup.cmd
-
-rm ${DESTDIR}/setup.cmd
+bin/sh -c ./sbin/setup.sh

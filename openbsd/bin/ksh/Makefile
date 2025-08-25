@@ -48,7 +48,7 @@ install-local:
 
 install: ${DESTDIR} ksh
 	${INSTALL} ksh ${DESTDIR}/bin/
-	ln -f ${DESTDIR}/bin/ksh ${DESTDIR}/bin/sh.exe
+	${LN} -f ${DESTDIR}/bin/ksh ${DESTDIR}/bin/sh
 	@${MKDIR} -p ${DESTDIR}/usr/share/man/man1
 	${INSTALL} sh.1 ksh.1 ${DESTDIR}/usr/share/man/man1/
 

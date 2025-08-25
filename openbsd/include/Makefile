@@ -5,7 +5,8 @@ include ${ROOTDIR}/Makefile.inc
 HEADERS= ${XINCDIR}/fcntl.h ${XINCDIR}/stdarg.h ${XINCDIR}/stdint.h \
 	${XINCDIR}/syslog.h ${XINCDIR}/termios.h
 SYSDIRS= ${XINCDIR}/machine ${XINCDIR}/net ${XINCDIR}/netinet ${XINCDIR}/netinet6 \
-	${XINCDIR}/uvm ${XINCDIR}/dev/wscons ${XINCDIR}/ufs/ffs
+	${XINCDIR}/uvm ${XINCDIR}/dev/wscons ${XINCDIR}/ufs/ext2fs \
+	${XINCDIR}/ufs/ffs ${XINCDIR}/ufs/mfs ${XINCDIR}/ufs/ufs
 INCSRC= ${SRCDIR}/include
 
 all: ${INCSRC}
@@ -17,16 +18,13 @@ ${INCSRC}:
 	@echo " ---------------------------------------------------"
 	@exit 1
 
-${TMPDIR}:
-	@/bin/mkdir -p ${TMPDIR}
-
 ${XINCDIR}/%: ${SRCDIR}/sys/%
 	@/bin/mkdir -p $@
-	/bin/cp -u $</*.h $@/
+	/bin/cp -uv $</*.h $@/
 
-# make patch.exe use local tmp directory
+# make patch.exe use local tmp directory for proper ACL
 
-${XINCDIR}/machine: ${TMPDIR}
+${XINCDIR}/machine:
 	@/bin/mkdir -p $@
 	/bin/cp -ru  ${SRCDIR}/sys/arch/${ARCH}/include/* $@/
 	TMPDIR=${TMPDIR} /bin/patch -p 0 -d ${XPREFIX} <../include.patch
