@@ -8,11 +8,9 @@ if [ -z "${DESTDIR}" ]; then
 	DESTDIR=${SYSTEMDRIVE}/minc-release
 fi
 
-if ! make -C openbsd build-check; then
+if ! /bin/make -C openbsd build-check; then
 	exit 1
 fi
-
-PATH=${DESTDIR}/sbin
 
 echo " ---------------------------------------------------"
 echo -n "| Installing in ${DESTDIR} for "
@@ -30,6 +28,8 @@ echo " ---------------------------------------------------"
 
 /bin/make -C openbsd install
 /bin/make -C libposix install
+
+PATH=${DESTDIR}/sbin
 
 cd ${DESTDIR}
 

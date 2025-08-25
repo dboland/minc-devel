@@ -58,7 +58,7 @@ install-cross:
 
 install: ${INSTALL}
 	${INSTALL} -m 06555 ${LIBPOSIX} ${DESTDIR}${SBINDIR}/
-	${INSTALL} ${IMPLIB} ${DESTDIR}${ULIBDIR}/libposix.so
+	${INSTALL} ${IMPLIB} ${DESTDIR}${ULIBDIR}/libposix.a
 
 release-clean:
 	/bin/rm version.o

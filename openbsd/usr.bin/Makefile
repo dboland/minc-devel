@@ -4,7 +4,7 @@ include ${ROOTDIR}/Makefile.inc
 
 PROGS= gzip id
 XPROGS= arch uname touch
-OBJECTS= ${PROGS} ${XPROGS} du env find xargs sed sort
+OBJECTS= ${PROGS} ${XPROGS} du env find xargs sed sort cap_mkdb
 UBINSRC= ${SRCDIR}/usr.bin
 UBINDIR= /usr/bin
 
@@ -21,12 +21,12 @@ ${UBINSRC}:
 
 ${BINDIR}: ${PROGS} install.exe
 	@/bin/mkdir -p ${BINDIR}
-	/bin/cp -vu ${PROGS} install ${BINDIR}/
+	/bin/cp -vu install ${PROGS} ${BINDIR}/
 	/bin/cp -vu manifest ${BINDIR}/install.exe.manifest
 
 ${XBINDIR}: ${XPROGS} install.exe
 	@/bin/mkdir -p ${XBINDIR}
-	/bin/cp -vu ${XPROGS} install ${XBINDIR}/
+	/bin/cp -vu install ${XPROGS} ${XBINDIR}/
 	/bin/cp -vu manifest ${XBINDIR}/install.exe.manifest
 
 uname: ${UBINSRC}/uname/uname.c
@@ -77,11 +77,14 @@ sort: sort.c ${UBINSRC}/sort/append.c ${UBINSRC}/sort/fields.c \
 	${UBINSRC}/sort/msort.c ${UBINSRC}/sort/tmp.c
 	${XGCC} -s ${CFLAGS} -I${UBINSRC}/sort -o $@ $^
 
+cap_mkdb: ${UBINSRC}/cap_mkdb/cap_mkdb.c ${UBINSRC}/cap_mkdb/getinfo.c
+	${XGCC} -s ${CFLAGS} -o $@ $^
+
 install-local: ${BINDIR} ${XBINDIR}
 
 install: ${DESTDIR} ${OBJECTS} install.exe
 	@${MKDIR} -p ${DESTDIR}${UBINDIR}
-	${INSTALL} ${OBJECTS} install ${DESTDIR}${UBINDIR}/
+	${INSTALL} install ${OBJECTS} ${DESTDIR}${UBINDIR}/
 	${INSTALL} -m 00444 manifest ${DESTDIR}${UBINDIR}/install.manifest
 	${INSTALL} -m 00444 manifest ${DESTDIR}${UBINDIR}/patch.manifest
 
