@@ -1,3 +1,6 @@
+.SUFFIXES:
+.DEFAULT:
+
 usage:
 	@echo "usage: ${MAKE} TARGET"
 	@echo

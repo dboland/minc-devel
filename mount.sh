@@ -30,8 +30,8 @@ else
 	echo
 	echo "Compilers"
 	printf " mingw\t\t\tmount MinGW default compiler\n"
+	printf " cross\t\t\tmount poor man's cross compiler\n"
 	printf " minc\t\t\tmount OpenBSD system\n"
-	printf " cross\t\t\tmount OpenBSD cross-compiler\n"
 	echo
 	echo "Currently mounted:"
 	/bin/cat $FSTAB
