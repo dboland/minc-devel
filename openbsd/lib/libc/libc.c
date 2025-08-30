@@ -51,7 +51,7 @@ typedef struct _IMAGE_TLS_DIRECTORY {
 #include <nlist.h>
 #include <string.h>
 
-extern __import char 	*__PROGNAME;
+extern __import CHAR 	*__PROGNAME;
 
 #define GOT_MAX		32
 

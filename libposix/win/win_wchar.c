@@ -102,13 +102,13 @@ win_wcscat(LPWSTR Destination, LPCWSTR Source)
 	return(pszResult);
 }
 LPWSTR 
-win_wcsncpy(LPWSTR Destination, LPCWSTR Source, LONG Length)
+win_wcslcpy(LPWSTR Destination, LPCWSTR Source, LONG Length)
 {
 	LPWSTR D = Destination;
 	WCHAR C;
 
 	while (C = *Source++){
-		Length--;		/* not POSIX, but much safer */
+		Length--;
 		if (Length < 1){
 			break;
 		}

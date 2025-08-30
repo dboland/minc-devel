@@ -122,13 +122,13 @@ win_strcat(LPSTR Destination, LPCSTR Source)
 	return(pszResult);
 }
 LPSTR 
-win_strncpy(LPSTR Destination, LPCSTR Source, LONG Length)
+win_strlcpy(LPSTR Destination, LPCSTR Source, LONG Length)
 {
 	LPSTR D = Destination;
 	CHAR C;
 
 	while (C = *Source++){
-		Length--;		/* not POSIX, but much safer */
+		Length--;
 		if (Length < 1){
 			break;
 		}

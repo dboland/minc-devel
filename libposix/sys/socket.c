@@ -171,7 +171,7 @@ saddr_win(WIN_TASK *Task, SOCKADDR *Result, const struct sockaddr *addr, const s
 	Result->sa_family = af_win(addr->sa_family);
 	if (addr->sa_family == AF_LOCAL){
 		path_win(&wPath, addr->sa_data, 0);
-		win_wcsncpy((LPWSTR)Result->sa_data, wPath.Resolved, MAX_PATH);
+		win_wcslcpy((LPWSTR)Result->sa_data, wPath.Resolved, MAX_PATH);
 	}else{
 		win_memcpy(Result->sa_data, addr->sa_data, *addrlen - 2);
 	}

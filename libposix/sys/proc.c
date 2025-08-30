@@ -129,7 +129,7 @@ kproc_posix(struct kinfo_proc *proc, WIN_TASK *Task)
 	proc->p_tracep = (u_int32_t)Task->TraceHandle;
 	proc->p_traceflag = Task->TracePoints;
 	if (proc->p_stat == SSLEEP){
-		win_strncpy(proc->p_wmesg, syscallnames[Task->Code], KI_WMESGLEN);
+		win_strlcpy(proc->p_wmesg, syscallnames[Task->Code], KI_WMESGLEN);
 	}
 	proc->p_tid = Task->ThreadId;
 	return(proc + 1);

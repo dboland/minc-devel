@@ -51,7 +51,7 @@ swapctl_STATS(struct swapent *swap, int count)
 	swap->se_flags = SWF_ENABLE;
 	swap->se_nblks = (dwlTotal + dwPageSize - 1) / dwPageSize;
 	swap->se_inuse = (dwlUsed + dwPageSize - 1) / dwPageSize;
-	win_strncpy(win_stpcpy(swap->se_path, "/dev/"), pwDevice->Name, MAXPATHLEN - 5);
+	win_strlcpy(win_stpcpy(swap->se_path, "/dev/"), pwDevice->Name, MAXPATHLEN - 5);
 
 	return(count);
 }

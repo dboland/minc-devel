@@ -43,9 +43,6 @@ ksh: ${OBJECTS}
 	@echo "done."
 	${XGCC} -static -s ${CFLAGS} -o $@ ${OBJECTS}
 
-install-local:
-	/bin/cp -vu ksh ${BINDIR}/sh
-
 install: ${DESTDIR} ksh
 	${INSTALL} ksh ${DESTDIR}/bin/
 	${LN} -f ${DESTDIR}/bin/ksh ${DESTDIR}/bin/sh

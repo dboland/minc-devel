@@ -34,4 +34,4 @@ PATH=${DESTDIR}/sbin
 
 cd ${DESTDIR}
 
-bin/sh -c ./sbin/setup.sh
+./bin/sh -c ./sbin/setup.sh

@@ -68,7 +68,7 @@ extern HANDLE		__PipeEvent;
 
 u_long	__THREAD_FRAME;
 
-char 	*__PROGNAME;		/* ktrace.c */
+CHAR 			*__PROGNAME;		/* ktrace.c */
 
 WIN_NAMEIDATA *path_win(WIN_NAMEIDATA *Path, const char *pathname, int flags);
 

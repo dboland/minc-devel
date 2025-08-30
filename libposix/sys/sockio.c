@@ -77,7 +77,7 @@ sock_SIOCGIFDESCR(struct ifreq *req)
 	if (dwStatus != ERROR_SUCCESS){
 		result -= errno_posix(dwStatus);
 	}else{
-		win_strncpy(req->ifr_data, ifInfo.bDescr, MIN(ifInfo.dwDescrLen, IFDESCRSIZE));
+		win_strlcpy(req->ifr_data, ifInfo.bDescr, MIN(ifInfo.dwDescrLen, IFDESCRSIZE));
 	}
 	return(result);
 }

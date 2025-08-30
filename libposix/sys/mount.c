@@ -55,12 +55,12 @@ fstype_posix(char *type, void *options, LPWSTR TypeName)
 {
 	if (!wcsncmp(TypeName, L"FAT", 3)){
 		struct msdosfs_args *msdos = options;
-		win_strncpy(type, "msdos", MFSNAMELEN);
+		win_strlcpy(type, "msdos", MFSNAMELEN);
 		msdos->uid = rid_posix(&SidEveryone);
 		msdos->gid = rid_posix(&SidEveryone);
 		msdos->mask = 00777;
 	}else if (!wcscmp(TypeName, L"ISO9660")){
-		win_strncpy(type, "cd9660", MFSNAMELEN);
+		win_strlcpy(type, "cd9660", MFSNAMELEN);
 	}else{
 		win_wcstombs(type, win_wcslcase(TypeName), MFSNAMELEN);
 	}
@@ -125,10 +125,10 @@ statfs_posix(struct statfs *buf, WIN_STATFS *Stat)
 	pathn_posix(buf->f_mntonname, win_wcslcase(Stat->Path), MNAMELEN);
 
 	/* mounted file system */
-	win_strncpy(win_stpcpy(buf->f_mntfromname, "/dev/"), pwDevice->Name, MNAMELEN - 5);
+	win_strlcpy(win_stpcpy(buf->f_mntfromname, "/dev/"), pwDevice->Name, MNAMELEN - 5);
 
 	/* special for mount request */
-	win_strncpy(buf->f_mntfromspec, buf->f_mntfromname, MNAMELEN);
+	win_strlcpy(buf->f_mntfromspec, buf->f_mntfromname, MNAMELEN);
 
 	return(buf + 1);
 }

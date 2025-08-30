@@ -102,12 +102,19 @@ win_realpath(LPCWSTR Path, DWORD Size, LPWSTR Result)
 {
 	BOOL bResult = FALSE;
 	LPWSTR pszBase = NULL;
+	WCHAR szSave = Path[0];
 
-	/* Note: GetFullPathName() does not merge slashes.
+	/* This is the first actual hack in the system. Take advantage 
+	 * of GetFullPathName() not merging slashes to resolve path name by
+	 * replacing dot in the root (perl.exe).
 	 */
+	if (szSave == '.'){
+		*(LPWSTR)Path = '\\';
+	}
 	if (!GetFullPathNameW(Path, Size, Result, &pszBase)){
 		WIN_ERR("GetFullPathName(%ls): %s\n", Path, win_strerror(GetLastError()));
 	}else{
+		*Result = szSave;
 		bResult = TRUE;
 	}
 	return(bResult);

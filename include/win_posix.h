@@ -39,7 +39,7 @@ LPSTR win_strerror(HRESULT Error);
 LPSTR nt_strerror(NTSTATUS Status);
 LPSTR win_strcpy(LPSTR Destination, LPCSTR Source);
 LPSTR win_stpcpy(LPSTR Destination, LPCSTR Source);
-LPSTR win_strncpy(LPSTR Destination, LPCSTR Source, LONG Length);
+LPSTR win_strlcpy(LPSTR Destination, LPCSTR Source, LONG Length);
 VOID win_memcpy(LPVOID Destination, LPCVOID Source, SIZE_T Size);
 LPCSTR win_index(LPCSTR String, CHAR Chr);
 VOID win_memset(PVOID Dest, CHAR Fill, SIZE_T Size);
@@ -60,7 +60,7 @@ LPSTR win_wcstombp(LPSTR Destination, LPCWSTR Source, int Bufsize);
 LPWSTR win_wcscpy(LPWSTR Destination, LPCWSTR Source);
 LPWSTR win_wcpcpy(LPWSTR Destination, LPCWSTR Source);
 LPWSTR win_wcscat(LPWSTR Destination, LPCWSTR Source);
-LPWSTR win_wcsncpy(LPWSTR Destination, LPCWSTR Source, LONG Length);
+LPWSTR win_wcslcpy(LPWSTR Destination, LPCWSTR Source, LONG Length);
 LPWSTR win_wcslcase(LPWSTR String);
 LPWSTR win_wcsucase(LPWSTR String);
 

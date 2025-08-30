@@ -231,6 +231,7 @@ BOOL
 vfs_chdir(WIN_TASK *Task, WIN_NAMEIDATA *Path)
 {
 	BOOL bResult = FALSE;
+	WCHAR szPath[WIN_PATH_MAX];
 
 	/* perl.exe creates really weird paths.
 	 */
@@ -239,7 +240,6 @@ vfs_chdir(WIN_TASK *Task, WIN_NAMEIDATA *Path)
 	}else if (!vfs_access(Path, WIN_S_IEXEC)){	/* network drives (Synology) */
 		return(FALSE);
 	}else if (win_realpath(Path->Resolved, WIN_PATH_MAX, __Strings[Task->TaskId].Path)){
-		win_wcscpy(__Strings[Task->TaskId].Path, Path->Resolved);
 		Task->MountId = Path->MountId;
 		bResult = TRUE;
 	}

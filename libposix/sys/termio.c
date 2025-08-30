@@ -187,10 +187,10 @@ term_PTMGET(WIN_VNODE *Node, WIN_TASK *Task, struct ptmget *ptm)
 	}else{
 		/* controlling terminal (master) */
 		ptm->cfd = fd_posix(Task, &vnMaster, 0);
-		win_strncpy(ptm->cn, DEVICE(vnMaster.DeviceId)->Name, 16);
+		win_strlcpy(ptm->cn, DEVICE(vnMaster.DeviceId)->Name, 16);
 		/* raw serial device (slave) */
 		ptm->sfd = fd_posix(Task, &vnSlave, 0);
-		win_strncpy(ptm->sn, DEVICE(vnSlave.DeviceId)->Name, 16);
+		win_strlcpy(ptm->sn, DEVICE(vnSlave.DeviceId)->Name, 16);
 	}
 	return(result);
 }

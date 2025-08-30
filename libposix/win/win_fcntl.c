@@ -94,7 +94,7 @@ win_F_GETPATH(HANDLE Handle, LPWSTR Buffer)
 	if (!NT_SUCCESS(ntStatus)){
 		WIN_ERR("win_F_GETPATH(%d): %s\n", Handle, nt_strerror(ntStatus));
 	}else if (puString->Length){
-		win_wcsncpy(win_wcpcpy(Buffer, L"\\\\.\\GLOBALROOT"), puString->Buffer, ulSize);
+		win_wcslcpy(win_wcpcpy(Buffer, L"\\\\.\\GLOBALROOT"), puString->Buffer, ulSize);
 		pszResult = Buffer;
 	}else{
 		*Buffer = 0;

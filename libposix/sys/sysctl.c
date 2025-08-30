@@ -64,13 +64,13 @@ sysctl_KERN(const int *name, void *oldp, size_t *oldlenp, void *newp, size_t new
 			result = kern_KERN_DOMAINNAME((char *)oldp, oldlenp, (const char *)newp, newlen);
 			break;
 		case KERN_OSTYPE:
-			win_strncpy(oldp, "OpenBSD", *oldlenp);
+			win_strlcpy(oldp, "OpenBSD", *oldlenp);
 			break;
 		case KERN_OSRELEASE:
-			win_strncpy(oldp, RELEASE, *oldlenp);
+			win_strlcpy(oldp, RELEASE, *oldlenp);
 			break;
 		case KERN_OSVERSION:
-			win_strncpy(win_stpcpy(oldp, "MINC#"), VERSION, *oldlenp - 5);
+			win_strlcpy(win_stpcpy(oldp, "MINC#"), VERSION, *oldlenp - 5);
 			break;
 		case KERN_ARGMAX:
 			*(int *)oldp = MAX_ARGBUF - (MAX_ARGBUF % __Globals->PageSize);
@@ -157,7 +157,7 @@ sysctl_HW(const int *name, void *oldp, size_t *oldlenp, void *newp, size_t newle
 
 	switch (name[1]){
 		case HW_MACHINE:
-			win_strncpy(oldp, MACHINE, *oldlenp);
+			win_strlcpy(oldp, MACHINE, *oldlenp);
 			break;
 		case HW_PAGESIZE:
 			*(int *)oldp = __Globals->PageSize;

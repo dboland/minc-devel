@@ -13,12 +13,12 @@ function rm_modules {
 
 cp ./usr/lib/perl5/5.30.0/OpenBSD.i386-openbsd-multi/CORE/libperl.so ./usr/lib/
 
-echo -n "Verwijderen modules... "
+echo -n "Removing modules... "
 rm_modules "${MODS}"
 rm -rf ./usr/lib/perl5/5.30.0/Pod
-echo gereed.
+echo done.
 
-echo -n "Inpakken perl53.tgz... "
+echo -n "Compressing perl53.tgz... "
 tar -zcf $DISTROOT/perl53.tgz *
-echo gereed.
+echo done.
 

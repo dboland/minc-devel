@@ -48,7 +48,7 @@ config_init(LPCSTR Name, DWORD FSType, DWORD FileType, DWORD DeviceType)
 {
 	WIN_DEVICE *pwDevice = DEVICE(DeviceType);
 
-	win_strncpy(pwDevice->Name, Name, MAX_NAME);
+	win_strlcpy(pwDevice->Name, Name, MAX_NAME);
 	pwDevice->FSType = FSType;
 	pwDevice->FileType = FileType;
 	pwDevice->DeviceType = DeviceType;
