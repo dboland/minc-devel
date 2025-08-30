@@ -55,7 +55,7 @@ install-cross:
 	/bin/cp -vu libsocket.a ${_LIBDIR}/
 
 install: ${DESTDIR}
-	${INSTALL} ${LIBSOCKET} libsocket.a ${DESTDIR}${ULIBDIR}/
+	${INSTALL} -m ${BINMODE} ${LIBSOCKET} libsocket.a ${DESTDIR}${ULIBDIR}/
 	@#${LN} -s ${LIBSOCKET} ${DESTDIR}${ULIBDIR}/libsocket.so
 
 clean: objects-clean lib-clean

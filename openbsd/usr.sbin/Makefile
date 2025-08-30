@@ -23,7 +23,7 @@ pwd_mkdb: ${USBINSRC}/pwd_mkdb/pwd_mkdb.c
 
 install: ${DESTDIR}
 	@${MKDIR} -p ${DESTDIR}${USBINDIR}
-	${INSTALL} ${OBJECTS} ${DESTDIR}${USBINDIR}/
+	${INSTALL} -m ${BINMODE} ${OBJECTS} ${DESTDIR}${USBINDIR}/
 
 clean:
 	/bin/rm -f *.exe *.o

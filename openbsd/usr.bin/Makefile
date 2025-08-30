@@ -84,9 +84,9 @@ install-local: ${BINDIR} ${XBINDIR}
 
 install: ${DESTDIR} ${OBJECTS} install.exe
 	@${MKDIR} -p ${DESTDIR}${UBINDIR}
-	${INSTALL} install ${OBJECTS} ${DESTDIR}${UBINDIR}/
-	${INSTALL} -m 00444 manifest ${DESTDIR}${UBINDIR}/install.manifest
-	${INSTALL} -m 00444 manifest ${DESTDIR}${UBINDIR}/patch.manifest
+	${INSTALL} -m ${BINMODE} install ${OBJECTS} ${DESTDIR}${UBINDIR}/
+	${INSTALL} -m ${NONBINMODE} manifest ${DESTDIR}${UBINDIR}/install.manifest
+	${INSTALL} -m ${NONBINMODE} manifest ${DESTDIR}${UBINDIR}/patch.manifest
 
 clean:
 	/bin/rm -f *.exe *.o

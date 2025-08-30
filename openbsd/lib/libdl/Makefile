@@ -38,8 +38,8 @@ install-cross:
 
 install: ${DESTDIR}
 	@${MKDIR} -p ${DESTDIR}${ULIBXDIR}
-	${INSTALL} ${LIBDL} ${DESTDIR}${ULIBXDIR}/
-	${INSTALL} ${IMPLIB} ${DESTDIR}${ULIBDIR}/libdl.a
+	${INSTALL} -m ${BINMODE} ${LIBDL} ${DESTDIR}${ULIBXDIR}/
+	${INSTALL} -m ${BINMODE} ${IMPLIB} ${DESTDIR}${ULIBDIR}/libdl.a
 
 release-clean:
 	/bin/rm -f version.o

@@ -73,7 +73,7 @@ install-cross:
 
 install: ${DESTDIR}
 	@${MKDIR} -p ${DESTDIR}${ULIBDIR}
-	${INSTALL} ${LIBC} libc.a ${DESTDIR}${ULIBDIR}/
+	${INSTALL} -m ${BINMODE} ${LIBC} libc.a ${DESTDIR}${ULIBDIR}/
 
 clean: objects-clean lib-clean
 

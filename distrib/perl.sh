@@ -11,11 +11,11 @@ function rm_modules {
 	done
 }
 
-cp ./usr/lib/perl5/5.30.0/OpenBSD.i386-openbsd-multi/CORE/libperl.so ./usr/lib/
+mv ./usr/lib/perl5/5.30.0/OpenBSD.i386-openbsd-multi/CORE/libperl.so ./usr/lib/
 
 echo -n "Removing modules... "
 rm_modules "${MODS}"
-rm -rf ./usr/lib/perl5/5.30.0/Pod
+rm -rf ./usr/lib/perl5/5.30.0/Pod	# 9Mb
 echo done.
 
 echo -n "Compressing perl53.tgz... "

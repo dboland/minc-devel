@@ -81,7 +81,7 @@ libm.a: ${OBJECTS}
 	@ar cru $@ ${OBJECTS}
 
 install: ${DESTDIR}
-	${INSTALL} libm.a ${DESTDIR}${ULIBDIR}/
+	${INSTALL} -m ${BINMODE} libm.a ${DESTDIR}${ULIBDIR}/
 
 install-local:
 	/bin/cp -uv libm.a ${XLIBDIR}/

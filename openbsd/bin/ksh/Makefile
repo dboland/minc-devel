@@ -44,7 +44,7 @@ ksh: ${OBJECTS}
 	${XGCC} -static -s ${CFLAGS} -o $@ ${OBJECTS}
 
 install: ${DESTDIR} ksh
-	${INSTALL} ksh ${DESTDIR}/bin/
+	${INSTALL} -m ${BINMODE} ksh ${DESTDIR}/bin/
 	${LN} -f ${DESTDIR}/bin/ksh ${DESTDIR}/bin/sh
 	@${MKDIR} -p ${DESTDIR}/usr/share/man/man1
 	${INSTALL} sh.1 ksh.1 ${DESTDIR}/usr/share/man/man1/

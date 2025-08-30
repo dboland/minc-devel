@@ -67,7 +67,7 @@ install-local: ${BINDIR} ${XBINDIR}
 
 install: ${DESTDIR} ${OBJECTS}
 	@${MKDIR} -p ${DESTDIR}/bin
-	${INSTALL} ${OBJECTS} ${DESTDIR}/bin/
+	${INSTALL} -m ${BINMODE} ${OBJECTS} ${DESTDIR}/bin/
 	@${MAKE} -C ksh install
 
 clean:

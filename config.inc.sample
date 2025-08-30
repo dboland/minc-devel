@@ -33,6 +33,12 @@ XINCDIR=${XPREFIX}/include
 XLIBXDIR=${XPREFIX}/libexec
 XGCC=${XBINDIR}/gcc
 
+# install modes
+
+BINMODE=555
+NONBINMODE=444
+DIRMODE=755
+
 # native location of packages (release.sh)
 
 PKGROOT=/mnt/d/release
