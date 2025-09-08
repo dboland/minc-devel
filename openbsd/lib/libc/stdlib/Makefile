@@ -10,21 +10,25 @@ OBJECTS = a64l.o atoi.o atof.o atol.o atoll.o bsearch.o \
 	div.o hcreate.o getopt_long.o
 
 OBJECTS+= atexit.c.o
-
 #OBJECTS+= ecvt.o gcvt.o malloc.o
 
 .SUFFIXES:
 .DEFAULT:
 
-all: ${OBJECTS}
-	@/bin/echo "done."
+LIB= ../stdlib.a
+
+all: ${OBJECTS} ${LIB}
+	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/stdlib/%.c
-	@/bin/echo -n "$@ "
+	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -I../include -o $@ $<
 
 %.c.o: %.c
-	@/bin/echo -n "$@ "
+	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -I${ROOTDIR}/include -I${SRCDIR}/stdlib -o $@ $<
 
 

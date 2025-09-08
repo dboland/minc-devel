@@ -3,8 +3,16 @@ OBJECTS=mpool.o
 .SUFFIXES:
 .DEFAULT:
 
-all: ${OBJECTS}
+CFLAGS+= -D__DBINTERFACE_PRIVATE
+LIB= ../mpool.a
+
+all: ${OBJECTS} ${LIB}
+	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/db/mpool/%.c
-	${XGCC} -c ${CFLAGS} -o $@ $<
+	@echo -n "$@ "
+	@${XGCC} -c ${CFLAGS} -o $@ $<
 

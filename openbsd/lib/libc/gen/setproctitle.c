@@ -48,6 +48,7 @@
 void 
 setproctitle(const char *fmt, ...)
 {
+	extern char *__progname;
 	va_list args;
 	char buf[WIN_MAX_PROCTITLE];
 	int used;

@@ -60,7 +60,19 @@ typedef struct {
 	int c_si;
 	int c_bx;
 	int c_cx;
-	WIN_TASK *Task;
-	ULONG Code;
-	ULONG Base;	/* return address */
+	void *Task;
+	unsigned long Code;
+	unsigned long Base;	/* return address */
 } call_t;
+
+typedef struct {
+	int argc;
+	char **argv;
+	char **env;
+	void *frame;
+	char *reserved1;
+	void *text;
+	void *data;
+	void *bss;
+	void *end;
+} exec_t;

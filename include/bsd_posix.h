@@ -52,13 +52,18 @@ char *group_posix(char *buf, size_t buflen, WIN_GRENT *Group);
 
 /* syscall.S */
 
-__dead void __threxit(pid_t *pid);
+__dead void sys__threxit(pid_t *pid);
 
 /* namei.c */
 
-WIN_NAMEIDATA *path_win(WIN_NAMEIDATA *Path, const char *pathname, int flags);
+WIN_NAMEIDATA *path_win(WIN_NAMEIDATA *Path, const char *path, int flags);
 
-/* syscall.S */
+/* fork.S */
 
 int sys_fork(call_t call);
 int sys_vfork(call_t call);
+
+/* sched.c */
+
+void task_init(char *arg0, exec_t *exec);
+

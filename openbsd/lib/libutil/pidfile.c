@@ -43,7 +43,7 @@ static pid_t pidfile_pid;
 
 static void pidfile_cleanup(void);
 
-//extern char *__progname;
+extern __import char *__progname;
 
 int
 pidfile(const char *basename)

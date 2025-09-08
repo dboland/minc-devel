@@ -2,8 +2,8 @@ ROOTDIR= ../..
 
 include ${ROOTDIR}/Makefile.inc
 
-PROGS= ln mkdir chmod ls cp
-XPROGS= ${PROGS} mv rm rmdir test chown chgrp
+PROGS= ln mkdir chmod ls cp rm
+XPROGS= ${PROGS} mv rmdir test chown chgrp
 OBJECTS= ${XPROGS} cat
 CFLAGS+= -DNOPIE -s -static
 BINSRC= ${SRCDIR}/bin
@@ -56,7 +56,7 @@ test: ${BINSRC}/test/test.c
 cat: ${BINSRC}/cat/cat.c
 	${XGCC} ${CFLAGS} -o $@ $<
 
-ls: ls-main.c ${BINSRC}/ls/print.c ${BINSRC}/ls/cmp.c ${BINSRC}/ls/util.c \
+ls: ${BINSRC}/ls/main.c ${BINSRC}/ls/print.c ${BINSRC}/ls/cmp.c ${BINSRC}/ls/util.c \
 	${BINSRC}/ls/ls.c
 	${XGCC} ${CFLAGS} -o $@ $^ -lutil
 

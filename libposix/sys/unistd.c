@@ -69,7 +69,8 @@ int
 sys_getdtablecount(call_t call)
 {
 	int result = 0;
-	WIN_VNODE *pvNode = call.Task->Node;
+	WIN_TASK *pwTask = call.Task;
+	WIN_VNODE *pvNode = pwTask->Node;
 	int fd = 0;
 
 	while (fd < OPEN_MAX){
@@ -528,11 +529,12 @@ int
 sys_closefrom(call_t call, int fd)
 {
 	int result = 0;
+	WIN_TASK *pwTask = call.Task;
 
 	if (fd < 0 || fd >= OPEN_MAX){
 		result = -EBADF;
 	}else{
-		result = __closefrom(call.Task->Node, fd);
+		result = __closefrom(pwTask->Node, fd);
 	}
 	return(result);
 }
@@ -621,7 +623,9 @@ sys_pwrite(call_t call, int fd, const void *buf, size_t nbytes, off_t offset)
 int 
 sys_getthrid(call_t call)
 {
-	return(call.Task->TaskId);	/* libc.so raise() (git.exe) */
+	WIN_TASK *pwTask = call.Task;
+
+	return(pwTask->TaskId);	/* libc.so raise() (git.exe) */
 }
 pid_t 
 __getpgid(WIN_TASK *Task, pid_t pid)
@@ -651,12 +655,13 @@ int
 sys_setpgid(call_t call, pid_t pid, pid_t pgid)
 {
 	int result = 0;
+	WIN_TASK *pwTask = call.Task;
 
 	if (pid < 0 || pid >= CHILD_MAX){
 		result = -EINVAL;
 	}else{
 		if (!pid){
-			pid = call.Task->TaskId;
+			pid = pwTask->TaskId;
 		}
 		if (!pgid){
 			pgid = __Tasks[pid].TaskId;
@@ -668,7 +673,9 @@ sys_setpgid(call_t call, pid_t pid, pid_t pgid)
 int 
 sys_issetugid(call_t call)
 {
-	return(call.Task->IsSetUGid);
+	WIN_TASK *pwTask = call.Task;
+
+	return(pwTask->IsSetUGid);
 }
 int 
 sys_revoke(call_t call, const char *path)

@@ -53,6 +53,6 @@ ${_INCDIR}:
 	@/bin/mkdir -p ${_INCDIR}
 	/bin/cp -ru ${XINCDIR}/* ${_INCDIR}/
 
-install-local: ${INCSRC} ${XINCDIR} ${SYSDIRS} ${HEADERS}
-
 install-cross: ${_INCDIR}
+
+install-local: ${INCSRC} ${XINCDIR} ${SYSDIRS} ${HEADERS} install-cross

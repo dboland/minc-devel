@@ -21,6 +21,4 @@ ${XLIBDIR}/libncursesw.a:
 ${_LIBDIR}/%.a: ${XLIBDIR}/%.a
 	/bin/ln -f $< $@
 
-install-local: ${XINCLUDES} ${XLIBS}
-
-install-cross: ${_LIBS}
+install-local: ${XINCLUDES} ${XLIBS} ${_LIBDIR} ${_LIBS}

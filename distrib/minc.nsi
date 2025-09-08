@@ -209,7 +209,7 @@ Section
 ;	${EndIf}
 
 	DetailPrint "Configuring..."
-	ExecDos::exec /DETAILED '.\postinstall.cmd osx'
+	ExecDos::exec /DETAILED '.\postinstall.cmd monokai'
 	RMDir /r "$INSTDIR\miniroot"
 	Delete "$INSTDIR\*.cmd"
 

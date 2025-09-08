@@ -3,10 +3,15 @@ OBJECTS=htonl.o htons.o ntohl.o ntohs.o
 .SUFFIXES:
 .DEFAULT:
 
-all: ${OBJECTS}
-	@/bin/echo "done."
+LIB= ../net.a
+
+all: ${OBJECTS} ${LIB}
+	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/arch/${ARCH}/net/%.S
-	@/bin/echo -n "$@ "
+	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -o $@ $<
 

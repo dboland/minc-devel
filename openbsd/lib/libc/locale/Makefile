@@ -14,9 +14,14 @@ OBJECTS+= wcstof.o wcstold.o
 .SUFFIXES:
 .DEFAULT:
 
-all: ${OBJECTS}
-	@/bin/echo "done."
+LIB= ../locale.a
+
+all: ${OBJECTS} ${LIB}
+	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/locale/%.c
-	@/bin/echo -n "$@ "
+	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -DLOCALE_CHARSETS="\"${LOCALECHARSETS}\"" -I../include -I${SRCDIR}/lib/libc/citrus -o $@ $<

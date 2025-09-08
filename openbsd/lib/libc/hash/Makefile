@@ -5,13 +5,20 @@ OBJECTS=md5hl.o rmd160hl.o sha1hl.o sha224hl.o sha256hl.o sha384hl.o sha512hl.o 
 .SUFFIXES:
 .DEFAULT:
 
-all: ${HELPER} ${OBJECTS}
+LIB= ../hash.a
+
+all: ${HELPER} ${OBJECTS} ${LIB}
+	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.c: ${SRCDIR}/lib/libc/hash/%.c
 	/bin/cp -u $< $@
 
 %.o: %.c
-	${XGCC} -c ${CFLAGS} -o $@ $<
+	@echo -n "$@ "
+	@${XGCC} -c ${CFLAGS} -o $@ $<
 
 clean:
 	rm -f ${HELPER} *.o *.dll *.a

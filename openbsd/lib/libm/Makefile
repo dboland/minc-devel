@@ -62,7 +62,7 @@ OBJECTS=b_exp__D.o b_log__D.o b_tgamma.o \
 
 OBJECTS+=s_rintl.o
 
-all: libm.a
+all: ${OBJECTS} libm.a
 
 %.o: ${SRCDIR}/lib/libm/src/%.c
 	@echo -n "$@ "
@@ -75,7 +75,7 @@ all: libm.a
 %.d: %
 	CFLAGS="${CFLAGS}" ${MAKE} -C $< XGCC="${XGCC}" SRCDIR="${SRCDIR}" ARCH="${ARCH}"
 
-libm.a: ${OBJECTS}
+libm.a:
 	@echo "done."
 	@echo "Creating static library $@"
 	@ar cru $@ ${OBJECTS}
@@ -86,5 +86,10 @@ install: ${DESTDIR}
 install-local:
 	/bin/cp -uv libm.a ${XLIBDIR}/
 
-clean:
-	/bin/rm -f *.o *.a
+lib-clean:
+	/bin/rm -f libm.a
+
+all-clean: lib-clean
+	/bin/rm -f *.o
+
+clean: lib-clean

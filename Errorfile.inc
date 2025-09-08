@@ -12,14 +12,21 @@ ${SRCDIR}:
 	@echo " ---------------------------------------------------"
 	@exit 1
 
-${TMPDIR}:
-	@/bin/mkdir -p ${TMPDIR}
+${DESTDIR}:
+	@echo " ---------------------------------------------------"
+	@echo "| Install directory ($@) not found. If you want to install"
+	@echo "| MinC in this directory, run ./mkroot.sh instead."
+	@echo " ---------------------------------------------------"
+	@exit 1
 
 ${ROOTDIR}/config.inc:
 	@echo " ---------------------------------------------------"
 	@echo "| Cross-compiler not set up. Please run 'make opt' first."
 	@echo " ---------------------------------------------------"
 	@exit 1
+
+${TMPDIR}:
+	@/bin/mkdir -p ${TMPDIR}
 
 ${MKDIR}:
 	@echo " ---------------------------------------------------"

@@ -38,10 +38,6 @@ int errno_posix(UINT Error);
 int rid_posix(SID8 *Sid);
 SID8 *rid_win(SID8 *Buf, int rid);
 
-/* proc.c */
-
-void task_init(char *cmdbuf, char *argv[], void *frame_address);
-
 /* namei.c */
 
 char *path_posix(char *dest, LPCWSTR Source);

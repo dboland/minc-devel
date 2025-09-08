@@ -3,8 +3,15 @@ OBJECTS= send.o recv.o herror.o
 .SUFFIXES:
 .DEFAULT:
 
-all: ${OBJECTS}
+LIB= ../net.a
+
+all: ${OBJECTS} ${LIB}
+	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/net/%.c
-	${XGCC} -c ${CFLAGS} -o $@ $<
+	@echo -n "$@ "
+	@${XGCC} -c ${CFLAGS} -o $@ $<
 

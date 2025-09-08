@@ -56,6 +56,9 @@
 #include <sys/tty.h>
 #include <sys/termios.h>
 
+extern char *__progname;
+extern char **environ;
+
 #include "../../libposix/kern/systm.h"
 
 #define _KERNEL
@@ -275,7 +278,7 @@ halt(int level)
 /************************************************************/
 
 int 
-main(int argc, char *argv[], char *envp[])
+main(int argc, char *argv[], char *env[])
 {
 	int mib[2] = {CTL_KERN, KERN_SECURELVL};
 	size_t size = sizeof(int);

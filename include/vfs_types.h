@@ -211,7 +211,7 @@ typedef struct _WIN_NAMEIDATA {
 	WCHAR Resolved[WIN_PATH_MAX];
 } WIN_NAMEIDATA;
 
-#define WIN_PATHCOPY		0x00400000
+#define WIN_PATHCOPY		0x00400000	/* copy path verbatim */
 #define WIN_REQUIREOBJECT	0x01000000
 
 /* sys/namei.h */
@@ -517,9 +517,10 @@ typedef struct _WIN_TASK {
 	DWORD Nice;
 	DWORD Flags;
 	DWORD Depth;
-//	DWORD SetSize;
-//	DWORD TextSize;
-//	DWORD DataSize;
+	ULONG SetSize;			/* size of bss section */
+	ULONG DataSize;			/* size of entire data section */
+	ULONG TextSize;			/* size of text section */
+	PVOID Data;			/* start of data section */
 	SID8 UserSid;			/* effective user id */
 	SID8 GroupSid;			/* effective group id */
 	HANDLE TraceHandle;

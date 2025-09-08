@@ -4,13 +4,14 @@ include ${ROOTDIR}/Makefile.inc
 
 PROGS= gzip id
 XPROGS= arch uname touch
-OBJECTS= ${PROGS} ${XPROGS} du env find xargs sed sort cap_mkdb
+OBJECTS= ${XPROGS} du env find sed cap_mkdb
 UBINSRC= ${SRCDIR}/usr.bin
 UBINDIR= /usr/bin
 
 # GNU make can't cd into make if make/make.exe exists?!?!
 
-all: ${UBINSRC} ${OBJECTS} install.exe
+all: ${UBINSRC} ${OBJECTS} xinstall
+	@${MAKE} -C make
 
 ${UBINSRC}:
 	@echo " ---------------------------------------------------"
@@ -19,14 +20,16 @@ ${UBINSRC}:
 	@echo " ---------------------------------------------------"
 	@exit 1
 
-${BINDIR}: ${PROGS} install.exe
+${BINDIR}: ${PROGS} xinstall
 	@/bin/mkdir -p ${BINDIR}
-	/bin/cp -vu install ${PROGS} ${BINDIR}/
+	/bin/cp -vu ${PROGS} ${BINDIR}/
+	/bin/cp -vu xinstall ${BINDIR}/install
 	/bin/cp -vu manifest ${BINDIR}/install.exe.manifest
 
-${XBINDIR}: ${XPROGS} install.exe
+${XBINDIR}: ${XPROGS} xinstall
 	@/bin/mkdir -p ${XBINDIR}
-	/bin/cp -vu install ${XPROGS} ${XBINDIR}/
+	/bin/cp -vu ${XPROGS} ${XBINDIR}/
+	/bin/cp -vu xinstall ${XBINDIR}/install
 	/bin/cp -vu manifest ${XBINDIR}/install.exe.manifest
 
 uname: ${UBINSRC}/uname/uname.c
@@ -47,14 +50,14 @@ id: ${UBINSRC}/id/id.c
 # down execution to a crawl.
 # see: https://irq5.io/2011/06/26/gnu-patch-and-windows-uac/
 
-install.exe: xinstall.c
+xinstall: ${UBINSRC}/xinstall/xinstall.c
 	${XGCC} -s -static ${CFLAGS} -DNOPIE -I${UBINSRC}/xinstall -o $@ $<
 
 gzip: ${UBINSRC}/compress/main.c ${UBINSRC}/compress/zopen.c \
 	${UBINSRC}/compress/gzopen.c ${UBINSRC}/compress/nullopen.c
 	${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $^ -lz
 
-env: env.c
+env: ${UBINSRC}/env/env.c
 	${XGCC} -s ${CFLAGS} -o $@ $<
 
 du: ${UBINSRC}/du/du.c
@@ -65,28 +68,23 @@ find: ${UBINSRC}/find/find.c ${UBINSRC}/find/function.c ${UBINSRC}/find/ls.c \
 	${UBINSRC}/find/option.c
 	${XGCC} -s ${CFLAGS} -o $@ $^
 
-xargs: xargs.c ${UBINSRC}/xargs/strnsubst.c
-	${XGCC} -s ${CFLAGS} -I${UBINSRC}/xargs -o $@ $^
-
 sed: ${UBINSRC}/sed/compile.c ${UBINSRC}/sed/main.c ${UBINSRC}/sed/misc.c \
 	${UBINSRC}/sed/process.c
 	${XGCC} -s ${CFLAGS} -o $@ $^
-
-sort: sort.c ${UBINSRC}/sort/append.c ${UBINSRC}/sort/fields.c \
-	${UBINSRC}/sort/files.c ${UBINSRC}/sort/fsort.c ${UBINSRC}/sort/init.c \
-	${UBINSRC}/sort/msort.c ${UBINSRC}/sort/tmp.c
-	${XGCC} -s ${CFLAGS} -I${UBINSRC}/sort -o $@ $^
 
 cap_mkdb: ${UBINSRC}/cap_mkdb/cap_mkdb.c ${UBINSRC}/cap_mkdb/getinfo.c
 	${XGCC} -s ${CFLAGS} -o $@ $^
 
 install-local: ${BINDIR} ${XBINDIR}
 
-install: ${DESTDIR} ${OBJECTS} install.exe
+install: ${DESTDIR} ${OBJECTS} xinstall
 	@${MKDIR} -p ${DESTDIR}${UBINDIR}
-	${INSTALL} -m ${BINMODE} install ${OBJECTS} ${DESTDIR}${UBINDIR}/
+	${INSTALL} -m ${BINMODE} ${OBJECTS} ${DESTDIR}${UBINDIR}/
+	${INSTALL} -m ${BINMODE} xinstall ${DESTDIR}${UBINDIR}/install
 	${INSTALL} -m ${NONBINMODE} manifest ${DESTDIR}${UBINDIR}/install.manifest
 	${INSTALL} -m ${NONBINMODE} manifest ${DESTDIR}${UBINDIR}/patch.manifest
+	@${MAKE} -C make install
 
 clean:
 	/bin/rm -f *.exe *.o
+	${MAKE} -C make clean

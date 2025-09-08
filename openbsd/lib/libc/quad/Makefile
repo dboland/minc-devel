@@ -10,8 +10,13 @@ KOBJECTS=adddi3.o anddi3.o ashldi3.o ashrdi3.o cmpdi2.o divdi3.o iordi3.o \
 .SUFFIXES:
 .DEFAULT:
 
-all: ${OBJECTS}
+LIB= ../quad.a
+
+all: ${OBJECTS} ${LIB}
 	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/quad/%.c
 	@echo -n "$@ "

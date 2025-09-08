@@ -38,7 +38,10 @@ libutil.a: ${OBJECTS}
 	@ar cru $@ ${OBJECTS}
 
 clean:
-	/bin/rm -f *.o *.a ${LIBUTIL}
+	/bin/rm -f libutil.a
+
+all-clean: clean
+	/bin/rm -f *.o
 
 install-local:
 	/bin/cp -vu libutil.a ${XLIBDIR}/

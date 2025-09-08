@@ -11,10 +11,15 @@ OBJECTS=explicit_bzero.o memccpy.o memmem.o memrchr.o stpcpy.o stpncpy.o \
 .SUFFIXES:
 .DEFAULT:
 
-all: ${OBJECTS}
-	@/bin/echo "done."
+LIB= ../string.a
+
+all: ${OBJECTS} ${LIB}
+	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/string/%.c
-	@/bin/echo -n "$@ "
+	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -I../include -I${SRCDIR}/lib/libc -o $@ $<
 

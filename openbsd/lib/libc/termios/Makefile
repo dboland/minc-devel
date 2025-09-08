@@ -5,9 +5,14 @@ OBJECTS= cfgetispeed.o cfgetospeed.o cfmakeraw.o cfsetispeed.o cfsetospeed.o \
 .SUFFIXES:
 .DEFAULT:
 
-all: ${OBJECTS}
-	@/bin/echo "done."
+LIB= ../termios.a
+
+all: ${OBJECTS} ${LIB}
+	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/termios/%.c
-	@/bin/echo -n "$@ "
+	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -o $@ $<

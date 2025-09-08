@@ -10,7 +10,7 @@ GCCOBJ= _mulsc3.o _muldc3.o _mulxc3.o _ctzdi2.o \
 GCCDIR= /lib/gcc/mingw32/${GCCVER}
 ULIBDIR= /usr/lib
 
-all: ${MINGW}${GCCDIR} ${OBJECTS} ${LIBS}
+all: ${MINGW}${GCCDIR} ${OBJECTS} ${LIBS} gcrt0.o
 
 ${MINGW}${GCCDIR}:
 	@echo " -----------------------------------------------"
@@ -21,7 +21,7 @@ ${MINGW}${GCCDIR}:
 	@exit 1
 
 %.o: %.c
-	${CC} -c ${CFLAGS} -I${ROOTDIR}/include -o $@ $<
+	${XGCC} -c ${CFLAGS} -I${ROOTDIR}/include -o $@ $<
 
 %.a: %.def
 	dlltool -d $< -l $@ -k
@@ -52,23 +52,21 @@ crt0_tls.o: crt0.o win_tls.o
 #	/bin/cp -vu ${MINGW}${GCCDIR}/libssp.a ${XPREFIX}${GCCDIR}/
 #	/bin/cp -vu ${MINGW}${GCCDIR}/libstdc++.a ${XPREFIX}${GCCDIR}/
 
-install-local:
+install-cross:
+	@/bin/mkdir -p ${_LIBDIR}
+	@/bin/cp -vu crtbegin.o crtend.o ${_LIBDIR}/
+	@/bin/cp -vu crt0.o crt1.o gcrt0.o ${_LIBDIR}/
+
+install-local: install-cross
 	@/bin/mkdir -p ${XPREFIX}${GCCDIR}
 	@/bin/cp -vu ${LIBS} ${XPREFIX}${GCCDIR}/
 	@/bin/cp -vu crtbegin.o crtend.o ${XPREFIX}${GCCDIR}/
 	@/bin/cp -vu crt0.o ${XLIBDIR}/crt2.o
 	@/bin/cp -vu crt1.o ${XLIBDIR}/dllcrt2.o
-	@#/bin/cp -vu gcrt0.o ${XLIBDIR}/gcrt2.o
-
-install-cross:
-	/bin/cp -vu crtbegin.o crtend.o ${_LIBDIR}/
-	/bin/cp -vu crt0.o crt1.o ${_LIBDIR}/
 
 install: ${DESTDIR}${ULIBDIR}
-	@#${INSTALL} libgcc.a ${DESTDIR}${ULIBDIR}/gcc/i686-pe-openbsd/${GCCVER}/
-	${INSTALL} crtbegin.o crtend.o ${DESTDIR}${ULIBDIR}/
-	${INSTALL} crt0.o crt1.o ${DESTDIR}${ULIBDIR}/
-	${INSTALL} gcrt0.o ${DESTDIR}${ULIBDIR}/
+	${INSTALL} -m ${NONBINMODE} crtbegin.o crtend.o ${DESTDIR}${ULIBDIR}/
+	${INSTALL} -m ${NONBINMODE} crt0.o crt1.o gcrt0.o ${DESTDIR}${ULIBDIR}/
 
 clean:
 	/bin/rm -f *.o *.a

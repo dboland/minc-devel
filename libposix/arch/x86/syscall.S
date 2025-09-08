@@ -73,9 +73,9 @@ _sys_syscall:
 	push %ecx
 	ret
 
-.def ___threxit; .scl 2; .type 32; .endef
+.def _sys__threxit; .scl 2; .type 32; .endef
 
-___threxit:
+_sys__threxit:
 	pop %ecx
 	mov $SYS___threxit,%eax
 	call ___kernel

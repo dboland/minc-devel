@@ -319,12 +319,13 @@ int
 sys_setresuid(call_t call, uid_t ruid, uid_t euid, uid_t suid)
 {
 	int result = 0;
+	WIN_TASK *pwTask = call.Task;
 
 	if (!suid){
 		suid = ROOT_UID;
 	}
 	if (!__setreuid(call.Task, ruid, euid)){
-		call.Task->SavedUid = suid;
+		pwTask->SavedUid = suid;
 	}else{
 		result = -EPERM;
 	}
@@ -393,11 +394,13 @@ sys_setregid(call_t call, gid_t rgid, gid_t egid)
 int 
 sys_setresgid(call_t call, gid_t rgid, gid_t egid, gid_t sgid)
 {
+	WIN_TASK *pwTask = call.Task;
+
 	if (!sgid){
 		sgid = ROOT_GID;
 	}
-	if (!__setregid(call.Task, rgid, egid)){
-		call.Task->SavedGid = sgid;
+	if (!__setregid(pwTask, rgid, egid)){
+		pwTask->SavedGid = sgid;
 	}else{
 		return(-EPERM);
 	}
@@ -433,12 +436,16 @@ sys_setlogin(call_t call, const char *name)
 pid_t 
 sys_getpid(call_t call)
 {
-	return(call.Task->TaskId);
+	WIN_TASK *pwTask = call.Task;
+
+	return(pwTask->TaskId);
 }
 pid_t 
 sys_getppid(call_t call)
 {
-	return(call.Task->ParentId);
+	WIN_TASK *pwTask = call.Task;
+
+	return(pwTask->ParentId);
 }
 pid_t 
 sys_getsid(call_t call, pid_t pid)

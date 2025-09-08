@@ -19,9 +19,14 @@ CFLAGS+= -DFLOATING_POINT -DPRINTF_WIDE_CHAR -DSCANF_WIDE_CHAR
 .SUFFIXES:
 .DEFAULT:
 
-all: ${OBJECTS}
-	@/bin/echo "done."
+LIB= ../stdio.a
+
+all: ${OBJECTS} ${LIB}
+	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/stdio/%.c
-	@/bin/echo -n "$@ "
+	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -I../include -I${SRCDIR}/lib/libc/gdtoa -I${SRCDIR}/lib/libc/arch/${ARCH}/gdtoa -o $@ $<

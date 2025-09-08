@@ -3,8 +3,15 @@ OBJECTS=unithread_malloc_lock.o unithread_mutex.o unithread_tag.o
 .SUFFIXES:
 .DEFAULT:
 
-all: ${OBJECTS}
+LIB= ../thread.a
+
+all: ${OBJECTS} ${LIB}
+	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/thread/%.c
-	${XGCC} -c ${CFLAGS} -I../include -o $@ $<
+	@echo -n "$@ "
+	@${XGCC} -c ${CFLAGS} -I../include -o $@ $<
 

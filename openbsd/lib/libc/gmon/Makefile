@@ -4,10 +4,18 @@ OBJECTS+=mcount.c.o
 .SUFFIXES:
 .DEFAULT:
 
-all: ${OBJECTS}
+LIB= ../gmon.a
+
+all: ${OBJECTS} ${LIB}
+	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/gmon/%.c
-	${XGCC} -c ${CFLAGS} -o $@ $<
+	@echo -n "$@ "
+	@${XGCC} -c ${CFLAGS} -o $@ $<
 
 %.c.o: %.c
-	${XGCC} -c ${CFLAGS} -o $@ $<
+	@echo -n "$@ "
+	@${XGCC} -c ${CFLAGS} -o $@ $<

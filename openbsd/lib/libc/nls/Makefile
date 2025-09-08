@@ -4,8 +4,15 @@ OBJECTS+=_catclose.o _catgets.o _catopen.o
 .SUFFIXES:
 .DEFAULT:
 
-all: ${OBJECTS}
+LIB= ../nls.a
+
+all: ${OBJECTS} ${LIB}
+	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/nls/%.c
-	${XGCC} -c ${CFLAGS} -o $@ $<
+	@echo -n "$@ "
+	@${XGCC} -c ${CFLAGS} -o $@ $<
 

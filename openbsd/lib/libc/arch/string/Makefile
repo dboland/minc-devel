@@ -8,8 +8,13 @@ OBJECTS+= strncat.c.o strncpy.c.o strcspn.c.o strlcpy.c.o strspn.c.o
 .SUFFIXES:
 .DEFAULT:
 
-all: ${OBJECTS}
-	@/bin/echo "done."
+LIB= ../string.a
+
+all: ${OBJECTS} ${LIB}
+	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/arch/${ARCH}/string/%.S
 	@echo -n "$@ "

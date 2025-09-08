@@ -9,14 +9,19 @@ OBJECTS+= divsi3.o fixdfsi.o fixunsdfsi.o udivsi3.o
 .SUFFIXES:
 .DEFAULT:
 
-all: ${OBJECTS}
-	@/bin/echo "done."
+LIB= ../gen.a
+
+all: ${OBJECTS} ${LIB}
+	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.c.o: ${SRCDIR}/lib/libc/arch/${ARCH}/gen/%.c
-	@/bin/echo -n "$@ "
+	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -o $@ $<
 
 %.o: ${SRCDIR}/lib/libc/arch/${ARCH}/gen/%.S
-	@/bin/echo -n "$@ "
+	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -o $@ $<
 

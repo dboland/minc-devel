@@ -32,6 +32,8 @@ diff_dir()
 			continue
 		elif [[ $file == */Makefile ]]; then
 			continue
+		elif [[ $file == */.* ]]; then
+			continue
 		elif ! diff_file "$file"; then
 			exit 2
 		fi

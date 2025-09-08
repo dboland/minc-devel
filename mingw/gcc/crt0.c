@@ -29,38 +29,43 @@
  */
 
 #include <stdlib.h>
-#include <stdint.h>
 
+#include <sys/types.h>
 #include <sys/param.h>
-//#include <sys/exec.h>		/* use struct exec for next version */
+
+#include "bsd_types.h"
+
+extern unsigned char _bss_end__;
+extern unsigned char _bss_start__;
+extern unsigned char _data_start__;
 
 extern int main(int argc, char *argv[], char *env[]);
 
-/* libc_stdlib.c */
+/* libc.c */
 
-void _init(char *cmdbuf, int *_argc, char ***_argv, char ***_env, void *frame_address);
+void _init(char *arg0, exec_t *exec);
 
 /* crtbegin.c */
 
 void __init();
 void __fini(void);
 
-/* lib/csu/ia64/crt0.c */
-
-//char __progname_storage[NAME_MAX+1];
-
 /************************************************************/
 
 void 
 __start(void)
 {
-	char buf[PATH_MAX];	/* diff.exe (set_argstr()) */
-	int argc;
-	char **argv, **env;
+	char arg0[PATH_MAX];	/* diff.exe (set_argstr()) */
 	int result;
+	exec_t exec = {0};
 
-	_init(buf, &argc, &argv, &env, __builtin_frame_address(0));
-	result = main(argc, argv, env);
+	exec.end = &_bss_end__;
+	exec.bss = &_bss_start__;
+	exec.data = &_data_start__;
+	exec.text = __start;
+	exec.frame = __builtin_frame_address(0);
+	_init(arg0, &exec);
+	result = main(exec.argc, exec.argv, exec.env);
 	__fini();
 	exit(result);
 }

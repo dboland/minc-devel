@@ -29,8 +29,13 @@ LIBC= send.so recv.so herror.so
 
 SHOBJECTS+=ip6opt.so rthdr.so vars6.so
 
-all: ${OBJECTS} ${SHOBJECTS}
+LIB= ../net.a
+
+all: ${OBJECTS} ${SHOBJECTS} ${LIB}
 	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/net/%.c
 	@echo -n "$@ "

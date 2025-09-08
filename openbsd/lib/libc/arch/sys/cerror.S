@@ -1,8 +1,10 @@
-/*	$OpenBSD: src/usr.bin/env/env.c,v 1.15 2014/03/08 00:09:20 schwarze Exp $	*/
-
-/*
- * Copyright (c) 1988, 1993, 1994
- *	The Regents of the University of California.  All rights reserved.
+/*	$OpenBSD: src/lib/libc/arch/i386/sys/cerror.S,v 1.9 2012/08/22 17:19:34 pascal Exp $ */
+/*-
+ * Copyright (c) 1990 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * This code is derived from software contributed to Berkeley by
+ * William Jolitz.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,69 +31,21 @@
  * SUCH DAMAGE.
  */
 
-#include <err.h>
-#include <errno.h>
-#include <locale.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include "../SYS.h"
 
-__dead void usage(void);
+	.globl	_C_LABEL(errno)
 
-int
-main(int argc, char *argv[])
-{
-//	extern char **environ;
-//	extern int optind;
-	char **ep, *p;
-	int ch;
+WEAK_ALIAS(CERROR, _CERROR)
 
-	setlocale(LC_ALL, "");
-
-	while ((ch = getopt(argc, argv, "i-")) != -1)
-		switch(ch) {
-		case '-':			/* obsolete */
-		case 'i':
-			if ((environ = calloc(1, sizeof(char *))) == NULL)
-				err(126, "calloc");
-			break;
-		default:
-			usage();
-		}
-	argc -= optind;
-	argv += optind;
-
-	for (; *argv && (p = strchr(*argv, '=')); ++argv) {
-		*p++ = '\0';
-		if (setenv(*argv, p, 1) == -1) {
-			/* reuse 126, it matches the problem most */
-			err(126, "setenv");
-		}
-	}
-
-	if (*argv) {
-		/*
-		 * return 127 if the command to be run could not be
-		 * found; 126 if the command was found but could
-		 * not be invoked
-		 */
-		execvp(*argv, argv);
-		err((errno == ENOENT) ? 127 : 126, "%s", *argv);
-	}
-
-	for (ep = environ; *ep; ep++)
-		(void)printf("%s\n", *ep);
-
-	exit(0);
-}
-
-void
-usage(void)
-{
-//	extern char *__progname;
-
-	(void)fprintf(stderr, "usage: %s [-i] [name=value ...] "
-	    "[utility [argument ...]]\n", __progname);
-	exit(1);
-}
+_ENTRY(_CERROR)
+#ifdef __PIC__
+	PIC_PROLOGUE
+	movl	PIC_GOT(_C_LABEL(errno)),%ecx
+	PIC_EPILOGUE
+	movl	%eax,(%ecx)
+#else
+	movl	%eax,_C_LABEL(errno)
+#endif
+	movl	$-1,%eax
+	movl	$-1,%edx
+	ret

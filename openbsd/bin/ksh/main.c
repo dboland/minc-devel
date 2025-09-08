@@ -10,7 +10,7 @@
 #include <sys/stat.h>
 #include <pwd.h>
 
-//extern char **environ;
+extern char **environ;
 
 /*
  * global data

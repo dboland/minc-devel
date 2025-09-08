@@ -1,4 +1,4 @@
-#include "SYS.h"
+#include "../SYS.h"
 
 ENTRY(_getlogin)
 	pop %ecx

@@ -4,12 +4,19 @@ include ${ROOTDIR}/Makefile.inc
 
 RELEASE= 75.0
 OBJECTS= libc.o
-SHOBJECTS= $(shell /bin/ls arch/${ARCH}/*/*.o */*.o db/*/*.o)
+LIBS= stdio.a stdlib.a quad.a locale.a citrus.a compat-43.a crypt.a gdtoa.a gen.a \
+	hash.a regex.a string.a termios.a time.a thread.a \
+	sys.a nls.a dlfcn.a gmon.a net.a
+LIBS+= arch/string.a arch/gen.a arch/net.a arch/sys.a
+LIBS+= db/btree.a db/db.a db/hash.a db/mpool.a db/recno.a
+SHOBJECTS= $(shell /bin/ls arch/*/*.o */*.o db/*/*.o)
 LIBC= libc.so.${RELEASE}
 GCCDIR= ${XLIBDIR}/gcc/mingw32/${GCCVER}
 CFLAGS+= -g -DNOPIE
 IMPLIB= libc.dll.a
 ULIBDIR= /usr/lib
+#LDFLAGS+= --whole-archive
+LDFLAGS+= --export-all
 
 NLS=    C.msg Pig.msg da.ISO8859-1.msg da.UTF-8.msg de.ISO8859-1.msg \
         de.UTF-8.msg es.ISO8859-1.msg es.UTF-8.msg fi.ISO8859-1.msg \
@@ -17,9 +24,9 @@ NLS=    C.msg Pig.msg da.ISO8859-1.msg da.UTF-8.msg de.ISO8859-1.msg \
         nl.ISO8859-1.msg nl.UTF-8.msg no.ISO8859-1.msg no.UTF-8.msg \
         ru.KOI8-R.msg ru.UTF-8.msg sv.ISO8859-1.msg sv.UTF-8.msg
 
-all: include objects lib
+all: include ${LIBS} lib
 
-%.d: %
+%.a: %
 	@CFLAGS="${CFLAGS}" ${MAKE} -C $< XGCC="${XGCC}" ROOTDIR="${ROOTDIR}/.." \
 	SRCDIR=${SRCDIR} ARCH=${ARCH}
 
@@ -35,45 +42,42 @@ version.o: version.rc
 
 ${LIBC}: ${OBJECTS} version.o
 	${LD} -s -shared ${LDFLAGS} -e _DllMainCRTStartup@12 --out-implib=${IMPLIB} \
-	-o $@ --image-base=${IMGBASE_LIBC} ${XLIBDIR}/dllcrt2.o ${OBJECTS} ${SHOBJECTS} version.o \
+	-o $@ --image-base=${IMGBASE_LIBC} ${XLIBDIR}/dllcrt2.o ${SHOBJECTS} ${OBJECTS} version.o \
 	-L${XLIBDIR} -L${GCCDIR} -lmingw32 -lmsvcrt -lgcc
 
 include:
 	/bin/cp -rvu ${SRCDIR}/lib/libc/include .
 	/bin/patch -p 2 -d . <../../libc.patch
 
-objects: arch.d quad.d stdlib.d citrus.d compat-43.d crypt.d db.d gdtoa.d gen.d \
-	hash.d locale.d regex.d stdio.d string.d termios.d time.d thread.d \
-	sys.d nls.d dlfcn.d gmon.d net.d
-
 lib: ${LIBC} libc.a
 
 lib-clean:
-	/bin/rm -f *.o *.a ${LIBC}
+	/bin/rm -f ${OBJECTS} ${LIBC} libc.a
 
-objects-clean:
-	/bin/rm -f */*.o arch/${ARCH}/*/*.o db/*/*.o
+all-clean: lib-clean
+	/bin/rm -f ${LIBS} */*.o arch/*/*.o db/*/*.o
 
 release-clean:
 	/bin/rm -f version.o
 
+install-cross: ${_LIBDIR}
+	@/bin/mkdir -p ${_LIBDIR}
+	@/bin/cp -vu libc.a ${_LIBDIR}/
+	@/bin/cp -vu ${IMPLIB} ${_LIBDIR}/libc.so
+
 # Perl needs libc.so
 
-install-local:
-	/bin/cp -vu ${LIBC} ${XBINDIR}/
-	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libc.so
-	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libmingwex.dll.a
-	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/
-	/bin/cp -vu libc.a ${XLIBDIR}/libmingwex.a
-	/bin/cp -vu libc.a ${XLIBDIR}/
-
-install-cross:
-	/bin/cp -vu libc.a ${_LIBDIR}/
-	/bin/cp -vu ${IMPLIB} ${_LIBDIR}/libc.so
+install-local: install-cross
+	@/bin/cp -vu ${LIBC} ${XBINDIR}/
+	@/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libc.so
+	@/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libmingwex.dll.a
+	@/bin/cp -vu ${IMPLIB} ${XLIBDIR}/
+	@/bin/cp -vu libc.a ${XLIBDIR}/libmingwex.a
+	@/bin/cp -vu libc.a ${XLIBDIR}/
 
 install: ${DESTDIR}
 	@${MKDIR} -p ${DESTDIR}${ULIBDIR}
 	${INSTALL} -m ${BINMODE} ${LIBC} libc.a ${DESTDIR}${ULIBDIR}/
 
-clean: objects-clean lib-clean
+clean: lib-clean
 

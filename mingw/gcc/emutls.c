@@ -71,10 +71,10 @@ DWORD __tls_index__ = -1;
 PIMAGE_TLS_CALLBACK __tls_init__[2] = {&TlsMainCRTStartup, NULL};
 
 const IMAGE_TLS_DIRECTORY _tls_used = {
-	&__tls_start__,	/* start of tls data */
-	&__tls_end__,	/* end of tls data */
-	&__tls_index__,	/* offset into thread-local storage array */
-	&__tls_init__,	/* pointer to call back array */
+	&__tls_start__,		/* start of tls data */
+	&__tls_end__,		/* end of tls data */
+	&__tls_index__,		/* offset into thread-local storage array */
+	&__tls_init__,		/* pointer to call back array */
 	0,			/* size of tls zero fill */
 	0			/* characteristics */
 };

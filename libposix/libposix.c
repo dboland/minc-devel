@@ -70,11 +70,9 @@ u_long	__THREAD_FRAME;
 
 CHAR 			*__PROGNAME;		/* ktrace.c */
 
-WIN_NAMEIDATA *path_win(WIN_NAMEIDATA *Path, const char *pathname, int flags);
-
 #define WIN_ERR		msvc_printf
 
-/* Hello Terry Davis */
+/* hello Terry Davis */
 
 #include "kern/syscall.h"
 #include "kern/syscalls.c"

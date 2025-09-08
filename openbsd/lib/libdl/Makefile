@@ -30,11 +30,11 @@ ${LIBXDIR}: ${LIBDL}
 
 lib: ${LIBDL}
 
-install-local: ${LIBXDIR}
-	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/
-
-install-cross:
+install-cross: ${_LIBDIR}
 	/bin/cp -vu ${IMPLIB} ${_LIBDIR}/libdl.a
+
+install-local: ${LIBXDIR} install-cross
+	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/
 
 install: ${DESTDIR}
 	@${MKDIR} -p ${DESTDIR}${ULIBXDIR}

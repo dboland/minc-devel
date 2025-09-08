@@ -73,7 +73,7 @@ copy_stack(u_long origin, u_long src, u_long *dest)
 		dest[0] -= size;
 		memcpy((void *)dest[0], (void *)src, size);
 		if (!depth){
-			*(u_long *)(dest[0] + sizeof(u_long)) = (u_long)&__threxit;
+			*(u_long *)(dest[0] + sizeof(u_long)) = (u_long)&sys__threxit;
 		}
 		*(u_long *)dest[0] = dest[0] + size;
 		depth++;
@@ -84,19 +84,23 @@ copy_stack(u_long origin, u_long src, u_long *dest)
 /****************************************************/
 
 void 
-task_init(char *cmdbuf, char *argv[], void *frame_address)
+task_init(char *arg0, exec_t *exec)
 {
 	int fd = 0;
 	SID8 sid;
 	WIN_TASK *pwTask;
 	LPWSTR pszCommand;
 
-	__THREAD_FRAME = (u_long)frame_address;
-	pwTask = proc_start(sigproc_win);
+	__THREAD_FRAME = (u_long)exec->frame;
+	pwTask = proc_init(sigproc_win);
+	pwTask->SetSize = exec->end - exec->bss;
+	pwTask->DataSize = exec->end - exec->data;
+	pwTask->TextSize = exec->data - exec->text;
+	pwTask->Data = exec->data;
 	srand(time_posix(&pwTask->Started));
 	pszCommand = __Strings[pwTask->TaskId].Command;
-	win_mbstowcs(pszCommand, argv[0], WIN_MAX_PROCTITLE);
-	argv[0] = path_posix(cmdbuf, pszCommand);
+	win_mbstowcs(pszCommand, exec->argv[0], WIN_MAX_PROCTITLE);
+	exec->argv[0] = path_posix(arg0, pszCommand);
 
 	TlsSetValue(__TlsIndex, (PVOID)pwTask->TaskId);
 }

@@ -100,9 +100,9 @@ kproc_posix(struct kinfo_proc *proc, WIN_TASK *Task)
 	proc->p_svgid = Task->SavedGid;
 	proc->p_tdev = pTerminal->DeviceId;
 	proc->p_tpgid = pTerminal->GroupId;
-	proc->p_vm_rssize = 10;
-	proc->p_vm_tsize = 10;
-	proc->p_vm_dsize = 10;
+	proc->p_vm_rssize = (Task->SetSize + dwPageSize - 1) / dwPageSize;
+	proc->p_vm_tsize = (Task->TextSize + dwPageSize - 1) / dwPageSize;
+	proc->p_vm_dsize = (Task->DataSize - Task->SetSize + dwPageSize - 1) / dwPageSize;
 	proc->p_vm_ssize = (WIN_STACKSIZE + dwPageSize - 1) / dwPageSize;
 	if (win_KERN_PROC(Task->ThreadId, &wkUsage)){
 

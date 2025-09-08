@@ -1,8 +1,8 @@
-#include "SYS.h"
+#include "../SYS.h"
 
-ENTRY(_exit)
+ENTRY(syscall)
 	pop %ecx
-	mov $SYS_exit,%eax
+	pop %eax
 	call ___kernel
 	SYSCALL_ERROR
 	push %ecx

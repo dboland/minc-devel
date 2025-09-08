@@ -4,8 +4,14 @@ OBJECTS=rec_close.o rec_delete.o rec_get.o rec_open.o rec_put.o rec_search.o \
 .SUFFIXES:
 .DEFAULT:
 
-all: ${OBJECTS}
-	@/bin/echo "done."
+CFLAGS+= -D__DBINTERFACE_PRIVATE
+LIB= ../recno.a
+
+all: ${OBJECTS} ${LIB}
+	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/db/recno/%.c
 	@/bin/echo -n "$@ "

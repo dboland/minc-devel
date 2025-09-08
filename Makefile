@@ -40,6 +40,11 @@ install-cross:
 	@${MAKE} -C libposix install-cross
 	@${MAKE} -C openbsd install-cross
 
+install:
+	@${MAKE} -C openbsd install
+	@${MAKE} -C libposix install
+	@${MAKE} -C mingw install
+
 clean:
 	@${MAKE} -C libposix clean
 	@${MAKE} -C openbsd clean

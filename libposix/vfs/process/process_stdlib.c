@@ -80,7 +80,7 @@ proc_setugid(WIN_TASK *Task)
 	return(bResult);
 }
 WIN_TASK *
-proc_start(WIN_SIGPROC SignalProc)
+proc_init(WIN_SIGPROC SignalProc)
 {
 	STARTUPINFO si = {0};
 

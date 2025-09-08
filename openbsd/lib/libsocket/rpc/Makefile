@@ -18,8 +18,13 @@ SHOBJECTS=auth_none.so auth_unix.so  authunix_prot.so bindresvport.so \
 	xdr_rec.so xdr_reference.so xdr_stdio.so
 #SHOBJECTS+= pmap_rmt.so
 
-all: ${OBJECTS} ${SHOBJECTS}
+LIB= ../rpc.a
+
+all: ${OBJECTS} ${SHOBJECTS} ${LIB}
 	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/rpc/%.c
 	@echo -n "$@ "

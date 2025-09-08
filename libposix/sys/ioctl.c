@@ -37,32 +37,33 @@ sys_ioctl(call_t call, int fd, unsigned long request, ...)
 {
 	int result = 0;
 	va_list args;
+	WIN_TASK *pwTask = call.Task;
 
 	va_start(args, request);
 	if (fd < 0 || fd >= OPEN_MAX){
 		result = -EBADF;
 	}else switch (IOCGROUP(request)){
 		case 'd':
-			result = disk_ioctl(call.Task, fd, request, args);
+			result = disk_ioctl(pwTask, fd, request, args);
 			break;
 		case 't':
-			result = term_ioctl(call.Task, fd, request, args);
+			result = term_ioctl(pwTask, fd, request, args);
 			break;
 		case 's':
 		case 'i':
-			result = sock_ioctl(call.Task, fd, request, args);
+			result = sock_ioctl(pwTask, fd, request, args);
 			break;
 		case 'f':
-			result = file_ioctl(call.Task, fd, request, args);
+			result = file_ioctl(pwTask, fd, request, args);
 			break;
 		case 'p':
-			result = pci_ioctl(call.Task, fd, request, args);
+			result = pci_ioctl(pwTask, fd, request, args);
 			break;
 		case 'W':
-			result = wscons_ioctl(call.Task, fd, request, args);
+			result = wscons_ioctl(pwTask, fd, request, args);
 			break;
 		case 'm':		/* tar.exe */
-			result = mtape_ioctl(call.Task, fd, request, args);
+			result = mtape_ioctl(pwTask, fd, request, args);
 			break;
 		default:
 			result = -EOPNOTSUPP;

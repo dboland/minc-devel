@@ -196,7 +196,7 @@ BOOL tty_attach(WIN_DEVICE *Device);
 
 /* process.c */
 
-WIN_TASK *proc_start(WIN_SIGPROC SignalProc);
+WIN_TASK *proc_init(WIN_SIGPROC SignalProc);
 WIN_TASK *proc_dup(WIN_TASK *Parent, WIN_THREAD_STRUCT *Thread);
 BOOL proc_close(WIN_TASK *Task);
 BOOL proc_poll(WIN_TASK *Task);

@@ -33,8 +33,9 @@
 
 #include "win/windows.h"
 #include "win_types.h"
+#include "vfs_posix.h"
 #include "msvc_posix.h"
-#include "arch_posix.h"
+#include "bsd_posix.h"
 
 /* winnt.h */
 
@@ -60,19 +61,23 @@ typedef struct {
 	size_t size;
 } tlsentry;
 
+/* In GCC, 'environ' seems to be a reserved word. Without 'dllexport' 
+ * and the --export-all flag in LD, it will be omitted in the import 
+ * table.
+ */
 char *__progname;
-char **__environ;
+char **environ __attribute__((dllexport));
 int h_errno;
 
 tlsentry __offsets[GOT_MAX];
 
 void 
-_init(char *cmdbuf, int *_argc, char ***_argv, char ***_env, void *frame_address)
+_init(char *arg0, exec_t *exec)
 {
-	msvc_init(_argc, _argv, _env);
-	task_init(cmdbuf, *_argv, frame_address);
-	__environ = *_env;
-	__progname = __PROGNAME = basename(*_argv[0]);
+	msvc_init(&exec->argc, &exec->argv, &exec->env);
+	task_init(arg0, exec);
+	environ = exec->env;
+	__progname = __PROGNAME = basename(arg0);
 }
 int 
 __fdnlist(int fd, struct nlist *list)

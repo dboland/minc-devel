@@ -3,8 +3,15 @@ OBJECTS=asctime.o difftime.o localtime.o strftime.o strptime.o wcsftime.o
 .SUFFIXES:
 .DEFAULT:
 
-all: ${OBJECTS}
+LIB= ../time.a
+
+all: ${OBJECTS} ${LIB}
+	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/time/%.c
-	${XGCC} -c ${CFLAGS} -I../include -o $@ $<
+	@echo -n "$@ "
+	@${XGCC} -c ${CFLAGS} -I../include -o $@ $<
 

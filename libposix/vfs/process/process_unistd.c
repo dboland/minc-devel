@@ -96,7 +96,6 @@ proc_dup(WIN_TASK *Parent, WIN_THREAD_STRUCT *Thread)
 	ptResult->RealGid = Parent->RealGid;
 	ptResult->SavedGid = Parent->SavedGid;
 	ptResult->ProcMask = Parent->ProcMask;
-//	ptResult->ClockTime = Parent->ClockTime;
 	ptResult->KernelTime = 0LL;
 	ptResult->UserTime = 0LL;
 	win_memcpy(ptResult->Limit, Parent->Limit, WIN_RLIM_NLIMITS * sizeof(DWORDLONG));

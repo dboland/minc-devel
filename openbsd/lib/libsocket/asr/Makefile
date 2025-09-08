@@ -16,8 +16,13 @@ SHOBJECTS+= getaddrinfo.so gethostnamadr.so getnameinfo.so getnetnamadr.so \
 	getrrsetbyname.so res_debug.so res_init.c.so res_mkquery.so \
 	sethostent.so
 
-all: ${OBJECTS} ${SHOBJECTS}
+LIB= ../asr.a
+
+all: ${OBJECTS} ${SHOBJECTS} ${LIB}
 	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/asr/%.c
 	@echo -n "$@ "

@@ -16,9 +16,9 @@ include ${ROOTDIR}/Errorfile.inc
 install-local: ${SRCDIR} ${TMPDIR}
 	@${MAKE} -C include install-local
 
-build-check: ${MKDIR} ${INSTALL} ${ID} ${CP} ${LN}
+build-complete: ${MKDIR} ${INSTALL} ${ID} ${CP} ${LN}
 
-install:
+install: ${DESTDIR}
 	@${MAKE} -C bin install
 	@${MAKE} -C sbin install
 	@${MAKE} -C lib install
@@ -26,10 +26,6 @@ install:
 	@${MAKE} -C usr.sbin install
 	@${MAKE} -C share install
 	@${MAKE} -C etc install
-
-install-cross:
-	@#${MAKE} -C share install
-	@${MAKE} -C lib install-cross
 
 release:
 	@${MAKE} -C lib release

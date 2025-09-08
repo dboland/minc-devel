@@ -34,8 +34,4 @@
 #include "bsd_posix.h"
 #include "arch_posix.h"
 
-extern __import WIN_TASK 	*__Tasks;
-
-extern __import DWORD	 	__TlsIndex;
-
 #include "dlfcn.c"

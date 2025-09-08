@@ -320,11 +320,12 @@ int
 sys_sigpending(call_t call, sigset_t *set)
 {
 	int result = 0;
+	WIN_TASK *pwTask = call.Task;
 
 	if (!set){
 		result = -EFAULT;
 	}else{
-		*set = call.Task->Pending;
+		*set = pwTask->Pending;
 	}
 	return(result);
 }

@@ -31,5 +31,6 @@ _INCDIR= ${_PREFIX}/include
 # In GCC 6.3.0, -ffixed-ebx crashes compilation
 
 CC= gcc
-CFLAGS= -Wimplicit-function-declaration -Werror -ffreestanding -Wl,--disable-auto-import
+CFLAGS= -ffreestanding -Wimplicit-function-declaration -Werror
+CFLAGS+= -Wno-pointer-sign -Wl,--disable-auto-import
 LDFLAGS= --disable-auto-import

@@ -4,7 +4,7 @@ echo ' ---------------------------------------------------'
 echo '| MinC System Configuration'
 echo ' ---------------------------------------------------'
 
-PATH='/bin:/usr/bin:/sbin'
+PATH='/bin:/usr/bin:/sbin:/usr/sbin'
 USER="$USERNAME"
 HOME="/home/$USERNAME"
 WINHOME="$USERPROFILE"

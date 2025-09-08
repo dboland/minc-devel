@@ -10,7 +10,7 @@ OBJECTS= assert.o \
 	isnan.o isnormal.o signbit.o lockf.o \
 	nftw.o pause.o popen.o psignal.o \
 	pw_dup.o readpassphrase.o scandir.o \
-	setjmperr.o setmode.o \
+	setjmperr.o setmode.o getprogname.o setprogname.o \
 	siginterrupt.o siglist.o signame.o \
 	sigsetops.o sleep.o strtofflags.o \
 	time.o times.o timezone.o getlogin.o \
@@ -27,8 +27,8 @@ OBJECTS= assert.o \
 	opendir.o readdir.o readdir_r.o rewinddir.o seekdir.o dirfd.o \
 	telldir.o closedir.o exec.o posix_spawn.o shm_open.o
 
-OBJECTS+= getpwent.c.o getgrent.c.o setproctitle.c.o setprogname.c.o \
-	getprogname.c.o signal.c.o getgrouplist.c.o errno.c.o
+OBJECTS+= getpwent.c.o getgrent.c.o setproctitle.c.o \
+	signal.c.o getgrouplist.c.o errno.c.o
 #OBJECTS+= _exit.S.o _getlogin.S.o _setlogin.S.o
 OBJECTS+= syslog_r.o syslog.o auth_subr.o login_cap.o authenticate.o
 
@@ -37,17 +37,22 @@ OBJECTS+= syslog_r.o syslog.o auth_subr.o login_cap.o authenticate.o
 .SUFFIXES:
 .DEFAULT:
 
-all: ${OBJECTS}
-	@/bin/echo "done."
+LIB= ../gen.a
+
+all: ${OBJECTS} ${LIB}
+	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/gen/%.c
-	@/bin/echo -n "$@ "
+	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -I../include -o $@ $<
 
 %.c.o: %.c
-	@/bin/echo -n "$@ "
+	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -I${ROOTDIR}/include -o $@ $<
 
 %.S.o: %.S
-	@/bin/echo -n "$@ "
+	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -I../arch/${ARCH} -o $@ $<

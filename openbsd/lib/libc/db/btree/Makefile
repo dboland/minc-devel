@@ -5,10 +5,16 @@ OBJECTS=bt_close.o bt_conv.o bt_debug.o bt_delete.o bt_get.o bt_open.o \
 .SUFFIXES:
 .DEFAULT:
 
-all: ${OBJECTS}
-	@/bin/echo "done."
+CFLAGS+= -D__DBINTERFACE_PRIVATE
+LIB= ../btree.a
+
+all: ${OBJECTS} ${LIB}
+	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/db/btree/%.c
-	@/bin/echo -n "$@ "
+	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -o $@ $<
 

@@ -5,8 +5,13 @@ OBJECTS+=_exit.S.o _getlogin.S.o _setlogin.S.o
 .SUFFIXES:
 .DEFAULT:
 
-all: ${OBJECTS}
+LIB= ../sys.a
+
+all: ${OBJECTS} ${LIB}
 	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/arch/${ARCH}/sys/%.S
 	@echo -n "$@ "

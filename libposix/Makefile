@@ -49,14 +49,14 @@ ${XLIBDIR}:
 
 # make sure we always have access to the kernel
 
-install-local:
-	/bin/cp -vu ${LIBPOSIX} /usr/bin/
-	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libmingw32.a
-
 install-cross:
 	/bin/cp -vu ${IMPLIB} ${_LIBDIR}/libposix.so
 
-install: ${INSTALL}
+install-local: install-cross
+	/bin/cp -vu ${LIBPOSIX} /usr/bin/
+	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libmingw32.a
+
+install: ${DESTDIR}
 	${INSTALL} -m 06555 ${LIBPOSIX} ${DESTDIR}${SBINDIR}/
 	${INSTALL} -m ${BINMODE} ${IMPLIB} ${DESTDIR}${ULIBDIR}/libposix.a
 

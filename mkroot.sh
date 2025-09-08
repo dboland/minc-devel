@@ -1,5 +1,5 @@
 #!/bin/sh
-# Hello Rob Landley
+# Hello Rob Landley #
 
 DEVROOT=$(dirname $0)
 
@@ -9,7 +9,7 @@ if [ -z "${DESTDIR}" ]; then
 	DESTDIR=${SYSTEMDRIVE}/minc-release
 fi
 
-if ! /bin/make -C openbsd build-check; then
+if ! /bin/make -C openbsd build-complete; then
 	exit 1
 fi
 
@@ -29,6 +29,7 @@ echo " ---------------------------------------------------"
 
 /bin/make -C openbsd install
 /bin/make -C libposix install
+/bin/make -C mingw install
 
 PATH=${DESTDIR}/sbin
 

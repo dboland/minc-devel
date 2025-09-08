@@ -38,20 +38,21 @@ OBJECTS+= socket.o connect.o accept.o recvfrom.o sendto.o sendmsg.o recvmsg.o \
 .SUFFIXES:
 .DEFAULT:
 
-all: source ${OBJECTS}
-	@/bin/echo "done."
+LIB= ../sys.a
+
+all: source ${OBJECTS} ${LIB}
+	@echo "done."
+
+${LIB}:
+	@ar cru $@ ${OBJECTS}
 
 %.o: %.S
-	@/bin/echo -n "$@ "
-	@${XGCC} -c ${CFLAGS} -I../arch/${ARCH} -o $@ $<
+	@echo -n "$@ "
+	@${XGCC} -c ${CFLAGS} -I../arch -o $@ $<
 
 %.c.o: ${SRCDIR}/lib/libc/sys/%.c
-	@/bin/echo -n "$@ "
-	@${XGCC} -c ${CFLAGS} -I../arch/${ARCH} -o $@ $<
+	@echo -n "$@ "
+	@${XGCC} -c ${CFLAGS} -I../arch -o $@ $<
 
 source:
 	@syscall.sh
-
-clean:
-	/bin/rm -f *.o
-
