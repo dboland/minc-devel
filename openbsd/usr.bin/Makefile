@@ -4,7 +4,7 @@ include ${ROOTDIR}/Makefile.inc
 
 PROGS= gzip id
 XPROGS= arch uname touch
-OBJECTS= ${XPROGS} du env find sed cap_mkdb
+OBJECTS= ${XPROGS} du find sed cap_mkdb
 UBINSRC= ${SRCDIR}/usr.bin
 UBINDIR= /usr/bin
 
@@ -50,15 +50,12 @@ id: ${UBINSRC}/id/id.c
 # down execution to a crawl.
 # see: https://irq5.io/2011/06/26/gnu-patch-and-windows-uac/
 
-xinstall: ${UBINSRC}/xinstall/xinstall.c
+xinstall: xinstall.c
 	${XGCC} -s -static ${CFLAGS} -DNOPIE -I${UBINSRC}/xinstall -o $@ $<
 
 gzip: ${UBINSRC}/compress/main.c ${UBINSRC}/compress/zopen.c \
 	${UBINSRC}/compress/gzopen.c ${UBINSRC}/compress/nullopen.c
 	${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $^ -lz
-
-env: ${UBINSRC}/env/env.c
-	${XGCC} -s ${CFLAGS} -o $@ $<
 
 du: ${UBINSRC}/du/du.c
 	${XGCC} -s ${CFLAGS} -o $@ $< -lutil

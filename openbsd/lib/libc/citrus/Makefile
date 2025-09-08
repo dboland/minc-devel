@@ -12,7 +12,7 @@ ${LIB}:
 	@ar cru $@ ${OBJECTS}
 
 %.o: ${SRCDIR}/lib/libc/citrus/%.c
-	@echo "$@ "
+	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -o $@ $<
 
 citrus_utf8.o: citrus_utf8.c

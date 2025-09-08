@@ -20,7 +20,7 @@ ${INCSRC}:
 
 ${XINCDIR}/%: ${SRCDIR}/sys/%
 	@/bin/mkdir -p $@
-	/bin/cp -uv $</*.h $@/
+	/bin/cp -u $</*.h $@/
 
 # make patch.exe use local tmp directory for proper ACL
 

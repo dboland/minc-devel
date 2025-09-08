@@ -10,7 +10,8 @@ OBJECTS = arch.o buf.o cmd_exec.o compat.o cond.o dir.o direxpand.o dump.o \
 UBINSRC= ${SRCDIR}/usr.bin
 UBINDIR= /usr/bin
 
-PROG= make.exe
+PROG= make.out
+CFLAGS+= -I${.OBJDIR} -I${.CURDIR}
 HOSTCC=${XGCC}
 .OBJDIR=.
 LDFLAGS= -s
@@ -26,12 +27,12 @@ CDEFS+=-DHAS_EXTENDED_GETCWD
 
 DPADD += ${LIBUTIL}
 LDADD += liblst.a -lutil
-#CFLAGS+=${CDEFS}
-HOSTCFLAGS+= ${CFLAGS} ${CDEFS}
+CFLAGS+=${CDEFS}
+HOSTCFLAGS+=${CDEFS}
 
 %.o: ${UBINSRC}/make/%.c
-	@#echo -n "$@ "
-	@${XGCC} -c ${HOSTCFLAGS} -o $@ $<
+	@echo -n "$@ "
+	@${XGCC} -c ${CFLAGS} -o $@ $<
 
 liblst.a:
 	@${MAKE} -C lst.lib XGCC="${XGCC}" CFLAGS="${CFLAGS}" UBINSRC="${UBINSRC}"

@@ -24,7 +24,7 @@ ${SHDIR}/mk:
 install-local: ${SHDIR}/mk
 
 install:
-	@${MKDIR} -p ${SHAREDEST}
+	@${MKDIR} -p ${SHAREDEST}/mk
 	${CP} -R ${SHDIR}/mk ${SHAREDEST}/
 
 clean:
