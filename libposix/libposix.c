@@ -32,6 +32,8 @@
 #include <stdint.h>
 #include <wchar.h>
 
+#include <sys/sysctl.h>
+
 #include "win/windows.h"		/* minimal Win32 */
 #include "win/winsock2.h"		/* minimal Windows Sockets v.2 */
 #include "win/iphlpapi.h"		/* minimal Network API */

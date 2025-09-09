@@ -19,6 +19,7 @@ ln -sf libsocket.so.75.0 ./usr/lib/libsocket.so
 ln -sf libsqlite3.so.27.0 ./usr/lib/libsqlite3.so
 ln -sf libssl.so.24.1 ./usr/lib/libssl.so
 ln -sf libutil.so.12.1 ./usr/lib/libutil.so
+ln -sf libedit.so.5.1 ./usr/lib/libedit.so
 
 echo -n "Compressing comp61.tgz... "
 tar -zcf $DISTROOT/comp61.tgz *

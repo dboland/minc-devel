@@ -9,7 +9,7 @@ SYSDIRS= ${XINCDIR}/machine ${XINCDIR}/net ${XINCDIR}/netinet ${XINCDIR}/netinet
 	${XINCDIR}/ufs/ffs ${XINCDIR}/ufs/mfs ${XINCDIR}/ufs/ufs
 INCSRC= ${SRCDIR}/include
 
-all: ${INCSRC}
+all: ${INCSRC} ${TMPDIR}
 
 ${INCSRC}:
 	@echo " ---------------------------------------------------"

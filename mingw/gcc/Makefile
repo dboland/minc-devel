@@ -2,7 +2,7 @@ ROOTDIR= ../..
 
 include ${ROOTDIR}/Makefile.inc
 
-OBJECTS= crt0.o crt1.o crtbegin.o crtend.o
+OBJECTS= crt0.o crt1.o gcrt0.o crtbegin.o crtend.o
 LIBS= libgcc.a libgcc_s.a libgcc_eh.a
 GCCOBJ= _mulsc3.o _muldc3.o _mulxc3.o _ctzdi2.o \
 	_divdi3.o _udivdi3.o _clrsbdi2.o _clrsbsi2.o \
@@ -10,7 +10,7 @@ GCCOBJ= _mulsc3.o _muldc3.o _mulxc3.o _ctzdi2.o \
 GCCDIR= /lib/gcc/mingw32/${GCCVER}
 ULIBDIR= /usr/lib
 
-all: ${MINGW}${GCCDIR} ${OBJECTS} ${LIBS} gcrt0.o
+all: ${MINGW}${GCCDIR} ${OBJECTS} ${LIBS}
 
 ${MINGW}${GCCDIR}:
 	@echo " -----------------------------------------------"
@@ -26,15 +26,15 @@ ${MINGW}${GCCDIR}:
 %.a: %.def
 	dlltool -d $< -l $@ -k
 
+crt1.o: crt1.c
+	${CC} -c ${CFLAGS} -I${ROOTDIR}/include -o $@ $<
+
 # we need alloca(), which belongs in libgcc.a
 # btw: there is a chkstk() in ntdll.dll
 
 libgcc.a: emutls.o
 	ar xv ${MINGW}${GCCDIR}/libgcc.a ${GCCOBJ}
 	ar cru $@ ${GCCOBJ} $^
-
-#libgcc_s.a: wintls.o emutls.o
-#	ar cru $@ $^
 
 # use -r switch to combine objects:
 
@@ -54,8 +54,7 @@ crt0_tls.o: crt0.o win_tls.o
 
 install-cross:
 	@/bin/mkdir -p ${_LIBDIR}
-	@/bin/cp -vu crtbegin.o crtend.o ${_LIBDIR}/
-	@/bin/cp -vu crt0.o crt1.o gcrt0.o ${_LIBDIR}/
+	@/bin/cp -vu ${OBJECTS} ${_LIBDIR}/
 
 install-local: install-cross
 	@/bin/mkdir -p ${XPREFIX}${GCCDIR}
@@ -65,8 +64,7 @@ install-local: install-cross
 	@/bin/cp -vu crt1.o ${XLIBDIR}/dllcrt2.o
 
 install: ${DESTDIR}${ULIBDIR}
-	${INSTALL} -m ${NONBINMODE} crtbegin.o crtend.o ${DESTDIR}${ULIBDIR}/
-	${INSTALL} -m ${NONBINMODE} crt0.o crt1.o gcrt0.o ${DESTDIR}${ULIBDIR}/
+	${INSTALL} -m ${NONBINMODE} ${OBJECTS} ${DESTDIR}${ULIBDIR}/
 
 clean:
 	/bin/rm -f *.o *.a

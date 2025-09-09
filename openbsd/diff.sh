@@ -4,14 +4,14 @@
 
 VERBOSE=
 TARGET=
-SOURCE=${SRCDIR}
+SOURCE=${XPREFIX}
 
 diff_file()
 {
 	if [ "$VERBOSE" ]; then
 		echo "$1"
 	fi
-	diff -Naur "$SOURCE/$1" "$1" | sed "s:$SOURCE/::"
+	diff -Nau "$SOURCE/$1" "$1" | sed "s:$SOURCE/::"
 }
 diff_list()
 {
@@ -25,8 +25,6 @@ diff_list()
 }
 diff_dir()
 {
-	IFS="
-"
 	for file in $(find "$1" -type f); do
 		if [[ $file == *.o ]]; then
 			continue

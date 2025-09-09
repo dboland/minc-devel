@@ -6,6 +6,7 @@ LIBS= ${XLIBDIR}/libcrypto.so ${XLIBDIR}/libssl.so
 
 all:
 	@${MAKE} -C libpthread install-local
+	@${MAKE} -C libedit install-local
 	@${MAKE} -C libz all install-local
 	@${MAKE} -C libc all install-local
 	@${MAKE} -C libdl all install-local

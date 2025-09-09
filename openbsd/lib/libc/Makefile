@@ -47,7 +47,7 @@ ${LIBC}: ${OBJECTS} version.o
 
 include:
 	/bin/cp -rvu ${SRCDIR}/lib/libc/include .
-	/bin/patch -p 2 -d . <../../libc.patch
+	TMPDIR=${TMPDIR} /bin/patch -p 2 -d . <../../libc.patch
 
 lib: ${LIBC} libc.a
 

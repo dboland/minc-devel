@@ -30,9 +30,6 @@
 
 #include <stdlib.h>
 
-#include <sys/types.h>
-#include <sys/param.h>
-
 #include "bsd_types.h"
 
 extern unsigned char _bss_end__;
