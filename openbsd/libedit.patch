@@ -1,0 +1,59 @@
+--- lib/libedit/readline/readline.h	2014-05-19 17:05:13 +0200
++++ lib/libedit/readline/readline.h	2025-09-09 06:56:43 +0200
+@@ -97,31 +97,31 @@
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
+-extern const char	*rl_library_version;
+-extern int 		rl_readline_version; 
+-extern char		*rl_readline_name;
+-extern FILE		*rl_instream;
+-extern FILE		*rl_outstream;
+-extern char		*rl_line_buffer;
+-extern int		 rl_point, rl_end;
+-extern int		 history_base, history_length;
+-extern int		 max_input_history;
+-extern char		*rl_basic_word_break_characters;
+-extern char		*rl_completer_word_break_characters;
+-extern char		*rl_completer_quote_characters;
+-extern Function		*rl_completion_entry_function;
+-extern CPPFunction	*rl_attempted_completion_function;
+-extern int		 rl_attempted_completion_over;
+-extern int		rl_completion_type;
+-extern int		rl_completion_query_items;
+-extern char		*rl_special_prefixes;
+-extern int		rl_completion_append_character;
+-extern int		rl_inhibit_completion;
+-extern Function		*rl_pre_input_hook;
+-extern Function		*rl_startup_hook;
+-extern char		*rl_terminal_name;
+-extern int		rl_already_prompted;
+-extern char		*rl_prompt;
++extern DLL_IMPORT const char	*rl_library_version;
++extern DLL_IMPORT int 		rl_readline_version; 
++extern DLL_IMPORT char		*rl_readline_name;
++extern DLL_IMPORT FILE		*rl_instream;
++extern DLL_IMPORT FILE		*rl_outstream;
++extern DLL_IMPORT char		*rl_line_buffer;
++extern DLL_IMPORT int		 rl_point, rl_end;
++extern DLL_IMPORT int		 history_base, history_length;
++extern DLL_IMPORT int		 max_input_history;
++extern DLL_IMPORT char		*rl_basic_word_break_characters;
++extern DLL_IMPORT char		*rl_completer_word_break_characters;
++extern DLL_IMPORT char		*rl_completer_quote_characters;
++extern DLL_IMPORT Function		*rl_completion_entry_function;
++extern DLL_IMPORT CPPFunction	*rl_attempted_completion_function;
++extern DLL_IMPORT int		 rl_attempted_completion_over;
++extern DLL_IMPORT int		rl_completion_type;
++extern DLL_IMPORT int		rl_completion_query_items;
++extern DLL_IMPORT char		*rl_special_prefixes;
++extern DLL_IMPORT int		rl_completion_append_character;
++extern DLL_IMPORT int		rl_inhibit_completion;
++extern DLL_IMPORT Function		*rl_pre_input_hook;
++extern DLL_IMPORT Function		*rl_startup_hook;
++extern DLL_IMPORT char		*rl_terminal_name;
++extern DLL_IMPORT int		rl_already_prompted;
++extern DLL_IMPORT char		*rl_prompt;
+ /*
+  * The following is not implemented
+  */
