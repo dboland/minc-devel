@@ -38,6 +38,7 @@
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <sys/mount.h>
+#include <sys/sysctl.h>
 
 #include "win/windows.h"
 #include "win/winsock2.h"

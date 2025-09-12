@@ -5,7 +5,7 @@ include ${ROOTDIR}/Makefile.inc
 SHARESRC= ${SRCDIR}/share
 SHAREDEST= ${DESTDIR}/usr/share
 
-all: ${SHARESRC}
+all: ${SHARESRC} ${TMPDIR} ${SHARESRC}/.patch
 
 ${SHARESRC}:
 	@echo " ---------------------------------------------------"
@@ -19,13 +19,15 @@ ${SHARESRC}:
 ${SHDIR}/mk:
 	@/bin/mkdir -p ${SHDIR}
 	/bin/cp -ru ${SHARESRC}/mk ${SHDIR}/
-	TMPDIR=${TMPDIR} /bin/patch -p 1 -d ${SHDIR} <../share.patch
+
+${SHARESRC}/.patch:
+	TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${SHARESRC} <../share.patch
 
 install-local: ${SHDIR}/mk
 
 install:
 	@${MKDIR} -p ${SHAREDEST}/mk
-	${CP} -R ${SHDIR}/mk ${SHAREDEST}/
+	${CP} -R ${SHARESRC}/mk ${SHAREDEST}/
 
 clean:
 	/bin/rm -rf ${SHDIR}/mk

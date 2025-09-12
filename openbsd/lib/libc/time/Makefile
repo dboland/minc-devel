@@ -1,4 +1,5 @@
-OBJECTS=asctime.o difftime.o localtime.o strftime.o strptime.o wcsftime.o
+OBJECTS= asctime.o difftime.o localtime.o strftime.o strptime.o wcsftime.o
+CFLAGS+= -I${SRCDIR}/lib/libc/include
 
 .SUFFIXES:
 .DEFAULT:
@@ -13,5 +14,5 @@ ${LIB}:
 
 %.o: ${SRCDIR}/lib/libc/time/%.c
 	@echo -n "$@ "
-	@${XGCC} -c ${CFLAGS} -I../include -o $@ $<
+	@${XGCC} -c ${CFLAGS} -o $@ $<
 

@@ -1,4 +1,5 @@
-OBJECTS=crypt.o crypt2.o cryptutil.o blowfish.o bcrypt.o arc4random.o
+OBJECTS= crypt.o crypt2.o cryptutil.o blowfish.o bcrypt.o arc4random.o
+CFLAGS+= -I${SRCDIR}/lib/libc/include
 
 .SUFFIXES:
 .DEFAULT:
@@ -13,5 +14,5 @@ ${LIB}:
 
 %.o: ${SRCDIR}/lib/libc/crypt/%.c
 	@echo -n "$@ "
-	@${XGCC} -c ${CFLAGS} -I../include -o $@ $<
+	@${XGCC} -c ${CFLAGS} -o $@ $<
 

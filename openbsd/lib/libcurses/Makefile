@@ -15,6 +15,6 @@ ${XINCDIR}/ncurses.h: ${INCSRC}/curses.h
 	@/bin/cp -vu $< $@
 
 ${INCSRC}/.patch:
-	@TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${INCSRC} <../libcurses.patch
+	TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${INCSRC} <../libcurses.patch
 
 install-local: ${HEADERS}
