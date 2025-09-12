@@ -12,9 +12,9 @@ ${XINCDIR}/%.h: ${INCSRC}/%.h
 
 ${XINCDIR}/readline:
 	@/bin/mkdir -p $@
-	@/bin/cp -rvu ${INCSRC}/readline/*.h $@/
+	/bin/cp -rvu ${INCSRC}/readline/*.h $@/
 
 ${INCSRC}/.patch:
-	@TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${INCSRC} <../libedit.patch
+	TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${INCSRC} <../libedit.patch
 
 install-local: ${HEADERS} ${XINCDIR}/readline

@@ -21,7 +21,7 @@ ${SHDIR}/mk:
 	/bin/cp -ru ${SHARESRC}/mk ${SHDIR}/
 
 ${SHARESRC}/.patch:
-	TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${SHARESRC} <../share.patch
+	TMPDIR=${TMPDIR} /bin/patch -p 1 -d ${SHARESRC} <../share.patch
 
 install-local: ${SHDIR}/mk
 
