@@ -1,0 +1,15 @@
+--- lib/libc/include/.patch	1970-01-01 01:00:00 +0100
++++ lib/libc/include/.patch	2025-09-12 11:34:13 +0200
+@@ -0,0 +1 @@
++This directory has been patched.
+--- lib/libc/include/thread_private.h	2025-06-26 18:43:58 +0200
++++ lib/libc/include/thread_private.h	2025-09-12 15:44:42 +0200
+@@ -15,7 +15,7 @@
+ /*
+  * This variable is 0 until a second thread is created.
+  */
+-extern int __isthreaded;
++extern __import int __isthreaded;
+ 
+ /*
+  * Weak symbols are used in libc so that the thread library can

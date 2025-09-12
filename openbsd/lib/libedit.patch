@@ -1,0 +1,63 @@
+--- lib/libedit/.patch	1970-01-01 01:00:00 +0100
++++ lib/libedit/.patch	2025-09-12 11:34:13 +0200
+@@ -0,0 +1 @@
++This directory has been patched.
+--- lib/libedit/readline/readline.h	2014-05-19 17:05:13 +0200
++++ lib/libedit/readline/readline.h	2025-09-11 11:14:55 +0200
+@@ -97,31 +97,31 @@
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
+-extern const char	*rl_library_version;
+-extern int 		rl_readline_version; 
+-extern char		*rl_readline_name;
+-extern FILE		*rl_instream;
+-extern FILE		*rl_outstream;
+-extern char		*rl_line_buffer;
+-extern int		 rl_point, rl_end;
+-extern int		 history_base, history_length;
+-extern int		 max_input_history;
+-extern char		*rl_basic_word_break_characters;
+-extern char		*rl_completer_word_break_characters;
+-extern char		*rl_completer_quote_characters;
+-extern Function		*rl_completion_entry_function;
+-extern CPPFunction	*rl_attempted_completion_function;
+-extern int		 rl_attempted_completion_over;
+-extern int		rl_completion_type;
+-extern int		rl_completion_query_items;
+-extern char		*rl_special_prefixes;
+-extern int		rl_completion_append_character;
+-extern int		rl_inhibit_completion;
+-extern Function		*rl_pre_input_hook;
+-extern Function		*rl_startup_hook;
+-extern char		*rl_terminal_name;
+-extern int		rl_already_prompted;
+-extern char		*rl_prompt;
++extern __import const char	*rl_library_version;
++extern __import int 		rl_readline_version; 
++extern __import char		*rl_readline_name;
++extern __import FILE		*rl_instream;
++extern __import FILE		*rl_outstream;
++extern __import char		*rl_line_buffer;
++extern __import int		 rl_point, rl_end;
++extern __import int		 history_base, history_length;
++extern __import int		 max_input_history;
++extern __import char		*rl_basic_word_break_characters;
++extern __import char		*rl_completer_word_break_characters;
++extern __import char		*rl_completer_quote_characters;
++extern __import Function		*rl_completion_entry_function;
++extern __import CPPFunction	*rl_attempted_completion_function;
++extern __import int		 rl_attempted_completion_over;
++extern __import int		rl_completion_type;
++extern __import int		rl_completion_query_items;
++extern __import char		*rl_special_prefixes;
++extern __import int		rl_completion_append_character;
++extern __import int		rl_inhibit_completion;
++extern __import Function		*rl_pre_input_hook;
++extern __import Function		*rl_startup_hook;
++extern __import char		*rl_terminal_name;
++extern __import int		rl_already_prompted;
++extern __import char		*rl_prompt;
+ /*
+  * The following is not implemented
+  */

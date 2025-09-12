@@ -28,9 +28,15 @@ diff_dir()
 	for file in $(find "$1" -type f); do
 		if [[ $file == *.o ]]; then
 			continue
+		elif [[ $file == *.a ]]; then
+			continue
+		elif [[ $file == *.S ]]; then
+			continue
 		elif [[ $file == */Makefile ]]; then
 			continue
-		elif [[ $file == */.* ]]; then
+		elif [[ $file == */BSDmakefile ]]; then
+			continue
+		elif [[ $file == */.gitignore ]]; then
 			continue
 		elif ! diff_file "$file"; then
 			exit 2
@@ -54,9 +60,6 @@ while [ -n "$1" ]; do
 			;;
 		-v|--verbose)
 			VERBOSE=yes
-			;;
-		-p|--prefix)
-			SOURCE="/mnt${SOURCE}"
 			;;
 		*)
 			TARGET="$1"

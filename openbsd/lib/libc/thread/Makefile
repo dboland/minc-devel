@@ -13,5 +13,5 @@ ${LIB}:
 
 %.o: ${SRCDIR}/lib/libc/thread/%.c
 	@echo -n "$@ "
-	@${XGCC} -c ${CFLAGS} -I../include -o $@ $<
+	@${XGCC} -c ${CFLAGS} -I${SRCDIR}/lib/libc/include -o $@ $<
 

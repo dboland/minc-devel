@@ -1,0 +1,68 @@
+--- lib/libocurses/.patch	1970-01-01 01:00:00 +0100
++++ lib/libocurses/.patch	2025-09-12 11:34:13 +0200
+@@ -0,0 +1 @@
++This directory has been patched.
+--- lib/libocurses/curses.h	2014-05-19 17:05:13 +0200
++++ lib/libocurses/curses.h	2025-09-12 07:14:57 +0200
+@@ -64,17 +64,17 @@
+ #define	ospeed		(cfgetospeed(&__baset))
+ #endif /* _CURSES_PRIVATE */
+ 
+-extern char	 GT;			/* Gtty indicates tabs. */
+-extern char	 NONL;			/* Term can't hack LF doing a CR. */
+-extern char	 UPPERCASE;		/* Terminal is uppercase only. */
++extern __import char	 GT;			/* Gtty indicates tabs. */
++extern __import char	 NONL;			/* Term can't hack LF doing a CR. */
++extern __import char	 UPPERCASE;		/* Terminal is uppercase only. */
+ 
+-extern int	 My_term;		/* Use Def_term regardless. */
+-extern char	*Def_term;		/* Default terminal type. */
++extern __import int	 My_term;		/* Use Def_term regardless. */
++extern __import char	*Def_term;		/* Default terminal type. */
+ 
+ /* Termcap capabilities. */
+-extern char	AM, BS, CA, DA, EO, HC, IN, MI, MS, NC, NS, OS,
++extern __import char	AM, BS, CA, DA, EO, HC, IN, MI, MS, NC, NS, OS,
+ 		PC, UL, XB, XN, XT, XS, XX;
+-extern char	*AL, *BC, *BT, *CD, *CE, *CL, *CM, *CR, *CS, *DC, *DL,
++extern __import char	*AL, *BC, *BT, *CD, *CE, *CL, *CM, *CR, *CS, *DC, *DL,
+ 		*DM, *DO, *ED, *EI, *K0, *K1, *K2, *K3, *K4, *K5, *K6,
+ 		*K7, *K8, *K9, *HO, *IC, *IM, *IP, *KD, *KE, *KH, *KL,
+ 		*KR, *KS, *KU, *LL, *MA, *ND, *NL, *RC, *SC, *SE, *SF,
+@@ -89,8 +89,8 @@
+ #define	unctrl(c)		__unctrl[(c) & 0xff]
+ #define	unctrllen(ch)		__unctrllen[(ch) & 0xff]
+ 
+-extern char	*__unctrl[256];	/* Control strings. */
+-extern char	 __unctrllen[256];	/* Control strings length. */
++extern __import char	*__unctrl[256];	/* Control strings. */
++extern __import char	 __unctrllen[256];	/* Control strings length. */
+ 
+ /*
+  * A window an array of __LINE structures pointed to by the 'lines' pointer.
+@@ -145,17 +145,17 @@
+ } WINDOW;
+ 
+ /* Curses external declarations. */
+-extern WINDOW	*curscr;		/* Current screen. */
+-extern WINDOW	*stdscr;		/* Standard screen. */
++extern __import WINDOW	*curscr;		/* Current screen. */
++extern __import WINDOW	*stdscr;		/* Standard screen. */
+ 
+-extern struct termios __orig_termios;	/* Terminal state before curses */
+-extern struct termios __baset;		/* Our base terminal state */
+-extern int __tcaction;			/* If terminal hardware set. */
++extern __import struct termios __orig_termios;	/* Terminal state before curses */
++extern __import struct termios __baset;		/* Our base terminal state */
++extern __import int __tcaction;			/* If terminal hardware set. */
+ 
+-extern int	 COLS;			/* Columns on the screen. */
+-extern int	 LINES;			/* Lines on the screen. */
++extern __import int	 COLS;			/* Columns on the screen. */
++extern __import int	 LINES;			/* Lines on the screen. */
+ 
+-extern char	*ttytype;		/* Full name of current terminal. */
++extern __import char	*ttytype;		/* Full name of current terminal. */
+ 
+ #define	ERR	(0)			/* Error return. */
+ #define	OK	(1)			/* Success return. */

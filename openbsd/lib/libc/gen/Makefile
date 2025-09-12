@@ -10,7 +10,7 @@ OBJECTS= assert.o \
 	isnan.o isnormal.o signbit.o lockf.o \
 	nftw.o pause.o popen.o psignal.o \
 	pw_dup.o readpassphrase.o scandir.o \
-	setjmperr.o setmode.o getprogname.o setprogname.o \
+	setjmperr.o setmode.o \
 	siginterrupt.o siglist.o signame.o \
 	sigsetops.o sleep.o strtofflags.o \
 	time.o times.o timezone.o getlogin.o \
@@ -27,6 +27,7 @@ OBJECTS= assert.o \
 	opendir.o readdir.o readdir_r.o rewinddir.o seekdir.o dirfd.o \
 	telldir.o closedir.o exec.o posix_spawn.o shm_open.o
 
+OBJECTS+= getprogname.c.o setprogname.c.o
 OBJECTS+= getpwent.c.o getgrent.c.o setproctitle.c.o \
 	signal.c.o getgrouplist.c.o errno.c.o
 #OBJECTS+= _exit.S.o _getlogin.S.o _setlogin.S.o
@@ -47,7 +48,7 @@ ${LIB}:
 
 %.o: ${SRCDIR}/lib/libc/gen/%.c
 	@echo -n "$@ "
-	@${XGCC} -c ${CFLAGS} -I../include -o $@ $<
+	@${XGCC} -c ${CFLAGS} -I${SRCDIR}/lib/libc/include -o $@ $<
 
 %.c.o: %.c
 	@echo -n "$@ "

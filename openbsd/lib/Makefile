@@ -2,17 +2,17 @@ ROOTDIR= ../..
 
 include ${ROOTDIR}/Makefile.inc
 
-LIBS= ${XLIBDIR}/libcrypto.so ${XLIBDIR}/libssl.so
-
 all:
-	@${MAKE} -C libpthread install-local
-	@${MAKE} -C libedit install-local
-	@${MAKE} -C libz all install-local
+	@${MAKE} -C libpthread all install-local
 	@${MAKE} -C libc all install-local
-	@${MAKE} -C libdl all install-local
-	@${MAKE} -C libutil all install-local
 	@${MAKE} -C libsocket all install-local
 	@${MAKE} -C libm all install-local
+	@${MAKE} -C libz all install-local
+	@${MAKE} -C libutil all install-local
+	@${MAKE} -C libdl all install-local
+	@${MAKE} -C libedit all install-local
+	@${MAKE} -C libcurses all install-local
+	@${MAKE} -C libocurses all install-local
 
 install:
 	@${MAKE} -C libc install

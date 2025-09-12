@@ -2,23 +2,19 @@ ROOTDIR= ../../..
 
 include ${ROOTDIR}/Makefile.inc
 
-XINCLUDES= ${XINCDIR}/ncurses.h ${XINCDIR}/unctrl.h ${XINCDIR}/curses.h
-XLIBS= ${XLIBDIR}/libncurses.a ${XLIBDIR}/libncursesw.a
-_LIBS= ${_LIBDIR}/libncurses.a ${_LIBDIR}/libncursesw.a
+HEADERS= ${XINCDIR}/ncurses.h ${XINCDIR}/unctrl.h \
+	${XINCDIR}/term.h ${XINCDIR}/termcap.h
+INCSRC= ${SRCDIR}/lib/libcurses
 
-ULIBDIR= ${DESTDIR}/usr/lib
-UINCDIR= ${DESTDIR}/usr/include
+all: ${INCSRC} ${TMPDIR} ${INCSRC}/.patch
 
-${XINCDIR}/%.h: ${UINCDIR}/%.h
+${XINCDIR}/%.h: ${INCSRC}/%.h
 	@/bin/cp -vu $< $@
 
-${XLIBDIR}/libncurses.a:
-	/bin/cp -vu ${ULIBDIR}/libncurses.a ${XLIBDIR}/
+${XINCDIR}/ncurses.h: ${INCSRC}/curses.h
+	@/bin/cp -vu $< $@
 
-${XLIBDIR}/libncursesw.a:
-	/bin/ln ${XLIBDIR}/libncurses.a $@
+${INCSRC}/.patch:
+	@TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${INCSRC} <../libcurses.patch
 
-${_LIBDIR}/%.a: ${XLIBDIR}/%.a
-	/bin/ln -f $< $@
-
-install-local: ${XINCLUDES} ${XLIBS} ${_LIBDIR} ${_LIBS}
+install-local: ${HEADERS}

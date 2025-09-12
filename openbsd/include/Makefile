@@ -3,10 +3,11 @@ ROOTDIR= ../..
 include ${ROOTDIR}/Makefile.inc
 
 HEADERS= ${XINCDIR}/fcntl.h ${XINCDIR}/stdarg.h ${XINCDIR}/stdint.h \
-	${XINCDIR}/syslog.h ${XINCDIR}/termios.h
+	${XINCDIR}/syslog.h ${XINCDIR}/termios.h \
+	${XINCDIR}/.patch
 SYSDIRS= ${XINCDIR}/machine ${XINCDIR}/net ${XINCDIR}/netinet ${XINCDIR}/netinet6 \
-	${XINCDIR}/uvm ${XINCDIR}/dev/wscons ${XINCDIR}/ufs/ext2fs \
-	${XINCDIR}/ufs/ffs ${XINCDIR}/ufs/mfs ${XINCDIR}/ufs/ufs
+	${XINCDIR}/uvm ${XINCDIR}/dev ${XINCDIR}/dev/wscons \
+	${XINCDIR}/ufs/ext2fs ${XINCDIR}/ufs/ffs ${XINCDIR}/ufs/mfs ${XINCDIR}/ufs/ufs
 INCSRC= ${SRCDIR}/include
 
 all: ${INCSRC} ${TMPDIR}
@@ -27,7 +28,6 @@ ${XINCDIR}/%: ${SRCDIR}/sys/%
 ${XINCDIR}/machine:
 	@/bin/mkdir -p $@
 	/bin/cp -ru  ${SRCDIR}/sys/arch/${ARCH}/include/* $@/
-	TMPDIR=${TMPDIR} /bin/patch -p 0 -d ${XPREFIX} <../include.patch
 
 ${XINCDIR}:
 	@/bin/mkdir -p ${XINCDIR}
@@ -49,10 +49,11 @@ ${XINCDIR}/syslog.h:
 ${XINCDIR}/termios.h:
 	@/bin/cp -vu ../termios.h ${XINCDIR}/
 
-${_INCDIR}:
+${XINCDIR}/.patch:
+	TMPDIR=${TMPDIR} /bin/patch -p 0 -d ${XPREFIX} <../include.patch
+
+${_INCDIR}: ${XINCDIR}
 	@/bin/mkdir -p ${_INCDIR}
 	/bin/cp -ru ${XINCDIR}/* ${_INCDIR}/
 
-install-cross: ${_INCDIR}
-
-install-local: ${INCSRC} ${XINCDIR} ${SYSDIRS} ${HEADERS} install-cross
+install-local: ${XINCDIR} ${SYSDIRS} ${HEADERS} ${_INCDIR}

@@ -15,7 +15,7 @@ usage:
 all: kernel system
 
 opt: config.inc
-	@${MAKE} -C openbsd/include all install-local
+	@${MAKE} -C openbsd install-local
 	@${MAKE} -C mingw all install-local
 
 kernel:
@@ -23,7 +23,7 @@ kernel:
 	@${MAKE} -C libposix all install-local
 
 system:
-	@${MAKE} -C openbsd
+	@${MAKE} -C openbsd all
 
 config.inc:
 	@/bin/cp $@.sample $@

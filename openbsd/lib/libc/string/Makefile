@@ -21,5 +21,5 @@ ${LIB}:
 
 %.o: ${SRCDIR}/lib/libc/string/%.c
 	@echo -n "$@ "
-	@${XGCC} -c ${CFLAGS} -I../include -I${SRCDIR}/lib/libc -o $@ $<
+	@${XGCC} -c ${CFLAGS} -I${SRCDIR}/lib/libc/include -I${SRCDIR}/lib/libc -o $@ $<
 

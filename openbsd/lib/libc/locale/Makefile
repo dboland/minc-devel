@@ -8,8 +8,8 @@ OBJECTS= btowc.o _def_messages.o _def_monetary.o _def_numeric.o _def_time.o \
 	wcstoul.o wcstoll.o wcstoull.o wcstoimax.o wcstoumax.o \
 	setrunelocale.o runeglue.o rune.o runetable.o ___runetype_mb.o \
 	_wctrans.o wcsxfrm.o
-
 OBJECTS+= wcstof.o wcstold.o
+CFLAGS+= -DLOCALE_CHARSETS="\"${LOCALECHARSETS}\""
 
 .SUFFIXES:
 .DEFAULT:
@@ -24,4 +24,4 @@ ${LIB}:
 
 %.o: ${SRCDIR}/lib/libc/locale/%.c
 	@echo -n "$@ "
-	@${XGCC} -c ${CFLAGS} -DLOCALE_CHARSETS="\"${LOCALECHARSETS}\"" -I../include -I${SRCDIR}/lib/libc/citrus -o $@ $<
+	@${XGCC} -c ${CFLAGS} -I${SRCDIR}/lib/libc/include -I${SRCDIR}/lib/libc/citrus -o $@ $<

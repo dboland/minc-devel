@@ -8,7 +8,6 @@ OBJECTS = a64l.o atoi.o atof.o atol.o atoll.o bsearch.o \
 	lcong48.o lrand48.o mrand48.o nrand48.o seed48.o srand48.o qabs.o \
 	qdiv.o _Exit.o exit.o abort.o rand.o realpath.o \
 	div.o hcreate.o getopt_long.o
-
 OBJECTS+= atexit.c.o
 #OBJECTS+= ecvt.o gcvt.o malloc.o
 
@@ -25,7 +24,7 @@ ${LIB}:
 
 %.o: ${SRCDIR}/lib/libc/stdlib/%.c
 	@echo -n "$@ "
-	@${XGCC} -c ${CFLAGS} -I../include -o $@ $<
+	@${XGCC} -c ${CFLAGS} -I${SRCDIR}/lib/libc/include -o $@ $<
 
 %.c.o: %.c
 	@echo -n "$@ "

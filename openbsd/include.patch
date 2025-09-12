@@ -1,5 +1,10 @@
---- include/ctype.h	2025-09-09 04:25:25 +0200
-+++ include/ctype.h	2025-06-15 09:14:30 +0200
+--- include/.patch	1970-01-01 01:00:00 +0100
++++ include/.patch	2025-09-12 11:06:37 +0200
+@@ -0,0 +1,2 @@
++This directory has been patched.
++
+--- include/ctype.h	2025-09-11 17:39:14 +0200
++++ include/ctype.h	2025-09-11 11:12:30 +0200
 @@ -53,9 +53,9 @@
  
  __BEGIN_DECLS
@@ -7,14 +12,38 @@
 -extern const char	*_ctype_;
 -extern const short	*_tolower_tab_;
 -extern const short	*_toupper_tab_;
-+extern LIBC_IMPORT const char	*_ctype_;
-+extern LIBC_IMPORT const short	*_tolower_tab_;
-+extern LIBC_IMPORT const short	*_toupper_tab_;
++extern __import const char	*_ctype_;
++extern __import const short	*_tolower_tab_;
++extern __import const short	*_toupper_tab_;
  
  #if defined(__GNUC__) || defined(_ANSI_LIBRARY)
  int	isalnum(int);
---- include/getopt.h	2025-09-09 04:25:36 +0200
-+++ include/getopt.h	2025-06-15 09:29:08 +0200
+--- include/curses.h	1970-01-01 01:00:00 +0100
++++ include/curses.h	2025-09-11 18:39:35 +0200
+@@ -0,0 +1,21 @@
++/*      $OpenBSD: curses.h,v 1.3 2003/06/17 21:33:53 millert Exp $      */
++
++/*
++ * Placed in the public domain by Todd C. Miller <Todd.Miller@courtesan.com>
++ * on June 17, 2003.
++ */
++
++/* 2025 Daniel Boland <dboland@xs4all.nl>
++ * Including this file would create a circular reference in ncurses.h.
++ * Luckily, we have an #include guard in place. Taken from OpenBSD 4.1.
++ */
++#ifndef _CURSES_H_
++#define _CURSES_H_
++
++#ifdef _USE_OLD_CURSES_
++#include <ocurses.h>
++#else
++#include <ncurses.h>
++#endif
++
++#endif /* _CURSES_H_ */
+--- include/getopt.h	2025-09-11 17:39:23 +0200
++++ include/getopt.h	2025-09-11 11:12:30 +0200
 @@ -65,11 +65,11 @@
  #define _GETOPT_DEFINED_
  int	 getopt(int, char * const *, const char *);
@@ -24,15 +53,15 @@
 -extern   int optind;
 -extern   int optopt;
 -extern   int optreset;
-+extern LIBC_IMPORT  char *optarg;                  /* getopt(3) external variables */
-+extern LIBC_IMPORT  int opterr;
-+extern LIBC_IMPORT  int optind;
-+extern LIBC_IMPORT  int optopt;
-+extern LIBC_IMPORT  int optreset;
++extern __import  char *optarg;                  /* getopt(3) external variables */
++extern __import  int opterr;
++extern __import  int optind;
++extern __import  int optopt;
++extern __import  int optreset;
  #endif
  __END_DECLS
   
---- include/machine/asm.h	2025-09-09 04:29:08 +0200
+--- include/machine/asm.h	2025-09-11 17:41:38 +0200
 +++ include/machine/asm.h	2025-06-15 09:29:56 +0200
 @@ -58,7 +58,7 @@
  #define PIC_GOTOFF(x)	x
@@ -52,9 +81,9 @@
  
  #if defined(PROF) || defined(GPROF)
  # define _PROF_PROLOGUE	\
---- include/machine/cdefs.h	2025-09-09 04:29:18 +0200
-+++ include/machine/cdefs.h	2025-09-03 07:20:48 +0200
-@@ -4,18 +4,71 @@
+--- include/machine/cdefs.h	2025-09-11 17:41:46 +0200
++++ include/machine/cdefs.h	2025-09-11 11:15:32 +0200
+@@ -4,18 +4,61 @@
   * Written by J.T. Conklin <jtc@wimsey.com> 01/17/95.
   * Public domain.
   */
@@ -90,33 +119,23 @@
 +#undef WINNT
 +
 +#define __thread	__thread __attribute__((section(".tls")))
-+#define __import	__attribute__((dllimport))
 +
 +#define __MinC__
 +#define __OpenBSD__
++
 +#define restrict	__restrict
 +#define alloca		__builtin_alloca
 +
 +#define sys_siglist	_sys_siglist	/* legacy */
 +
 +#ifdef NOPIE
-+#define LIBC_IMPORT		
-+#define GETOPT_IMPORT	
-+#define LIBSOCK_IMPORT	
-+#define DLL_IMPORT	
++#define __import
++#else
++#define __import	__attribute__((dllimport))
 +#endif
 +
-+#ifndef LIBC_IMPORT
-+#define LIBC_IMPORT	__import
-+#endif
 +#ifndef GETOPT_IMPORT
 +#define GETOPT_IMPORT	__import
-+#endif
-+#ifndef LIBSOCK_IMPORT
-+#define LIBSOCK_IMPORT	__import
-+#endif
-+#ifndef DLL_IMPORT
-+#define DLL_IMPORT	__import
 +#endif
 +
 +/* weak aliases are kind of broken in MinGW32 ld.exe:
@@ -135,7 +154,7 @@
 +	extern __typeof(symbol) symbol __attribute__((deprecated(msg)))
  
  #endif /* !_MACHINE_CDEFS_H_ */
---- include/machine/exec.h	2025-09-09 04:29:29 +0200
+--- include/machine/exec.h	2025-09-11 17:41:57 +0200
 +++ include/machine/exec.h	2025-06-15 09:29:46 +0200
 @@ -40,7 +40,6 @@
  #define ELF_TARG_MACH		EM_386 /* XXX - EM_486 is currently unused
@@ -145,7 +164,7 @@
  #define _KERN_DO_ELF
  
  #endif  /* _MACHINE_EXEC_H_ */
---- include/machine/_types.h	2025-09-09 04:28:46 +0200
+--- include/machine/_types.h	2025-09-11 17:41:29 +0200
 +++ include/machine/_types.h	2025-08-04 12:04:53 +0200
 @@ -35,6 +35,12 @@
  #ifndef _MACHINE__TYPES_H_
@@ -178,30 +197,30 @@
  #endif
  typedef int			__wint_t;
  typedef	int			__rune_t;
---- include/math.h	2025-09-09 04:25:47 +0200
-+++ include/math.h	2025-06-15 09:29:02 +0200
+--- include/math.h	2025-09-11 17:39:33 +0200
++++ include/math.h	2025-09-11 11:12:30 +0200
 @@ -24,7 +24,7 @@
  /*
   * ANSI/POSIX
   */
 -extern char __infinity[];
-+extern LIBC_IMPORT char __infinity[];
++extern __import char __infinity[];
  #if __GNUC_PREREQ__(3, 3) && !defined(__vax__)
  #define HUGE_VAL	__builtin_huge_val()
  #else /* __GNUC_PREREQ__(3, 3) && !__vax__ */
---- include/netdb.h	2025-09-09 04:26:00 +0200
-+++ include/netdb.h	2025-06-15 09:28:58 +0200
+--- include/netdb.h	2025-09-11 17:39:41 +0200
++++ include/netdb.h	2025-09-11 11:12:30 +0200
 @@ -144,7 +144,7 @@
  };
  
  #if __BSD_VISIBLE || __POSIX_VISIBLE < 200809
 -extern int h_errno;
-+extern LIBC_IMPORT int h_errno;
++extern __import int h_errno;
  
  /*
   * Error return codes from gethostbyname() and gethostbyaddr()
---- include/resolv.h	2025-09-09 04:26:13 +0200
-+++ include/resolv.h	2025-06-15 09:28:52 +0200
+--- include/resolv.h	2025-09-11 17:39:51 +0200
++++ include/resolv.h	2025-09-12 06:10:14 +0200
 @@ -91,6 +91,7 @@
  #include <sys/types.h>
  #include <sys/socket.h>
@@ -215,31 +234,31 @@
  };
  
 -extern struct __res_state _res;
-+extern LIBSOCK_IMPORT struct __res_state _res;
++extern __import struct __res_state _res;
  #if 1 /* INET6 */
  extern struct __res_state_ext _res_ext;
  #endif
---- include/signal.h	2025-09-09 04:26:23 +0200
-+++ include/signal.h	2025-06-15 09:28:37 +0200
+--- include/signal.h	2025-09-11 17:39:58 +0200
++++ include/signal.h	2025-09-11 11:12:30 +0200
 @@ -43,8 +43,8 @@
  
  __BEGIN_DECLS
  #if __BSD_VISIBLE
 -extern __const char *__const sys_signame[_NSIG];
 -extern __const char *__const sys_siglist[_NSIG];
-+extern LIBC_IMPORT __const char *__const sys_signame[_NSIG];
-+extern LIBC_IMPORT __const char *__const sys_siglist[_NSIG];
++extern __import __const char *__const sys_signame[_NSIG];
++extern __import __const char *__const sys_siglist[_NSIG];
  #endif
  
  int	raise(int);
---- include/stdio.h	2025-09-09 04:26:40 +0200
-+++ include/stdio.h	2025-07-27 16:40:57 +0200
+--- include/stdio.h	2025-09-11 17:40:07 +0200
++++ include/stdio.h	2025-09-11 11:12:30 +0200
 @@ -140,7 +140,7 @@
  } FILE;
  
  __BEGIN_DECLS
 -extern FILE __sF[];
-+extern LIBC_IMPORT FILE __sF[];
++extern __import FILE __sF[];
  __END_DECLS
  
  #define	__SLBF	0x0001		/* line buffered */
@@ -256,7 +275,7 @@
  
  extern int sys_nerr;			/* perror(3) external variables */
 -extern char *sys_errlist[];
-+extern LIBC_IMPORT char *sys_errlist[];
++extern __import char *sys_errlist[];
  #endif
  void	 perror(const char *);
  int	 printf(const char *, ...);
@@ -265,12 +284,12 @@
  #define	__sfileno(p)	((p)->_file)
  
 -extern int __isthreaded;
-+extern LIBC_IMPORT int __isthreaded;
++extern __import int __isthreaded;
  
  #define feof(p)		(!__isthreaded ? __sfeof(p) : (feof)(p))
  #define ferror(p)	(!__isthreaded ? __sferror(p) : (ferror)(p))
---- include/stdlib.h	2025-09-09 04:26:51 +0200
-+++ include/stdlib.h	2025-09-05 13:53:26 +0200
+--- include/stdlib.h	2025-09-11 17:40:14 +0200
++++ include/stdlib.h	2025-09-11 11:12:30 +0200
 @@ -34,6 +34,7 @@
  
  #ifndef _STDLIB_H_
@@ -279,35 +298,38 @@
  
  #include <sys/cdefs.h>
  #include <machine/_types.h>
-@@ -41,6 +42,9 @@
- #include <sys/types.h>
- #endif
- 
-+extern LIBC_IMPORT char *__progname;
-+extern LIBC_IMPORT char **environ;
-+
- #ifndef	_SIZE_T_DEFINED_
- #define	_SIZE_T_DEFINED_
- typedef	__size_t	size_t;
-@@ -92,7 +96,7 @@
+@@ -92,7 +93,7 @@
  
  #define	RAND_MAX	0x7fffffff
  
 -extern size_t	__mb_cur_max;
-+extern LIBC_IMPORT size_t	__mb_cur_max;
++extern __import size_t	__mb_cur_max;
  #define	MB_CUR_MAX	__mb_cur_max
  
  #include <sys/cdefs.h>
-@@ -282,7 +286,7 @@
+@@ -282,7 +283,7 @@
  	getprogname(void);
  void	setprogname(const char *);
  
 -extern	 char *suboptarg;		/* getsubopt(3) external variable */
-+extern	 LIBC_IMPORT char *suboptarg;		/* getsubopt(3) external variable */
++extern	 __import char *suboptarg;		/* getsubopt(3) external variable */
  
  int	 mkstemps(char *, int);
  
---- include/sys/ucred.h	2025-09-09 04:27:37 +0200
+--- include/sys/types.h	2025-09-11 17:43:18 +0200
++++ include/sys/types.h	2025-09-11 08:52:15 +0200
+@@ -267,4 +267,10 @@
+ 
+ #endif /* _KERNEL */
+ 
++/* Forward type declarations for the linker to know whether to import or
++ * not to import.
++ */
++extern __import char **environ;
++extern __import char *__progname;
++
+ #endif /* !_SYS_TYPES_H_ */
+--- include/sys/ucred.h	2025-09-11 17:43:29 +0200
 +++ include/sys/ucred.h	2025-08-11 08:45:21 +0200
 @@ -35,6 +35,8 @@
  #ifndef _SYS_UCRED_H_
@@ -318,18 +340,18 @@
  /*
   * Credentials.
   */
---- include/time.h	2025-09-09 04:27:00 +0200
-+++ include/time.h	2021-11-28 10:28:56 +0100
+--- include/time.h	2025-09-11 17:40:23 +0200
++++ include/time.h	2025-09-11 11:12:30 +0200
 @@ -150,7 +150,7 @@
  #endif
  
  #if __POSIX_VISIBLE
 -extern char *tzname[2];
-+extern LIBC_IMPORT char *tzname[2];
++extern __import char *tzname[2];
  void tzset(void);
  #endif
  
---- include/unistd.h	2025-09-09 04:27:09 +0200
+--- include/unistd.h	2025-09-11 17:40:30 +0200
 +++ include/unistd.h	2025-06-15 09:27:27 +0200
 @@ -68,7 +68,7 @@
  #define _POSIX_CLOCK_SELECTION			(-1)

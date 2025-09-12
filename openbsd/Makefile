@@ -15,6 +15,9 @@ include ${ROOTDIR}/Errorfile.inc
 
 build-complete: ${MKDIR} ${INSTALL} ${ID} ${CP} ${LN}
 
+install-local:
+	@${MAKE} -C include all install-local
+
 install: ${DESTDIR}
 	@${MAKE} -C bin install
 	@${MAKE} -C sbin install
