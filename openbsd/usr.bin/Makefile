@@ -58,6 +58,12 @@ xargs: ${UBINSRC}/xargs/xargs.c ${UBINSRC}/xargs/strnsubst.c
 	@echo -n "$@ "
 	@${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $^
 
+sort: ${UBINSRC}/sort/append.c ${UBINSRC}/sort/fields.c ${UBINSRC}/sort/files.c \
+	${UBINSRC}/sort/fsort.c ${UBINSRC}/sort/init.c ${UBINSRC}/sort/msort.c \
+	${UBINSRC}/sort/sort.c ${UBINSRC}/sort/tmp.c
+	@echo -n "$@ "
+	@${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $^
+
 # In Windows, "install", "setup" and "patch" seem to be reserved 
 # words. When executed with such name, Vista checks if user is
 # elevated, yields ERROR_ELEVATION_REQUIRED if not. XP just slows
@@ -84,12 +90,6 @@ sed: ${UBINSRC}/sed/compile.c ${UBINSRC}/sed/main.c ${UBINSRC}/sed/misc.c \
 	@${XGCC} -s ${CFLAGS} -o $@ $^
 
 cap_mkdb: ${UBINSRC}/cap_mkdb/cap_mkdb.c ${UBINSRC}/cap_mkdb/getinfo.c
-	@echo -n "$@ "
-	@${XGCC} -s ${CFLAGS} -o $@ $^
-
-sort: ${UBINSRC}/sort/append.c ${UBINSRC}/sort/fields.c ${UBINSRC}/sort/files.c \
-	${UBINSRC}/sort/fsort.c ${UBINSRC}/sort/init.c ${UBINSRC}/sort/msort.c \
-	${UBINSRC}/sort/sort.c ${UBINSRC}/sort/tmp.c
 	@echo -n "$@ "
 	@${XGCC} -s ${CFLAGS} -o $@ $^
 
