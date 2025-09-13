@@ -21,9 +21,9 @@ install:
 	@${MAKE} -C libsocket install
 
 release:
-	@${MAKE} -C libdl release-clean lib
-	@${MAKE} -C libc release-clean lib
-	@${MAKE} -C libsocket release-clean lib
+	@${MAKE} -C libdl release
+	@${MAKE} -C libc release
+	@${MAKE} -C libsocket release
 
 clean:
 	@${MAKE} -C libc clean

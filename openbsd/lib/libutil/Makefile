@@ -13,10 +13,10 @@ OBJECTS+= ohash_create_entry.o ohash_delete.o ohash_do.o ohash_entries.o \
 	ohash_qlookup.o ohash_qlookupi.o
 OBJECTS+= getmaxpartitions.o
 # BSD Auth
-OBJECTS+=passwd.o check_expire.o login_fbtab.o imsg.o imsg-buffer.o login.o
+OBJECTS+= passwd.o check_expire.o login_fbtab.o imsg.o imsg-buffer.o login.o
 
 HEADERS= ${XINCDIR}/util.h ${XINCDIR}/imsg.h ${XINCDIR}/ohash.h
-CFLAGS+= -DNOPIE -I${SRCDIR}/sys
+CFLAGS+= -DNOPIE
 ULIBDIR= /usr/lib
 
 all: ${HEADERS} libutil.a
@@ -28,23 +28,16 @@ all: ${HEADERS} libutil.a
 ${XINCDIR}/%.h: ${SRCDIR}/lib/libutil/%.h
 	@/bin/cp -vu $< $@
 
-pidfile.o: pidfile.c
-	@echo -n "$@ "
-	@${XGCC} -c ${CFLAGS} -o $@ $<
-
 libutil.a: ${OBJECTS}
 	@echo "done."
 	@echo "Making static library $@"
 	@ar cru $@ ${OBJECTS}
-
-clean:
-	/bin/rm -f libutil.a
-
-all-clean: clean
-	/bin/rm -f *.o
 
 install-local:
 	/bin/cp -vu libutil.a ${XLIBDIR}/
 
 install:
 	/bin/cp -vu libutil.a ${DESTDIR}${ULIBDIR}/
+
+clean:
+	/bin/rm -f *.o libutil.a

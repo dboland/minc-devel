@@ -39,6 +39,8 @@ all-clean: lib-clean
 release-clean:
 	/bin/rm version.o
 
+release: release-clean all
+
 # Perl needs libsocket.so
 
 install-cross: ${_LIBDIR}

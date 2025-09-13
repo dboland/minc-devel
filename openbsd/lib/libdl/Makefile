@@ -9,7 +9,7 @@ LIBDL= ld.so
 ULIBDIR= /usr/lib
 ULIBXDIR= /usr/libexec
 
-all: lib
+all: ${LIBDL}
 
 %.o: %.c
 	${XGCC} -c -g ${CFLAGS} -I${ROOTDIR}/include $<
@@ -28,8 +28,6 @@ ${LIBXDIR}: ${LIBDL}
 	@/bin/mkdir -p ${LIBXDIR}
 	/bin/cp -vu ${LIBDL} ${LIBXDIR}/
 
-lib: ${LIBDL}
-
 install-cross: ${_LIBDIR}
 	/bin/cp -vu ${IMPLIB} ${_LIBDIR}/libdl.a
 
@@ -43,6 +41,8 @@ install: ${DESTDIR}
 
 release-clean:
 	/bin/rm -f version.o
+
+release: release-clean all
 
 clean:
 	/bin/rm -f *.o *.a ${LIBDL}

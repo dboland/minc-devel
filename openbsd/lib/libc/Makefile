@@ -57,6 +57,8 @@ all-clean: lib-clean
 release-clean:
 	/bin/rm -f version.o
 
+release: release-clean all
+
 install-cross: ${_LIBDIR}
 	@/bin/mkdir -p ${_LIBDIR}
 	@/bin/cp -vu libc.a ${_LIBDIR}/
