@@ -4,7 +4,7 @@
 
 VERBOSE=
 TARGET=
-SOURCE=${XPREFIX}
+SOURCE=${SRCDIR}
 
 diff_file()
 {

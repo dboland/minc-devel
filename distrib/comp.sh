@@ -24,6 +24,7 @@ ln -sf libcurses.so.14.0 ./usr/lib/libcurses.so
 ln -sf libncurses.so.14.0 ./usr/lib/libncurses.so
 ln -sf libncursesw.so.14.0 ./usr/lib/libncursesw.so
 ln -sf libocurses.so.6.0 ./usr/lib/libocurses.so
+ln -sf libskey.so.6.0 ./usr/lib/libskey.so
 
 echo -n "Compressing comp61.tgz... "
 tar -zcf $DISTROOT/comp61.tgz *

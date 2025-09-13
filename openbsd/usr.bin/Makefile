@@ -4,13 +4,14 @@ include ${ROOTDIR}/Makefile.inc
 
 PROGS= gzip id
 XPROGS= arch uname touch
-OBJECTS= ${XPROGS} du find sed cap_mkdb
+OBJECTS= ${XPROGS} du find sed cap_mkdb sort xargs
 UBINSRC= ${SRCDIR}/usr.bin
 UBINDIR= /usr/bin
 
 # GNU make can't cd into make if make/make.exe exists?!?!
 
 all: ${UBINSRC} ${OBJECTS} xinstall
+	@echo "done."
 	@${MAKE} -C make
 
 ${UBINSRC}:
@@ -33,16 +34,29 @@ ${XBINDIR}: ${XPROGS} xinstall
 	/bin/cp -vu manifest ${XBINDIR}/install.exe.manifest
 
 uname: ${UBINSRC}/uname/uname.c
-	${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $<
+	@echo -n "$@ "
+	@${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $<
 
 arch: ${UBINSRC}/arch/arch.c
-	${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $<
+	@echo -n "$@ "
+	@${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $<
 
 touch: ${UBINSRC}/touch/touch.c
-	${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $<
+	@echo -n "$@ "
+	@${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $<
 
 id: ${UBINSRC}/id/id.c
-	${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $<
+	@echo -n "$@ "
+	@${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $<
+
+gzip: ${UBINSRC}/compress/main.c ${UBINSRC}/compress/zopen.c \
+	${UBINSRC}/compress/gzopen.c ${UBINSRC}/compress/nullopen.c
+	@echo -n "$@ "
+	@${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $^ -lz
+
+xargs: ${UBINSRC}/xargs/xargs.c ${UBINSRC}/xargs/strnsubst.c
+	@echo -n "$@ "
+	@${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $^
 
 # In Windows, "install", "setup" and "patch" seem to be reserved 
 # words. When executed with such name, Vista checks if user is
@@ -51,26 +65,33 @@ id: ${UBINSRC}/id/id.c
 # see: https://irq5.io/2011/06/26/gnu-patch-and-windows-uac/
 
 xinstall: xinstall.c
-	${XGCC} -s -static ${CFLAGS} -DNOPIE -I${UBINSRC}/xinstall -o $@ $<
-
-gzip: ${UBINSRC}/compress/main.c ${UBINSRC}/compress/zopen.c \
-	${UBINSRC}/compress/gzopen.c ${UBINSRC}/compress/nullopen.c
-	${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $^ -lz
+	@echo -n "$@ "
+	@${XGCC} -s -static ${CFLAGS} -DNOPIE -I${UBINSRC}/xinstall -o $@ $<
 
 du: ${UBINSRC}/du/du.c
-	${XGCC} -s ${CFLAGS} -o $@ $< -lutil
+	@echo -n "$@ "
+	@${XGCC} -s ${CFLAGS} -o $@ $< -lutil
 
 find: ${UBINSRC}/find/find.c ${UBINSRC}/find/function.c ${UBINSRC}/find/ls.c \
 	${UBINSRC}/find/main.c ${UBINSRC}/find/misc.c ${UBINSRC}/find/operator.c \
 	${UBINSRC}/find/option.c
-	${XGCC} -s ${CFLAGS} -o $@ $^
+	@echo -n "$@ "
+	@${XGCC} -s ${CFLAGS} -o $@ $^
 
 sed: ${UBINSRC}/sed/compile.c ${UBINSRC}/sed/main.c ${UBINSRC}/sed/misc.c \
 	${UBINSRC}/sed/process.c
-	${XGCC} -s ${CFLAGS} -o $@ $^
+	@echo -n "$@ "
+	@${XGCC} -s ${CFLAGS} -o $@ $^
 
 cap_mkdb: ${UBINSRC}/cap_mkdb/cap_mkdb.c ${UBINSRC}/cap_mkdb/getinfo.c
-	${XGCC} -s ${CFLAGS} -o $@ $^
+	@echo -n "$@ "
+	@${XGCC} -s ${CFLAGS} -o $@ $^
+
+sort: ${UBINSRC}/sort/append.c ${UBINSRC}/sort/fields.c ${UBINSRC}/sort/files.c \
+	${UBINSRC}/sort/fsort.c ${UBINSRC}/sort/init.c ${UBINSRC}/sort/msort.c \
+	${UBINSRC}/sort/sort.c ${UBINSRC}/sort/tmp.c
+	@echo -n "$@ "
+	@${XGCC} -s ${CFLAGS} -o $@ $^
 
 install-local: ${BINDIR} ${XBINDIR}
 

@@ -13,6 +13,7 @@ all:
 	@${MAKE} -C libedit all install-local
 	@${MAKE} -C libcurses all install-local
 	@${MAKE} -C libocurses all install-local
+	@${MAKE} -C libssl all install-local
 
 install:
 	@${MAKE} -C libc install
