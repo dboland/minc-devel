@@ -11,26 +11,24 @@ diff_file()
 	if [ "$VERBOSE" ]; then
 		echo "$1"
 	fi
-	diff -Nau "$SOURCE/$1" "$1" | sed "s:$SOURCE/::"
+	if ! diff -Nau "$SOURCE/$1" "$1" | sed "s:$SOURCE/::"; then
+		echo "$1" >&2
+	fi
 }
 diff_list()
 {
 	while read -r file; do
 		if [[ $file == \#* ]]; then
 			continue
-		elif ! diff_file "$file"; then
-			exit 2
+		else
+			diff_file "$file"
 		fi
 	done < $TARGET;
 }
 diff_dir()
 {
 	for file in $(find "$1" -type f); do
-		if [[ $file == *.o ]]; then
-			continue
-		elif [[ $file == *.a ]]; then
-			continue
-		elif [[ $file == *.S ]]; then
+		if [[ $file == *.S ]]; then
 			continue
 		elif [[ $file == */Makefile ]]; then
 			continue
@@ -38,8 +36,8 @@ diff_dir()
 			continue
 		elif [[ $file == */.gitignore ]]; then
 			continue
-		elif ! diff_file "$file"; then
-			exit 2
+		else
+			diff_file "$file"
 		fi
 	done
 }

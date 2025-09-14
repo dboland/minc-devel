@@ -500,8 +500,6 @@ __DEBUG_JOBS("exchild(enter): flags(%s)\n", __X_FLAGS(flags))
 		if (flags & XCOPROC)
 			coproc_cleanup(false);
 		sigprocmask(SIG_SETMASK, &omask, (sigset_t *) 0);
-//		cleanup_parents_env();
-
 #ifdef JOBS
 		/* If FMONITOR or FTALKING is set, these signals are ignored,
 		 * if neither FMONITOR nor FTALKING are set, the signals have
@@ -528,7 +526,6 @@ __DEBUG_JOBS("exchild(enter): flags(%s)\n", __X_FLAGS(flags))
 				}
 			}
 		}
-//		remove_job(j, "child");	/* in case of `jobs` command */
 last_job = (Job *) 0;
 async_job = (Job *) 0;
 		nzombie = 0;
@@ -538,7 +535,6 @@ async_job = (Job *) 0;
 #endif /* JOBS */
 		Flag(FTALKING) = 0;
 		tty_close();
-//		cleartraps();
 		execute(t, (flags & XERROK) | XEXEC, NULL); /* no return */
 		internal_errorf(0, "exchild: execute() returned");
 		unwind(LLEAVE);
@@ -1168,7 +1164,6 @@ __DEBUG_JOBS("j_sigchld(enter)\n")
 	 */
 	for (j = job_list; j; j = j->next)
 		if (j->ppid == procpid && !(j->flags & JF_STARTED)) {
-//__PRINTF(" j_sigchld(0x%x): <job partially started>\n", j)
 			held_sigchld = 1;
 			goto finished;
 		}

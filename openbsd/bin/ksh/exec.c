@@ -363,7 +363,6 @@ __DEBUG_SUBST("execute(execve): str(%s)\n", t->str)
 		s = t->args[0];
 		ap = makenv();
 		restoresigs();
-//		cleanup_proc_env();
 		execve(t->str, t->args, ap);
 		if (errno == ENOEXEC)
 			scriptexec(t, ap);
@@ -375,7 +374,7 @@ __DEBUG_SUBST("execute(execve): str(%s)\n", t->str)
 
 	quitenv(NULL);		/* restores IO */
 	if ((flags&XEXEC))
-{//		unwind(LEXIT);	/* exit child */
+{
 __DEBUG_EXIT("execute(exit)\n")
 exit(rv);
 }
@@ -687,7 +686,6 @@ __DEBUG_SUBST("comexec(enter): flags(%s)\n", __X_FLAGS(flags))
 		break;
 	}
   Leave:
-//	if (flags & XEXEC) {
 	if (rv != 0 && (flags & XEXEC)){
 __DEBUG_EXIT("comexec(exit): rv(%d)\n", rv)
 		exstat = rv;

@@ -2,8 +2,6 @@ ROOTDIR= ../../..
 
 include ${ROOTDIR}/Makefile.inc
 
-# wait for signals from child executable
-#CFLAGS+=-Dfork=vfork
 #CFLAGS+=-DDEBUG
 #CFLAGS+=-DDEBUG_JOBS
 #CFLAGS+=-DDEBUG_SUBST
@@ -11,11 +9,23 @@ include ${ROOTDIR}/Makefile.inc
 #CFLAGS+=-DKSH_DEBUG
 CFLAGS+=-DSMALL
 #CFLAGS+=-DJOBS
+KSHSRC= ${SRCDIR}/bin/ksh
+MANFILES=  ${KSHSRC}/sh.1 ${KSHSRC}/ksh.1
 
-OBJECTS= alloc.o c_ksh.o c_sh.o c_test.o c_ulimit.o edit.o 2021_emacs.o eval.o \
+# wait for signals from child executable
+#CFLAGS+=-Dfork=vfork
+CFLAGS+= -I${KSHSRC}
+
+PROG= ksh
+
+# emacs.c and vi.c were taken from 2021 (v7.4) distro for utf8 handling
+OBJECTS= alloc.o c_ksh.o c_sh.o c_test.o c_ulimit.o edit.o emacs.o eval.o \
 	exec.o expr.o history.o io.o jobs.o lex.o mail.o main.o mknod.o \
 	misc.o path.o shf.o syn.o table.o trap.o tree.o tty.o var.o \
-	version.o 2021_vi.o debug.o
+	version.o vi.o
+
+# temporary debugging code
+#OBJECTS+= debug.o
 
 # Flags for using gmon. MinGW uses libgmon.a, which contains the 
 # mcount() function. In OpenBSD, this function is inluded in libc.
@@ -29,26 +39,29 @@ OBJECTS= alloc.o c_ksh.o c_sh.o c_test.o c_ulimit.o edit.o 2021_emacs.o eval.o \
 #CFLAGS+=-pg
 #OBJECTS+=/usr/lib/gcrt0.o
 
-all: ksh
+all: ${TMPDIR} ${KSHSRC}/.patch ${PROG}
 
-%.o: %.c
+%.o: ${KSHSRC}/%.c
 	@echo -n "$@ "
-	@${XGCC} -c ${CFLAGS} -g -DNOPIE -o $@ $<
+	@${XGCC} -c -g ${CFLAGS} -DNOPIE -o $@ $<
 
-misc.o: misc.c
+misc.o: ${KSHSRC}/misc.c
 	@echo -n "$@ "
-	@${XGCC} -c ${CFLAGS} -g -DNOPIE -I${SRCDIR}/lib/libc/gen -o $@ $<
+	@${XGCC} -c -g ${CFLAGS} -DNOPIE -I${SRCDIR}/lib/libc/gen -o $@ $<
 
-ksh: ${OBJECTS}
+${KSHSRC}/.patch:
+	@TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${KSHSRC} <../ksh.patch
+
+${PROG}: ${OBJECTS}
 	@echo "done."
 	${XGCC} -static -s ${CFLAGS} -o $@ ${OBJECTS}
 
-install: ${DESTDIR} ksh
-	${INSTALL} -m ${BINMODE} ksh ${DESTDIR}/bin/
+install: ${DESTDIR} ${PROG}
+	${INSTALL} -m ${BINMODE} ${PROG} ${DESTDIR}/bin/
 	${LN} -f ${DESTDIR}/bin/ksh ${DESTDIR}/bin/sh
 	@${MKDIR} -p ${DESTDIR}/usr/share/man/man1
-	${INSTALL} sh.1 ksh.1 ${DESTDIR}/usr/share/man/man1/
+	${INSTALL} ${MANFILES} ${DESTDIR}/usr/share/man/man1/
 
 clean:
-	/bin/rm -f *.o *.exe
+	/bin/rm -f *.o ${PROG}
 

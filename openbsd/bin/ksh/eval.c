@@ -706,7 +706,6 @@ varsub(Expand *xp, char *sp, char *word,
 
 	xp->var = (struct tbl *) 0;
 
-//__DEBUG_SUBST("varsub(%s)\n", sp)
 	/* ${#var}, string length or array size */
 	if (sp[0] == '#' && (c = sp[1]) != '\0') {
 		int zero_ok = 0;

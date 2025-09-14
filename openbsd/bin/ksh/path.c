@@ -184,8 +184,6 @@ set_current_wd(char *path)
 	len = strlen(p) + 1;
 
 /* aresize() calling realloc(), destroys parent's path */
-//	if (len > current_wd_size)
-//		current_wd = aresize(current_wd, current_wd_size = len, APERM);
 current_wd = alloc(current_wd_size = len, APERM);
 
 	memcpy(current_wd, p, len);

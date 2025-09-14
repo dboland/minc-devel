@@ -2,7 +2,7 @@ ROOTDIR= ..
 
 include ${ROOTDIR}/Makefile.inc
 
-all: ${SRCDIR}
+all: ${SRCDIR} ${TMPDIR}
 	@${MAKE} -C lib
 	@${MAKE} -C bin all install-local
 	@${MAKE} -C usr.bin all install-local

@@ -1,4 +1,4 @@
-/*	$OpenBSD: src/bin/ksh/emacs.c,v 1.48 2013/12/17 16:37:05 deraadt Exp $	*/
+/*	$OpenBSD: emacs.c,v 1.89 2021/10/09 21:38:00 halex Exp $	*/
 
 /*
  *  Emacs-like command line editing and history
@@ -14,29 +14,37 @@
 #include "config.h"
 #ifdef EMACS
 
-#include "sh.h"
-#include <sys/stat.h>
 #include <sys/queue.h>
+#include <sys/stat.h>
+
 #include <ctype.h>
-#include <locale.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#ifndef SMALL
+# include <term.h>
+# include <curses.h>
+#endif
+
+#include "sh.h"
 #include "edit.h"
 
 static	Area	aedit;
 #define	AEDIT	&aedit		/* area for kill ring and macro defns */
 
+#undef CTRL
 #define	CTRL(x)		((x) == '?' ? 0x7F : (x) & 0x1F)	/* ASCII */
 #define	UNCTRL(x)	((x) == 0x7F ? '?' : (x) | 0x40)	/* ASCII */
-#define	META(x)		((x) & 0x7f)
-#define	ISMETA(x)	(Flag(FEMACSUSEMETA) && ((x) & 0x80))
-
 
 /* values returned by keyboard functions */
 #define	KSTD	0
 #define	KEOL	1		/* ^M, ^J */
 #define	KINTR	2		/* ^G, ^C */
 
+typedef int (*kb_func)(int);
+
 struct	x_ftab {
-	int		(*xf_func)(int c);
+	kb_func		xf_func;
 	const char	*xf_name;
 	short		xf_flags;
 };
@@ -49,7 +57,8 @@ struct	x_ftab {
 #define	is_cfs(c)	(c == ' ' || c == '\t' || c == '"' || c == '\'')
 
 /* Separator for motion */
-#define	is_mfs(c)	(!(isalnum((unsigned char)c) || c == '_' || c == '$'))
+#define	is_mfs(c)	(!(isalnum((unsigned char)c) || \
+			c == '_' || c == '$' || c & 0x80))
 
 /* Arguments for do_complete()
  * 0 = enumerate  M-= complete as much as possible and then list
@@ -82,7 +91,7 @@ static char    *xend;		/* end input buffer */
 static char    *xcp;		/* current position */
 static char    *xep;		/* current end */
 static char    *xbp;		/* start of visible portion of input buffer */
-static char    *xlp;		/* last char visible on screen */
+static char    *xlp;		/* last byte visible on screen */
 static int	x_adj_ok;
 /*
  * we use x_adj_done so that functions can tell
@@ -132,17 +141,19 @@ static void	x_push(int);
 static void	x_adjust(void);
 static void	x_e_ungetc(int);
 static int	x_e_getc(void);
+static int	x_e_getu8(char *, int);
 static void	x_e_putc(int);
 static void	x_e_puts(const char *);
 static int	x_comment(int);
 static int	x_fold_case(int);
 static char	*x_lastcp(void);
 static void	do_complete(int, Comp_type);
-static int	x_emacs_putbuf(const char *, size_t);
+static int	isu8cont(unsigned char);
 
 /* proto's for keybindings */
 static int	x_abort(int);
 static int	x_beg_hist(int);
+static int	x_clear_screen(int);
 static int	x_comp_comm(int);
 static int	x_comp_file(int);
 static int	x_complete(int);
@@ -182,10 +193,7 @@ static int	x_search_char_forw(int);
 static int	x_search_char_back(int);
 static int	x_search_hist(int);
 static int	x_set_mark(int);
-static int	x_stuff(int);
-static int	x_stuffreset(int);
 static int	x_transpose(int);
-static int	x_version(int);
 static int	x_xchg_point_mark(int);
 static int	x_yank(int);
 static int	x_comp_list(int);
@@ -202,6 +210,7 @@ static int	x_debug_info(int);
 static const struct x_ftab x_ftab[] = {
 	{ x_abort,		"abort",			0 },
 	{ x_beg_hist,		"beginning-of-history",		0 },
+	{ x_clear_screen,	"clear-screen",			0 },
 	{ x_comp_comm,		"complete-command",		0 },
 	{ x_comp_file,		"complete-file",		0 },
 	{ x_complete,		"complete",			0 },
@@ -241,10 +250,7 @@ static const struct x_ftab x_ftab[] = {
 	{ x_search_char_back,	"search-character-backward",	XF_ARG },
 	{ x_search_hist,	"search-history",		0 },
 	{ x_set_mark,		"set-mark-command",		0 },
-	{ x_stuff,		"stuff",			0 },
-	{ x_stuffreset,		"stuff-reset",			0 },
 	{ x_transpose,		"transpose-chars",		0 },
-	{ x_version,		"version",			0 },
 	{ x_xchg_point_mark,	"exchange-point-and-mark",	0 },
 	{ x_yank,		"yank",				0 },
 	{ x_comp_list,		"complete-list",		0 },
@@ -264,11 +270,17 @@ static const struct x_ftab x_ftab[] = {
 };
 
 int
+isu8cont(unsigned char c)
+{
+	return (c & (0x80 | 0x40)) == 0x80;
+}
+
+int
 x_emacs(char *buf, size_t len)
 {
 	struct kb_entry		*k, *kmatch = NULL;
 	char			line[LINE + 1];
-	int			at = 0, submatch, ret, c;
+	int			at = 0, ntries = 0, submatch, ret;
 	const char		*p;
 
 	xbp = xbuf = buf; xend = buf + len;
@@ -303,17 +315,14 @@ x_emacs(char *buf, size_t len)
 		x_nextcmd = -1;
 	}
 
-	line[0] = '\0';
 	x_literal_set = 0;
 	x_arg = -1;
 	x_last_command = NULL;
 	while (1) {
 		x_flush();
-		if ((c = x_e_getc()) < 0)
+		if ((at = x_e_getu8(line, at)) < 0)
 			return 0;
-
-		line[at++] = c;
-		line[at] = '\0';
+		ntries++;
 
 		if (x_arg == -1) {
 			x_arg = 1;
@@ -331,7 +340,7 @@ x_emacs(char *buf, size_t len)
 				if (at > k->len)
 					continue;
 
-				if (!bcmp(k->seq, line, at)) {
+				if (memcmp(k->seq, line, at) == 0) {
 					/* sub match */
 					submatch++;
 					if (k->len == at)
@@ -351,14 +360,18 @@ x_emacs(char *buf, size_t len)
 				macro_args = kmatch->args;
 				ret = KSTD;
 			} else
-				ret = kmatch->ftab->xf_func(c);
+				ret = kmatch->ftab->xf_func(line[at - 1]);
 		} else {
 			if (submatch)
 				continue;
-			if (at == 1)
-				ret = x_insert(c);
-			else
-				ret = x_error(c); /* not matched meta sequence */
+			if (ntries > 1) {
+				ret = x_error(0); /* unmatched meta sequence */
+			} else if (at > 1) {
+				x_ins(line);
+				ret = KSTD;
+			} else {
+				ret = x_insert(line[0]);
+			}
 		}
 
 		switch (ret) {
@@ -383,8 +396,7 @@ x_emacs(char *buf, size_t len)
 		}
 
 		/* reset meta sequence */
-		at = 0;
-		line[0] = '\0';
+		at = ntries = 0;
 		if (x_arg_set)
 			x_arg_set = 0; /* reset args next time around */
 		else
@@ -417,10 +429,8 @@ x_ins_string(int c)
 	return x_insert(c);
 }
 
-static int x_do_ins(const char *cp, int len);
-
 static int
-x_do_ins(const char *cp, int len)
+x_do_ins(const char *cp, size_t len)
 {
 	if (xep+len >= xend) {
 		x_e_putc(BEL);
@@ -460,19 +470,6 @@ x_ins(char *s)
 	return 0;
 }
 
-/*
- * this is used for x_escape() in do_complete()
- */
-static int
-x_emacs_putbuf(const char *s, size_t len)
-{
-	int rval;
-
-	if ((rval = x_do_ins(s, len)) != 0)
-		return (rval);
-	return (rval);
-}
-
 static int
 x_del_back(int c)
 {
@@ -484,6 +481,8 @@ x_del_back(int c)
 	}
 	if (x_arg > col)
 		x_arg = col;
+	while (x_arg < col && isu8cont(xcp[-x_arg]))
+		x_arg++;
 	x_goto(xcp - x_arg);
 	x_delete(x_arg, false);
 	return KSTD;
@@ -500,11 +499,13 @@ x_del_char(int c)
 	}
 	if (x_arg > nleft)
 		x_arg = nleft;
+	while (x_arg < nleft && isu8cont(xcp[x_arg]))
+		x_arg++;
 	x_delete(x_arg, false);
 	return KSTD;
 }
 
-/* Delete nc chars to the right of the cursor (including cursor position) */
+/* Delete nc bytes to the right of the cursor (including cursor position) */
 static void
 x_delete(int nc, int push)
 {
@@ -535,6 +536,7 @@ x_delete(int nc, int push)
 	}
 	memmove(xcp, xcp+nc, xep - xcp + 1);	/* Copies the null */
 	x_adj_ok = 0;			/* don't redraw */
+	xlp_valid = false;
 	x_zots(xcp);
 	/*
 	 * if we are already filling the line,
@@ -676,6 +678,8 @@ x_size(int c)
 		return 4;	/* Kludge, tabs are always four spaces. */
 	if (iscntrl(c))		/* control char */
 		return 2;
+	if (isu8cont(c))
+		return 0;
 	return 1;
 }
 
@@ -684,6 +688,11 @@ x_zots(char *str)
 {
 	int	adj = x_adj_done;
 
+	if (str > xbuf && isu8cont(*str)) {
+		while (str > xbuf && isu8cont(*str))
+			str--;
+		x_e_putc('\b');
+	}
 	x_lastcp();
 	while (*str && str < xlp && adj == x_adj_done)
 		x_zotc(*str++);
@@ -713,6 +722,8 @@ x_mv_back(int c)
 	}
 	if (x_arg > col)
 		x_arg = col;
+	while (x_arg < col && isu8cont(xcp[-x_arg]))
+		x_arg++;
 	x_goto(xcp - x_arg);
 	return KSTD;
 }
@@ -728,6 +739,8 @@ x_mv_forw(int c)
 	}
 	if (x_arg > nleft)
 		x_arg = nleft;
+	while (x_arg < nleft && isu8cont(xcp[x_arg]))
+		x_arg++;
 	x_goto(xcp + x_arg);
 	return KSTD;
 }
@@ -850,7 +863,7 @@ x_eot_del(int c)
 		return (x_del_char(c));
 }
 
-static void *
+static kb_func
 kb_find_hist_func(char c)
 {
 	struct kb_entry		*k;
@@ -884,9 +897,10 @@ x_search_hist(int c)
 		if ((c = x_e_getc()) < 0)
 			return KSTD;
 		f = kb_find_hist_func(c);
-		if (c == CTRL('['))
+		if (c == CTRL('[') || c == CTRL('@')) {
+			x_e_ungetc(c);
 			break;
-		else if (f == x_search_hist)
+		} else if (f == x_search_hist)
 			offset = x_search(pat, 0, offset);
 		else if (f == x_del_back) {
 			if (p == pat) {
@@ -999,12 +1013,19 @@ x_draw_line(int c)
 {
 	x_redraw(-1);
 	return KSTD;
-
 }
 
-/* Redraw (part of) the line.  If limit is < 0, the everything is redrawn
- * on a NEW line, otherwise limit is the screen column up to which needs
- * redrawing.
+static int
+x_clear_screen(int c)
+{
+	x_redraw(-2);
+	return KSTD;
+}
+
+/* Redraw (part of) the line.
+ * A non-negative limit is the screen column up to which needs
+ * redrawing. A limit of -1 redraws on a new line, while a limit
+ * of -2 (attempts to) clear the screen.
  */
 static void
 x_redraw(int limit)
@@ -1013,13 +1034,24 @@ x_redraw(int limit)
 	char	*cp;
 
 	x_adj_ok = 0;
-	if (limit == -1)
+	if (limit == -2) {
+		int cleared = 0;
+#ifndef SMALL
+		if (cur_term != NULL && clear_screen != NULL) {
+			if (tputs(clear_screen, 1, x_putc) != ERR)
+				cleared = 1;
+		}
+#endif
+		if (!cleared)
+			x_e_putc('\n');
+	}
+	else if (limit == -1)
 		x_e_putc('\n');
-	else
+	else if (limit >= 0)
 		x_e_putc('\r');
 	x_flush();
 	if (xbp == xbuf) {
-		x_col = promptlen(prompt, (const char **) 0);
+		x_col = promptlen(prompt, NULL);
 		if (x_col > xx_cols)
 			truncate = (x_col / xx_cols) * xx_cols;
 		if (prompt_redraw)
@@ -1033,7 +1065,7 @@ x_redraw(int limit)
 		x_displen = xx_cols - 2;
 	}
 	xlp_valid = false;
-	cp = x_lastcp();
+	x_lastcp();
 	x_zots(xbp);
 	if (xbp != xbuf || xep > xlp)
 		limit = xx_cols;
@@ -1061,7 +1093,9 @@ x_redraw(int limit)
 	for (cp = xlp; cp > xcp; )
 		x_bs(*--cp);
 	x_adj_ok = 1;
-	D__(x_flush();)
+#ifdef DEBUG
+	x_flush();
+#endif
 	return;
 }
 
@@ -1135,6 +1169,8 @@ x_kill(int c)
 		x_arg = lastcol;
 	else if (x_arg > lastcol)
 		x_arg = lastcol;
+	while (x_arg < lastcol && isu8cont(xbuf[x_arg]))
+		x_arg++;
 	ndel = x_arg - col;
 	if (ndel < 0) {
 		x_goto(xbuf + x_arg);
@@ -1148,8 +1184,7 @@ static void
 x_push(int nchars)
 {
 	char	*cp = str_nsave(xcp, nchars, AEDIT);
-	if (killstack[killsp])
-		afree((void *)killstack[killsp], AEDIT);
+	afree(killstack[killsp], AEDIT);
 	killstack[killsp] = cp;
 	killsp = (killsp + 1) % KILLSIZE;
 }
@@ -1213,36 +1248,6 @@ x_error(int c)
 	return KSTD;
 }
 
-static int
-x_stuffreset(int c)
-{
-#ifdef TIOCSTI
-	(void)x_stuff(c);
-	return KINTR;
-#else
-	x_zotc(c);
-	xlp = xcp = xep = xbp = xbuf;
-	xlp_valid = true;
-	*xcp = 0;
-	x_redraw(-1);
-	return KSTD;
-#endif
-}
-
-static int
-x_stuff(int c)
-{
-#ifdef TIOCSTI
-	char	ch = c;
-	bool	savmode = x_mode(false);
-
-	(void)ioctl(TTY, TIOCSTI, &ch);
-	(void)x_mode(savmode);
-	x_redraw(-1);
-#endif
-	return KSTD;
-}
-
 static char *
 kb_encode(const char *s)
 {
@@ -1271,11 +1276,11 @@ static char *
 kb_decode(const char *s)
 {
 	static char		l[LINE + 1];
-	int			i, at = 0;
+	unsigned int		i, at = 0;
 
 	l[0] = '\0';
 	for (i = 0; i < strlen(s); i++) {
-		if (iscntrl(s[i])) {
+		if (iscntrl((unsigned char)s[i])) {
 			l[at++] = '^';
 			l[at++] = UNCTRL(s[i]);
 		} else
@@ -1296,7 +1301,7 @@ kb_match(char *s)
 		if (len > k->len)
 			continue;
 
-		if (!bcmp(k->seq, s, len))
+		if (memcmp(k->seq, s, len) == 0)
 			return (1);
 	}
 
@@ -1307,21 +1312,20 @@ static void
 kb_del(struct kb_entry *k)
 {
 	TAILQ_REMOVE(&kblist, k, entry);
-	if (k->args)
-		free(k->args);
+	free(k->args);
 	afree(k, AEDIT);
 }
 
 static struct kb_entry *
-kb_add_string(void *func, void *args, char *str)
+kb_add_string(kb_func func, void *args, char *str)
 {
-	int			i, count;
+	unsigned int		ele, count;
 	struct kb_entry		*k;
 	struct x_ftab		*xf = NULL;
 
-	for (i = 0; i < NELEM(x_ftab); i++)
-		if (x_ftab[i].xf_func == func) {
-			xf = (struct x_ftab *)&x_ftab[i];
+	for (ele = 0; ele < NELEM(x_ftab); ele++)
+		if (x_ftab[ele].xf_func == func) {
+			xf = (struct x_ftab *)&x_ftab[ele];
 			break;
 		}
 	if (xf == NULL)
@@ -1348,24 +1352,24 @@ kb_add_string(void *func, void *args, char *str)
 }
 
 static struct kb_entry *
-kb_add(void *func, void *args, ...)
+kb_add(kb_func func, ...)
 {
 	va_list			ap;
-	int			i, count;
-	char			l[LINE + 1];
+	unsigned char		ch;
+	unsigned int		i;
+	char			line[LINE + 1];
 
-	va_start(ap, args);
-	count = 0;
-	while (va_arg(ap, unsigned int) != 0)
-		count++;
+	va_start(ap, func);
+	for (i = 0; i < sizeof(line) - 1; i++) {
+		ch = va_arg(ap, unsigned int);
+		if (ch == 0)
+			break;
+		line[i] = ch;
+	}
 	va_end(ap);
+	line[i] = '\0';
 
-	va_start(ap, args);
-	for (i = 0; i <= count /* <= is correct */; i++)
-		l[i] = (unsigned char)va_arg(ap, unsigned int);
-	va_end(ap);
-
-	return (kb_add_string(func, args, l));
+	return (kb_add_string(func, NULL, line));
 }
 
 static void
@@ -1385,7 +1389,7 @@ x_bind(const char *a1, const char *a2,
 	int macro,		/* bind -m */
 	int list)		/* bind -l */
 {
-	int			i;
+	unsigned int		i;
 	struct kb_entry		*k, *kb;
 	char			in[LINE + 1];
 
@@ -1469,128 +1473,116 @@ x_bind(const char *a1, const char *a2,
 void
 x_init_emacs(void)
 {
-	char *locale;
-
 	x_tty = 1;
 	ainit(AEDIT);
 	x_nextcmd = -1;
 
-	/* Determine if we can translate meta key or use 8-bit AscII
-	 * XXX - It would be nice if there was a locale attribute to
-	 * determine if the locale is 7-bit or not.
-	 */
-	locale = setlocale(LC_CTYPE, NULL);
-	if (locale == NULL || !strcmp(locale, "C") || !strcmp(locale, "POSIX"))
-		Flag(FEMACSUSEMETA) = 1;
-
-	/* new keybinding stuff */
 	TAILQ_INIT(&kblist);
 
 	/* man page order */
-	kb_add(x_abort,			NULL, CTRL('G'), 0);
-	kb_add(x_mv_back,		NULL, CTRL('B'), 0);
-	kb_add(x_mv_back,		NULL, CTRL('X'), CTRL('D'), 0);
-	kb_add(x_mv_bword,		NULL, CTRL('['), 'b', 0);
-	kb_add(x_beg_hist,		NULL, CTRL('['), '<', 0);
-	kb_add(x_mv_begin,		NULL, CTRL('A'), 0);
-	kb_add(x_fold_capitalize,	NULL, CTRL('['), 'C', 0);
-	kb_add(x_fold_capitalize,	NULL, CTRL('['), 'c', 0);
-	kb_add(x_comment,		NULL, CTRL('['), '#', 0);
-	kb_add(x_complete,		NULL, CTRL('['), CTRL('['), 0);
-	kb_add(x_comp_comm,		NULL, CTRL('X'), CTRL('['), 0);
-	kb_add(x_comp_file,		NULL, CTRL('['), CTRL('X'), 0);
-	kb_add(x_comp_list,		NULL, CTRL('I'), 0);
-	kb_add(x_comp_list,		NULL, CTRL('['), '=', 0);
-	kb_add(x_del_back,		NULL, CTRL('?'), 0);
-	kb_add(x_del_back,		NULL, CTRL('H'), 0);
-	/* x_del_char not assigned by default */
-	kb_add(x_del_bword,		NULL, CTRL('['), CTRL('?'), 0);
-	kb_add(x_del_bword,		NULL, CTRL('['), CTRL('H'), 0);
-	kb_add(x_del_bword,		NULL, CTRL('['), 'h', 0);
-	kb_add(x_del_fword,		NULL, CTRL('['), 'd', 0);
-	kb_add(x_next_com,		NULL, CTRL('N'), 0);
-	kb_add(x_next_com,		NULL, CTRL('X'), 'B', 0);
-	kb_add(x_fold_lower,		NULL, CTRL('['), 'L', 0);
-	kb_add(x_fold_lower,		NULL, CTRL('['), 'l', 0);
-	kb_add(x_end_hist,		NULL, CTRL('['), '>', 0);
-	kb_add(x_mv_end,		NULL, CTRL('E'), 0);
+	kb_add(x_abort,			CTRL('G'), 0);
+	kb_add(x_mv_back,		CTRL('B'), 0);
+	kb_add(x_mv_back,		CTRL('X'), CTRL('D'), 0);
+	kb_add(x_mv_bword,		CTRL('['), 'b', 0);
+	kb_add(x_beg_hist,		CTRL('['), '<', 0);
+	kb_add(x_mv_begin,		CTRL('A'), 0);
+	kb_add(x_fold_capitalize,	CTRL('['), 'C', 0);
+	kb_add(x_fold_capitalize,	CTRL('['), 'c', 0);
+	kb_add(x_comment,		CTRL('['), '#', 0);
+	kb_add(x_complete,		CTRL('['), CTRL('['), 0);
+	kb_add(x_comp_comm,		CTRL('X'), CTRL('['), 0);
+	kb_add(x_comp_file,		CTRL('['), CTRL('X'), 0);
+	kb_add(x_comp_list,		CTRL('I'), 0);
+	kb_add(x_comp_list,		CTRL('['), '=', 0);
+	kb_add(x_del_back,		CTRL('?'), 0);
+	kb_add(x_del_back,		CTRL('H'), 0);
+	kb_add(x_del_char,		CTRL('['), '[', '3', '~', 0); /* delete */
+	kb_add(x_del_bword,		CTRL('W'), 0);
+	kb_add(x_del_bword,		CTRL('['), CTRL('?'), 0);
+	kb_add(x_del_bword,		CTRL('['), CTRL('H'), 0);
+	kb_add(x_del_bword,		CTRL('['), 'h', 0);
+	kb_add(x_del_fword,		CTRL('['), 'd', 0);
+	kb_add(x_next_com,		CTRL('N'), 0);
+	kb_add(x_next_com,		CTRL('X'), 'B', 0);
+	kb_add(x_fold_lower,		CTRL('['), 'L', 0);
+	kb_add(x_fold_lower,		CTRL('['), 'l', 0);
+	kb_add(x_end_hist,		CTRL('['), '>', 0);
+	kb_add(x_mv_end,		CTRL('E'), 0);
 	/* how to handle: eot: ^_, underneath copied from original keybindings */
-	kb_add(x_end_of_text,		NULL, CTRL('_'), 0);
-	kb_add(x_eot_del,		NULL, CTRL('D'), 0);
+	kb_add(x_end_of_text,		CTRL('_'), 0);
+	kb_add(x_eot_del,		CTRL('D'), 0);
 	/* error */
-	kb_add(x_xchg_point_mark,	NULL, CTRL('X'), CTRL('X'), 0);
-	kb_add(x_expand,		NULL, CTRL('['), '*', 0);
-	kb_add(x_mv_forw,		NULL, CTRL('F'), 0);
-	kb_add(x_mv_forw,		NULL, CTRL('X'), 'C', 0);
-	kb_add(x_mv_fword,		NULL, CTRL('['), 'f', 0);
-	kb_add(x_goto_hist,		NULL, CTRL('['), 'g', 0);
+	kb_add(x_xchg_point_mark,	CTRL('X'), CTRL('X'), 0);
+	kb_add(x_expand,		CTRL('['), '*', 0);
+	kb_add(x_mv_forw,		CTRL('F'), 0);
+	kb_add(x_mv_forw,		CTRL('X'), 'C', 0);
+	kb_add(x_mv_fword,		CTRL('['), 'f', 0);
+	kb_add(x_goto_hist,		CTRL('['), 'g', 0);
 	/* kill-line */
-	kb_add(x_del_bword,		NULL, CTRL('W'), 0); /* not what man says */
-	kb_add(x_kill,			NULL, CTRL('K'), 0);
-	kb_add(x_enumerate,		NULL, CTRL('['), '?', 0);
-	kb_add(x_list_comm,		NULL, CTRL('X'), '?', 0);
-	kb_add(x_list_file,		NULL, CTRL('X'), CTRL('Y'), 0);
-	kb_add(x_newline,		NULL, CTRL('J'), 0);
-	kb_add(x_newline,		NULL, CTRL('M'), 0);
-	kb_add(x_nl_next_com,		NULL, CTRL('O'), 0);
+	kb_add(x_kill,			CTRL('K'), 0);
+	kb_add(x_enumerate,		CTRL('['), '?', 0);
+	kb_add(x_list_comm,		CTRL('X'), '?', 0);
+	kb_add(x_list_file,		CTRL('X'), CTRL('Y'), 0);
+	kb_add(x_newline,		CTRL('J'), 0);
+	kb_add(x_newline,		CTRL('M'), 0);
+	kb_add(x_nl_next_com,		CTRL('O'), 0);
 	/* no-op */
-	kb_add(x_prev_histword,		NULL, CTRL('['), '.', 0);
-	kb_add(x_prev_histword,		NULL, CTRL('['), '_', 0);
+	kb_add(x_prev_histword,		CTRL('['), '.', 0);
+	kb_add(x_prev_histword,		CTRL('['), '_', 0);
 	/* how to handle: quote: ^^ */
-	kb_add(x_draw_line,		NULL, CTRL('L'), 0);
-	kb_add(x_search_char_back,	NULL, CTRL('['), CTRL(']'), 0);
-	kb_add(x_search_char_forw,	NULL, CTRL(']'), 0);
-	kb_add(x_search_hist,		NULL, CTRL('R'), 0);
-	kb_add(x_set_mark,		NULL, CTRL('['), ' ', 0);
-#if defined(TIOCSTI)
-	kb_add(x_stuff,			NULL, CTRL('T'), 0);
-	/* stuff-reset */
-#else
-	kb_add(x_transpose,		NULL, CTRL('T'), 0);
-#endif
-	kb_add(x_prev_com,		NULL, CTRL('P'), 0);
-	kb_add(x_prev_com,		NULL, CTRL('X'), 'A', 0);
-	kb_add(x_fold_upper,		NULL, CTRL('['), 'U', 0);
-	kb_add(x_fold_upper,		NULL, CTRL('['), 'u', 0);
-	kb_add(x_literal,		NULL, CTRL('V'), 0);
-	kb_add(x_literal,		NULL, CTRL('^'), 0);
-	kb_add(x_yank,			NULL, CTRL('Y'), 0);
-	kb_add(x_meta_yank,		NULL, CTRL('['), 'y', 0);
+	kb_add(x_literal,		CTRL('^'), 0);
+	kb_add(x_clear_screen,		CTRL('L'), 0);
+	kb_add(x_search_char_back,	CTRL('['), CTRL(']'), 0);
+	kb_add(x_search_char_forw,	CTRL(']'), 0);
+	kb_add(x_search_hist,		CTRL('R'), 0);
+	kb_add(x_set_mark,		CTRL('['), ' ', 0);
+	kb_add(x_transpose,		CTRL('T'), 0);
+	kb_add(x_prev_com,		CTRL('P'), 0);
+	kb_add(x_prev_com,		CTRL('X'), 'A', 0);
+	kb_add(x_fold_upper,		CTRL('['), 'U', 0);
+	kb_add(x_fold_upper,		CTRL('['), 'u', 0);
+	kb_add(x_literal,		CTRL('V'), 0);
+	kb_add(x_yank,			CTRL('Y'), 0);
+	kb_add(x_meta_yank,		CTRL('['), 'y', 0);
 	/* man page ends here */
 
 	/* arrow keys */
-	kb_add(x_prev_com,		NULL, CTRL('['), '[', 'A', 0); /* up */
-	kb_add(x_next_com,		NULL, CTRL('['), '[', 'B', 0); /* down */
-	kb_add(x_mv_forw,		NULL, CTRL('['), '[', 'C', 0); /* right */
-	kb_add(x_mv_back,		NULL, CTRL('['), '[', 'D', 0); /* left */
-	kb_add(x_prev_com,		NULL, CTRL('['), 'O', 'A', 0); /* up */
-	kb_add(x_next_com,		NULL, CTRL('['), 'O', 'B', 0); /* down */
-	kb_add(x_mv_forw,		NULL, CTRL('['), 'O', 'C', 0); /* right */
-	kb_add(x_mv_back,		NULL, CTRL('['), 'O', 'D', 0); /* left */
+	kb_add(x_prev_com,		CTRL('['), '[', 'A', 0); /* up */
+	kb_add(x_next_com,		CTRL('['), '[', 'B', 0); /* down */
+	kb_add(x_mv_forw,		CTRL('['), '[', 'C', 0); /* right */
+	kb_add(x_mv_back,		CTRL('['), '[', 'D', 0); /* left */
+	kb_add(x_prev_com,		CTRL('['), 'O', 'A', 0); /* up */
+	kb_add(x_next_com,		CTRL('['), 'O', 'B', 0); /* down */
+	kb_add(x_mv_forw,		CTRL('['), 'O', 'C', 0); /* right */
+	kb_add(x_mv_back,		CTRL('['), 'O', 'D', 0); /* left */
 
 	/* more navigation keys */
-	kb_add(x_mv_begin,		NULL, CTRL('['), '[', 'H', 0); /* home */
-	kb_add(x_mv_end,		NULL, CTRL('['), '[', 'F', 0); /* end */
-	kb_add(x_mv_begin,		NULL, CTRL('['), 'O', 'H', 0); /* home */
-	kb_add(x_mv_end,		NULL, CTRL('['), 'O', 'F', 0); /* end */
+	kb_add(x_mv_begin,		CTRL('['), '[', 'H', 0); /* home */
+	kb_add(x_mv_end,		CTRL('['), '[', 'F', 0); /* end */
+	kb_add(x_mv_begin,		CTRL('['), 'O', 'H', 0); /* home */
+	kb_add(x_mv_end,		CTRL('['), 'O', 'F', 0); /* end */
+	kb_add(x_mv_begin,		CTRL('['), '[', '1', '~', 0); /* home */
+	kb_add(x_mv_end,		CTRL('['), '[', '4', '~', 0); /* end */
+	kb_add(x_mv_begin,		CTRL('['), '[', '7', '~', 0); /* home */
+	kb_add(x_mv_end,		CTRL('['), '[', '8', '~', 0); /* end */
 
 	/* can't be bound */
-	kb_add(x_set_arg,		NULL, CTRL('['), '0', 0);
-	kb_add(x_set_arg,		NULL, CTRL('['), '1', 0);
-	kb_add(x_set_arg,		NULL, CTRL('['), '2', 0);
-	kb_add(x_set_arg,		NULL, CTRL('['), '3', 0);
-	kb_add(x_set_arg,		NULL, CTRL('['), '4', 0);
-	kb_add(x_set_arg,		NULL, CTRL('['), '5', 0);
-	kb_add(x_set_arg,		NULL, CTRL('['), '6', 0);
-	kb_add(x_set_arg,		NULL, CTRL('['), '7', 0);
-	kb_add(x_set_arg,		NULL, CTRL('['), '8', 0);
-	kb_add(x_set_arg,		NULL, CTRL('['), '9', 0);
+	kb_add(x_set_arg,		CTRL('['), '0', 0);
+	kb_add(x_set_arg,		CTRL('['), '1', 0);
+	kb_add(x_set_arg,		CTRL('['), '2', 0);
+	kb_add(x_set_arg,		CTRL('['), '3', 0);
+	kb_add(x_set_arg,		CTRL('['), '4', 0);
+	kb_add(x_set_arg,		CTRL('['), '5', 0);
+	kb_add(x_set_arg,		CTRL('['), '6', 0);
+	kb_add(x_set_arg,		CTRL('['), '7', 0);
+	kb_add(x_set_arg,		CTRL('['), '8', 0);
+	kb_add(x_set_arg,		CTRL('['), '9', 0);
 
 	/* ctrl arrow keys */
-	kb_add(x_mv_end,		NULL, CTRL('['), '[', '1', ';', '5', 'A', 0); /* ctrl up */
-	kb_add(x_mv_begin,		NULL, CTRL('['), '[', '1', ';', '5', 'B', 0); /* ctrl down */
-	kb_add(x_mv_fword,		NULL, CTRL('['), '[', '1', ';', '5', 'C', 0); /* ctrl right */
-	kb_add(x_mv_bword,		NULL, CTRL('['), '[', '1', ';', '5', 'D', 0); /* ctrl left */
+	kb_add(x_mv_end,		CTRL('['), '[', '1', ';', '5', 'A', 0); /* ctrl up */
+	kb_add(x_mv_begin,		CTRL('['), '[', '1', ';', '5', 'B', 0); /* ctrl down */
+	kb_add(x_mv_fword,		CTRL('['), '[', '1', ';', '5', 'C', 0); /* ctrl right */
+	kb_add(x_mv_bword,		CTRL('['), '[', '1', ';', '5', 'D', 0); /* ctrl left */
 }
 
 void
@@ -1598,17 +1590,17 @@ x_emacs_keys(X_chars *ec)
 {
 	x_bind_quiet = 1;
 	if (ec->erase >= 0) {
-		kb_add(x_del_back, NULL, ec->erase, 0);
-		kb_add(x_del_bword, NULL, CTRL('['), ec->erase, 0);
+		kb_add(x_del_back, ec->erase, 0);
+		kb_add(x_del_bword, CTRL('['), ec->erase, 0);
 	}
 	if (ec->kill >= 0)
-		kb_add(x_del_line, NULL, ec->kill, 0);
+		kb_add(x_del_line, ec->kill, 0);
 	if (ec->werase >= 0)
-		kb_add(x_del_bword, NULL, ec->werase, 0);
+		kb_add(x_del_bword, ec->werase, 0);
 	if (ec->intr >= 0)
-		kb_add(x_abort, NULL, ec->intr, 0);
+		kb_add(x_abort, ec->intr, 0);
 	if (ec->quit >= 0)
-		kb_add(x_noop, NULL, ec->quit, 0);
+		kb_add(x_noop, ec->quit, 0);
 	x_bind_quiet = 0;
 }
 
@@ -1654,35 +1646,6 @@ x_xchg_point_mark(int c)
 	tmp = xmp;
 	xmp = xcp;
 	x_goto( tmp );
-	return KSTD;
-}
-
-static int
-x_version(int c)
-{
-	char *o_xbuf = xbuf, *o_xend = xend;
-	char *o_xbp = xbp, *o_xep = xep, *o_xcp = xcp;
-	int lim = x_lastcp() - xbp;
-
-	xbuf = xbp = xcp = (char *) ksh_version + 4;
-	xend = xep = (char *) ksh_version + 4 + strlen(ksh_version + 4);
-	x_redraw(lim);
-	x_flush();
-
-	c = x_e_getc();
-	xbuf = o_xbuf;
-	xend = o_xend;
-	xbp = o_xbp;
-	xep = o_xep;
-	xcp = o_xcp;
-	x_redraw(strlen(ksh_version));
-
-	if (c < 0)
-		return KSTD;
-	/* This is what at&t ksh seems to do...  Very bizarre */
-	if (c != ' ')
-		x_e_ungetc(c);
-
 	return KSTD;
 }
 
@@ -1758,8 +1721,8 @@ x_expand(int c)
 	x_goto(xbuf + start);
 	x_delete(end - start, false);
 	for (i = 0; i < nwords;) {
-		if (x_escape(words[i], strlen(words[i]), x_emacs_putbuf) < 0 ||
-		    (++i < nwords && x_ins(space) < 0)) {
+		if (x_escape(words[i], strlen(words[i]), x_do_ins) < 0 ||
+		    (++i < nwords && x_ins(" ") < 0)) {
 			x_e_putc(BEL);
 			return KSTD;
 		}
@@ -1801,13 +1764,13 @@ do_complete(int flags,	/* XCF_{COMMAND,FILE,COMMAND_FILE} */
 	if (nwords == 1 || nlen > olen) {
 		x_goto(xbuf + start);
 		x_delete(olen, false);
-		x_escape(words[0], nlen, x_emacs_putbuf);
+		x_escape(words[0], nlen, x_do_ins);
 		x_adjust();
 		completed = 1;
 	}
 	/* add space if single non-dir match */
 	if (nwords == 1 && words[0][nlen - 1] != '/') {
-		x_ins(space);
+		x_ins(" ");
 		completed = 1;
 	}
 
@@ -1878,6 +1841,50 @@ x_e_getc(void)
 	return c;
 }
 
+static int
+x_e_getu8(char *buf, int off)
+{
+	int	c, cc, len;
+
+	c = x_e_getc();
+	if (c == -1)
+		return -1;
+	buf[off++] = c;
+
+	/*
+	 * In the following, comments refer to violations of
+	 * the inequality tests at the ends of the lines.
+	 * See the utf8(7) manual page for details.
+	 */
+
+	if ((c & 0xf8) == 0xf0 && c < 0xf5)  /* beyond Unicode */
+		len = 4;
+	else if ((c & 0xf0) == 0xe0)
+		len = 3;
+	else if ((c & 0xe0) == 0xc0 && c > 0xc1)  /* use single byte */
+		len = 2;
+	else
+		len = 1;
+
+	for (; len > 1; len--) {
+		cc = x_e_getc();
+		if (cc == -1)
+			break;
+		if (isu8cont(cc) == 0 ||
+		    (c == 0xe0 && len == 3 && cc < 0xa0) ||  /* use 2 bytes */
+		    (c == 0xed && len == 3 && cc > 0x9f) ||  /* surrogates  */
+		    (c == 0xf0 && len == 4 && cc < 0x90) ||  /* use 3 bytes */
+		    (c == 0xf4 && len == 4 && cc > 0x8f)) {  /* beyond Uni. */
+			x_e_ungetc(cc);
+			break;
+		}
+		buf[off++] = cc;
+	}
+	buf[off] = '\0';
+
+	return off;
+}
+
 static void
 x_e_putc(int c)
 {
@@ -1895,7 +1902,8 @@ x_e_putc(int c)
 			x_col--;
 			break;
 		default:
-			x_col++;
+			if (!isu8cont(c))
+				x_col++;
 			break;
 		}
 	}
@@ -1915,7 +1923,7 @@ x_debug_info(int c)
 	shellf("\txbp == 0x%lx,\txbuf == 0x%lx\n", (long) xbp, (long) xbuf);
 	shellf("\txlp == 0x%lx\n", (long) xlp);
 	shellf("\txlp == 0x%lx\n", (long) x_lastcp());
-	shellf(newline);
+	shellf("\n");
 	x_redraw(-1);
 	return 0;
 }
@@ -2021,8 +2029,6 @@ x_prev_histword(int c)
 			rcp++;
 		x_ins(rcp);
 	} else {
-		int c;
-
 		rcp = cp;
 		/*
 		 * ignore white-space at start of line
@@ -2126,13 +2132,13 @@ x_fold_case(int c)
 }
 
 /* NAME:
- *      x_lastcp - last visible char
+ *      x_lastcp - last visible byte
  *
  * SYNOPSIS:
  *      x_lastcp()
  *
  * DESCRIPTION:
- *      This function returns a pointer to that  char in the
+ *      This function returns a pointer to that byte in the
  *      edit buffer that will be the last displayed on the
  *      screen.  The sequence:
  *
@@ -2160,4 +2166,4 @@ x_lastcp(void)
 	return (xlp);
 }
 
-#endif /* EDIT */
+#endif /* EMACS */

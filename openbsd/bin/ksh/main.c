@@ -659,7 +659,6 @@ newenv(int type)
 	ep->oenv = e;
 	ep->temps = NULL;
 	e = ep;
-//__DEBUG_SUBST("newenv(%s): addr(0x%x) pid(%d)\n", __E_TYPE[type], ep, getpid())
 }
 
 void

@@ -404,7 +404,6 @@ get_command(int cf)
 		XPfree(vars);
 	}
 
-//__DEBUG("get_command(%s): type(%d)\n", t->str, t->type);
 	return t;
 }
 

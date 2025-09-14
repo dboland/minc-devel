@@ -285,7 +285,6 @@ settrap(Trap *p, char *s)
 {
 	sig_t f;
 
-//__DEBUG_JOBS("settrap(%s): %s\n", p->name, s)
 	if (p->trap)
 		afree(p->trap, APERM);
 	p->trap = str_save(s, APERM); /* handles s == 0 */
@@ -392,8 +391,6 @@ setsig(Trap *p, sig_t f, int flags)
 		sigact.sa_flags = 0 /* interruptible */;
 		sigact.sa_handler = f;
 		sigaction(p->signal, &sigact, (struct sigaction *) 0);
-//__DEBUG_JOBS("setsig(%s): cursig(0x%x), shtrap(0x%x) trap(%s) flags(0x%x)\n", 
-//		p->name, p->cursig, p->shtrap, p->trap, flags)
 	}
 
 	return 1;
