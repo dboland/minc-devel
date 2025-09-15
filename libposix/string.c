@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016 Daniel Boland <dboland@xs4all.nl>.
+ * Copyright (c) 2025 Atharva Tiwari <atharvatiwari1101@outlook.in>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,25 +36,15 @@
 char *
 stpquot(char *dest, const char *src)
 {
-	char c;
-	char count = 1;
-
-	*dest++ = ' ';
-	*dest++ = '"';
-	while (c = *src++){
-		if (c == '"'){
-			while (count--){
-				*dest++ = '\\';
-			}
-			count = 1;
-		}else if (c == '\\'){
-			count++;
-		}else{
-			count = 1;
-		}
-		*dest++ = c;
-	}
-	*dest++ = '"';
-	*dest = 0;
-	return(dest);
+    char *out = dest;
+    *out++ = ' ';
+    *out++ = '"';
+    for (; *src; src++) {
+        if (*src == '"' || (*src == '\\' && src[1] == '"')) *out++ = '\\';
+        *out++ = *src;
+    }
+    *out++ = '"';
+    *out = 0;
+    return out;
 }
+
