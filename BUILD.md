@@ -24,11 +24,7 @@ However, you can also use my copy (186Mb):
 
 To build the new kernel and compile the operating system code, 
 you would have to build an OpenBSD cross compiler first. This 
-can be very laborious and frustrating. If you want to know more 
-about cross-compiling, watch Rob Landley's excellent presentation 
-on the topic:
-
-* https://youtu.be/Sk9TatW9ino
+can be very laborious and frustrating. 
 
 Instead we will create an isolated, slightly modified instance 
 of the MinGW compiler. Let's call it a *poor man's cross-compiler*. 
@@ -64,8 +60,9 @@ the build:
 ## Step 3: install the system
 
 For this step, you need to be **Administrator**. Close the MSYS 
-terminal and open it again as Administrator. Change to your 
-*minc-devel* directory and run the *mkroot* command:
+terminal and open it again as Administrator by right-clicking 
+the MSYS icon on your Desktop. Change to your *minc-devel* 
+directory and run the *mkroot* command:
 
 	./mkroot.sh
 
@@ -112,6 +109,19 @@ or type its location in the address bar, like *C:\minc-release*.
 
 ## Step 4: building the GCC compiler
 
-This is currently not within the scope of this document.
+Building the GNU C Compiler and build tools for MinC is as simple 
+as running the *configure* and *make* commands. But in reality it 
+is a bit more complicated. You have to provide the OpenBSD headers 
+and import libraries yourself, of which the latter have to be built 
+first. So you immediately run into the *chicken-and-egg* problem.
 
-Daniel Boland, July, 2025
+Instead, I recommend just installing the pre-compiled build tools 
+which you can find in the *Releases* section on GitHub.
+
+If you want to know more about cross-compiling, watch Rob Landley's 
+excellent presentation on the topic:
+
+* https://youtu.be/Sk9TatW9ino
+
+
+Daniel Boland, September, 2025
