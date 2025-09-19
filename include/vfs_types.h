@@ -529,6 +529,7 @@ typedef struct _WIN_TASK {
 	DWORDLONG ClockTime;		/* monotonic clock at syscall() in nanoseconds */
 	DWORDLONG KernelTime;		/* kernel time in nanoseconds */
 	DWORDLONG UserTime;		/* user time in nanoseconds */
+	DWORDLONG IdleTime;		/* idle time in nanoseconds */
 	DWORD State;
 	DWORD Code;			/* syscall currently running */
 	HANDLE Timer;			/* interval timer */

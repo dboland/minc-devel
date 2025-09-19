@@ -80,7 +80,7 @@ ws2_setvfs(WIN_IFDATA *Config)
 		Config->Index = 0;
 		bResult = TRUE;
 	}else{
-		WIN_ERR("GetAdaptersAddresses(AF_UNSPEC): %s", win_strerror(ulStatus));
+		WIN_ERR("GetAdaptersAddresses(AF_UNSPEC): %s\n", win_strerror(ulStatus));
 	}
 	return(bResult);
 }

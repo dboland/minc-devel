@@ -36,7 +36,7 @@ char *
 stpquot(char *dest, const char *src)
 {
 	char c;
-	char count = 1;
+	size_t count = 1;
 
 	*dest++ = ' ';
 	*dest++ = '"';
@@ -46,10 +46,12 @@ stpquot(char *dest, const char *src)
 				*dest++ = '\\';
 			}
 			count = 1;
-		}else if (c == '\\'){
-			count++;
-		}else{
+		}else if (c != '\\'){
 			count = 1;
+		}else if (!*src){	/* backslash at end (hello Avi Halachmi) */
+			*dest++ = '\\';
+		}else{
+			count++;
 		}
 		*dest++ = c;
 	}

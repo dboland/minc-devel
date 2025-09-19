@@ -160,7 +160,7 @@
  typedef long double		__float_t;
  typedef long			__ptrdiff_t;
 -typedef	unsigned long		__size_t;
-+typedef	__SIZE_TYPE__		__size_t;		/* match WinNT's */
++typedef	unsigned int		__size_t;		/* match WinNT's */
  typedef	long			__ssize_t;
  #if defined(__GNUC__) && __GNUC__ >= 3
  typedef	__builtin_va_list	__va_list;
@@ -169,7 +169,7 @@
  /* Wide character support types */
  #ifndef __cplusplus
 -typedef	int			__wchar_t;
-+typedef	__WCHAR_TYPE__		__wchar_t;		/* match WinNT's */
++typedef	short unsigned int	__wchar_t;		/* match WinNT's */
  #endif
  typedef int			__wint_t;
  typedef	int			__rune_t;

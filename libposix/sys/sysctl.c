@@ -91,7 +91,7 @@ sysctl_KERN(const int *name, void *oldp, size_t *oldlenp, void *newp, size_t new
 			*(int *)oldp = FSCALE;
 			break;
 		case KERN_CCPU:		/* The scheduler exponential decay value (ps.exe) */
-			*(int *)oldp = 1948;
+			*(int *)oldp = __CCPU;
 			break;
 		case KERN_CPTIME:	/* the number of ticks spent by the system (top.exe) */
 			result = kern_KERN_CPTIME((long *)oldp);
@@ -191,6 +191,10 @@ sysctl_VM_LOADAVG(struct loadavg *load, size_t size)
 	/* Not sure what this should be.
 	 * Let OpenBSD figure it out (top.exe).
 	 */
+	load->ldavg[0] = 1 * FSCALE;	/* 1 min. */
+	load->ldavg[1] = 1 * FSCALE;	/* 5 min. */
+	load->ldavg[2] = 1 * FSCALE;	/* 15 min. */
+	load->fscale = FSCALE;
 	return(0);
 }
 int 

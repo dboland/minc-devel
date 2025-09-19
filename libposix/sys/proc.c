@@ -80,15 +80,17 @@ kproc_posix(struct kinfo_proc *proc, WIN_TASK *Task)
 	DWORD dwPageSize = __Globals->PageSize;
 	WIN_KUSAGE wkUsage;
 	struct timeval tv;
-	u_int64_t rtime;
+	u_int64_t rtime = 0LL;
+	u_int32_t rticks;
 
-	/* see: src/sys/sys/sysctl.h */
-
+	/* see: src/sys/sys/sysctl.h
+	 */
 	win_bzero(proc, sizeof(struct kinfo_proc));
 	win_wcstombs(proc->p_comm, command, KI_MAXCOMLEN);
 //	proc->p_flag					/* INT: P_* flags. */
 	proc->p_psflags = Task->Flags;			/* INT: PS_* flags on the process. */
 	proc->p_pid = Task->TaskId;
+	proc->p_tid = Task->ThreadId;
 	proc->p_ppid = Task->ParentId;
 	proc->p_sid = Task->SessionId;
 	proc->p__pgid = Task->GroupId;
@@ -100,39 +102,45 @@ kproc_posix(struct kinfo_proc *proc, WIN_TASK *Task)
 	proc->p_svgid = Task->SavedGid;
 	proc->p_tdev = pTerminal->DeviceId;
 	proc->p_tpgid = pTerminal->GroupId;
+
 	proc->p_vm_rssize = (Task->SetSize + dwPageSize - 1) / dwPageSize;
 	proc->p_vm_tsize = (Task->TextSize + dwPageSize - 1) / dwPageSize;
 	proc->p_vm_dsize = (Task->DataSize - Task->SetSize + dwPageSize - 1) / dwPageSize;
 	proc->p_vm_ssize = (WIN_STACKSIZE + dwPageSize - 1) / dwPageSize;
-	if (win_KERN_PROC(Task->ThreadId, &wkUsage)){
 
-		proc->p_uvalid = 1;			/* CHAR: following p_u* members from struct user are valid */
+	timeval_posix(&tv, &Task->Started);
+	proc->p_ustart_sec = tv.tv_sec;
+	proc->p_ustart_usec = tv.tv_usec;
 
-		timeval_posix(&tv, &wkUsage.Creation);
-		proc->p_ustart_sec = tv.tv_sec;
-		proc->p_ustart_usec = tv.tv_usec;
+	rtime = ktime_posix(&Task->Started);		/* microseconds */
+	proc->p_rtime_sec = rtime * 0.000001;
+	proc->p_rtime_usec = rtime - (proc->p_rtime_sec * 1000000);
 
-		rtime = ktime_posix(&wkUsage.Creation);	/* microseconds */
-		proc->p_rtime_sec = rtime * 0.000001;
-		proc->p_rtime_usec = rtime - (proc->p_rtime_sec * 1000000);
+	/* milliseconds (GCC needs type cast) */
+	proc->p_sticks = (u_int64_t)(Task->KernelTime * 0.000001);
+	proc->p_uticks = (u_int64_t)(Task->UserTime * 0.000001);
+	proc->p_iticks = (u_int64_t)(Task->IdleTime * 0.000001);
+	proc->p_cpticks = (u_int32_t)(proc->p_uticks + proc->p_sticks);
 
-		proc->p_uticks = kticks_posix(&wkUsage.User);	/* milliseconds */
-		proc->p_sticks = kticks_posix(&wkUsage.Kernel) + proc->p_uticks;
+	/* FSCALE is used to pack a decimal into an integer, but 
+	 * the result is not yet optimal (see: sys/kern/sched_bsd.c:227)
+	 */
+	rticks = (u_int32_t)(rtime * 0.001);		/* milliseconds */
+	proc->p_pctcpu = (proc->p_cpticks * FSCALE) / rticks;
 
-		proc->p_pctcpu = (proc->p_sticks * 100000) / rtime;
-
-	}
 	proc->p_stat = Task->State;			/* CHAR: S* process status (from LWP). */
 	proc->p_cpuid = Task->Processor;		/* LONG: CPU id */
 	proc->p_nice = Task->Nice;
 	proc->p_xstat = Task->Status >> 8;		/* U_SHORT: Exit status for wait; also stop signal. */
 	proc->p_tracep = (u_int32_t)Task->TraceHandle;
 	proc->p_traceflag = Task->TracePoints;
+
 	if (proc->p_stat == SSLEEP){
 		win_strlcpy(proc->p_wmesg, syscallnames[Task->Code], KI_WMESGLEN);
 	}
-	proc->p_tid = Task->ThreadId;
+
 	return(proc + 1);
+
 }
 
 /****************************************************/

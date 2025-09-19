@@ -76,11 +76,15 @@ WaitTimeOut(WIN_TASK *Task, WIN_TASK *Children[], DWORD TimeOut, WIN_RUSAGE *Res
 	BOOL bResult = FALSE;
 	HANDLE hObjects[MAXIMUM_WAIT_OBJECTS];
 	DWORD dwCount = WaitGetObjects(Children, hObjects);
+	LONGLONG llTime = Task->ClockTime;
 
 	if (WAIT_FAILED == WaitForMultipleObjectsEx(dwCount, hObjects, FALSE, TimeOut, TRUE)){
 		WIN_ERR("WaitForMultipleObjectsEx(%s): %s\n", win_strobj(hObjects, 2), win_strerror(GetLastError()));
 	}else{
 		bResult = TRUE;
+	}
+	if (win_clock_gettime_MONOTONIC(&Task->ClockTime)){
+		Task->IdleTime += (Task->ClockTime - llTime);
 	}
 	return(bResult);
 }

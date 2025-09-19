@@ -92,7 +92,7 @@ kern_KERN_DOMAINNAME(char *curname, size_t *csize, const char *newname, size_t n
 	return(result);
 }
 int 
-kern_KERN_PROC(const int *name, void *data, size_t *size)
+kern_KERN_PROC_OLD(const int *name, void *data, size_t *size)
 {
 	int result = 0;
 	pid_t pid = WIN_PID_INIT;
@@ -114,7 +114,7 @@ kern_KERN_PROC(const int *name, void *data, size_t *size)
 	return(result);
 }
 int 
-kern_KERN_PROC_NEW(const int *name, void *data, size_t *size)
+kern_KERN_PROC(const int *name, void *data, size_t *size)
 {
 	int result = 0;
 	pid_t pid = WIN_PID_INIT;

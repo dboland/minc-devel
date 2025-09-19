@@ -11,6 +11,8 @@ cp -p /usr/lib/libsocket.a ./usr/lib/
 cp -p /usr/lib/libdl.a ./usr/lib/
 cp -p /usr/lib/libposix.a ./usr/lib/
 
+cp -p /usr/lib/libcurl.so.10.0 ./usr/lib/
+
 ln -sf libc.so.75.0 ./usr/lib/libc.so
 ln -sf libcrypto.so.27.0 ./usr/lib/libcrypto.so
 ln -sf libedit.so.5.1 ./usr/lib/libedit.so

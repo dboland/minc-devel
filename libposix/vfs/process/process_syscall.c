@@ -45,8 +45,8 @@ ProcCreateTask(DWORD Offset)
 			pwTask->ThreadId = GetCurrentThreadId();
 			pwTask->ProcessId = GetCurrentProcessId();
 			pwTask->Processor = KeGetCurrentProcessorNumber();
-			GetSystemTimeAsFileTime(&pwTask->Started);
 			win_clock_gettime_MONOTONIC(&pwTask->ClockTime);
+			GetSystemTimeAsFileTime(&pwTask->Started);
 			return(pwTask);
 		}else if (pwTask->Flags & WIN_PS_NOZOMBIE){
 			ZeroMemory(pwTask, sizeof(WIN_TASK));

@@ -114,7 +114,6 @@ as running the *configure* and *make* commands. But in reality it
 is a bit more complicated. You have to provide the OpenBSD headers 
 and import libraries yourself, of which the latter have to be built 
 first. So you immediately run into the *chicken-and-egg* problem.
-
 Instead, I recommend just installing the pre-compiled build tools 
 which you can find in the *Releases* section on GitHub.
 

@@ -2,18 +2,19 @@
 
 . ../config.inc
 
-VERBOSE=
 TARGET=
 SOURCE=${SRCDIR}
+ARCHIVE=
 
 diff_file()
 {
-	if [ "$VERBOSE" ]; then
-		echo "$1"
-	fi
 	if ! diff -Nau "$SOURCE/$1" "$1" | sed "s:$SOURCE/::"; then
-		echo "$1" >&2
+		echo "$1: no difference" >&2
 	fi
+}
+diff_zip()
+{
+	unzip -p $ARCHIVE "$1" | diff -au - "$1"
 }
 diff_list()
 {
@@ -36,18 +37,12 @@ diff_dir()
 			continue
 		elif [[ $file == */.gitignore ]]; then
 			continue
+		elif [ "$ARCHIVE" ]; then
+			diff_zip "$file"
 		else
 			diff_file "$file"
 		fi
 	done
-}
-do_usage()
-{
-	echo "Usage: $0: [options] PATH"
-	echo
-	echo "Options"
-	echo " -s,--source\t\t\tspecify source directory"
-	echo " -v,--verbose\t\t\tbe verbose"
 }
 
 while [ -n "$1" ]; do
@@ -56,8 +51,9 @@ while [ -n "$1" ]; do
 			SOURCE="$2"
 			shift;
 			;;
-		-v|--verbose)
-			VERBOSE=yes
+		-a|--archive)
+			ARCHIVE="$2"
+			shift
 			;;
 		*)
 			TARGET="$1"
@@ -65,6 +61,15 @@ while [ -n "$1" ]; do
 	esac
 	shift
 done
+
+do_usage()
+{
+	echo "Usage: $0: [options] PATH"
+	echo
+	echo "Options"
+	printf " -s,--source\t\tspecify source directory\n"
+	printf " -a,--archive\t\tsource is ZIP archive\n"
+}
 
 if [ -z "$TARGET" ]; then
 	do_usage
