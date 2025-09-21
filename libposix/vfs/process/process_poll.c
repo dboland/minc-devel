@@ -37,6 +37,7 @@ proc_poll(WIN_TASK *Task)
 {
 	BOOL bResult = FALSE;
 	MSG msg;
+	LONGLONG llTime = Task->ClockTime;
 
 	if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)){
 		bResult = vfs_raise(msg.message, msg.wParam, msg.lParam);
@@ -44,6 +45,9 @@ proc_poll(WIN_TASK *Task)
 		SetLastError(ERROR_SIGNAL_PENDING);
 		Task->Pending = 0;
 		bResult = TRUE;
+	}
+	if (win_clock_gettime_MONOTONIC(&Task->ClockTime)){
+		Task->IdleTime += (Task->ClockTime - llTime);
 	}
 	return(bResult);
 }

@@ -36,6 +36,7 @@ VOID CALLBACK
 TimeProc(PVOID Param, DWORD LowValue, DWORD HighValue)
 {
 	WIN_TASK *pwTask = Param;
+	LONGLONG llTime = pwTask->ClockTime;
 
 	/* This procedure will not be called when including the handle 
 	 * created by CreateWaitableTimer() in one of the 
@@ -43,6 +44,9 @@ TimeProc(PVOID Param, DWORD LowValue, DWORD HighValue)
 	 */
 	if (!PostThreadMessage(pwTask->ThreadId, WM_TIMER, LowValue, HighValue)){
 		WIN_ERR("PostThreadMessage(%d): %s\n", pwTask->ThreadId, win_strerror(GetLastError()));
+	}
+	if (win_clock_gettime_MONOTONIC(&pwTask->ClockTime)){
+		pwTask->InterruptTime += (pwTask->ClockTime - llTime);
 	}
 }
 
@@ -105,11 +109,10 @@ BOOL
 vfs_nanosleep(WIN_TASK *Task, DWORDLONG TimeOut, DWORDLONG *Remain)
 {
 	BOOL bResult = FALSE;
-	LONGLONG llRemain = 0LL;
 	HANDLE hTimer = CreateWaitableTimer(NULL, FALSE, NULL);
 	LARGE_INTEGER liTimeOut;
 	DWORD dwStatus;
-	DWORDLONG dwlElapsed = 0LL;
+	DWORDLONG dwlTime = Task->ClockTime + TimeOut;
 
 	liTimeOut.QuadPart = (LONGLONG)(TimeOut * -0.01);	/* 100-nanosecond intervals */
 	if (!SetWaitableTimer(hTimer, &liTimeOut, 0, NULL, NULL, FALSE)){
@@ -125,10 +128,7 @@ vfs_nanosleep(WIN_TASK *Task, DWORDLONG TimeOut, DWORDLONG *Remain)
 		}
 	}
 	NtClose(hTimer);		/* don't clear last error */
-	if (win_clock_gettime_MONOTONIC(&dwlElapsed)){
-		dwlElapsed -= Task->ClockTime;
-	}
-	*Remain = TimeOut - dwlElapsed;
+	*Remain = Task->ClockTime - dwlTime;
 	return(bResult);
 }
 BOOL 

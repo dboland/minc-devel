@@ -36,7 +36,7 @@ char *
 stpquot(char *dest, const char *src)
 {
 	char c;
-	size_t count = 1;	/* add backslash in-line */
+	size_t count = 1;	/* add backslash when in-line */
 
 	*dest++ = ' ';
 	*dest++ = '"';

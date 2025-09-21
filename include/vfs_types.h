@@ -530,6 +530,7 @@ typedef struct _WIN_TASK {
 	DWORDLONG KernelTime;		/* kernel time in nanoseconds */
 	DWORDLONG UserTime;		/* user time in nanoseconds */
 	DWORDLONG IdleTime;		/* idle time in nanoseconds */
+	DWORDLONG InterruptTime;	/* interrupt time in nanoseconds */
 	DWORD State;
 	DWORD Code;			/* syscall currently running */
 	HANDLE Timer;			/* interval timer */

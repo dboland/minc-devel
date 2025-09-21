@@ -22,15 +22,15 @@ elif [ "$1" == "minc" ]; then
 	echo "${MINCROOT} /usr/local" >>$FSTAB
 elif ! [ -d ${XMINCROOT} ]; then
 	echo "${XMINCROOT}: No such directory"
-elif [ "$1" == "pmcc" ]; then
+elif [ "$1" == "cross" ]; then
 	echo "${MINGWROOT} /mingw" >$FSTAB
 	echo "${XMINCROOT} /usr/local" >>$FSTAB
 else
-	echo "Usage $0 COMPILER"
+	echo "Usage $0 SYSTEM"
 	echo
-	echo "Compilers"
+	echo "Systems"
 	printf " mingw\t\t\tmount MinGW default compiler\n"
-	printf " pmcc\t\t\tmount poor man's cross compiler\n"
+	printf " cross\t\t\tmount poor man's cross compiler\n"
 	printf " minc\t\t\tmount minimal OpenBSD system\n"
 	echo
 	echo "Currently mounted:"

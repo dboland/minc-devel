@@ -94,11 +94,10 @@ PollWait(WIN_TASK *Task, WIN_VNODE *Nodes[], DWORD *TimeOut)
 	DWORD dwStatus = 0;
 	HANDLE hObjects[WSA_MAXIMUM_WAIT_EVENTS];
 	DWORD dwCount = PollGetObjects(Nodes, hObjects);
-	LONGLONG llTime = Task->ClockTime;
-	LONG lRemain = llTime * 0.000001;
+	LONGLONG llRemain = (LONGLONG)GetTickCount();
 
 	if (*TimeOut != INFINITE){
-		lRemain += *TimeOut;
+		llRemain += *TimeOut;
 	}
 	dwStatus = WSAWaitForMultipleEvents(dwCount, hObjects, FALSE, *TimeOut, TRUE);
 	if (dwStatus == WSA_WAIT_FAILED){
@@ -106,12 +105,9 @@ PollWait(WIN_TASK *Task, WIN_VNODE *Nodes[], DWORD *TimeOut)
 	}else{
 		bResult = TRUE;
 	}
-	if (win_clock_gettime_MONOTONIC(&Task->ClockTime)){
-		Task->IdleTime += (Task->ClockTime - llTime);
-	}
-	lRemain -= (Task->ClockTime * 0.000001);
-	if (lRemain > 0){
-		*TimeOut = lRemain;
+	llRemain -= (LONGLONG)GetTickCount();
+	if (llRemain > 0){
+		*TimeOut = llRemain;
 	}else if (*TimeOut != INFINITE){
 		*TimeOut = 0;
 	}

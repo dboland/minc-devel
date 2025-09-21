@@ -202,7 +202,6 @@ vfs_sigsuspend(WIN_TASK *Task, CONST UINT *Mask)
 	HACCEL hKeys = NULL;
 	UINT uiCurrent = Task->ProcMask;
 	MSG msg = {0};
-	LONGLONG llTime = Task->ClockTime;
 
 	Task->ProcMask = *Mask;
 	Task->State = WIN_SSLEEP;
@@ -210,9 +209,6 @@ vfs_sigsuspend(WIN_TASK *Task, CONST UINT *Mask)
 		bResult = TRUE;
 	}else if (!vfs_raise(msg.message, msg.wParam, msg.lParam)){
 		SetLastError(ERROR_SIGNAL_PENDING);
-	}
-	if (win_clock_gettime_MONOTONIC(&Task->ClockTime)){
-		Task->IdleTime += (Task->ClockTime - llTime);
 	}
 	Task->State = WIN_SONPROC;
 	Task->ProcMask = uiCurrent;
