@@ -36,7 +36,7 @@ char *
 stpquot(char *dest, const char *src)
 {
 	char c;
-	size_t count = 1;
+	size_t count = 1;	/* add backslash in-line */
 
 	*dest++ = ' ';
 	*dest++ = '"';
@@ -46,14 +46,16 @@ stpquot(char *dest, const char *src)
 				*dest++ = '\\';
 			}
 			count = 1;
-		}else if (c != '\\'){
-			count = 1;
-		}else if (!*src){	/* backslash at end (hello Avi Halachmi) */
-			*dest++ = '\\';
-		}else{
+		}else if (c == '\\'){
 			count++;
+		}else{
+			count = 1;
 		}
 		*dest++ = c;
+	}
+	count--;		/* one less at end (hello Avi Halachmi) */
+	while (count--){
+		*dest++ = '\\';
 	}
 	*dest++ = '"';
 	*dest = 0;
