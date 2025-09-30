@@ -16,7 +16,7 @@ ${SHARESRC}:
 
 # make patch.exe use local tmp directory for proper ACL
 
-${SHDIR}/mk:
+${SHDIR}/mk: ${SHARESRC}/mk
 	@/bin/mkdir -p ${SHDIR}
 	/bin/cp -ru ${SHARESRC}/mk ${SHDIR}/
 

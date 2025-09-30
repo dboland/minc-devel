@@ -96,6 +96,6 @@ SectionEnd
 !insertmacro MUI_DESCRIPTION_TEXT ${SecGCC} 'gcc - GNU project C and C++ compiler'
 !insertmacro MUI_DESCRIPTION_TEXT ${SecBinUtils} 'ld - The GNU linker'
 !insertmacro MUI_DESCRIPTION_TEXT ${SecGit} "git - the stupid content tracker"
-!insertmacro MUI_DESCRIPTION_TEXT ${SecMake} 'make - GNU make utility to maintain groups of programs'
+!insertmacro MUI_DESCRIPTION_TEXT ${SecMake} 'gmake - GNU make utility to maintain groups of programs'
 !insertmacro MUI_DESCRIPTION_TEXT ${SecVim} "Vi IMproved, a programmer's text editor"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END

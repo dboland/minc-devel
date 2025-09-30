@@ -8,7 +8,7 @@ LIBPOSIX= libposix-${RELEASE}.dll
 IMPLIB= libposix.dll.a
 CFLAGS+= -I${ROOTDIR}/include -g
 CFLAGS+= -DRELEASE=\"${RELEASE}\" -DVERSION=\"${VERSION}\" -DBUILD=${BUILD}
-GCCDIR= ${ROOTDIR}/mingw/gcc
+GCCDIR= ${ROOTDIR}/mingw/libgcc
 TRACEDIR= ${ROOTDIR}/libtrace
 SBINDIR= /sbin
 ULIBDIR= /usr/lib
@@ -61,7 +61,7 @@ install: ${DESTDIR}
 	${INSTALL} -m ${BINMODE} ${IMPLIB} ${DESTDIR}${ULIBDIR}/libposix.a
 
 release-clean:
-	/bin/rm version.o
+	/bin/rm -f version.o libposix.o
 
 release: release-clean all
 

@@ -292,30 +292,6 @@
  
  int	 mkstemps(char *, int);
  
---- include/sys/types.h	2025-09-11 17:43:18 +0200
-+++ include/sys/types.h	2025-09-11 08:52:15 +0200
-@@ -267,4 +267,10 @@
- 
- #endif /* _KERNEL */
- 
-+/* Forward type declarations for the linker to know whether to import or
-+ * not to import.
-+ */
-+extern __import char **environ;
-+extern __import char *__progname;
-+
- #endif /* !_SYS_TYPES_H_ */
---- include/sys/ucred.h	2025-09-11 17:43:29 +0200
-+++ include/sys/ucred.h	2025-08-11 08:45:21 +0200
-@@ -35,6 +35,8 @@
- #ifndef _SYS_UCRED_H_
- #define	_SYS_UCRED_H_
- 
-+#include <sys/param.h>	/* GNU conftest for sys/mount.h usage */
-+
- /*
-  * Credentials.
-  */
 --- include/time.h	2025-09-11 17:40:23 +0200
 +++ include/time.h	2025-09-11 11:12:30 +0200
 @@ -150,7 +150,7 @@

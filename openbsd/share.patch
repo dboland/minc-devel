@@ -63,7 +63,16 @@
  .  endfor
  .endif
 --- share/mk/bsd.own.mk	2014-05-19 17:05:13 +0200
-+++ share/mk/bsd.own.mk	2025-08-13 05:43:48 +0200
++++ share/mk/bsd.own.mk	2025-09-24 11:48:37 +0200
+@@ -13,7 +13,7 @@
+ # Set `SKEY' to `yes' to build with support for S/key authentication.
+ SKEY?=		yes
+ # Set `YP' to `yes' to build with support for NIS/YP.
+-YP?=		yes
++YP?=		no
+ # Set `DEBUGLIBS' to `yes' to build libraries with debugging symbols
+ DEBUGLIBS?=	no
+ 
 @@ -40,8 +40,7 @@
  .endif
  

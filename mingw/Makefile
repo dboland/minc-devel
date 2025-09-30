@@ -8,7 +8,7 @@ ULIBDIR= /usr/lib
 GCCBIN= ${XBINDIR}/gcc.exe ${XBINDIR}/cpp.exe ${XBINDIR}/g++.exe ${XBINDIR}/c++.exe
 
 all: ${LIBS} libiphlpapi.dll.a
-	@${MAKE} -C gcc
+	@${MAKE} -C libgcc
 
 include ${ROOTDIR}/Errorfile.inc
 
@@ -38,20 +38,19 @@ ${XLIBXDIR}:
 
 # GetIpStatisticsEx() is missing in vanilla MinGW (libiphlpapi.dll.a)
 
-install-local: ${MINGW} ${XBINDIR} ${GCCBIN} ${XLIBXDIR}
+install-cross:
+	/bin/cp -vu libmsvcrt.a ${_LIBDIR}/
+
+install-local: ${MINGW} install-cross ${XBINDIR} ${GCCBIN} ${XLIBXDIR}
 	@/bin/mkdir -p ${XLIBDIR}
 	/bin/cp -vu ${LIBS} ${XLIBDIR}/
 	/bin/cp -vu libiphlpapi.dll.a ${MINGW}/lib/
-	@${MAKE} -C gcc install-local
-
-install-cross:
-	/bin/cp -vu libmsvcrt.a ${_LIBDIR}/
-	@${MAKE} -C gcc install-cross
+	@${MAKE} -C libgcc install-local
 
 install: ${DESTDIR}
 	@${MKDIR} -p ${DESTDIR}${ULIBDIR}
 	${INSTALL} libmsvcrt.a ${DESTDIR}${ULIBDIR}/
-	@${MAKE} -C gcc install
+	@${MAKE} -C libgcc install
 
 clean:
 	/bin/rm -f *.a

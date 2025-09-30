@@ -12,9 +12,10 @@ CVS software:
 
 * https://www.openbsd.org/anoncvs.html
 
-However, you can also use my copy (186Mb):
+However, you can also download the source distribution from
+GitHub (196Mb):
 
-* https://minc.commandlinerevolution.nl/openbsd-master-6.1.0.zip
+* https://github.com/openbsd/src/archive/7692f5f0b8e1ff836d8f3e9dbf51174095f66410.zip
 
 **Note**: create a folder in the root of a diskdrive, named 
 'source'. Move the .ZIP file there and extract it.
@@ -120,7 +121,8 @@ which you can find in the *Releases* section on GitHub.
 If you want to know more about cross-compiling, watch Rob Landley's 
 excellent presentation on the topic:
 
-* https://youtu.be/Sk9TatW9ino
+Tutorial: Building the Simplest Possible Linux System - Rob Landley
+https://youtu.be/Sk9TatW9ino
 
 
 Daniel Boland, September, 2025

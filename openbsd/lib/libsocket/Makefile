@@ -37,7 +37,7 @@ all-clean: lib-clean
 	/bin/rm -f ${LIBS} */*.o */*.so
 
 release-clean:
-	/bin/rm version.o
+	/bin/rm -f version.o
 
 release: release-clean all
 

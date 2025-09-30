@@ -63,7 +63,7 @@ install: ${DESTDIR} ${OBJECTS}
 	${INSTALL} -m 00754 -o 0 -g 0 setup.sh ${DESTDIR}${SBINDIR}/
 
 release-clean:
-	rm version.o
+	rm -f version.o
 
 release: release-clean all
 

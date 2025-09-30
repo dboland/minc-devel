@@ -1,0 +1,61 @@
+--- sys/.patch	1970-01-01 01:00:00 +0100
++++ sys/.patch	2025-09-12 11:34:13 +0200
+@@ -0,0 +1 @@
++This directory has been patched.
+--- sys/netinet6/in6.h	2014-05-19 17:05:13 +0200
++++ sys/netinet6/in6.h	2025-09-23 19:59:56 +0200
+@@ -127,20 +127,20 @@
+ #define IN6MASK128	{{{ 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, \
+ 			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff }}}
+ 
+-extern const struct sockaddr_in6 sa6_any;
++extern __import const struct sockaddr_in6 sa6_any;
+ 
+-extern const struct in6_addr in6mask0;
+-extern const struct in6_addr in6mask32;
+-extern const struct in6_addr in6mask64;
+-extern const struct in6_addr in6mask96;
+-extern const struct in6_addr in6mask128;
++extern __import const struct in6_addr in6mask0;
++extern __import const struct in6_addr in6mask32;
++extern __import const struct in6_addr in6mask64;
++extern __import const struct in6_addr in6mask96;
++extern __import const struct in6_addr in6mask128;
+ #endif /* _KERNEL */
+ 
+ /* Both kernel and libc define these for use */
+-extern const struct in6_addr in6addr_any;
+-extern const struct in6_addr in6addr_loopback;
+-extern const struct in6_addr in6addr_intfacelocal_allnodes;
+-extern const struct in6_addr in6addr_linklocal_allnodes;
++extern __import const struct in6_addr in6addr_any;
++extern __import const struct in6_addr in6addr_loopback;
++extern __import const struct in6_addr in6addr_intfacelocal_allnodes;
++extern __import const struct in6_addr in6addr_linklocal_allnodes;
+ 
+ #if __BSD_VISIBLE
+ /*
+--- sys/sys/types.h	2014-05-19 17:05:13 +0200
++++ sys/sys/types.h	2025-09-11 08:52:15 +0200
+@@ -267,4 +267,10 @@
+ 
+ #endif /* _KERNEL */
+ 
++/* Forward type declarations for the linker to know whether to import or
++ * not to import.
++ */
++extern __import char **environ;
++extern __import char *__progname;
++
+ #endif /* !_SYS_TYPES_H_ */
+--- sys/sys/ucred.h	2014-05-19 17:05:13 +0200
++++ sys/sys/ucred.h	2025-08-11 08:45:21 +0200
+@@ -35,6 +35,8 @@
+ #ifndef _SYS_UCRED_H_
+ #define	_SYS_UCRED_H_
+ 
++#include <sys/param.h>	/* GNU conftest for sys/mount.h usage */
++
+ /*
+  * Credentials.
+  */

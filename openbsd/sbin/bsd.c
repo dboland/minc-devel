@@ -268,12 +268,6 @@ state(int level)
 	else
 		multi();
 }
-void 
-halt(int level)
-{
-	if (!level)
-		fs_unmount();
-}
 
 /************************************************************/
 
@@ -301,7 +295,6 @@ main(int argc, char *argv[], char *env[])
 			break;
 		default:
 			waitpid(pid, &status, 0);
-			halt(level);
 	}
 	return(0);
 }

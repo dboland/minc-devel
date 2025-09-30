@@ -17,6 +17,7 @@ build-complete: ${MKDIR} ${INSTALL} ${ID} ${CP} ${LN}
 
 install-local: ${TMPDIR}
 	@${MAKE} -C include all install-local
+	@${MAKE} -C sys all install-local
 
 install: ${DESTDIR}
 	@${MAKE} -C bin install

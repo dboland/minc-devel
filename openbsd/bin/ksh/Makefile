@@ -2,6 +2,7 @@ ROOTDIR= ../../..
 
 include ${ROOTDIR}/Makefile.inc
 
+PROG= ksh
 #CFLAGS+=-DDEBUG
 #CFLAGS+=-DDEBUG_JOBS
 #CFLAGS+=-DDEBUG_SUBST
@@ -11,14 +12,15 @@ CFLAGS+=-DSMALL
 #CFLAGS+=-DJOBS
 KSHSRC= ${SRCDIR}/bin/ksh
 MANFILES=  ${KSHSRC}/sh.1 ${KSHSRC}/ksh.1
+CFLAGS+= -I.
 
 # wait for signals from child executable
 #CFLAGS+=-Dfork=vfork
-CFLAGS+= -I${KSHSRC}
 
-PROG= ksh
+HEADERS= config.h table.h tree.h expand.h lex.h proto.h c_test.h ksh_limval.h
 
 # emacs.c and vi.c were taken from 2021 (v7.4) distro for utf8 handling
+#
 OBJECTS= alloc.o c_ksh.o c_sh.o c_test.o c_ulimit.o edit.o emacs.o eval.o \
 	exec.o expr.o history.o io.o jobs.o lex.o mail.o main.o mknod.o \
 	misc.o path.o shf.o syn.o table.o trap.o tree.o tty.o var.o \
@@ -39,21 +41,24 @@ OBJECTS= alloc.o c_ksh.o c_sh.o c_test.o c_ulimit.o edit.o emacs.o eval.o \
 #CFLAGS+=-pg
 #OBJECTS+=/usr/lib/gcrt0.o
 
-all: ${TMPDIR} ${KSHSRC}/.patch ${PROG}
+all: ${TMPDIR} ${HEADERS} ${PROG}
 
-%.o: ${KSHSRC}/%.c
-	@echo -n "$@ "
-	@${XGCC} -c -g ${CFLAGS} -DNOPIE -o $@ $<
+%.h: ${KSHSRC}/%.h
+	@/bin/cp -uv $< $@
 
-misc.o: ${KSHSRC}/misc.c
-	@echo -n "$@ "
-	@${XGCC} -c -g ${CFLAGS} -DNOPIE -I${SRCDIR}/lib/libc/gen -o $@ $<
+%.c: ${KSHSRC}/%.c
+	@/bin/cp -uv $< $@
 
-${KSHSRC}/.patch:
-	@TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${KSHSRC} <../ksh.patch
+%.o: %.c
+	@#echo -n "$@ "
+	${XGCC} -c -g ${CFLAGS} -DNOPIE -o $@ $<
+
+misc.o: misc.c
+	@#echo -n "$@ "
+	${XGCC} -c -g ${CFLAGS} -DNOPIE -I${SRCDIR}/lib/libc/gen -o $@ $<
 
 ${PROG}: ${OBJECTS}
-	@echo "done."
+	@#echo "done."
 	${XGCC} -static -s ${CFLAGS} -o $@ ${OBJECTS}
 
 install: ${DESTDIR} ${PROG}
