@@ -2,7 +2,7 @@ ROOTDIR= ../../..
 
 include ${ROOTDIR}/Makefile.inc
 
-PROG= ksh
+PROG= ksh.exe
 #CFLAGS+=-DDEBUG
 #CFLAGS+=-DDEBUG_JOBS
 #CFLAGS+=-DDEBUG_SUBST
@@ -11,20 +11,24 @@ PROG= ksh
 CFLAGS+=-DSMALL
 #CFLAGS+=-DJOBS
 KSHSRC= ${SRCDIR}/bin/ksh
-MANFILES=  ${KSHSRC}/sh.1 ${KSHSRC}/ksh.1
+MANFILES= ${KSHSRC}/sh.1
 CFLAGS+= -I.
+# misc.c:
+CFLAGS+= -I${SRCDIR}/lib/libc/gen
 
 # wait for signals from child executable
 #CFLAGS+=-Dfork=vfork
 
+SOURCES= eval.c exec.c io.c jobs.c main.c path.c shf.c syn.c trap.c version.c
+SOURCES+= edit.h sh.h shf.h tty.h ksh.1 .patch
 HEADERS= config.h table.h tree.h expand.h lex.h proto.h c_test.h ksh_limval.h
 
 # emacs.c and vi.c were taken from 2021 (v7.4) distro for utf8 handling
 #
-OBJECTS= alloc.o c_ksh.o c_sh.o c_test.o c_ulimit.o edit.o emacs.o eval.o \
+OBJECTS= alloc.o c_ksh.o c_sh.o c_test.o c_ulimit.o edit.o emacs.2021.o eval.o \
 	exec.o expr.o history.o io.o jobs.o lex.o mail.o main.o mknod.o \
 	misc.o path.o shf.o syn.o table.o trap.o tree.o tty.o var.o \
-	version.o vi.o
+	version.o vi.2021.o
 
 # temporary debugging code
 #OBJECTS+= debug.o
@@ -41,32 +45,34 @@ OBJECTS= alloc.o c_ksh.o c_sh.o c_test.o c_ulimit.o edit.o emacs.o eval.o \
 #CFLAGS+=-pg
 #OBJECTS+=/usr/lib/gcrt0.o
 
-all: ${TMPDIR} ${HEADERS} ${PROG}
+all: ${TMPDIR} ${SOURCES} ${PROG}
 
 %.h: ${KSHSRC}/%.h
-	@/bin/cp -uv $< $@
+	@/bin/cp -u $< $@
 
 %.c: ${KSHSRC}/%.c
-	@/bin/cp -uv $< $@
+	@/bin/cp -u $< $@
 
 %.o: %.c
-	@#echo -n "$@ "
-	${XGCC} -c -g ${CFLAGS} -DNOPIE -o $@ $<
+	@echo -n "$@ "
+	@${XGCC} -c -g ${CFLAGS} -DNOPIE -o $@ $<
 
-misc.o: misc.c
-	@#echo -n "$@ "
-	${XGCC} -c -g ${CFLAGS} -DNOPIE -I${SRCDIR}/lib/libc/gen -o $@ $<
+ksh.1: ${KSHSRC}/ksh.1
+	@/bin/cp -u $< $@
 
-${PROG}: ${OBJECTS}
-	@#echo "done."
+.patch:
+	TMPDIR=${TMPDIR} /bin/patch -p 2 -d . <../ksh.patch
+
+${PROG}: ${HEADERS} ${OBJECTS}
+	@echo "done."
 	${XGCC} -static -s ${CFLAGS} -o $@ ${OBJECTS}
 
 install: ${DESTDIR} ${PROG}
 	${INSTALL} -m ${BINMODE} ${PROG} ${DESTDIR}/bin/
 	${LN} -f ${DESTDIR}/bin/ksh ${DESTDIR}/bin/sh
 	@${MKDIR} -p ${DESTDIR}/usr/share/man/man1
-	${INSTALL} ${MANFILES} ${DESTDIR}/usr/share/man/man1/
+	${INSTALL} ${MANFILES} ksh.1 ${DESTDIR}/usr/share/man/man1/
 
 clean:
-	/bin/rm -f *.o ${PROG}
+	/bin/rm -f *.o ${HEADERS} ${PROG}
 

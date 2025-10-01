@@ -1,3 +1,8 @@
+.patch
+*.c
 *.h
 *.1
-.patch
+!debug.c
+!debug.h
+!emacs.2021.c
+!vi.2021.c
