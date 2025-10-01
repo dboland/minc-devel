@@ -20,7 +20,7 @@ ${XINCDIR}/machine:
 	@/bin/mkdir -p $@
 	/bin/cp -ru  ${SRCDIR}/sys/arch/${ARCH}/include/* $@/
 
-${XINCDIR}:
+${XINCDIR}: ${XINCDIR}/machine
 	@/bin/mkdir -p ${XINCDIR}
 	/bin/cp -ru ${INCSRC}/* ${XINCDIR}/
 
@@ -44,8 +44,4 @@ ${XINCDIR}/termios.h:
 ${XINCDIR}/.patch:
 	TMPDIR=${TMPDIR} /bin/patch -p 0 -d ${XPREFIX} <../include.patch
 
-${_INCDIR}: ${XINCDIR}
-	@/bin/mkdir -p ${_INCDIR}
-	/bin/cp -ru ${XINCDIR}/* ${_INCDIR}/
-
-install-local: ${XINCDIR} ${HEADERS} ${_INCDIR}
+install-local: ${XINCDIR} ${HEADERS}

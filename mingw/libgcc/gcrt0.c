@@ -28,10 +28,9 @@
  *
  */
 
-#include <stdint.h>
 #include <stdlib.h>
 
-#include <sys/gmon.h>
+typedef unsigned long u_long;
 
 extern unsigned char etext, eprol;
 

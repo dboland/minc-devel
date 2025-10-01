@@ -24,4 +24,8 @@ ${XINCDIR}/%: ${SRCDIR}/sys/%
 ${SYSSRC}/.patch:
 	TMPDIR=${TMPDIR} /bin/patch -p 1 -d ${SYSSRC} <../sys.patch
 
-install-local: ${XINCDIR} ${SYSDIRS}
+${_INCDIR}: ${XINCDIR}
+	@/bin/mkdir -p ${_INCDIR}
+	/bin/cp -ru ${XINCDIR}/* ${_INCDIR}/
+
+install-local: ${XINCDIR} ${SYSDIRS} ${_INCDIR}

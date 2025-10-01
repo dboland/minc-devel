@@ -54,4 +54,4 @@ install: ${DESTDIR}
 
 clean:
 	/bin/rm -f *.a
-	@${MAKE} -C gcc clean
+	@${MAKE} -C libgcc clean
