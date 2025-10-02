@@ -46,6 +46,8 @@
 #define SIGMASK_STOP	(BIT_SIGSTOP | BIT_SIGTSTP | BIT_SIGTTIN | BIT_SIGTTOU | BIT_SIGCONT)
 #define SIGMASK_IGNORE	(BIT_SIGWINCH | BIT_SIGCHLD | BIT_SIGURG | BIT_SIGINFO | BIT_SIGIO)
 
+typedef void (*action_t)(int, siginfo_t *, void *);
+
 static const 
 DWORD __SIG_WIN[NSIG] = {
 	0,

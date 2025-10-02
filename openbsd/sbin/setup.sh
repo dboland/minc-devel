@@ -29,8 +29,10 @@ echo done.
 
 echo -n "Creating /dev file system... "
 sh /etc/MAKEDEV
-mkent -p fstab >/etc/fstab
-admins_only "/etc/fstab"
+if ! [ -f /etc/fstab ]; then
+	mkent -p fstab >/etc/fstab
+	admins_only "/etc/fstab"
+fi
 echo done.
 
 echo -n "Configuring network... "
@@ -43,7 +45,7 @@ mkent resolv >/etc/resolv.conf
 admins_only "/etc/resolv.conf"
 echo done.
 
-echo -n "Creating home directory for '$USER' ... "
+echo -n "Creating home directory for '$USER'... "
 mkdir -p "$HOME"
 ln -sn "$WINHOME\Documents" "$HOME/Documents" 2>/dev/null
 ln -sn "$WINHOME\Downloads" "$HOME/Downloads" 2>/dev/null

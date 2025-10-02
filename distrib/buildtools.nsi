@@ -5,17 +5,24 @@
 !include WinVer.nsh
 
 !define OUTFILE "buildtools-6.1.0.${VERSION}.exe"
+; In Vista, all keys are deferred to Software\WOW6432Node\Microsoft
+!define REGFILE "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC"
 
 Name "MinC - Build Tools"
 OutFile ${OUTFILE}
 RequestExecutionLevel admin
 Unicode True
-InstallDir "%SystemDrive%\MinC"
+; Use local drive as default, so the "Browse.." mechanism works:
+InstallDir "C:\MinC"
+; Try the last saved directory
+InstallDirRegKey HKLM ${REGFILE} "InstallLocation"
 
 ; Must be BMP3 and 200x57 pixels
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_BITMAP "images\puf800X689.bmp"
 !define MUI_HEADERIMAGE_RIGHT
+; Do not automatically advance to the "Finish" page:
+!define MUI_FINISHPAGE_NOAUTOCLOSE
 
 !insertmacro MUI_PAGE_LICENSE "..\LICENSE"
 !insertmacro MUI_PAGE_DIRECTORY
@@ -25,17 +32,16 @@ InstallDir "%SystemDrive%\MinC"
 
 !insertmacro MUI_LANGUAGE English
 
-Var SYSTEMDRIVE
 Var USERNAME
-
-;LogSet on
+Var LOCATION
 
 ;--------------------------------
 
 Function .onInit
-        ReadEnvStr $SYSTEMDRIVE SystemDrive
         ReadEnvStr $USERNAME USERNAME
-        StrCpy $INSTDIR "$SYSTEMDRIVE\MinC"
+	ReadRegStr $LOCATION HKLM ${REGFILE} "BuildTools"
+	IfErrors +2
+	StrCpy $INSTDIR $LOCATION
 FunctionEnd
 Section
 
@@ -48,7 +54,7 @@ Section
 	ExecDos::exec /DETAILED '.\miniroot\chmod -R 00755 miniroot'
 
 SectionEnd
-Section "Base system" SecBase
+Section "Base libraries" SecBase
 
 	# Component can not be disabled
 	SectionIn RO
@@ -58,6 +64,9 @@ Section "Base system" SecBase
 
 	DetailPrint "Installing base libraries..."
 	ExecDos::exec /DETAILED '.\install.cmd comp61.tgz'
+
+        # Remember last chosen directory
+        WriteRegStr HKLM ${REGFILE} "BuildTools" $INSTDIR
 
 SectionEnd
 Section "GNU Compiler Collection" SecGCC

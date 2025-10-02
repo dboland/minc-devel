@@ -4,18 +4,24 @@
 !include WinMessages.nsh
 !include WinVer.nsh
 
+!define OUTFILE "test-6.1.0.${VERSION}.exe"
+
 Name "MinC"
-OutFile test-6.1.exe
+OutFile ${OUTFILE}
 RequestExecutionLevel admin
 Unicode True
 
 ; Use local drive as default, so the "Browse.." mechanism works
-InstallDir "%SystemDrive%\MinC"
+InstallDir "C:\MinC"
+; We use this to remember the last chosen directory
+InstallDirRegKey HKLM "Software\MinC" "Location"
 
 ; Must be BMP3 and 200x57 pixels
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_BITMAP "images\puf800X689.bmp"
 !define MUI_HEADERIMAGE_RIGHT
+;do not automatically advance to the "Finish" page:
+!define MUI_FINISHPAGE_NOAUTOCLOSE
 
 !insertmacro MUI_PAGE_LICENSE "..\LICENSE"
 !insertmacro MUI_PAGE_DIRECTORY
@@ -29,15 +35,21 @@ InstallDir "%SystemDrive%\MinC"
 
 #!addplugindir "C:\Program Files\NSIS\Plugins"
 
-Var SYSTEMDRIVE
+;Var SYSTEMDRIVE
 Var USERNAME
+Var LOCATION
+
+;LogSet on
 
 ;--------------------------------
 
 Function .onInit
-	ReadEnvStr $SYSTEMDRIVE SystemDrive
 	ReadEnvStr $USERNAME USERNAME
-	StrCpy $INSTDIR "$SYSTEMDRIVE\MinC"
+;	ReadEnvStr $SYSTEMDRIVE SystemDrive
+;	StrCpy $INSTDIR "$SYSTEMDRIVE\MinC"
+        ReadRegStr $LOCATION HKLM "Software\MinC" "BuildTools"
+        IfErrors +2
+        StrCpy $INSTDIR $LOCATION
 FunctionEnd
 Section
 
@@ -69,6 +81,9 @@ Section "Kernel" SecKernel
 
 	DetailPrint "Installing kernel..."
 	ExecDos::exec /DETAILED '.\install.cmd test61.tgz'
+
+	# Remember last chosen directory
+	WriteRegStr HKLM "Software\MinC" "Location" "$INSTDIR"
 
 SectionEnd
 Section

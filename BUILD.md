@@ -105,8 +105,8 @@ This is because when MinC mounts its root directory, it hides the
 directory from view in Windows Explorer. This is super important 
 for preventing recursive directory listings. It is also standard 
 practice in Windows for mounted drives. If you want to access 
-the MinC root folder in Windows Explorer, just exit the console 
-or type its location in the address bar, like *C:\minc-release*.
+the MinC root folder in Windows Explorer, type its location in 
+the address bar, like *C:\minc-release*.
 
 ## Step 4: building the GCC compiler
 

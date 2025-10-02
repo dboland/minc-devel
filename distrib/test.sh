@@ -1,4 +1,4 @@
-if ! cd "$PKGROOT/../minc-test"; then
+if ! cd "$PKGROOT/minc-test"; then
         exit 1
 fi
 

@@ -112,13 +112,17 @@ wtrace_ACL_FILE(LPCWSTR FileName, LPSTR Buffer)
 	BOOL bDefaulted;
 	BOOL bPresent;
 	PACL Acl;
+	WCHAR szPath[MAX_PATH];
+	LPWSTR pszBase = NULL;
 
 	GetFileSecurityW(FileName, dwType, NULL, dwSize, &dwSize);
 	psd = LocalAlloc(LMEM_FIXED, dwSize);
 	if (!GetFileSecurityW(FileName, dwType, psd, dwSize, &dwSize)){
 		WIN_ERR("GetFileSecurity(%ls): %s\n", FileName, win_strerror(GetLastError()));
+	}else if (!GetFullPathNameW(FileName, MAX_PATH, szPath, &pszBase)){
+		WIN_ERR("GetFullPathName(%ls): %s", FileName, win_strerror(GetLastError()));
 	}else{
-		printf("FileName: %ls\n", FileName);
+		printf("FileName: %ls\n", szPath);
 		win_SECURITY_DESCRIPTOR(psd, OB_TYPE_FILE, Buffer);
 	}
 	LocalFree(psd);

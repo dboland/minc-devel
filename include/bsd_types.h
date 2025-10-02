@@ -50,7 +50,6 @@
 /* sys/signal.c */
 
 typedef void (*atexit_t)(void);
-//typedef void (*action_t)(int, siginfo_t *, void *);
 
 typedef struct {
 	int c_dx;

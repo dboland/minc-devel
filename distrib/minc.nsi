@@ -5,20 +5,24 @@
 !include WinVer.nsh
 
 !define OUTFILE "minc-6.1.0.${VERSION}.exe"
+; In Vista, all keys are deferred to Software\WOW6432Node\Microsoft
+!define REGFILE "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC"
 
 Name "MinC"
 OutFile ${OUTFILE}
 RequestExecutionLevel admin
 Unicode True
-
-; Use local drive as default, so the "Browse.." mechanism works
-InstallDir "%SystemDrive%\MinC"
+; Use local drive as default, so the "Browse.." mechanism works:
+InstallDir "C:\MinC"
+; Try the last saved directory
+InstallDirRegKey HKLM ${REGFILE} "InstallLocation"
 
 ; Must be BMP3 and 200x57 pixels
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_BITMAP "images\puf800X689.bmp"
 !define MUI_HEADERIMAGE_RIGHT
-;!define MUI_PAGE_CUSTOMFUNCTION_SHOW "doShowFinish"
+; Do not automatically advance to the "Finish" page:
+!define MUI_FINISHPAGE_NOAUTOCLOSE
 
 !insertmacro MUI_PAGE_LICENSE "..\LICENSE"
 !insertmacro MUI_PAGE_DIRECTORY
@@ -32,15 +36,12 @@ InstallDir "%SystemDrive%\MinC"
 
 !insertmacro MUI_LANGUAGE English
 
-Var SYSTEMDRIVE
 Var USERNAME
 
 ;--------------------------------
 
 Function .onInit
-	ReadEnvStr $SYSTEMDRIVE SystemDrive
 	ReadEnvStr $USERNAME USERNAME
-	StrCpy $INSTDIR "$SYSTEMDRIVE\MinC"
 FunctionEnd
 Section
 
@@ -109,11 +110,11 @@ Section "Base system" SecBase
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "DisplayName" "MinC Unix emulator"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "InstallLocation" "$INSTDIR"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "InstallSource" "$INSTDIR"
-#	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "SourceDir" "$INSTDIR"
-#	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "EstimatedSize" 1048576
+;	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "SourceDir" "$INSTDIR"
+;	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "EstimatedSize" 1048576
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "Publisher" "BOLAND Automatisering"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "ProductVersion" "6.1"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "DisplayVersion" "6.1.1"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "DisplayVersion" "6.1.0"
 	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "NoModify" 1
 	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "NoRepair" 1
 
