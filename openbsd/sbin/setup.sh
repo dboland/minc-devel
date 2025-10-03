@@ -29,10 +29,8 @@ echo done.
 
 echo -n "Creating /dev file system... "
 sh /etc/MAKEDEV
-if ! [ -f /etc/fstab ]; then
-	mkent -p fstab >/etc/fstab
-	admins_only "/etc/fstab"
-fi
+mkent -p fstab >/etc/fstab
+admins_only "/etc/fstab"
 echo done.
 
 echo -n "Configuring network... "
