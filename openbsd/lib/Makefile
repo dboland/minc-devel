@@ -9,7 +9,6 @@ all:
 	@${MAKE} -C libm all install-local
 	@${MAKE} -C libz all install-local
 	@${MAKE} -C libutil all install-local
-	@${MAKE} -C libdl all install-local
 	@${MAKE} -C libedit all install-local
 	@${MAKE} -C libcurses all install-local
 	@${MAKE} -C libocurses all install-local
@@ -17,18 +16,16 @@ all:
 
 install:
 	@${MAKE} -C libc install
-	@${MAKE} -C libdl install
 	@${MAKE} -C libsocket install
 
 release:
-	@${MAKE} -C libdl release
 	@${MAKE} -C libc release
 	@${MAKE} -C libsocket release
 
 clean:
 	@${MAKE} -C libc clean
-	@${MAKE} -C libdl clean
 	@${MAKE} -C libsocket clean
 	@${MAKE} -C libutil clean
 	@${MAKE} -C libm clean
+	@${MAKE} -C libz clean
 

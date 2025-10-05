@@ -3,7 +3,7 @@ ROOTDIR= ../../..
 include ${ROOTDIR}/Makefile.inc
 
 RELEASE= 75.0
-OBJECTS= libc.o
+OBJECTS= libc.minc.o version.o
 LIBS= stdio.a stdlib.a quad.a locale.a citrus.a compat-43.a crypt.a gdtoa.a gen.a \
 	hash.a regex.a string.a termios.a time.a thread.a \
 	sys.a nls.a dlfcn.a gmon.a net.a
@@ -24,7 +24,7 @@ NLS=    C.msg Pig.msg da.ISO8859-1.msg da.UTF-8.msg de.ISO8859-1.msg \
         nl.ISO8859-1.msg nl.UTF-8.msg no.ISO8859-1.msg no.UTF-8.msg \
         ru.KOI8-R.msg ru.UTF-8.msg sv.ISO8859-1.msg sv.UTF-8.msg
 
-all: ${TMPDIR} ${INCSRC}/.patch ${LIBS} ${LIBC} libc.a
+all: ${TMPDIR} .patch ${LIBS} ${LIBC} libc.a
 
 %.a: %
 	@CFLAGS="${CFLAGS}" ${MAKE} -C $< XGCC="${XGCC}" ROOTDIR="${ROOTDIR}/.." \
@@ -33,8 +33,11 @@ all: ${TMPDIR} ${INCSRC}/.patch ${LIBS} ${LIBC} libc.a
 %.o: %.c
 	${XGCC} -c ${CFLAGS} -I${ROOTDIR}/include -o $@ $<
 
-${INCSRC}/.patch:
-	TMPDIR=${TMPDIR} /bin/patch -p 3 -d ${INCSRC} <../libc.patch
+.patch:
+	@${MAKE} -C citrus SRCDIR=${SRCDIR} source
+	@${MAKE} -C gen SRCDIR=${SRCDIR} source
+	@${MAKE} -C gmon SRCDIR=${SRCDIR} source
+	TMPDIR=${TMPDIR} /bin/patch -p 2 -d . <../libc.patch
 
 libc.a:
 	@/bin/echo "Making static library $@"
@@ -43,15 +46,16 @@ libc.a:
 version.o: version.rc
 	windres -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@
 
-${LIBC}: ${OBJECTS} version.o
+${LIBC}: ${OBJECTS}
 	${LD} -s -shared ${LDFLAGS} -e _DllMainCRTStartup@12 --out-implib=${IMPLIB} \
 	-o $@ --image-base=${IMGBASE_LIBC} ${XLIBDIR}/dllcrt2.o ${SHOBJECTS} ${OBJECTS} version.o \
 	-L${XLIBDIR} -L${GCCDIR} -lmingw32 -lmsvcrt -lgcc
 
 lib-clean:
-	/bin/rm -f ${OBJECTS} ${LIBC} libc.a
+	/bin/rm -f ${OBJECTS} ${LIBC} ${IMPLIB} libc.a
 
 all-clean: lib-clean
+	@${MAKE} -C hash clean
 	/bin/rm -f ${LIBS} */*.o arch/*/*.o db/*/*.o
 
 release-clean:
@@ -79,4 +83,3 @@ install: ${DESTDIR}
 	${INSTALL} -m ${BINMODE} ${LIBC} libc.a ${DESTDIR}${ULIBDIR}/
 
 clean: lib-clean
-

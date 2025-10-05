@@ -36,23 +36,8 @@
 
 sigset_t __sigintr;		/* shared with siginterrupt */
 
-/* Let's try not to break user space.
- */
 sig_t
 _signal(int s, sig_t a)
-{
-	struct sigaction sa, osa;
-
-	memset(&sa, 0, sizeof sa);
-	sa.sa_handler = a;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	if (sigaction(s, &sa, &osa) < 0)
-		return (SIG_ERR);
-	return (osa.sa_handler);
-}
-sig_t
-bsd_signal(int s, sig_t a)
 {
 	struct sigaction sa, osa;
 
@@ -66,5 +51,20 @@ bsd_signal(int s, sig_t a)
 		return (SIG_ERR);
 	return (osa.sa_handler);
 }
+/* Let's try not to break user space.
+ */
+sig_t
+signal(int s, sig_t a)
+{
+	struct sigaction sa, osa;
 
-__weak_alias(signal, _signal);
+	memset(&sa, 0, sizeof sa);
+	sa.sa_handler = a;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	if (sigaction(s, &sa, &osa) < 0)
+		return (SIG_ERR);
+	return (osa.sa_handler);
+}
+
+__weak_alias(bsd_signal, _signal);

@@ -28,21 +28,19 @@
  *
  */
 
-#include <errno.h>
+#include <nlist.h>
+#include <stdio.h>
 
-#include "win/windows.h"
-#include "win_types.h"
-#include "vfs_posix.h"
-#include "arch_posix.h"
-
-char *
-if_indextoname(unsigned int ifindex, char *ifname)
+int 
+__fdnlist(int fd, struct nlist *list)
 {
-	char *result = ifname;
+	int result = 0;
 
-	if (!ws2_indextoname(ifindex, ifname)){
-		errno = errno_posix(errno_win());
-		result = NULL;
+	while (*list->n_name){
+printf("__fdnlist(%d): name(%s) type(0x%x) other(%d) desc(%d) value(%d)\n", 
+	fd, list->n_name, list->n_type, list->n_other, list->n_desc, list->n_value);
+		result++;
+		list++;
 	}
 	return(result);
 }

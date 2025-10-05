@@ -39,5 +39,10 @@ install-local:
 install:
 	/bin/cp -vu libutil.a ${DESTDIR}${ULIBDIR}/
 
-clean:
-	/bin/rm -f *.o libutil.a
+lib-clean:
+	/bin/rm -f libutil.a
+
+all-clean: lib-clean
+	/bin/rm -f *.o
+
+clean: lib-clean

@@ -8,6 +8,6 @@
 *.tgz
 *.so.*
 *.pdf
+.patch
 config.inc
-openbsd/lib/libc/include
 openbsd/share/mk

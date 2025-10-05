@@ -17,7 +17,7 @@
 
 #include <stdlib.h>
 
-//extern const char *__progname;
+extern char *__progname;
 
 const char *
 getprogname(void)

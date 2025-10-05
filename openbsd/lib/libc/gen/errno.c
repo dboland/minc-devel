@@ -15,9 +15,7 @@ __thread int errno;
 int *
 ___errno(void)
 {
-	/* Weird: if return without brackets %eax is not set.
-	 */
-	return(&errno);
+	return(&errno);		/* without parenthesis %eax is not set */
 }
 
 __weak_alias(__errno, ___errno);

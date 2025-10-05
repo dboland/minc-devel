@@ -1,1 +1,4 @@
+*.c
 *.h
+libc/sys/*.S
+!*.minc.c

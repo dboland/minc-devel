@@ -1,8 +1,121 @@
---- lib/libc/include/.patch	1970-01-01 01:00:00 +0100
-+++ lib/libc/include/.patch	2025-09-12 11:34:13 +0200
+--- lib/libc/.patch	1970-01-01 01:00:00 +0100
++++ lib/libc/.patch	2025-09-12 11:34:13 +0200
 @@ -0,0 +1 @@
 +This directory has been patched.
---- lib/libc/include/thread_private.h	2025-06-26 18:43:58 +0200
+--- lib/libc/citrus/citrus_utf8.c	2025-06-24 14:00:33 +0200
++++ lib/libc/citrus/citrus_utf8.c	2025-06-29 06:10:04 +0200
+@@ -113,7 +113,7 @@
+ 		} else if ((ch & 0xf8) == 0xf0) {
+ 			mask = 0x07;
+ 			want = 4;
+-			lbound = 0x10000;
++			lbound = 0x1000;
+ 		} else {
+ 			/*
+ 			 * Malformed input; input is not UTF-8.
+--- lib/libc/gen/errno.c	2014-05-19 17:05:13 +0200
++++ lib/libc/gen/errno.c	2025-10-03 10:21:03 +0200
+@@ -7,7 +7,7 @@
+ /*
+  * global errno for unthreaded programs.
+  */
+-int errno;
++__thread int errno;
+ 
+ /*
+  * weak version of function used by unthreaded programs.
+@@ -15,7 +15,7 @@
+ int *
+ ___errno(void)
+ {
+-	return &errno;
++	return(&errno);		/* without parenthesis %eax is not set */
+ }
+ 
+ __weak_alias(__errno, ___errno);
+--- lib/libc/gen/fts.c	2014-05-19 17:05:13 +0200
++++ lib/libc/gen/fts.c	2025-06-25 19:24:14 +0200
+@@ -297,7 +297,7 @@
+ 	if (p->fts_info == FTS_D) {
+ 		/* If skipped or crossed mount point, do post-order visit. */
+ 		if (instr == FTS_SKIP ||
+-		    (ISSET(FTS_XDEV) && p->fts_dev != sp->fts_dev)) {
++		    (p->fts_dev != sp->fts_dev)) {
+ 			if (p->fts_flags & FTS_SYMFOLLOW)
+ 				(void)close(p->fts_symfd);
+ 			if (sp->fts_child) {
+--- lib/libc/gen/getprogname.c	2014-05-19 17:05:13 +0200
++++ lib/libc/gen/getprogname.c	2025-10-03 10:15:10 +0200
+@@ -17,7 +17,7 @@
+ 
+ #include <stdlib.h>
+ 
+-extern const char *__progname;
++extern char *__progname;
+ 
+ const char *
+ getprogname(void)
+--- lib/libc/gen/setprogname.c	2014-05-19 17:05:13 +0200
++++ lib/libc/gen/setprogname.c	2025-10-03 13:29:10 +0200
+@@ -18,7 +18,7 @@
+ #include <string.h>
+ #include <stdlib.h>
+ 
+-extern const char *__progname;
++extern char *__progname;
+ 
+ void
+ setprogname(const char *progname)
+@@ -27,7 +27,7 @@
+ 
+ 	tmpn = strrchr(progname, '/');
+ 	if (tmpn == NULL)
+-		__progname = progname;
++		__progname = (char *)progname;
+ 	else
+-		__progname = tmpn + 1;
++		__progname = (char *)tmpn + 1;
+ }
+--- lib/libc/gen/signal.c	2014-05-19 17:05:13 +0200
++++ lib/libc/gen/signal.c	2025-10-03 10:52:38 +0200
+@@ -51,6 +51,20 @@
+ 		return (SIG_ERR);
+ 	return (osa.sa_handler);
+ }
++/* Let's try not to break user space.
++ */
++sig_t
++signal(int s, sig_t a)
++{
++	struct sigaction sa, osa;
++
++	memset(&sa, 0, sizeof sa);
++	sa.sa_handler = a;
++	sigemptyset(&sa.sa_mask);
++	sa.sa_flags = 0;
++	if (sigaction(s, &sa, &osa) < 0)
++		return (SIG_ERR);
++	return (osa.sa_handler);
++}
+ 
+-__weak_alias(signal, _signal);
+ __weak_alias(bsd_signal, _signal);
+--- lib/libc/gmon/mcount.c	2014-05-19 17:05:13 +0200
++++ lib/libc/gmon/mcount.c	2025-06-25 20:33:58 +0200
+@@ -183,4 +183,11 @@
+  * Actual definition of mcount function.  Defined in <machine/profile.h>,
+  * which is included by <sys/gmon.h>.
+  */
+-MCOUNT
++void 
++mcount(void)
++{
++	u_long frompc = (u_long)__builtin_return_address(1);
++	u_long selfpc = (u_long)__builtin_return_address(0);
++
++	_mcount(frompc, selfpc);
++}
+--- lib/libc/include/thread_private.h	2014-05-19 17:05:13 +0200
 +++ lib/libc/include/thread_private.h	2025-09-12 15:44:42 +0200
 @@ -15,7 +15,7 @@
  /*

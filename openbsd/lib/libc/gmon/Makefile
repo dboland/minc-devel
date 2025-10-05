@@ -1,3 +1,4 @@
+SOURCES= mcount.c
 OBJECTS=gmon.o
 OBJECTS+=mcount.c.o
 
@@ -12,6 +13,9 @@ all: ${OBJECTS} ${LIB}
 ${LIB}:
 	@ar cru $@ ${OBJECTS}
 
+%.c: ${SRCDIR}/lib/libc/gmon/%.c
+	@/bin/cp -uv $< $@
+
 %.o: ${SRCDIR}/lib/libc/gmon/%.c
 	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -o $@ $<
@@ -19,3 +23,5 @@ ${LIB}:
 %.c.o: %.c
 	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -o $@ $<
+
+source: ${SOURCES}

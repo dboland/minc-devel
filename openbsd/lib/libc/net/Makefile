@@ -1,4 +1,4 @@
-OBJECTS= send.o recv.o herror.o
+OBJECTS= send.o recv.o
 
 .SUFFIXES:
 .DEFAULT:

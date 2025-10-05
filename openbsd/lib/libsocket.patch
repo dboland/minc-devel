@@ -1,0 +1,26 @@
+--- ./.patch	1970-01-01 01:00:00 +0100
++++ ./.patch	2025-09-12 11:34:13 +0200
+@@ -0,0 +1 @@
++This directory has been patched.
+--- ./asr/asr.c	2014-05-19 17:05:13 +0200
++++ ./asr/asr.c	2025-10-03 15:37:02 +0200
+@@ -560,7 +560,7 @@
+ 	char	*cp, **tp;
+ 
+ 	for (cp = line, tp = tokens, ntok = 0;
+-	    ntok < ntokens && (*tp = strsep(&cp, " \t")) != NULL; )
++	    ntok < ntokens && (*tp = strsep(&cp, " \t\r")) != NULL; )
+ 		if (**tp != '\0') {
+ 			tp++;
+ 			ntok++;
+--- ./net/getservent.c	2014-05-19 17:05:13 +0200
++++ ./net/getservent.c	2019-11-26 07:07:29 +0100
+@@ -80,6 +80,8 @@
+ 		goto again;
+ 	if (p[len-1] == '\n')
+ 		len--;
++	if (p[len-1] == '\r')
++		len--;
+ 	if ((cp = memchr(p, '#', len)) != NULL)
+ 		len = cp - p;
+ 	cp = realloc(sd->line, len + 1);

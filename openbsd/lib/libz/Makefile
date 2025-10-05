@@ -22,3 +22,11 @@ libz.a: ${OBJECTS}
 
 install-local:
 	/bin/cp -vu libz.a ${XLIBDIR}/
+
+lib-clean:
+	/bin/rm -f libz.a
+
+all-clean: lib-clean
+	/bin/rm -f *.o
+
+clean: lib-clean

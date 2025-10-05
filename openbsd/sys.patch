@@ -1,9 +1,148 @@
---- sys/.patch	1970-01-01 01:00:00 +0100
-+++ sys/.patch	2025-09-12 11:34:13 +0200
+--- -	Sun Oct  5 08:59:21 2025
++++ openbsd-master/sys/.patch	Sun Oct  5 08:56:18 2025
 @@ -0,0 +1 @@
 +This directory has been patched.
---- sys/netinet6/in6.h	2014-05-19 17:05:13 +0200
-+++ sys/netinet6/in6.h	2025-09-23 19:59:56 +0200
+--- -	Sun Oct  5 08:59:22 2025
++++ openbsd-master/sys/arch/i386/include/asm.h	Sun Oct  5 08:56:18 2025
+@@ -58,7 +58,7 @@
+ #define PIC_GOTOFF(x)	x
+ #endif
+ 
+-#define _C_LABEL(name)	name
++#define _C_LABEL(name)	__CONCAT(_,name)
+ #define	_ASM_LABEL(x)	x
+ 
+ #define CVAROFF(x, y)	_C_LABEL(x) + y
+@@ -94,7 +94,7 @@
+ #endif
+ 
+ #define _ENTRY(x) \
+-	.text; _ALIGN_TEXT; .globl x; .type x,@function; x:
++	.text; _ALIGN_TEXT; .global x; .def x; .scl 2; .type 32; .endef; x:
+ 
+ #if defined(PROF) || defined(GPROF)
+ # define _PROF_PROLOGUE	\
+--- -	Sun Oct  5 08:59:22 2025
++++ openbsd-master/sys/arch/i386/include/cdefs.h	Sun Oct  5 08:56:18 2025
+@@ -4,18 +4,64 @@
+  * Written by J.T. Conklin <jtc@wimsey.com> 01/17/95.
+  * Public domain.
+  */
++/* Adapted 2016 for MinC by D. Boland <dboland@xs4all.nl>
++ */
+ 
+ #ifndef	_MACHINE_CDEFS_H_
+ #define	_MACHINE_CDEFS_H_
+ 
+-#define __strong_alias(alias,sym)			\
+-	__asm__(".global " __STRING(alias) " ; "	\
+-	    __STRING(alias) " = " __STRING(sym))
+-#define __weak_alias(alias,sym)				\
+-	__asm__(".weak " __STRING(alias) " ; "		\
+-	    __STRING(alias) " = " __STRING(sym))
+-#define __warn_references(sym,msg)			\
+-	__asm__(".section .gnu.warning." __STRING(sym)	\
+-	    " ; .ascii \"" msg "\" ; .text")
++#ifndef __bounded__
++#define __bounded__(...)	
++#endif
++#ifndef visibility
++#define visibility(a)	
++#endif
++
++#undef __MINGW32__
++#undef __WIN32__	// <GL/gl.h>
++#undef __MSVCRT__
++#undef __WINNT__
++#undef __WINNT
++#undef _WIN32		// cc.exe
++#undef WIN32		// cc.exe
++#undef WINNT
++
++#define __thread	__thread __attribute__((section(".tls")))
++
++#define __MinC__
++#define __OpenBSD__
++
++#define restrict	__restrict
++#define alloca		__builtin_alloca
++
++#define sys_siglist	_sys_siglist	/* legacy */
++
++#ifdef NOPIE
++#define __import
++#else
++#define __import	__attribute__((dllimport))
++#endif
++
++#ifndef GETOPT_IMPORT
++#define GETOPT_IMPORT	__import
++#endif
++#ifndef NETDB_IMPORT
++#define NETDB_IMPORT	__import
++#endif
++
++/* weak aliases are kind of broken in MinGW32 ld.exe:
++ * http://mingw.5.n7.nabble.com/weak-functions-td6379.html
++ * https://sourceware.org/bugzilla/show_bug.cgi?id=9687
++ * https://sourceware.org/bugzilla/show_bug.cgi?id=2729
++ */
++
++#define __strong_alias(name,symbol)			\
++	extern __typeof(symbol) name __attribute__((alias(__STRING(symbol))))
++//#define __weak_alias(name,symbol)			\
++//	extern __typeof(symbol) name __attribute__((weak,alias(__STRING(symbol))))
++#define __weak_alias(name,symbol)			\
++	__strong_alias(name,symbol)
++#define __warn_references(symbol,msg)			\
++	extern __typeof(symbol) symbol __attribute__((deprecated(msg)))
+ 
+ #endif /* !_MACHINE_CDEFS_H_ */
+--- -	Sun Oct  5 08:59:22 2025
++++ openbsd-master/sys/arch/i386/include/exec.h	Sun Oct  5 08:56:18 2025
+@@ -40,7 +40,6 @@
+ #define ELF_TARG_MACH		EM_386 /* XXX - EM_486 is currently unused
+                                           by all OSs/compilers/linkers */
+ 
+-#define _NLIST_DO_ELF
+ #define _KERN_DO_ELF
+ 
+ #endif  /* _MACHINE_EXEC_H_ */
+--- -	Sun Oct  5 08:59:22 2025
++++ openbsd-master/sys/arch/i386/include/_types.h	Sun Oct  5 08:56:18 2025
+@@ -35,6 +35,12 @@
+ #ifndef _MACHINE__TYPES_H_
+ #define _MACHINE__TYPES_H_
+ 
++/* When compiling libstd++ for GNU CC, __size_t is
++ * defined as a macro for BeOS in gcc/include/stddef.h.
++ * This yields 'declaration does not declare anything'.
++ */
++#undef __size_t
++
+ /*
+  * _ALIGN(p) rounds p (pointer or byte index) up to a correctly-aligned
+  * value for all data types (int, long, ...).   The result is an
+@@ -121,7 +127,7 @@
+ typedef long double		__double_t;
+ typedef long double		__float_t;
+ typedef long			__ptrdiff_t;
+-typedef	unsigned long		__size_t;
++typedef	unsigned int		__size_t;		/* match WinNT's */
+ typedef	long			__ssize_t;
+ #if defined(__GNUC__) && __GNUC__ >= 3
+ typedef	__builtin_va_list	__va_list;
+@@ -131,7 +137,7 @@
+ 
+ /* Wide character support types */
+ #ifndef __cplusplus
+-typedef	int			__wchar_t;
++typedef	short unsigned int	__wchar_t;		/* match WinNT's */
+ #endif
+ typedef int			__wint_t;
+ typedef	int			__rune_t;
+--- -	Sun Oct  5 08:59:22 2025
++++ openbsd-master/sys/netinet6/in6.h	Wed Sep 24 17:39:09 2025
 @@ -127,20 +127,20 @@
  #define IN6MASK128	{{{ 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, \
  			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff }}}
@@ -35,8 +174,8 @@
  
  #if __BSD_VISIBLE
  /*
---- sys/sys/types.h	2014-05-19 17:05:13 +0200
-+++ sys/sys/types.h	2025-09-11 08:52:15 +0200
+--- -	Sun Oct  5 08:59:22 2025
++++ openbsd-master/sys/sys/types.h	Wed Sep 24 17:39:09 2025
 @@ -267,4 +267,10 @@
  
  #endif /* _KERNEL */
@@ -48,8 +187,8 @@
 +extern __import char *__progname;
 +
  #endif /* !_SYS_TYPES_H_ */
---- sys/sys/ucred.h	2014-05-19 17:05:13 +0200
-+++ sys/sys/ucred.h	2025-08-11 08:45:21 +0200
+--- -	Sun Oct  5 08:59:22 2025
++++ openbsd-master/sys/sys/ucred.h	Wed Sep 24 17:39:09 2025
 @@ -35,6 +35,8 @@
  #ifndef _SYS_UCRED_H_
  #define	_SYS_UCRED_H_

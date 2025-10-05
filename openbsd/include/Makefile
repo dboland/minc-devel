@@ -2,12 +2,13 @@ ROOTDIR= ../..
 
 include ${ROOTDIR}/Makefile.inc
 
+SOURCES= ctype.h getopt.h math.h netdb.h resolv.h signal.h stdio.h \
+	stdlib.h time.h unistd.h
 HEADERS= ${XINCDIR}/fcntl.h ${XINCDIR}/stdarg.h ${XINCDIR}/stdint.h \
-	${XINCDIR}/syslog.h ${XINCDIR}/termios.h \
-	${XINCDIR}/.patch
+	${XINCDIR}/syslog.h ${XINCDIR}/termios.h
 INCSRC= ${SRCDIR}/include
 
-all: ${INCSRC} ${TMPDIR}
+all: ${INCSRC} ${TMPDIR} ${SOURCES} .patch
 
 ${INCSRC}:
 	@echo " ---------------------------------------------------"
@@ -16,13 +17,13 @@ ${INCSRC}:
 	@echo " ---------------------------------------------------"
 	@exit 1
 
-${XINCDIR}/machine:
-	@/bin/mkdir -p $@
-	/bin/cp -ru  ${SRCDIR}/sys/arch/${ARCH}/include/* $@/
+%.h: ${INCSRC}/%.h
+	/bin/cp -u $< $@
 
-${XINCDIR}: ${XINCDIR}/machine
+${XINCDIR}:
 	@/bin/mkdir -p ${XINCDIR}
 	/bin/cp -ru ${INCSRC}/* ${XINCDIR}/
+	/bin/cp -u ${SOURCES} ${XINCDIR}/
 
 ${XINCDIR}/fcntl.h:
 	@/bin/cp -vu ../fcntl.h ${XINCDIR}/
@@ -41,7 +42,7 @@ ${XINCDIR}/termios.h:
 
 # make patch.exe use local tmp directory for proper ACL
 
-${XINCDIR}/.patch:
-	TMPDIR=${TMPDIR} /bin/patch -p 0 -d ${XPREFIX} <../include.patch
+.patch:
+	TMPDIR=${TMPDIR} /bin/patch -p 1 -d . <../include.patch
 
 install-local: ${XINCDIR} ${HEADERS}

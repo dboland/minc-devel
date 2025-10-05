@@ -49,7 +49,6 @@ typedef struct _IMAGE_TLS_DIRECTORY {
 } IMAGE_TLS_DIRECTORY,*PIMAGE_TLS_DIRECTORY;
 
 #include <libgen.h>
-#include <nlist.h>
 #include <string.h>
 
 extern CHAR 	*__PROGNAME __attribute__((dllimport));
@@ -67,7 +66,7 @@ typedef struct {
  */
 char *__progname;
 char **environ __attribute__((dllexport));
-int h_errno;
+//int h_errno;
 
 tlsentry __offsets[GOT_MAX];
 
@@ -78,19 +77,6 @@ _init(char *arg0, exec_t *exec)
 	task_init(arg0, exec);
 	environ = exec->env;
 	__progname = __PROGNAME = basename(arg0);
-}
-int 
-__fdnlist(int fd, struct nlist *list)
-{
-	int result = 0;
-
-	while (*list->n_name){
-printf("__fdnlist(%d): name(%s) type(0x%x) other(%d) desc(%d) value(%d)\n", 
-	fd, list->n_name, list->n_type, list->n_other, list->n_desc, list->n_value);
-		result++;
-		list++;
-	}
-	return(result);
 }
 void 
 __tls_attach(const IMAGE_TLS_DIRECTORY *Image)

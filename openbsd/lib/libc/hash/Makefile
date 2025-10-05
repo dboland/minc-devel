@@ -20,9 +20,6 @@ ${LIB}:
 	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -o $@ $<
 
-clean:
-	rm -f ${HELPER} *.o *.dll *.a
-
 md5hl.c:	${SRCDIR}/lib/libc/hash/helper.c
 	sed -e 's/hashinc/md5.h/g' -e 's/HASH/MD5/g' $< > $@
 
@@ -51,3 +48,6 @@ sha512hl.c:	${SRCDIR}/lib/libc/hash/helper.c
 	sed -e 's/hashinc/sha2.h/g' \
 	    -e 's/HASH/SHA512/g' \
 	    -e 's/SHA[0-9][0-9][0-9]_CTX/SHA2_CTX/g' $< > $@
+
+clean:
+	/bin/rm -f ${HELPER}
