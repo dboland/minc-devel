@@ -1,6 +1,5 @@
 *.exe
 *.dll
-*.so
 *.o
 *.a
 *.tar
