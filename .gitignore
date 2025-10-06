@@ -1,6 +1,7 @@
 *.exe
 *.dll
 *.o
+*.so
 *.a
 *.tar
 *.out
@@ -9,4 +10,3 @@
 *.pdf
 .patch
 config.inc
-openbsd/share/mk

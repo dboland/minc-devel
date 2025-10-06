@@ -3,7 +3,7 @@
 @@ -0,0 +1 @@
 +This directory has been patched.
 --- share/mk/bsd.lib.mk	2014-05-19 17:05:13 +0200
-+++ share/mk/bsd.lib.mk	2021-02-23 13:55:36 +0100
++++ share/mk/bsd.lib.mk	2025-10-06 16:19:07 +0200
 @@ -36,8 +36,8 @@
  DIST_CFLAGS+=	-Os
  
@@ -33,7 +33,7 @@
  
  # all .do files...
 --- share/mk/bsd.man.mk	2014-05-19 17:05:13 +0200
-+++ share/mk/bsd.man.mk	2025-08-14 05:35:05 +0200
++++ share/mk/bsd.man.mk	2025-10-06 16:19:07 +0200
 @@ -54,7 +54,7 @@
  .for page in ${MAN}
  .  for sub in ${MANSUBDIR}
@@ -63,7 +63,7 @@
  .  endfor
  .endif
 --- share/mk/bsd.own.mk	2014-05-19 17:05:13 +0200
-+++ share/mk/bsd.own.mk	2025-09-24 11:48:37 +0200
++++ share/mk/bsd.own.mk	2025-10-06 16:19:07 +0200
 @@ -13,7 +13,7 @@
  # Set `SKEY' to `yes' to build with support for S/key authentication.
  SKEY?=		yes
@@ -112,7 +112,7 @@
  BSD_OWN_MK=Done
  
 --- share/mk/bsd.README	2014-05-19 17:05:13 +0200
-+++ share/mk/bsd.README	2025-08-13 05:45:38 +0200
++++ share/mk/bsd.README	2025-10-06 16:19:07 +0200
 @@ -180,7 +180,7 @@
  
  LIBOWN		Library owner. [${BINOWN}]
@@ -123,7 +123,7 @@
  DOCDIR		Base path for system documentation
  	        installation. [/usr/share/doc]
 --- share/mk/sys.mk	2014-05-19 17:05:13 +0200
-+++ share/mk/sys.mk	2025-07-20 06:42:35 +0200
++++ share/mk/sys.mk	2025-10-06 16:19:07 +0200
 @@ -32,7 +32,7 @@
  
  PIPE?=		-pipe

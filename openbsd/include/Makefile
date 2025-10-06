@@ -18,7 +18,7 @@ ${INCSRC}:
 # make patch.exe use local tmp directory for proper ACL
 #
 ${INCSRC}/.patch:
-	TMPDIR=${TMPDIR} /bin/patch -p 1 -d ${INCSRC} <../include.patch
+	TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${INCSRC} <../include.patch
 
 ${XINCDIR}:
 	@/bin/mkdir -p ${XINCDIR}

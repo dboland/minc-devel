@@ -1,9 +1,9 @@
---- lib/libssl/.patch	1970-01-01 01:00:00 +0100
-+++ lib/libssl/.patch	2025-09-12 11:34:13 +0200
+--- openbsd-master/lib/libssl/.patch	1970-01-01 01:00:00 +0100
++++ openbsd-master/lib/libssl/.patch	2025-09-12 11:34:13 +0200
 @@ -0,0 +1 @@
 +This directory has been patched.
---- lib/libssl/src/crypto/asn1/asn1.h	2014-05-19 17:05:13 +0200
-+++ lib/libssl/src/crypto/asn1/asn1.h	2025-09-13 08:33:38 +0200
+--- -	Mon Oct  6 15:07:21 2025
++++ openbsd-master/lib/libssl/src/crypto/asn1/asn1.h	Sat Sep 13 08:47:47 2025
 @@ -403,7 +403,7 @@
  #define ASN1_ITEM_rptr(ref) (&(ref##_it))
  

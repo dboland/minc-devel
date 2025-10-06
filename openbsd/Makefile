@@ -7,9 +7,9 @@ all: ${SRCDIR} ${TMPDIR}
 	@${MAKE} -C bin all install-local
 	@${MAKE} -C usr.bin all install-local
 	@${MAKE} -C sbin all install-local
-	@${MAKE} -C share all install-local
 	@${MAKE} -C libexec all install-local
 	@${MAKE} -C usr.sbin
+	@${MAKE} -C share
 	@${MAKE} -C etc
 
 include ${ROOTDIR}/Errorfile.inc
