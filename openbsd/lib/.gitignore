@@ -1,4 +1,5 @@
-*.c
 *.h
+*.c
 libc/sys/*.S
 !*.minc.c
+!*.minc.h

@@ -20,7 +20,7 @@ CFLAGS+= -I${SRCDIR}/lib/libc/gen
 #CFLAGS+=-Dfork=vfork
 
 SOURCES= eval.c exec.c io.c jobs.c main.c path.c shf.c syn.c trap.c version.c
-SOURCES+= edit.h sh.h shf.h tty.h ksh.1 .patch
+SOURCES+= edit.h sh.h shf.h tty.h ksh.1
 HEADERS= config.h table.h tree.h expand.h lex.h proto.h c_test.h ksh_limval.h
 
 # emacs.c and vi.c were taken from 2021 (v7.4) distro for utf8 handling
@@ -45,7 +45,7 @@ OBJECTS= alloc.o c_ksh.o c_sh.o c_test.o c_ulimit.o edit.o emacs.2021.o eval.o \
 #CFLAGS+=-pg
 #OBJECTS+=/usr/lib/gcrt0.o
 
-all: ${TMPDIR} ${SOURCES} ${PROG}
+all: ${TMPDIR} .patch ${PROG}
 
 %.h: ${KSHSRC}/%.h
 	@/bin/cp -u $< $@
@@ -60,7 +60,7 @@ all: ${TMPDIR} ${SOURCES} ${PROG}
 ksh.1: ${KSHSRC}/ksh.1
 	@/bin/cp -u $< $@
 
-.patch:
+.patch: ${SOURCES}
 	TMPDIR=${TMPDIR} /bin/patch -p 2 -d . <../ksh.patch
 
 ${PROG}: ${HEADERS} ${OBJECTS}
@@ -72,6 +72,9 @@ install: ${DESTDIR} ${PROG}
 	${LN} -f ${DESTDIR}/bin/ksh ${DESTDIR}/bin/sh
 	@${MKDIR} -p ${DESTDIR}/usr/share/man/man1
 	${INSTALL} ${MANFILES} ksh.1 ${DESTDIR}/usr/share/man/man1/
+
+patch-clean:
+	/bin/rm -f ${SOURCES} .patch
 
 clean:
 	/bin/rm -f *.o ${HEADERS} ${PROG}

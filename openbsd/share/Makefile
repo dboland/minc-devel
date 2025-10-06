@@ -5,7 +5,7 @@ include ${ROOTDIR}/Makefile.inc
 SHARESRC= ${SRCDIR}/share
 SHAREDEST= ${DESTDIR}/usr/share
 
-all: ${SHARESRC} ${TMPDIR} mk .patch
+all: ${SHARESRC} ${TMPDIR} .patch
 
 ${SHARESRC}:
 	@echo " ---------------------------------------------------"
@@ -17,10 +17,8 @@ ${SHARESRC}:
 # make patch.exe use local tmp directory for proper ACL
 #
 .patch:
+	/bin/cp -ru ${SHARESRC}/mk ./
 	TMPDIR=${TMPDIR} /bin/patch -p 1 -d . <../share.patch
-
-mk: ${SHARESRC}/mk
-	/bin/cp -ru $< ./
 
 install:
 	@${MKDIR} -p ${SHAREDEST}/mk
