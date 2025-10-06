@@ -1,9 +1,9 @@
---- lib/libcurses/.patch	1970-01-01 01:00:00 +0100
-+++ lib/libcurses/.patch	2025-09-12 11:34:13 +0200
+--- openbsd-master/lib/libcurses/.patch	1970-01-01 01:00:00 +0100
++++ openbsd-master/lib/libcurses/.patch	2025-09-12 11:34:13 +0200
 @@ -0,0 +1 @@
 +This directory has been patched.
---- lib/libcurses/curses.h	2014-05-19 17:05:13 +0200
-+++ lib/libcurses/curses.h	2025-09-12 07:23:15 +0200
+--- -	Mon Oct  6 19:41:39 2025
++++ openbsd-master/lib/libcurses/curses.h	Fri Sep 12 15:28:11 2025
 @@ -58,7 +58,7 @@
  #define NCURSES_VERSION "5.7"
  
@@ -13,8 +13,8 @@
  #endif
  #if !defined(NCURSES_API)
  #  define NCURSES_API /* nothing */
---- lib/libcurses/term.h	2014-05-19 17:05:13 +0200
-+++ lib/libcurses/term.h	2025-09-12 07:20:28 +0200
+--- -	Mon Oct  6 19:41:39 2025
++++ openbsd-master/lib/libcurses/term.h	Fri Sep 12 15:28:11 2025
 @@ -51,7 +51,7 @@
  #define NCURSES_VERSION "5.7"
  
@@ -24,8 +24,8 @@
  #endif
  #if !defined(NCURSES_API)
  #  define NCURSES_API /* nothing */
---- lib/libcurses/termcap.h	2014-05-19 17:05:13 +0200
-+++ lib/libcurses/termcap.h	2025-09-12 07:24:06 +0200
+--- -	Mon Oct  6 19:41:39 2025
++++ openbsd-master/lib/libcurses/termcap.h	Fri Sep 12 15:28:11 2025
 @@ -42,7 +42,7 @@
  #define NCURSES_VERSION "5.7"
  
