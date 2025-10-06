@@ -25,3 +25,6 @@ ${LIB}:
 	@${XGCC} -c ${CFLAGS} -o $@ $<
 
 source: ${SOURCES}
+
+patch-clean:
+	/bin/rm -f ${SOURCES}

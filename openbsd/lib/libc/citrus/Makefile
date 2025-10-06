@@ -24,3 +24,6 @@ citrus_utf8.o: citrus_utf8.c
 	@${XGCC} -c ${CFLAGS} -I${SRCDIR}/lib/libc/citrus -o $@ $<
 
 source: ${SOURCES}
+
+patch-clean:
+	/bin/rm -f ${SOURCES}

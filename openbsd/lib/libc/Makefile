@@ -62,6 +62,13 @@ all-clean: lib-clean
 release-clean:
 	/bin/rm -f version.o
 
+patch-clean:
+	@${MAKE} -C citrus patch-clean
+	@${MAKE} -C gen patch-clean
+	@${MAKE} -C gmon patch-clean
+	@${MAKE} -C include patch-clean
+	/bin/rm -f .patch
+
 release: release-clean all
 
 install-cross: ${_LIBDIR}

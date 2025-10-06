@@ -2,16 +2,17 @@ ROOTDIR= ../../..
 
 include ${ROOTDIR}/Makefile.inc
 
-HEADERS= ${XINCDIR}/openssl/asn1.h
-INCSRC= ${SRCDIR}/lib/libssl
+SSLSRC= ${SRCDIR}/lib/libssl
+SSLDIR= ${XINCDIR}/openssl
+HEADERS= ${SSLDIR}/asn1.h
 
-all: ${TMPDIR} ${INCSRC}/.patch
+all: ${TMPDIR} ${SSLSRC}/.patch
 
-${INCSRC}/.patch:
-	TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${INCSRC} <../libssl.patch
+${SSLSRC}/.patch:
+	TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${SSLSRC} <../libssl.patch
 
-${XINCDIR}/openssl/asn1.h:
-	@/bin/mkdir -p ${XINCDIR}/openssl
-	@/bin/cp -vu ${INCSRC}/src/crypto/asn1/asn1.h $@
+${SSLDIR}/asn1.h:
+	@/bin/mkdir -p ${SSLDIR}
+	@/bin/cp -vu ${SSLSRC}/src/crypto/asn1/asn1.h $@
 
 install-local: ${HEADERS}

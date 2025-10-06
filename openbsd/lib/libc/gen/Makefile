@@ -67,3 +67,6 @@ ${LIB}:
 	@${XGCC} -c ${CFLAGS} -I../arch/${ARCH} -o $@ $<
 
 source: ${SOURCES}
+
+patch-clean:
+	/bin/rm -f ${SOURCES}
