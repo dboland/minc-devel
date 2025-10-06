@@ -20,7 +20,7 @@ ${LIB}:
 	@${XGCC} -c ${CFLAGS} -o $@ $<
 
 citrus_utf8.o: citrus_utf8.c
-	@echo "$@ "
+	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -I${SRCDIR}/lib/libc/citrus -o $@ $<
 
 source: ${SOURCES}

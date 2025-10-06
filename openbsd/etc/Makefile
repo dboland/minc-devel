@@ -2,11 +2,13 @@ ROOTDIR= ../..
 
 include ${ROOTDIR}/Makefile.inc
 
-FILES= man.conf motd gettytab login.conf sysctl.conf ftpchroot ftpusers
+SOURCES= man.conf motd gettytab login.conf sysctl.conf ftpchroot ftpusers
 ETCSRC= ${SRCDIR}/etc
 ETCDIR= ${DESTDIR}/etc
+# install-only
+CONFIG= ${ETCDIR}/profile
 
-all: ${ETCSRC} ${FILES} ttys MAKEDEV
+all: ${ETCSRC} ${SOURCES} ttys MAKEDEV
 
 ${ETCSRC}:
 	@echo " ---------------------------------------------------"
@@ -15,9 +17,12 @@ ${ETCSRC}:
 	@echo " ---------------------------------------------------"
 	@exit 1
 
-${ETCDIR}: ${FILES}
+${ETCDIR}: ${SOURCES}
 	@${MKDIR} -p ${ETCDIR}
-	${INSTALL} ${FILES} ttys MAKEDEV ${ETCDIR}/
+	${INSTALL} ${SOURCES} ttys MAKEDEV ${ETCDIR}/
+
+${ETCDIR}/profile:
+	${INSTALL} profile ${ETCDIR}/
 
 %: ${ETCSRC}/%
 	@/bin/cp -uv $< $@
@@ -25,4 +30,4 @@ ${ETCDIR}: ${FILES}
 login.conf:
 	@/bin/cp -uv ${ETCSRC}/etc.${ARCH}/login.conf $@
 
-install: ${ETCDIR}
+install: ${ETCDIR} ${CONFIG}

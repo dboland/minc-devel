@@ -1,0 +1,4 @@
+export ENV=$HOME/.kshrc
+export HISTFILE=$HOME/.shhist
+export LESSHISTFILE=$HOME/.lesshist
+export HOSTALIASES=/etc/hosts.ics

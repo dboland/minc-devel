@@ -4,7 +4,7 @@ include ${ROOTDIR}/Makefile.inc
 
 PROGS= gzip id
 XPROGS= arch uname touch
-OBJECTS= ${XPROGS} du find sed cap_mkdb sort xargs
+OBJECTS= ${XPROGS} id du find sed cap_mkdb sort xargs
 UBINSRC= ${SRCDIR}/usr.bin
 UBINDIR= /usr/bin
 
