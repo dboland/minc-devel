@@ -1,4 +1,4 @@
-SOURCES= signal.c errno.c fts.c
+SOURCES= signal.c errno.c fts.c getprogname.c setprogname.c
 OBJECTS= assert.o \
 	basename.o clock.o clock_getcpuclockid.o \
 	confstr.o ctermid.o ctype_.o \

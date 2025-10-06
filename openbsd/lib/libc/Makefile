@@ -37,6 +37,7 @@ all: ${TMPDIR} .patch ${LIBS} ${LIBC} libc.a
 	@${MAKE} -C citrus SRCDIR=${SRCDIR} source
 	@${MAKE} -C gen SRCDIR=${SRCDIR} source
 	@${MAKE} -C gmon SRCDIR=${SRCDIR} source
+	@${MAKE} -C include SRCDIR=${SRCDIR} source
 	TMPDIR=${TMPDIR} /bin/patch -p 2 -d . <../libc.patch
 
 libc.a:

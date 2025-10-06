@@ -18,7 +18,7 @@ ${SYSSRC}:
 	@exit 1
 
 ${SYSSRC}/.patch:
-	TMPDIR=${TMPDIR} /bin/patch -p 1 -d ${SYSSRC} <../sys.patch
+	TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${SYSSRC} <../sys.patch
 
 ${XINCDIR}/%: ${SRCDIR}/sys/%
 	@/bin/mkdir -p $@
