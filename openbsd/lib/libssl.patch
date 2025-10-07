@@ -2,7 +2,7 @@
 +++ openbsd-master/lib/libssl/.patch	2025-09-12 11:34:13 +0200
 @@ -0,0 +1 @@
 +This directory has been patched.
---- -	Mon Oct  6 15:07:21 2025
+--- -	Tue Oct  7 08:01:27 2025
 +++ openbsd-master/lib/libssl/src/crypto/asn1/asn1.h	Sat Sep 13 08:47:47 2025
 @@ -403,7 +403,7 @@
  #define ASN1_ITEM_rptr(ref) (&(ref##_it))
@@ -13,3 +13,13 @@
  
  #else
  
+--- -	Tue Oct  7 08:01:28 2025
++++ openbsd-master/lib/libssl/ssl/Makefile	Tue Oct  7 07:55:09 2025
+@@ -4,6 +4,7 @@
+ 
+ SSL_SRC=	${.CURDIR}/../../libssl/src
+ LSSL_SRC=	${SSL_SRC}/ssl
++LDADD+= -lcrypto
+ 
+ .include <bsd.own.mk>
+ CFLAGS+= -Wall

@@ -2,7 +2,7 @@ ROOTDIR= ../..
 
 include ${ROOTDIR}/Makefile.inc
 
-PROGS= ldconfig
+PROGS= 
 LIBXSRC= ${SRCDIR}/libexec
 LIBSOSRC= ${LIBXSRC}/ld.so
 LIBXDIR= ${DESTDIR}/libexec
