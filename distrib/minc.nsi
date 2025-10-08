@@ -4,7 +4,7 @@
 !include WinMessages.nsh
 !include WinVer.nsh
 
-!define OUTFILE "minc-6.1.0.${VERSION}.exe"
+!define OUTFILE "minc-6.1.0.exe"
 ; In Vista, all keys are deferred to Software\WOW6432Node\Microsoft
 !define REGFILE "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC"
 
@@ -107,21 +107,21 @@ Section "Base system" SecBase
 	DetailPrint "Installing base system..."
 
 	# Write the uninstall keys for Windows
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "DisplayName" "MinC Unix emulator"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "InstallLocation" "$INSTDIR"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "InstallSource" "$INSTDIR"
+	WriteRegStr HKLM ${REGFILE} "DisplayName" "MinC Unix emulator"
+	WriteRegStr HKLM ${REGFILE} "InstallLocation" "$INSTDIR"
+	WriteRegStr HKLM ${REGFILE} "InstallSource" "$INSTDIR"
 ;	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "SourceDir" "$INSTDIR"
 ;	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "EstimatedSize" 1048576
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "Publisher" "BOLAND Automatisering"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "ProductVersion" "6.1"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "DisplayVersion" "6.1.0"
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "NoModify" 1
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "NoRepair" 1
+	WriteRegStr HKLM ${REGFILE} "Publisher" "BOLAND Automatisering"
+	WriteRegStr HKLM ${REGFILE} "ProductVersion" "6.1"
+	WriteRegStr HKLM ${REGFILE} "DisplayVersion" "6.1.0"
+	WriteRegDWORD HKLM ${REGFILE} "NoModify" 1
+	WriteRegDWORD HKLM ${REGFILE} "NoRepair" 1
 
 	ExecDos::exec /DETAILED '.\install.cmd base61.tgz'
 
 	WriteUninstaller "$INSTDIR\sbin\uninstall.exe"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC" "UninstallString" "$INSTDIR\sbin\uninstall.exe"
+	WriteRegStr HKLM ${REGFILE} "UninstallString" "$INSTDIR\sbin\uninstall.exe"
 
 SectionEnd
 ;Section "Perl" SecPerl

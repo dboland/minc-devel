@@ -25,18 +25,18 @@ ${XINCDIR}:
 	/bin/cp -ru ${INCSRC}/* ${XINCDIR}/
 
 ${XINCDIR}/fcntl.h:
-	@/bin/cp -vu ../fcntl.h ${XINCDIR}/
+	@/bin/cp -vu fcntl.h ${XINCDIR}/
 
 ${XINCDIR}/stdarg.h:
-	@/bin/cp -vu ../stdarg.h ${XINCDIR}/
+	@/bin/cp -vu stdarg.h ${XINCDIR}/
 
 ${XINCDIR}/stdint.h:
-	@/bin/cp -vu ../stdint.h ${XINCDIR}/
+	@/bin/cp -vu stdint.h ${XINCDIR}/
 
 ${XINCDIR}/syslog.h:
-	@/bin/cp -vu ../syslog.h ${XINCDIR}/
+	@/bin/cp -vu syslog.h ${XINCDIR}/
 
 ${XINCDIR}/termios.h:
-	@/bin/cp -vu ../termios.h ${XINCDIR}/
+	@/bin/cp -vu termios.h ${XINCDIR}/
 
 install-local: ${XINCDIR} ${HEADERS}

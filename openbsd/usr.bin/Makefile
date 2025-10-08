@@ -10,7 +10,7 @@ UBINDIR= /usr/bin
 
 # GNU make can't cd into make if make/make.exe exists?!?!
 
-all: ${UBINSRC} ${OBJECTS} xinstall
+all: ${UBINSRC} ${TMPDIR} ${UBINSRC}/.patch ${OBJECTS} xinstall
 	@echo "done."
 	@${MAKE} -C make
 
@@ -20,6 +20,9 @@ ${UBINSRC}:
 	@echo "| you extracted this directory from the source archive."
 	@echo " ---------------------------------------------------"
 	@exit 1
+
+${UBINSRC}/.patch:
+	TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${UBINSRC} <../usr.bin.patch
 
 ${BINDIR}: ${PROGS} xinstall
 	@/bin/mkdir -p ${BINDIR}
@@ -70,7 +73,7 @@ sort: ${UBINSRC}/sort/append.c ${UBINSRC}/sort/fields.c ${UBINSRC}/sort/files.c 
 # down execution to a crawl.
 # see: https://irq5.io/2011/06/26/gnu-patch-and-windows-uac/
 
-xinstall: xinstall.c
+xinstall: ${UBINSRC}/xinstall/xinstall.c
 	@echo -n "$@ "
 	@${XGCC} -s -static ${CFLAGS} -DNOPIE -I${UBINSRC}/xinstall -o $@ $<
 

@@ -8,39 +8,8 @@ TARGET=
 SOURCE=${SRCDIR}
 SRCTYPE=dir
 LIST=
-
-set_type()
-{
-	if [[ $1 == *.zip ]]; then
-		SRCTYPE=zip
-	elif [[ $1 == *.tar.gz ]]; then
-		SRCTYPE=tar
-	else
-		echo "$1: unsupported compression"
-		exit 1
-	fi
-	SOURCE="$1"
-}
-
-while [ -n "$1" ]; do
-        case "$1" in
-		-s|--source)
-			SOURCE="$2"
-			shift;
-			;;
-		-a|--archive)
-			set_type "$2"
-			shift
-			;;
-		-l|--list)
-			LIST=yes
-			;;
-		*)
-			TARGET="$1"
-			;;
-	esac
-	shift
-done
+DEPTH=
+COMMAND=diff
 
 diff_head()
 {
@@ -88,7 +57,7 @@ diff_zip()
 {
 	diff_head "$1"
 	for file in $(find "$1" -type f -newer ${SOURCE}); do
-		if [[ $file == *.o ]]; then
+		if [[ $file == *.manlint ]]; then
 			echo "$file: cannot diff: directory not clean" >&2
 			exit 1
 		elif [[ $file == *.out ]]; then
@@ -109,7 +78,7 @@ diff_zip()
 diff_tar()
 {
 	echo "tar: cannot diff: finding modified files..." >&2
-	for file in $(find "$1" -type f -newer ${SOURCE}); do
+	for file in $(find "$1" -type f -newer ${SOURCE} ${DEPTH}); do
 		if [[ $file == *.o ]]; then
 			continue
 		else
@@ -117,22 +86,72 @@ diff_tar()
 		fi
 	done
 }
+
+set_type()
+{
+	if [[ $1 == *.zip ]]; then
+		SRCTYPE=zip
+	elif [[ $1 == *.tar.gz ]]; then
+		SRCTYPE=tar
+	else
+		echo "$1: unsupported compression"
+		exit 1
+	fi
+	SOURCE="$1"
+}
+
+while [ -n "$1" ]; do
+        case "$1" in
+		-s|--source)
+			SOURCE="$2"
+			shift;
+			;;
+		-a|--archive)
+			set_type "$2"
+			shift
+			;;
+		-l|--list)
+			LIST=yes
+			;;
+		-d|--depth)
+			DEPTH="-maxdepth $2"
+			shift
+			;;
+		list|usage)
+			COMMAND=$1
+			;;
+		*)
+			TARGET="$1"
+			;;
+	esac
+	shift
+done
+
 do_usage()
 {
 	echo "Usage: $0: [options] PATH"
 	echo
 	echo "Options"
-	printf " -s,--source\t\tspecify source directory\n"
-	printf " -a,--archive\t\tsource is ZIP archive\n"
+	printf " -s,--source\t\tspecify source directory [${SOURCE}]\n"
+	printf " -a,--archive\t\tspecify ZIP archive as source\n"
 	printf " -l,--list\t\tprint files only, do not diff\n"
+	printf " -d,--depth\t\tlimit file search to depth\n"
+}
+do_list()
+{
+	find . -name .patch
+}
+do_diff()
+{
+	if [ -z "$TARGET" ]; then
+		do_usage
+	elif [[ $TARGET == *.master ]]; then
+		diff_list
+	elif [ -d "$TARGET" ]; then
+		diff_$SRCTYPE "$TARGET"
+	else
+		echo "$TARGET: not a directory"
+	fi
 }
 
-if [ -z "$TARGET" ]; then
-	do_usage
-elif [[ $TARGET == *.master ]]; then
-	diff_list
-elif [ -d "$TARGET" ]; then
-	diff_$SRCTYPE "$TARGET"
-else
-	echo "$TARGET: not a directory"
-fi
+do_${COMMAND}

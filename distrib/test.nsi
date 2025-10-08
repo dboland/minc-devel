@@ -4,7 +4,8 @@
 !include WinMessages.nsh
 !include WinVer.nsh
 
-!define OUTFILE "test-6.1.0.${VERSION}.exe"
+!define OUTFILE "test-6.1.0.exe"
+!define REGFILE "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC"
 
 Name "MinC"
 OutFile ${OUTFILE}
@@ -14,7 +15,8 @@ Unicode True
 ; Use local drive as default, so the "Browse.." mechanism works
 InstallDir "C:\MinC"
 ; We use this to remember the last chosen directory
-InstallDirRegKey HKLM "Software\MinC" "Location"
+InstallDirRegKey HKLM ${REGFILE} "InstallLocation"
+InstallDirRegKey HKLM ${REGFILE} "BuildTools"
 
 ; Must be BMP3 and 200x57 pixels
 !define MUI_HEADERIMAGE
@@ -37,7 +39,7 @@ InstallDirRegKey HKLM "Software\MinC" "Location"
 
 ;Var SYSTEMDRIVE
 Var USERNAME
-Var LOCATION
+;Var LOCATION
 
 ;LogSet on
 
@@ -47,9 +49,9 @@ Function .onInit
 	ReadEnvStr $USERNAME USERNAME
 ;	ReadEnvStr $SYSTEMDRIVE SystemDrive
 ;	StrCpy $INSTDIR "$SYSTEMDRIVE\MinC"
-        ReadRegStr $LOCATION HKLM "Software\MinC" "BuildTools"
-        IfErrors +2
-        StrCpy $INSTDIR $LOCATION
+;        ReadRegStr $LOCATION HKLM "Software\MinC" "BuildTools"
+;        IfErrors +2
+;        StrCpy $INSTDIR $LOCATION
 FunctionEnd
 Section
 

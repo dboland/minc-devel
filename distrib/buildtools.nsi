@@ -4,7 +4,7 @@
 !include WinMessages.nsh
 !include WinVer.nsh
 
-!define OUTFILE "buildtools-6.1.0.${VERSION}.exe"
+!define OUTFILE "buildtools-6.1.0.exe"
 ; In Vista, all keys are deferred to Software\WOW6432Node\Microsoft
 !define REGFILE "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC"
 
@@ -16,6 +16,7 @@ Unicode True
 InstallDir "C:\MinC"
 ; Try the last saved directory
 InstallDirRegKey HKLM ${REGFILE} "InstallLocation"
+InstallDirRegKey HKLM ${REGFILE} "BuildTools"
 
 ; Must be BMP3 and 200x57 pixels
 !define MUI_HEADERIMAGE
@@ -33,15 +34,15 @@ InstallDirRegKey HKLM ${REGFILE} "InstallLocation"
 !insertmacro MUI_LANGUAGE English
 
 Var USERNAME
-Var LOCATION
+;Var LOCATION
 
 ;--------------------------------
 
 Function .onInit
         ReadEnvStr $USERNAME USERNAME
-	ReadRegStr $LOCATION HKLM ${REGFILE} "BuildTools"
-	IfErrors +2
-	StrCpy $INSTDIR $LOCATION
+;	ReadRegStr $LOCATION HKLM ${REGFILE} "BuildTools"
+;	IfErrors +2
+;	StrCpy $INSTDIR $LOCATION
 FunctionEnd
 Section
 
