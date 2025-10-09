@@ -29,6 +29,7 @@ install: ${DESTDIR}
 	@${MAKE} -C share install
 	@${MAKE} -C libexec install
 	@${MAKE} -C etc install
+	@${MAKE} -C include install
 
 release:
 	@${MAKE} -C lib release

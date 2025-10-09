@@ -1,9 +1,7 @@
 #!/bin/sh
 # Hello Rob Landley #
 
-DEVROOT=$(dirname $0)
-
-. ${DEVROOT}/config.inc
+. config.inc
 
 if [ -z "${DESTDIR}" ]; then
 	DESTDIR=${SYSTEMDRIVE}/minc-release
@@ -27,9 +25,7 @@ echo " ---------------------------------------------------"
 
 /bin/rm -f ${DESTDIR}/dev/*
 
-/bin/make -C openbsd install
-/bin/make -C libposix install
-/bin/make -C mingw install
+/bin/make install
 
 PATH=${DESTDIR}/sbin
 

@@ -5,6 +5,7 @@ include ${ROOTDIR}/Makefile.inc
 HEADERS= ${XINCDIR}/fcntl.h ${XINCDIR}/stdarg.h ${XINCDIR}/stdint.h \
 	${XINCDIR}/syslog.h ${XINCDIR}/termios.h
 INCSRC= ${SRCDIR}/include
+INCDEST= ${DESTDIR}/usr/include
 
 all: ${INCSRC} ${TMPDIR} ${INCSRC}/.patch
 
@@ -40,3 +41,8 @@ ${XINCDIR}/termios.h:
 	@/bin/cp -vu termios.h ${XINCDIR}/
 
 install-local: ${XINCDIR} ${HEADERS}
+
+${INCDEST}:
+	${CP} -R ${XINCDIR} ${DESTDIR}/usr/
+
+install: ${INCDEST}

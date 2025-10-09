@@ -11,22 +11,25 @@ cp -p /usr/lib/libsocket.a ./usr/lib/
 cp -p /usr/lib/libdl.a ./usr/lib/
 cp -p /usr/lib/libposix.a ./usr/lib/
 
-cp -p /usr/lib/libcurl.so.10.0 ./usr/lib/
+#cp -p /usr/lib/libcurl.so.10.0 ./usr/lib/
+
+# Don't overwrite libs in base
+rm -f ./usr/lib/libutil.so.*
+rm -f ./usr/lib/libcrypto.so.*
+rm -f ./usr/lib/libssl.so.*
+rm -f ./usr/lib/libsqlite3.so.*
+rm -f ./usr/lib/libcurses.so.*
 
 ln -sf libc.so.75.0 ./usr/lib/libc.so
 ln -sf libcrypto.so.27.0 ./usr/lib/libcrypto.so
 ln -sf libedit.so.5.1 ./usr/lib/libedit.so
-ln -sf libkvm.so.16.0 ./usr/lib/libkvm.so
 ln -sf libsocket.so.75.0 ./usr/lib/libsocket.so
 ln -sf libsqlite3.so.27.0 ./usr/lib/libsqlite3.so
 ln -sf libssl.so.24.1 ./usr/lib/libssl.so
 ln -sf libutil.so.12.1 ./usr/lib/libutil.so
-ln -sf libedit.so.5.1 ./usr/lib/libedit.so
 ln -sf libcurses.so.14.0 ./usr/lib/libcurses.so
 ln -sf libncurses.so.14.0 ./usr/lib/libncurses.so
 ln -sf libncursesw.so.14.0 ./usr/lib/libncursesw.so
-ln -sf libocurses.so.6.0 ./usr/lib/libocurses.so
-ln -sf libskey.so.6.0 ./usr/lib/libskey.so
 
 echo -n "Compressing comp61.tgz... "
 tar -zcf $DISTROOT/comp61.tgz *

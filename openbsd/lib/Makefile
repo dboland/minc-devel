@@ -9,10 +9,10 @@ all:
 	@${MAKE} -C libm all install-local
 	@${MAKE} -C libz all install-local
 	@${MAKE} -C libutil all install-local
-	@${MAKE} -C libedit all install-local
-	@${MAKE} -C libcurses all install-local
-	@${MAKE} -C libocurses all install-local
-	@${MAKE} -C libssl all install-local
+	@${MAKE} -C libedit
+	@${MAKE} -C libcurses
+	@${MAKE} -C libocurses
+	@${MAKE} -C libssl
 
 install:
 	@${MAKE} -C libc install
