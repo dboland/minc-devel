@@ -22,6 +22,7 @@ install:
 	@${MAKE} -C libc install
 	@${MAKE} -C libsocket install
 	@${MAKE} -C libm install
+	@${MAKE} -C libz install
 
 release:
 	@${MAKE} -C libc release

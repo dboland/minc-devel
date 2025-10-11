@@ -37,7 +37,7 @@ diff_dir()
 	diff_head "$1"
 	for file in $(find "$1" -type f); do
 	case $file in
-		*.exe)
+		*.exe|*.dll)
 			echo "$file: cannot diff: directory not clean" >&2
 			exit 1
 			;;

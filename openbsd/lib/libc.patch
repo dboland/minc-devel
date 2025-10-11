@@ -2,6 +2,17 @@
 +++ lib/libc/.patch	2025-09-12 11:34:13 +0200
 @@ -0,0 +1 @@
 +This directory has been patched.
+--- lib/libc/asr/asr.c	2014-05-19 17:05:13 +0200
++++ lib/libc/asr/asr.c	2025-10-05 10:53:38 +0200
+@@ -560,7 +560,7 @@
+ 	char	*cp, **tp;
+ 
+ 	for (cp = line, tp = tokens, ntok = 0;
+-	    ntok < ntokens && (*tp = strsep(&cp, " \t")) != NULL; )
++	    ntok < ntokens && (*tp = strsep(&cp, " \t\r")) != NULL; )
+ 		if (**tp != '\0') {
+ 			tp++;
+ 			ntok++;
 --- lib/libc/citrus/citrus_utf8.c	2025-06-24 14:00:33 +0200
 +++ lib/libc/citrus/citrus_utf8.c	2025-06-29 06:10:04 +0200
 @@ -113,7 +113,7 @@
@@ -34,13 +45,13 @@
  
  __weak_alias(__errno, ___errno);
 --- lib/libc/gen/fts.c	2014-05-19 17:05:13 +0200
-+++ lib/libc/gen/fts.c	2025-06-25 19:24:14 +0200
++++ lib/libc/gen/fts.c	2025-10-11 18:31:45 +0200
 @@ -297,7 +297,7 @@
  	if (p->fts_info == FTS_D) {
  		/* If skipped or crossed mount point, do post-order visit. */
  		if (instr == FTS_SKIP ||
 -		    (ISSET(FTS_XDEV) && p->fts_dev != sp->fts_dev)) {
-+		    (p->fts_dev != sp->fts_dev)) {
++		    (p->fts_dev != sp->fts_dev)) {	/* never cross device boundaries */
  			if (p->fts_flags & FTS_SYMFOLLOW)
  				(void)close(p->fts_symfd);
  			if (sp->fts_child) {
@@ -126,3 +137,14 @@
  
  /*
   * Weak symbols are used in libc so that the thread library can
+--- lib/libc/net/getservent.c	2014-05-19 17:05:13 +0200
++++ lib/libc/net/getservent.c	2025-10-05 10:53:38 +0200
+@@ -80,6 +80,8 @@
+ 		goto again;
+ 	if (p[len-1] == '\n')
+ 		len--;
++	if (p[len-1] == '\r')
++		len--;
+ 	if ((cp = memchr(p, '#', len)) != NULL)
+ 		len = cp - p;
+ 	cp = realloc(sd->line, len + 1);

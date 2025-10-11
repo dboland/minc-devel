@@ -10,16 +10,11 @@ IMPLIB= libsocket.dll.a
 GCCDIR= ${XLIBDIR}/gcc/mingw32/${GCCVER}
 ULIBDIR= /usr/lib
 
-all: ${TMPDIR} .patch ${LIBS} ${LIBSOCKET} libsocket.a
+all: ${LIBS} ${LIBSOCKET} libsocket.a
 
 %.a: %
 	@CFLAGS="${CFLAGS} -I../../libc/include" ${MAKE} -C $< XGCC="${XGCC}" \
 	ROOTDIR="${ROOTDIR}/.." SRCDIR="${SRCDIR}"
-
-.patch:
-	@${MAKE} -C asr SRCDIR="${SRCDIR}" source
-	@${MAKE} -C net SRCDIR="${SRCDIR}" source
-	TMPDIR=${TMPDIR} /bin/patch -p 0 -d . <../libsocket.patch
 
 crt1.o: crt1.minc.c
 	${CC} -c ${CFLAGS} -I${ROOTDIR}/include -o $@ $<

@@ -34,10 +34,12 @@ all: ${TMPDIR} .patch ${LIBS} ${LIBC} libc.a
 	${XGCC} -c ${CFLAGS} -I${ROOTDIR}/include -o $@ $<
 
 .patch:
+	@${MAKE} -C asr SRCDIR=${SRCDIR} source
 	@${MAKE} -C citrus SRCDIR=${SRCDIR} source
 	@${MAKE} -C gen SRCDIR=${SRCDIR} source
 	@${MAKE} -C gmon SRCDIR=${SRCDIR} source
 	@${MAKE} -C include SRCDIR=${SRCDIR} source
+	@${MAKE} -C net SRCDIR=${SRCDIR} source
 	TMPDIR=${TMPDIR} /bin/patch -p 2 -d . <../libc.patch
 
 libc.a:
@@ -63,10 +65,12 @@ release-clean:
 	/bin/rm -f version.o
 
 patch-clean:
+	@${MAKE} -C asr patch-clean
 	@${MAKE} -C citrus patch-clean
 	@${MAKE} -C gen patch-clean
 	@${MAKE} -C gmon patch-clean
 	@${MAKE} -C include patch-clean
+	@${MAKE} -C net patch-clean
 	/bin/rm -f .patch
 
 release: release-clean all

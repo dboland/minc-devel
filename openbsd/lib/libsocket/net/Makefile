@@ -1,4 +1,3 @@
-SOURCES= getservent.c
 OBJECTS= base64.o freeaddrinfo.o gai_strerror.o \
 	getnetbyaddr.o getnetbyname.o getnetent.o \
 	getpeereid.o getproto.o getprotoent.o getprotoname.o \
@@ -44,6 +43,7 @@ SHOBJECTS+= if_indextoname.minc.c.so if_nametoindex.minc.c.so
 
 LIB= ../net.a
 CFLAGS+= -Wno-attributes
+LIBCDIR= ../../libc/net
 
 .SUFFIXES:
 .DEFAULT:
@@ -54,14 +54,11 @@ all: ${OBJECTS} ${SHOBJECTS} ${LIB}
 ${LIB}:
 	@ar cru $@ ${OBJECTS}
 
-%.c: ${SRCDIR}/lib/libc/net/%.c
-	@/bin/cp -uv $< $@
-
 %.o: ${SRCDIR}/lib/libc/net/%.c
 	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -DNOPIE -o $@ $<
 
-%.c.o: %.c
+%.c.o: ${LIBCDIR}/%.c
 	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -DNOPIE -I${ROOTDIR}/include -o $@ $<
 
@@ -69,8 +66,6 @@ ${LIB}:
 	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -o $@ $<
 
-%.c.so: %.c
+%.c.so: ${LIBCDIR}/%.c
 	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -I${ROOTDIR}/include -o $@ $<
-
-source: ${SOURCES}

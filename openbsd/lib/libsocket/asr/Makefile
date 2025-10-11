@@ -1,4 +1,3 @@
-SOURCES= asr.c
 OBJECTS= asr_debug.o asr_utils.o \
 	getrrsetbyname_async.o \
 	gethostnamadr_async.o getnetnamadr_async.o \
@@ -27,6 +26,7 @@ LIB= ../asr.a
 CFLAGS+= -DASR_OPT_HOSTALIASES
 #CFLAGS+= -Wno-attributes
 CFLAGS+= -DNETDB_IMPORT=
+LIBCDIR= ../../libc/asr
 
 .SUFFIXES:
 .DEFAULT:
@@ -44,7 +44,7 @@ ${LIB}:
 	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -DNOPIE -o $@ $<
 
-%.c.o: %.c
+%.c.o: ${LIBCDIR}/%.c
 	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -DNOPIE -I${SRCDIR}/lib/libc/asr -o $@ $<
 
@@ -52,8 +52,6 @@ ${LIB}:
 	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -o $@ $<
 
-%.c.so: %.c
+%.c.so: ${LIBCDIR}/%.c
 	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -I${SRCDIR}/lib/libc/asr -o $@ $<
-
-source: ${SOURCES}
