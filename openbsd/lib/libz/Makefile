@@ -2,11 +2,13 @@ ROOTDIR= ../../..
 
 include ${ROOTDIR}/Makefile.inc
 
+LIB= libz.a
 OBJECTS= adler32.o compress.o crc32.o deflate.o gzio.o infback.o \
 	inffast.o inflate.o inftrees.o trees.o uncompr.o zutil.o
 HEADERS= zlib.h zconf.h
+ULIBDEST= ${DESTDIR}/usr/lib
 
-all: ${HEADERS} libz.a
+all: ${HEADERS} ${LIB}
 
 %.o: ${SRCDIR}/lib/libz/%.c
 	@/bin/echo -n "$@ "
@@ -15,16 +17,19 @@ all: ${HEADERS} libz.a
 %.h: ${SRCDIR}/lib/libz/%.h
 	@/bin/cp -vu $< ${XINCDIR}/
 
-libz.a: ${OBJECTS}
+${LIB}: ${OBJECTS}
 	@/bin/echo "done."
 	@/bin/echo "Making static library $@"
 	@ar cru $@ ${OBJECTS}
 
 install-local:
-	/bin/cp -vu libz.a ${XLIBDIR}/
+	/bin/cp -vu ${LIB} ${XLIBDIR}/
+
+install:
+	/bin/cp -vu ${LIB} ${ULIBDEST}/
 
 lib-clean:
-	/bin/rm -f libz.a
+	/bin/rm -f ${LIB}
 
 all-clean: lib-clean
 	/bin/rm -f *.o

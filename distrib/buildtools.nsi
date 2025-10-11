@@ -47,7 +47,7 @@ Section
 
 	ExecDos::exec /DETAILED '.\miniroot\chmod -R 00755 miniroot'
 
-	IfFileExists .\usr\lib\crt0.o +3 0
+	IfFileExists .\usr\lib\libutil.so +3 0
 	DetailPrint "Installing base libraries..."
 	ExecDos::exec /DETAILED '.\install.cmd comp61.tgz'
 	Delete 'comp61.tgz'

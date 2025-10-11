@@ -2,17 +2,6 @@ if ! cd "$PKGROOT/minc-comp"; then
         exit 1
 fi
 
-cp -p /usr/lib/crt0.o ./usr/lib/
-cp -p /usr/lib/crt1.o ./usr/lib/
-cp -p /usr/lib/gcrt0.o ./usr/lib/
-
-cp -p /usr/lib/libc.a ./usr/lib/
-cp -p /usr/lib/libsocket.a ./usr/lib/
-cp -p /usr/lib/libdl.a ./usr/lib/
-cp -p /usr/lib/libposix.a ./usr/lib/
-
-#cp -p /usr/lib/libcurl.so.10.0 ./usr/lib/
-
 ln -sf libc.so.75.0 ./usr/lib/libc.so
 ln -sf libsocket.so.75.0 ./usr/lib/libsocket.so
 ln -sf libcrypto.so.27.0 ./usr/lib/libcrypto.so

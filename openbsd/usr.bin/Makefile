@@ -2,9 +2,9 @@ ROOTDIR= ../..
 
 include ${ROOTDIR}/Makefile.inc
 
-PROGS= gzip id
-XPROGS= arch uname touch
-OBJECTS= ${XPROGS} id du find sed cap_mkdb sort xargs tsort mktemp join
+PROGS= gzip id find
+XPROGS= arch uname touch find
+OBJECTS= ${XPROGS} id du sed cap_mkdb sort xargs tsort mktemp join
 UBINSRC= ${SRCDIR}/usr.bin
 UBINDIR= /usr/bin
 
@@ -79,6 +79,12 @@ join: ${UBINSRC}/join/join.c
 	@echo -n "$@ "
 	@${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $<
 
+find: ${UBINSRC}/find/find.c ${UBINSRC}/find/function.c ${UBINSRC}/find/ls.c \
+	${UBINSRC}/find/main.c ${UBINSRC}/find/misc.c ${UBINSRC}/find/operator.c \
+	${UBINSRC}/find/option.c
+	@echo -n "$@ "
+	@${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $^
+
 # In Windows, "install", "setup" and "patch" seem to be reserved 
 # words. When executed with such name, Vista checks if user is
 # elevated, yields ERROR_ELEVATION_REQUIRED if not. XP just slows
@@ -92,12 +98,6 @@ xinstall: ${UBINSRC}/xinstall/xinstall.c
 du: ${UBINSRC}/du/du.c
 	@echo -n "$@ "
 	@${XGCC} -s ${CFLAGS} -o $@ $< -lutil
-
-find: ${UBINSRC}/find/find.c ${UBINSRC}/find/function.c ${UBINSRC}/find/ls.c \
-	${UBINSRC}/find/main.c ${UBINSRC}/find/misc.c ${UBINSRC}/find/operator.c \
-	${UBINSRC}/find/option.c
-	@echo -n "$@ "
-	@${XGCC} -s ${CFLAGS} -o $@ $^
 
 sed: ${UBINSRC}/sed/compile.c ${UBINSRC}/sed/main.c ${UBINSRC}/sed/misc.c \
 	${UBINSRC}/sed/process.c

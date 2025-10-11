@@ -91,3 +91,4 @@ install: ${DESTDIR}
 	${INSTALL} -m ${BINMODE} ${LIBC} libc.a ${DESTDIR}${ULIBDIR}/
 
 clean: lib-clean
+	@${MAKE} -C hash clean

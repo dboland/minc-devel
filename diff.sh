@@ -37,11 +37,11 @@ diff_dir()
 	diff_head "$1"
 	for file in $(find "$1" -type f); do
 	case $file in
-		*.o|*.exe|*.a)
+		*.exe)
 			echo "$file: cannot diff: directory not clean" >&2
 			exit 1
 			;;
-		*.S|*/Makefile|*/BSDmakefile|*/.gitignore|*/.patch)
+		*.S|*.o|*.a|*/Makefile|*/BSDmakefile|*/.gitignore|*/.patch)
 			continue
 			;;
 		*.minc.*)
