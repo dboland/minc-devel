@@ -2,19 +2,21 @@ ROOTDIR= ../../..
 
 include ${ROOTDIR}/Makefile.inc
 
-HEADERS= ${XINCDIR}/histedit.h
+HEADERS= histedit.h
 INCSRC= ${SRCDIR}/lib/libedit
 
-all: ${INCSRC} ${TMPDIR} ${INCSRC}/.patch
+all: ${INCSRC} ${TMPDIR} .patch
 
-${XINCDIR}/%.h: ${INCSRC}/%.h
+%.h: ${INCSRC}/%.h
 	@/bin/cp -vu $< $@
 
+.patch:	${HEADERS}
+	@${MAKE} -C readline source
+	TMPDIR=${TMPDIR} /bin/patch -p 2 -d . <../libedit.patch
+
 ${XINCDIR}/readline:
-	@/bin/mkdir -p $@
-	/bin/cp -rvu ${INCSRC}/readline/*.h $@/
+	@/bin/cp -vu ${HEADERS} ${XINCDIR}/
 
-${INCSRC}/.patch:
-	TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${INCSRC} <../libedit.patch
-
-install-local: ${HEADERS} ${XINCDIR}/readline
+install-local:
+	@/bin/cp -uv ${HEADERS} ${XINCDIR}/
+	@${MAKE} -C readline install-local

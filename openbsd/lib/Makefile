@@ -2,21 +2,26 @@ ROOTDIR= ../..
 
 include ${ROOTDIR}/Makefile.inc
 
-all:
+LIBSRC= ${SRCDIR}/lib
+
+all: ${TMPDIR} ${LIBSRC}/.patch
 	@${MAKE} -C libpthread all install-local
 	@${MAKE} -C libc all install-local
 	@${MAKE} -C libsocket all install-local
 	@${MAKE} -C libm all install-local
 	@${MAKE} -C libz all install-local
 	@${MAKE} -C libutil all install-local
-	@${MAKE} -C libedit
-	@${MAKE} -C libcurses
-	@${MAKE} -C libocurses
-	@${MAKE} -C libssl
+	@${MAKE} -C libedit all install-local
+	@${MAKE} -C libcurses all install-local
+	@${MAKE} -C libocurses all install-local
+
+${LIBSRC}/.patch:
+	TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${LIBSRC} <../lib.patch
 
 install:
 	@${MAKE} -C libc install
 	@${MAKE} -C libsocket install
+	@${MAKE} -C libm install
 
 release:
 	@${MAKE} -C libc release

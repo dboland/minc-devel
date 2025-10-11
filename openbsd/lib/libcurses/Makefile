@@ -2,19 +2,19 @@ ROOTDIR= ../../..
 
 include ${ROOTDIR}/Makefile.inc
 
-HEADERS= ${XINCDIR}/ncurses.h ${XINCDIR}/unctrl.h \
-	${XINCDIR}/term.h ${XINCDIR}/termcap.h
+HEADERS= unctrl.h term.h termcap.h
 INCSRC= ${SRCDIR}/lib/libcurses
 
-all: ${INCSRC} ${TMPDIR} ${INCSRC}/.patch
+all: ${INCSRC} ${TMPDIR} .patch
 
-${XINCDIR}/%.h: ${INCSRC}/%.h
+%.h: ${INCSRC}/%.h
 	@/bin/cp -vu $< $@
 
-${XINCDIR}/ncurses.h: ${INCSRC}/curses.h
+.patch: ${HEADERS} curses.h
+	TMPDIR=${TMPDIR} /bin/patch -p 2 -d . <../libcurses.patch
+
+${XINCDIR}/ncurses.h: curses.h
 	@/bin/cp -vu $< $@
 
-${INCSRC}/.patch:
-	TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${INCSRC} <../libcurses.patch
-
-install-local: ${HEADERS}
+install-local: ${XINCDIR}/ncurses.h
+	/bin/cp -uv ${HEADERS} ${XINCDIR}/

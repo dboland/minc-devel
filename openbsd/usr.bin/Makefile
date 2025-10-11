@@ -4,7 +4,7 @@ include ${ROOTDIR}/Makefile.inc
 
 PROGS= gzip id
 XPROGS= arch uname touch
-OBJECTS= ${XPROGS} id du find sed cap_mkdb sort xargs
+OBJECTS= ${XPROGS} id du find sed cap_mkdb sort xargs tsort mktemp join
 UBINSRC= ${SRCDIR}/usr.bin
 UBINDIR= /usr/bin
 
@@ -66,6 +66,18 @@ sort: ${UBINSRC}/sort/append.c ${UBINSRC}/sort/fields.c ${UBINSRC}/sort/files.c 
 	${UBINSRC}/sort/sort.c ${UBINSRC}/sort/tmp.c
 	@echo -n "$@ "
 	@${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $^
+
+tsort: ${UBINSRC}/tsort/tsort.c
+	@echo -n "$@ "
+	@${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $< -lutil
+
+mktemp: ${UBINSRC}/mktemp/mktemp.c
+	@echo -n "$@ "
+	@${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $<
+
+join: ${UBINSRC}/join/join.c
+	@echo -n "$@ "
+	@${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $<
 
 # In Windows, "install", "setup" and "patch" seem to be reserved 
 # words. When executed with such name, Vista checks if user is

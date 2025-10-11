@@ -41,7 +41,7 @@ diff_dir()
 			echo "$file: cannot diff: directory not clean" >&2
 			exit 1
 			;;
-		*.S|*/Makefile|*/BSDmakefile|*/.gitignore)
+		*.S|*/Makefile|*/BSDmakefile|*/.gitignore|*/.patch)
 			continue
 			;;
 		*.minc.*)

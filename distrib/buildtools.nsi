@@ -33,17 +33,8 @@ InstallDirRegKey HKLM ${REGFILE} "BuildTools"
 
 !insertmacro MUI_LANGUAGE English
 
-Var USERNAME
-;Var LOCATION
-
 ;--------------------------------
 
-Function .onInit
-        ReadEnvStr $USERNAME USERNAME
-;	ReadRegStr $LOCATION HKLM ${REGFILE} "BuildTools"
-;	IfErrors +2
-;	StrCpy $INSTDIR $LOCATION
-FunctionEnd
 Section
 
 	# Set output path to the installation directory.
@@ -51,24 +42,24 @@ Section
 
 	# Put files there
 	File /r 'miniroot'
+	File '*.cmd'
+	File 'comp61.tgz'
 
 	ExecDos::exec /DETAILED '.\miniroot\chmod -R 00755 miniroot'
 
-SectionEnd
-Section "Base libraries" SecBase
-
-	# Component can not be disabled
-	SectionIn RO
-
-	File 'comp61.tgz'
-	File '*.cmd'
-
+	IfFileExists .\usr\lib\crt0.o +3 0
 	DetailPrint "Installing base libraries..."
 	ExecDos::exec /DETAILED '.\install.cmd comp61.tgz'
+	Delete 'comp61.tgz'
 
         # Remember last chosen directory
         WriteRegStr HKLM ${REGFILE} "BuildTools" $INSTDIR
 
+SectionEnd
+Section "Curl file transfer" SecCurl
+        File 'curl772.tgz'
+        DetailPrint "Installing curl 7.72..."
+        ExecDos::exec /DETAILED '.\install.cmd curl772.tgz'
 SectionEnd
 Section "GNU Compiler Collection" SecGCC
 	File 'gcc481.tgz'
@@ -96,13 +87,13 @@ Section "Vim editor" SecVim
 	ExecDos::exec /DETAILED '.\install.cmd vim81.tgz'
 SectionEnd
 Section
-	DetailPrint "Configuring..."
+	DetailPrint "Cleaning up..."
 	RMDir /r "$INSTDIR\miniroot"
 	Delete "$INSTDIR\*.cmd"
 SectionEnd
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-!insertmacro MUI_DESCRIPTION_TEXT ${SecBase} 'Base libraries'
+!insertmacro MUI_DESCRIPTION_TEXT ${SecCurl} "curl - transfer a URL"
 !insertmacro MUI_DESCRIPTION_TEXT ${SecGCC} 'gcc - GNU project C and C++ compiler'
 !insertmacro MUI_DESCRIPTION_TEXT ${SecBinUtils} 'ld - The GNU linker'
 !insertmacro MUI_DESCRIPTION_TEXT ${SecGit} "git - the stupid content tracker"

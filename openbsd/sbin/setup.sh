@@ -4,7 +4,7 @@ echo ' ---------------------------------------------------'
 echo '| MinC System Configuration'
 echo ' ---------------------------------------------------'
 
-PATH='/bin:/usr/bin:/sbin:/usr/sbin'
+PATH='/bin:/sbin:/usr/bin:/usr/sbin'
 USER="$USERNAME"
 HOME="/home/$USERNAME"
 WINHOME="$USERPROFILE"
@@ -19,7 +19,7 @@ function admins_only
 
 echo -n "Creating system directories... "
 mkdir -p /mnt /dev /root /home /tmp /var/run /var/mail
-chown "${USERNAME}" /mnt /tmp /home
+chown "${USER}" /mnt /tmp /home
 chmod 0775 /root /tmp
 chgrp 0 /root
 mkent group >/etc/group
@@ -52,5 +52,5 @@ ln -sn "$WINHOME\Videos" "$HOME/Videos" 2>/dev/null
 if ! [ -f "$HOME/.profile" ]; then
 	echo "mkent resolv 2>/dev/null >/etc/resolv.conf" >"$HOME/.profile"
 fi
-touch "/var/mail/$USERNAME"
+touch "/var/mail/$USER"
 echo done.

@@ -1,0 +1,69 @@
+--- openbsd-master/lib/.patch	1970-01-01 01:00:00 +0100
++++ openbsd-master/lib/.patch	2025-09-12 11:34:13 +0200
+@@ -0,0 +1 @@
++This directory has been patched.
+--- -	Fri Oct 10 18:12:58 2025
++++ openbsd-master/lib/libedit/Makefile	Thu Oct  9 19:45:01 2025
+@@ -67,6 +67,8 @@
+ 
+ #SUBDIR+=	readline
+ HOST_SH=	sh
++LDADD= -lcurses
++PICFLAG+= -Wl,--image-base=0x0FC00000
+ 
+ vi.h: vi.c makelist
+ 	${HOST_SH} ${LIBEDITDIR}/makelist -h ${LIBEDITDIR}/vi.c \
+--- -	Fri Oct 10 18:12:58 2025
++++ openbsd-master/lib/libkvm/Makefile	Fri Oct 10 18:10:38 2025
+@@ -18,7 +18,7 @@
+ .endif
+ .endif
+ 
+-CFLAGS+= -D_LIBKVM
++CFLAGS+= -D_LIBKVM -I../../sys
+ SRCS+=	kvm.c kvm_file2.c kvm_getloadavg.c kvm_proc.c kvm_proc2.c \
+ 	kvm_cd9660.c kvm_udf.c kvm_ntfs.c
+ 
+--- -	Fri Oct 10 18:12:59 2025
++++ openbsd-master/lib/libsqlite3/Makefile	Thu Oct  9 05:59:43 2025
+@@ -44,7 +44,7 @@
+ 		-DSQLITE_ENABLE_FTS3_PARENTHESIS \
+ 		-DSQLITE_OMIT_BUILTIN_TEST
+ 
+-CPPFLAGS += 	$(FEATURE_FLAGS) -DSQLITE_THREADSAFE=1 \
++CPPFLAGS += 	$(FEATURE_FLAGS) -DSQLITE_THREADSAFE=0 \
+ 		-DHAVE_STDINT_H=1 -DHAVE_INTTYPES_H=1 \
+ 		-DHAVE_GMTIME_R=1 \
+ 		-DHAVE_LOCALTIME_R=1 \
+--- -	Fri Oct 10 18:12:59 2025
++++ openbsd-master/lib/libssl/src/crypto/asn1/asn1.h	Fri Oct 10 10:22:29 2025
+@@ -403,7 +403,7 @@
+ #define ASN1_ITEM_rptr(ref) (&(ref##_it))
+ 
+ #define DECLARE_ASN1_ITEM(name) \
+-	OPENSSL_EXTERN const ASN1_ITEM name##_it;
++	OPENSSL_EXTERN __import const ASN1_ITEM name##_it;
+ 
+ #else
+ 
+--- -	Fri Oct 10 18:12:59 2025
++++ openbsd-master/lib/libssl/src/crypto/perlasm/x86asm.pl	Fri Oct 10 10:22:29 2025
+@@ -234,6 +234,8 @@
+     {	$coff=1;		require "x86gas.pl";	}
+     elsif (($type eq "macosx"))
+     {	$aout=1; $macosx=1;	require "x86gas.pl";	}
++    elsif (($type eq "openbsd-coff"))
++    {   $openbsd=$coff=1;       require "x86gas.pl";    }
+     elsif (($type eq "openbsd-elf"))
+     {	$openbsd=$elf=1;	require "x86gas.pl";	}
+     elsif (($type eq "openbsd-a.out"))
+--- -	Fri Oct 10 18:12:59 2025
++++ openbsd-master/lib/libssl/ssl/Makefile	Fri Oct 10 10:22:29 2025
+@@ -4,6 +4,7 @@
+ 
+ SSL_SRC=	${.CURDIR}/../../libssl/src
+ LSSL_SRC=	${SSL_SRC}/ssl
++LDADD+= -lcrypto
+ 
+ .include <bsd.own.mk>
+ CFLAGS+= -Wall

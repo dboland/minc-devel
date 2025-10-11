@@ -84,7 +84,7 @@ Section "Uninstall"
 	Delete ".\bsd.exe"
 
 	# Remove registry keys
-	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MinC"
+	DeleteRegKey HKLM ${REGFILE}
 
 	# Remove shortcuts
 	Delete "$DESKTOP\Console.lnk"
@@ -97,6 +97,7 @@ Section "Base system" SecBase
 	SectionIn RO
 
 	File 'base61.tgz'
+	File 'comp61.tgz'
 	File '*.cmd'
 
 	# Make sure tar.exe does not see /dev/tty
@@ -123,13 +124,10 @@ Section "Base system" SecBase
 	WriteUninstaller "$INSTDIR\sbin\uninstall.exe"
 	WriteRegStr HKLM ${REGFILE} "UninstallString" "$INSTDIR\sbin\uninstall.exe"
 
+	DetailPrint "Installing base libraries..."
+	ExecDos::exec /DETAILED '.\install.cmd comp61.tgz'
+
 SectionEnd
-;Section "Perl" SecPerl
-;	SectionIn RO
-;	File 'perl53.tgz'
-;	DetailPrint "Installing Perl 5.3.0..."
-;	ExecDos::exec /DETAILED '.\install.cmd perl53.tgz'
-;SectionEnd
 Section "Nano editor" SecNano
 	File 'nano64.tgz'
 	DetailPrint "Installing nano 6.4..."
@@ -144,11 +142,6 @@ Section "wget downloader" SecWGet
 	File 'wget118.tgz'
 	DetailPrint "Installing wget 1.18..."
 	ExecDos::exec /DETAILED '.\install.cmd wget118.tgz'
-SectionEnd
-Section "Curl file transfer" SecCurl
-	File 'curl772.tgz'
-	DetailPrint "Installing curl 7.72..."
-	ExecDos::exec /DETAILED '.\install.cmd curl772.tgz'
 SectionEnd
 Section "Unzip .zip files" SecUnzip
 	File 'unzip552.tgz'
@@ -223,7 +216,6 @@ SectionEnd
 !insertmacro MUI_DESCRIPTION_TEXT ${SecNano} "GNU nano -- an enhanced clone of the Pico text editor"
 !insertmacro MUI_DESCRIPTION_TEXT ${SecLynx} "lynx - a general purpose distributed information browser for the World Wide Web"
 !insertmacro MUI_DESCRIPTION_TEXT ${SecWGet} "Wget - The non-interactive network downloader"
-!insertmacro MUI_DESCRIPTION_TEXT ${SecCurl} "curl - transfer a URL"
 !insertmacro MUI_DESCRIPTION_TEXT ${SecUnzip} "unzip - list, test and extract compressed files in a ZIP archive"
 !insertmacro MUI_DESCRIPTION_TEXT ${SecBZip2} "bzip2, bunzip2 - a block-sorting file compressor, v1.0.6"
 !insertmacro MUI_DESCRIPTION_TEXT ${SecEMail} "email - Encrypted SMTP email via Command line"

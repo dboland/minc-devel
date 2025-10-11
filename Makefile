@@ -19,7 +19,7 @@ opt: config.inc
 	@${MAKE} -C mingw all install-local
 
 kernel:
-	@${MAKE} -C libtrace all
+	@${MAKE} -C libtrace
 	@${MAKE} -C libposix all install-local
 
 system:

@@ -42,7 +42,7 @@ ${XINCDIR}/termios.h:
 
 install-local: ${XINCDIR} ${HEADERS}
 
-${INCDEST}:
+${INCDEST}: ${XINCDIR}
 	${CP} -R ${XINCDIR} ${DESTDIR}/usr/
 
 install: ${INCDEST}

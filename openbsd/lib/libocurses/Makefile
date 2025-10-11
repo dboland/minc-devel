@@ -2,15 +2,18 @@ ROOTDIR= ../../..
 
 include ${ROOTDIR}/Makefile.inc
 
-HEADERS= ${XINCDIR}/ocurses.h
+HEADERS= 
 INCSRC= ${SRCDIR}/lib/libocurses
 
-all: ${INCSRC} ${TMPDIR} ${INCSRC}/.patch
+all: ${INCSRC} ${TMPDIR} .patch
 
-${XINCDIR}/ocurses.h: ${INCSRC}/curses.h
+%.h: ${INCSRC}/%.h
 	@/bin/cp -vu $< $@
 
-${INCSRC}/.patch:
-	@TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${INCSRC} <../libocurses.patch
+.patch: curses.h
+	@TMPDIR=${TMPDIR} /bin/patch -p 2 -d . <../libocurses.patch
 
-install-local: ${HEADERS}
+${XINCDIR}/ocurses.h: curses.h
+	@/bin/cp -vu $< $@
+
+install-local: ${XINCDIR}/ocurses.h

@@ -1,9 +1,9 @@
---- openbsd-master/lib/libedit/.patch	1970-01-01 01:00:00 +0100
-+++ openbsd-master/lib/libedit/.patch	2025-09-12 11:34:13 +0200
+--- lib/libedit/.patch	1970-01-01 01:00:00 +0100
++++ lib/libedit/.patch	2025-09-12 11:34:13 +0200
 @@ -0,0 +1 @@
 +This directory has been patched.
---- -	Mon Oct  6 18:13:18 2025
-+++ openbsd-master/lib/libedit/readline/readline.h	Fri Sep 12 15:27:41 2025
+--- lib/libedit/readline/readline.h	2025-10-09 19:21:38 +0200
++++ lib/libedit/readline/readline.h	2025-10-09 20:34:52 +0200
 @@ -97,31 +97,31 @@
  #ifdef __cplusplus
  extern "C" {
