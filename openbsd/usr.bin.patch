@@ -2,7 +2,7 @@
 +++ openbsd-master/usr.bin/.patch	2025-09-12 11:34:13 +0200
 @@ -0,0 +1 @@
 +This directory has been patched.
---- -	Tue Oct  7 16:29:59 2025
+--- -	Sun Oct 12 09:14:52 2025
 +++ openbsd-master/usr.bin/ftp/Makefile	Sun Feb 16 19:02:22 2025
 @@ -15,11 +15,12 @@
  SRCS=	cmds.c cmdtab.c complete.c cookie.c domacro.c fetch.c ftp.c \
@@ -18,7 +18,27 @@
  
  #COPTS+= -Wall -Wconversion -Wstrict-prototypes -Wmissing-prototypes
  
---- -	Tue Oct  7 16:30:02 2025
+--- -	Sun Oct 12 09:14:52 2025
++++ openbsd-master/usr.bin/kdump/kdump.c	Tue Oct  7 15:48:22 2025
+@@ -492,6 +492,7 @@
+ static void
+ plln(void)
+ {
++	ap--;	/* undo skip padding */
+ 	long long val = ((long long)*ap) & 0xffffffff;
+ 	ap++;
+ 	val |= ((long long)*ap) << 32;
+--- -	Sun Oct 12 09:14:53 2025
++++ openbsd-master/usr.bin/netstat/main.c	Tue Oct  7 15:56:35 2025
+@@ -335,6 +335,7 @@
+ 	need_nlist = !mflag && (pflag || nlistf != NULL || memf != NULL ||
+ 	    (!iflag && !sflag && (rflag ? Aflag :
+ 	    (gflag || af != AF_UNIX || Pflag))));
++need_nlist = 0;
+ 
+ 	/*
+ 	 * Discard setgid privileges if not the running kernel so that bad
+--- -	Sun Oct 12 09:14:53 2025
 +++ openbsd-master/usr.bin/sqlite3/Makefile	Sun May  1 08:20:56 2022
 @@ -11,8 +11,8 @@
  
@@ -31,7 +51,7 @@
  LDADD += -lsqlite3 -ledit -lcurses
  
  .include <bsd.prog.mk>
---- -	Tue Oct  7 16:30:02 2025
+--- -	Sun Oct 12 09:14:54 2025
 +++ openbsd-master/usr.bin/ssh/scp/Makefile	Sat Sep  6 07:38:24 2025
 @@ -12,4 +12,6 @@
  
@@ -40,7 +60,7 @@
 +LDADD+= -lssp
 +
  .include <bsd.prog.mk>
---- -	Tue Oct  7 16:30:02 2025
+--- -	Sun Oct 12 09:14:54 2025
 +++ openbsd-master/usr.bin/ssh/sftp/Makefile	Sat Sep  6 07:41:46 2025
 @@ -14,5 +14,5 @@
  
@@ -49,7 +69,7 @@
 -LDADD+=	-ledit -ltermcap -lutil
 +LDADD+=	-ledit -ltermcap -lutil -lssp
  DPADD+= ${LIBEDIT} ${LIBTERMCAP} ${LIBUTIL}
---- -	Tue Oct  7 16:30:02 2025
+--- -	Sun Oct 12 09:14:54 2025
 +++ openbsd-master/usr.bin/ssh/sftp-server/Makefile	Sat Sep  6 07:39:16 2025
 @@ -12,7 +12,7 @@
  
@@ -60,7 +80,7 @@
  DPADD+= ${LIBUTIL}
  
  .include <bsd.prog.mk>
---- -	Tue Oct  7 16:30:02 2025
+--- -	Sun Oct 12 09:14:54 2025
 +++ openbsd-master/usr.bin/ssh/ssh/Makefile	Sat Sep  6 07:14:43 2025
 @@ -42,5 +42,5 @@
  DPADD+=	${LIBCRYPTO} ${LIBUTIL}
@@ -69,7 +89,7 @@
 -LDADD+=	-lz
 +LDADD+=	-lz -lssp
  DPADD+=	${LIBZ}
---- -	Tue Oct  7 16:30:03 2025
+--- -	Sun Oct 12 09:14:54 2025
 +++ openbsd-master/usr.bin/ssh/ssh-add/Makefile	Sat Sep  6 07:32:25 2025
 @@ -14,5 +14,5 @@
  
@@ -78,7 +98,7 @@
 -LDADD+=	-lcrypto
 +LDADD+=	-lcrypto -lssp
  DPADD+= ${LIBCRYPTO}
---- -	Tue Oct  7 16:30:03 2025
+--- -	Sun Oct 12 09:14:54 2025
 +++ openbsd-master/usr.bin/ssh/ssh-agent/Makefile	Sat Sep  6 07:36:51 2025
 @@ -15,5 +15,5 @@
  
@@ -87,7 +107,7 @@
 -LDADD+=	-lcrypto
 +LDADD+=	-lcrypto -lssp
  DPADD+=	${LIBCRYPTO}
---- -	Tue Oct  7 16:30:03 2025
+--- -	Sun Oct 12 09:14:55 2025
 +++ openbsd-master/usr.bin/ssh/ssh-keygen/Makefile	Sat Sep  6 07:33:46 2025
 @@ -14,5 +14,5 @@
  
@@ -96,7 +116,7 @@
 -LDADD+=	-lcrypto
 +LDADD+=	-lcrypto -lssp
  DPADD+=	${LIBCRYPTO}
---- -	Tue Oct  7 16:30:03 2025
+--- -	Sun Oct 12 09:14:55 2025
 +++ openbsd-master/usr.bin/ssh/ssh-keyscan/Makefile	Sat Sep  6 07:41:00 2025
 @@ -14,5 +14,5 @@
  
@@ -105,7 +125,7 @@
 -LDADD+= -lcrypto -lz
 +LDADD+= -lcrypto -lz -lssp
  DPADD+= ${LIBCRYPTO} ${LIBZ}
---- -	Tue Oct  7 16:30:03 2025
+--- -	Sun Oct 12 09:14:55 2025
 +++ openbsd-master/usr.bin/ssh/ssh-keysign/Makefile	Sat Sep  6 07:40:15 2025
 @@ -14,5 +14,5 @@
  
@@ -114,7 +134,7 @@
 -LDADD+=	-lcrypto -lutil -lz
 +LDADD+=	-lcrypto -lutil -lz -lssp
  DPADD+=	${LIBCRYPTO} ${LIBUTIL} ${LIBZ}
---- -	Tue Oct  7 16:30:03 2025
+--- -	Sun Oct 12 09:14:55 2025
 +++ openbsd-master/usr.bin/ssh/ssh-pkcs11-helper/Makefile	Sat Sep  6 07:42:27 2025
 @@ -14,5 +14,5 @@
  
@@ -123,7 +143,7 @@
 -LDADD+=	-lcrypto
 +LDADD+=	-lcrypto -lssp
  DPADD+=	${LIBCRYPTO}
---- -	Tue Oct  7 16:30:03 2025
+--- -	Sun Oct 12 09:14:55 2025
 +++ openbsd-master/usr.bin/ssh/sshd/Makefile	Tue Sep 23 19:46:23 2025
 @@ -47,5 +47,5 @@
  DPADD+=	${LIBCRYPTO} ${LIBUTIL}
@@ -132,7 +152,7 @@
 -LDADD+=	-lz
 +LDADD+=	-lz -lssp
  DPADD+=	${LIBZ}
---- -	Tue Oct  7 16:30:05 2025
+--- -	Sun Oct 12 09:14:57 2025
 +++ openbsd-master/usr.bin/top/Makefile	Wed Sep 17 05:02:47 2025
 @@ -4,7 +4,7 @@
  
@@ -143,8 +163,8 @@
  SRCS=	commands.c display.c machine.c screen.c top.c username.c utils.c
  DPADD=	${LIBCURSES}
  LDADD=	-lcurses
---- -	Tue Oct  7 16:30:05 2025
-+++ openbsd-master/usr.bin/vi/build/config.h	Tue Jul  8 07:59:03 2025
+--- -	Sun Oct 12 09:14:57 2025
++++ openbsd-master/usr.bin/vi/build/config.h	Wed Oct  8 08:58:02 2025
 @@ -102,7 +102,7 @@
  /* #undef HAVE_LOCK_FCNTL */
  
@@ -154,7 +174,7 @@
  
  /* Define if you want to compile in the Perl interpreter. */
  /* #undef HAVE_PERL_INTERP */
---- -	Tue Oct  7 16:30:06 2025
+--- -	Sun Oct 12 09:14:57 2025
 +++ openbsd-master/usr.bin/xinstall/Makefile	Thu Jun 26 10:58:26 2025
 @@ -5,7 +5,7 @@
  MAN=	install.1
@@ -165,13 +185,13 @@
  	    -o ${BINOWN} -g ${BINGRP} \
  	    -m ${BINMODE} ${PROG} ${DESTDIR}${BINDIR}/install
  
---- -	Tue Oct  7 16:30:06 2025
-+++ openbsd-master/usr.bin/xinstall/xinstall.c	Sun Jul 20 06:53:18 2025
+--- -	Sun Oct 12 09:14:58 2025
++++ openbsd-master/usr.bin/xinstall/xinstall.c	Sat Oct 11 19:17:05 2025
 @@ -272,13 +272,13 @@
  	}
  
  	if (dostrip) {
-+		close(to_fd);
++		close(to_fd);		/* strip impossible on open file */
  		strip(safecopy ? tempfile : to_name);
  
  		/*

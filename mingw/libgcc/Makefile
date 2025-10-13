@@ -53,7 +53,7 @@ install-cross:
 	@/bin/mkdir -p ${_LIBDIR}
 	@/bin/cp -vu ${OBJECTS} ${_LIBDIR}/
 
-install-local: install-cross
+install-local:
 	@/bin/mkdir -p ${XPREFIX}${GCCDIR}
 	@/bin/cp -vu ${LIBS} ${XPREFIX}${GCCDIR}/
 	@/bin/cp -vu crtbegin.o crtend.o ${XPREFIX}${GCCDIR}/

@@ -31,7 +31,7 @@ ${LIBXDIR}: ${LIBDL}
 install-cross: ${_LIBDIR}
 	/bin/cp -vu ${IMPLIB} ${_LIBDIR}/libdl.a
 
-install-local: ${LIBXDIR} install-cross
+install-local: ${LIBXDIR}
 	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/
 
 install: ${DESTDIR}

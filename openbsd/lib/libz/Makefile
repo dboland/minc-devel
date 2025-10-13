@@ -26,7 +26,7 @@ install-local:
 	/bin/cp -vu ${LIB} ${XLIBDIR}/
 
 install:
-	/bin/cp -vu ${LIB} ${ULIBDEST}/
+	${INSTALL} -m ${BINMODE} ${LIB} ${ULIBDEST}/
 
 lib-clean:
 	/bin/rm -f ${LIB}

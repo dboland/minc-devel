@@ -58,10 +58,12 @@ VfsStatHandle(HANDLE Handle, WIN_VATTR *Result)
 
 	if (!win_acl_get_fd(Handle, &psd)){
 		return(FALSE);
-	}else if (!GetFileInformationByHandle(Handle, (BY_HANDLE_FILE_INFORMATION *)Result)){
-		WIN_ERR("GetFileInformationByHandle(%d): %s\n", Handle, win_strerror(GetLastError()));
-	}else{
+	}else if (GetFileInformationByHandle(Handle, (BY_HANDLE_FILE_INFORMATION *)Result)){
 		bResult = vfs_acl_stat(psd, Result);
+	}else if (ERROR_INVALID_FUNCTION == GetLastError()){	/* Windows device names (COM, AUX) */
+		SetLastError(ERROR_FILE_NOT_FOUND);
+	}else{
+		WIN_ERR("GetFileInformationByHandle(%d): %s\n", Handle, win_strerror(GetLastError()));
 	}
 	LocalFree(psd);
 	return(bResult);

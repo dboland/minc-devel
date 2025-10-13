@@ -52,7 +52,7 @@ ${XLIBDIR}:
 install-cross:
 	@/bin/cp -vu ${IMPLIB} ${_LIBDIR}/libposix.so
 
-install-local: install-cross
+install-local:
 	@/bin/cp -vu ${LIBPOSIX} /usr/bin/
 	@/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libmingw32.a
 

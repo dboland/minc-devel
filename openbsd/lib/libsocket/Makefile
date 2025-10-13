@@ -48,7 +48,7 @@ install-cross: ${_LIBDIR}
 	/bin/cp -vu ${IMPLIB} ${_LIBDIR}/libsocket.so
 	/bin/cp -vu libsocket.a ${_LIBDIR}/
 
-install-local: install-cross
+install-local:
 	/bin/cp -vu ${LIBSOCKET} ${XBINDIR}/
 	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libsocket.so
 	/bin/cp -vu libsocket.a ${XLIBDIR}/

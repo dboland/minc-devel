@@ -82,7 +82,7 @@ install-cross: ${_LIBDIR}
 
 # Perl needs libc.so
 
-install-local: install-cross
+install-local:
 	@/bin/cp -vu ${LIBC} ${XBINDIR}/
 	@/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libc.so
 	@/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libmingwex.dll.a

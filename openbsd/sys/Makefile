@@ -32,4 +32,4 @@ ${_INCDIR}: ${XINCDIR}
 	@/bin/mkdir -p ${_INCDIR}
 	/bin/cp -ru ${XINCDIR}/* ${_INCDIR}/
 
-install-local: ${XINCDIR} ${SYSDIRS} ${_INCDIR}
+install-local: ${XINCDIR} ${SYSDIRS}

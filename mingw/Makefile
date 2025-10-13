@@ -41,7 +41,7 @@ ${XLIBXDIR}:
 install-cross:
 	/bin/cp -vu libmsvcrt.a ${_LIBDIR}/
 
-install-local: ${MINGW} install-cross ${XBINDIR} ${GCCBIN} ${XLIBXDIR}
+install-local: ${MINGW} ${XBINDIR} ${GCCBIN} ${XLIBXDIR}
 	@/bin/mkdir -p ${XLIBDIR}
 	/bin/cp -vu ${LIBS} ${XLIBDIR}/
 	/bin/cp -vu libiphlpapi.dll.a ${MINGW}/lib/

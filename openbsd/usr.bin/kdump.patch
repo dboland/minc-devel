@@ -1,0 +1,177 @@
+--- usr.bin/kdump/.patch	1970-01-01 01:00:00 +0100
++++ usr.bin/kdump/.patch	2025-09-12 11:34:13 +0200
+@@ -0,0 +1 @@
++This directory has been patched.
+--- usr.bin/kdump/ktrstruct.c	2014-05-19 17:05:13 +0200
++++ usr.bin/kdump/ktrstruct.c	2025-10-11 20:18:23 +0200
+@@ -50,6 +50,8 @@
+ #include <grp.h>
+ #include <pwd.h>
+ #include <unistd.h>
++#include <fcntl.h>
++#include <netdb.h>
+ 
+ #include "kdump.h"
+ #include "kdump_subr.h"
+@@ -317,6 +319,108 @@
+ 	    rup->ru_nvcsw, rup->ru_nivcsw);
+ }
+ 
++static void
++ktrflock(const struct flock *fl)
++{
++        printf("struct flock { start=0x%llx, len=%lld, pid=%d, type=",
++            fl->l_start, fl->l_len, fl->l_pid);
++        flocktypename(fl->l_type);
++        printf(", whence=");
++        whencename(fl->l_whence);
++        printf(" }\n");
++}
++
++static void
++ktrmsghdr(const struct msghdr *msg)
++{
++	printf("struct msghdr { name=%p, namelen=%u, iov=%p, iovlen=%u,"
++	    " control=%p, controllen=%u, flags=",
++	    msg->msg_name, msg->msg_namelen, msg->msg_iov, msg->msg_iovlen,
++	    msg->msg_control, msg->msg_controllen);
++	sendrecvflagsname(msg->msg_flags);
++	printf(" }\n");
++}
++
++static void
++ktrcmsghdr(char *data, socklen_t len)
++{
++	struct msghdr msg;
++	struct cmsghdr *cmsg;
++	int i, count, *fds;
++
++	msg.msg_control = data;
++	msg.msg_controllen = len;
++
++	/* count the control messages */
++	count = 0;
++	for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL;
++	     cmsg = CMSG_NXTHDR(&msg, cmsg)) {
++		count++;
++	}
++
++	printf("struct cmsghdr");
++	if (count > 1)
++		printf(" [%d]", count);
++
++	for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL;
++	     cmsg = CMSG_NXTHDR(&msg, cmsg)) {
++		printf(" { len=%u, level=", cmsg->cmsg_len);
++		if (cmsg->cmsg_level == SOL_SOCKET) {
++			printf("SOL_SOCKET, type=");
++			switch (cmsg->cmsg_type) {
++			case SCM_RIGHTS:
++				printf("SCM_RIGHTS, data=");
++				fds = (int *)CMSG_DATA(cmsg);
++				for (i = 0;
++				    cmsg->cmsg_len > CMSG_LEN(sizeof(int) * i) 
++				    && (char *)fds + (i + 1) * sizeof(int) <=
++				    data + len;
++				    i++) {
++					printf("%s%d", i ? "," : "", fds[i]);
++				}
++				break;
++			case SCM_TIMESTAMP:
++			default:
++				printf("%d", cmsg->cmsg_type);
++				break;
++			}
++		} else {
++			struct protoent *p = getprotobynumber(cmsg->cmsg_level);
++
++			printf("%u<%s>, type=%d", cmsg->cmsg_level,
++			    p != NULL ? p->p_name : "unknown", cmsg->cmsg_type);
++		}
++		printf(" }");
++	}
++	printf("\n");
++}
++
++static void
++ktrpollfd(const char *data, int count)
++{
++	struct pollfd pfd;
++	int i;
++
++	printf("struct pollfd");
++	if (count > 1)
++		printf(" [%d]", count);
++	for (i = 0; i < count; i++) {
++		memcpy(&pfd, data, sizeof(pfd));
++		data += sizeof(pfd);
++		printf(" { fd=%d, events=", pfd.fd);
++		pollfdeventname(pfd.events);
++		printf(", revents=");
++		pollfdeventname(pfd.revents);
++		printf(" }");
++	}
++	printf("\n");
++}
++
++static void
++ktrfdvec(int sv[2])
++{
++	printf("int fd[2] { [%d][%d] }\n", sv[0], sv[1]);
++}
+ void
+ ktrstruct(char *buf, size_t buflen)
+ {
+@@ -407,6 +511,41 @@
+ 		memcpy(fds, data, datalen);
+ 		ktrfdset(fds, datalen);
+ 		free(fds);
++	} else if (strcmp(name, "pollfd") == 0) {
++		if (datalen % sizeof(struct pollfd))
++			goto invalid;
++		ktrpollfd(data, datalen / sizeof(struct pollfd));
++	} else if (strcmp(name, "fdvec") == 0) {
++		int fd[2];
++		memcpy(fd, data, datalen);
++		ktrfdvec(fd);
++	} else if (strcmp(name, "int") == 0) {
++		printf("int %d\n", *(int *)data);
++        } else if (strcmp(name, "flock") == 0) {
++                struct flock fl;
++
++                if (datalen != sizeof(fl))
++                        goto invalid;
++                memcpy(&fl, data, datalen);
++                ktrflock(&fl);
++	} else if (strcmp(name, "msghdr") == 0) {
++		struct msghdr msg;
++
++		if (datalen != sizeof(msg))
++			goto invalid;
++		memcpy(&msg, data, datalen);
++		ktrmsghdr(&msg);
++	} else if (strcmp(name, "cmsghdr") == 0) {
++		char *cmsg;
++
++		if (datalen == 0)
++			goto invalid;
++
++		if ((cmsg = malloc(datalen)) == NULL)
++			err(1, "malloc");
++		memcpy(cmsg, data, datalen);
++		ktrcmsghdr(cmsg, datalen);
++		free(cmsg);
+ 	} else {
+ 		printf("unknown structure %s\n", name);
+ 	}
+--- usr.bin/kdump/mksubr	2014-05-19 17:05:13 +0200
++++ usr.bin/kdump/mksubr	2025-10-12 05:54:31 +0200
+@@ -334,6 +334,8 @@
+ #auto_switch_type "ptraceopname" "PT_[[:alnum:]_]+[[:space:]]+[0-9]+" "sys/ptrace.h"
+ auto_orz_type "ktracefacname" "KTRFAC_[^M][[:alnum:]_]+" "sys/ktrace.h"
+ auto_switch_type "itimername" "ITIMER_[[:alnum:]_]+" "sys/time.h"
++auto_switch_type "flocktypename" "F_[A-Z]+LCK" "sys/fcntl.h"
++auto_orz_type "pollfdeventname" "POLL[^_][[:alnum:]_]+[[:space:]]+0x" "sys/poll.h"
+ 
+ cat <<_EOF_
+ /*

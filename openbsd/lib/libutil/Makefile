@@ -37,7 +37,7 @@ install-local:
 	/bin/cp -vu libutil.a ${XLIBDIR}/
 
 install:
-	/bin/cp -vu libutil.a ${DESTDIR}${ULIBDIR}/
+	${INSTALL} -m ${BINMODE} libutil.a ${DESTDIR}${ULIBDIR}/
 
 lib-clean:
 	/bin/rm -f libutil.a

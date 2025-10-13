@@ -13,6 +13,7 @@ UBINDIR= /usr/bin
 all: ${UBINSRC} ${TMPDIR} ${UBINSRC}/.patch ${OBJECTS} xinstall
 	@echo "done."
 	@${MAKE} -C make
+	@${MAKE} -C kdump
 
 ${UBINSRC}:
 	@echo " ---------------------------------------------------"
@@ -117,6 +118,7 @@ install: ${DESTDIR} ${OBJECTS} xinstall
 	${INSTALL} -m ${NONBINMODE} manifest ${DESTDIR}${UBINDIR}/install.manifest
 	${INSTALL} -m ${NONBINMODE} manifest ${DESTDIR}${UBINDIR}/patch.manifest
 	@${MAKE} -C make install
+	@${MAKE} -C kdump install
 
 clean:
 	/bin/rm -f *.exe *.o
