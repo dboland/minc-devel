@@ -15,7 +15,7 @@ all: ${HEADERS} ${LIB}
 	@${XGCC} -c ${CFLAGS} -o $@ $<
 
 %.h: ${SRCDIR}/lib/libz/%.h
-	@/bin/cp -vu $< ${XINCDIR}/
+	@/bin/cp -vu $< ${INCDIR}/
 
 ${LIB}: ${OBJECTS}
 	@/bin/echo "done."
@@ -23,7 +23,7 @@ ${LIB}: ${OBJECTS}
 	@ar cru $@ ${OBJECTS}
 
 install-local:
-	/bin/cp -vu ${LIB} ${XLIBDIR}/
+	/bin/cp -vu ${LIB} ${LIBDIR}/
 
 install:
 	${INSTALL} -m ${BINMODE} ${LIB} ${ULIBDEST}/

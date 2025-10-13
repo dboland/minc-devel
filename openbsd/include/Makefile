@@ -2,8 +2,8 @@ ROOTDIR= ../..
 
 include ${ROOTDIR}/Makefile.inc
 
-HEADERS= ${XINCDIR}/fcntl.h ${XINCDIR}/stdarg.h ${XINCDIR}/stdint.h \
-	${XINCDIR}/syslog.h ${XINCDIR}/termios.h
+HEADERS= ${INCDIR}/fcntl.h ${INCDIR}/stdarg.h ${INCDIR}/stdint.h \
+	${INCDIR}/syslog.h ${INCDIR}/termios.h
 INCSRC= ${SRCDIR}/include
 INCDEST= ${DESTDIR}/usr/include
 
@@ -21,28 +21,28 @@ ${INCSRC}:
 ${INCSRC}/.patch:
 	TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${INCSRC} <../include.patch
 
-${XINCDIR}:
-	@/bin/mkdir -p ${XINCDIR}
-	/bin/cp -ru ${INCSRC}/* ${XINCDIR}/
+${INCDIR}:
+	@/bin/mkdir -p ${INCDIR}
+	/bin/cp -ru ${INCSRC}/* ${INCDIR}/
 
-${XINCDIR}/fcntl.h:
-	@/bin/cp -vu fcntl.h ${XINCDIR}/
+${INCDIR}/fcntl.h:
+	@/bin/cp -vu fcntl.h ${INCDIR}/
 
-${XINCDIR}/stdarg.h:
-	@/bin/cp -vu stdarg.h ${XINCDIR}/
+${INCDIR}/stdarg.h:
+	@/bin/cp -vu stdarg.h ${INCDIR}/
 
-${XINCDIR}/stdint.h:
-	@/bin/cp -vu stdint.h ${XINCDIR}/
+${INCDIR}/stdint.h:
+	@/bin/cp -vu stdint.h ${INCDIR}/
 
-${XINCDIR}/syslog.h:
-	@/bin/cp -vu syslog.h ${XINCDIR}/
+${INCDIR}/syslog.h:
+	@/bin/cp -vu syslog.h ${INCDIR}/
 
-${XINCDIR}/termios.h:
-	@/bin/cp -vu termios.h ${XINCDIR}/
+${INCDIR}/termios.h:
+	@/bin/cp -vu termios.h ${INCDIR}/
 
-install-local: ${XINCDIR} ${HEADERS}
+install-local: ${INCDIR} ${HEADERS}
 
-${INCDEST}: ${XINCDIR}
-	${CP} -R ${XINCDIR} ${DESTDIR}/usr/
+${INCDEST}: ${INCDIR}
+	${CP} -R ${INCDIR} ${DESTDIR}/usr/
 
 install: ${INCDEST}

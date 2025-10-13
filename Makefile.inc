@@ -20,12 +20,6 @@ IMGBASE_LIBCURL=	0x0F900000 # 0.60 Mb
 
 BUILD= $(shell date +%s)
 
-# locations for GNU cross-compiler
-
-_PREFIX= /usr/i686-openbsd-pe
-_LIBDIR= ${_PREFIX}/lib
-_INCDIR= ${_PREFIX}/include
-
 # In GCC 6.3.0, -ffixed-ebx crashes compilation
 
 CC= gcc

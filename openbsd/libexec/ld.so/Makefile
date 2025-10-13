@@ -19,8 +19,8 @@ version.o: version.rc
 
 ${LIBDL}: ${OBJECTS} version.o
 	${LD} ${LDFLAGS} -e _DllMainCRTStartup@12 --out-implib=${IMPLIB} \
-	-o $@ --image-base=${IMGBASE_LIBDL} ${XLIBDIR}/dllcrt2.o ${OBJECTS} version.o \
-	-L${XLIBDIR} -lmingw32
+	-o $@ --image-base=${IMGBASE_LIBDL} ${LIBDIR}/dllcrt2.o ${OBJECTS} version.o \
+	-L${LIBDIR} -lmingw32
 
 # create /usr/libexec/ld.so for configure scripts to detect shared libs
 
@@ -28,11 +28,12 @@ ${LIBXDIR}: ${LIBDL}
 	@/bin/mkdir -p ${LIBXDIR}
 	/bin/cp -vu ${LIBDL} ${LIBXDIR}/
 
-install-cross: ${_LIBDIR}
-	/bin/cp -vu ${IMPLIB} ${_LIBDIR}/libdl.a
+install-cross:
+	@/bin/mkdir -p ${XLIBXDIR}
+	/bin/cp -vu ${IMPLIB} ${XLIBXDIR}/libdl.a
 
-install-local: ${LIBXDIR}
-	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/
+install-local: install-cross
+	/bin/cp -vu ${IMPLIB} ${LIBXDIR}/
 
 install: ${DESTDIR}
 	@${MKDIR} -p ${DESTDIR}${ULIBXDIR}

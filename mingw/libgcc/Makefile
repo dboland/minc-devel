@@ -50,15 +50,15 @@ crt0_tls.o: crt0.o win_tls.o
 #	/bin/cp -vu ${MINGW}${GCCDIR}/libstdc++.a ${XPREFIX}${GCCDIR}/
 
 install-cross:
-	@/bin/mkdir -p ${_LIBDIR}
-	@/bin/cp -vu ${OBJECTS} ${_LIBDIR}/
+	@/bin/mkdir -p ${XLIBDIR}
+	@/bin/cp -vu ${OBJECTS} ${XLIBDIR}/
 
-install-local:
-	@/bin/mkdir -p ${XPREFIX}${GCCDIR}
-	@/bin/cp -vu ${LIBS} ${XPREFIX}${GCCDIR}/
-	@/bin/cp -vu crtbegin.o crtend.o ${XPREFIX}${GCCDIR}/
-	@/bin/cp -vu crt0.o ${XLIBDIR}/crt2.o
-	@/bin/cp -vu crt1.o ${XLIBDIR}/dllcrt2.o
+install-local: install-cross
+	@/bin/mkdir -p ${PREFIX}${GCCDIR}
+	@/bin/cp -vu ${LIBS} ${PREFIX}${GCCDIR}/
+	@/bin/cp -vu crtbegin.o crtend.o ${PREFIX}${GCCDIR}/
+	@/bin/cp -vu crt0.o ${LIBDIR}/crt2.o
+	@/bin/cp -vu crt1.o ${LIBDIR}/dllcrt2.o
 
 install: ${DESTDIR}${ULIBDIR}
 	${INSTALL} -m ${NONBINMODE} ${OBJECTS} ${DESTDIR}${ULIBDIR}/

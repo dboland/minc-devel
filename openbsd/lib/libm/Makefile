@@ -2,6 +2,7 @@ ROOTDIR= ../../..
 
 include ${ROOTDIR}/Makefile.inc
 
+LIB= libm.a
 ARCH=i387
 ULIBDIR= /usr/lib
 
@@ -62,7 +63,7 @@ OBJECTS=b_exp__D.o b_log__D.o b_tgamma.o \
 
 OBJECTS+=s_rintl.o
 
-all: ${OBJECTS} libm.a
+all: ${OBJECTS} ${LIB}
 
 %.o: ${SRCDIR}/lib/libm/src/%.c
 	@echo -n "$@ "
@@ -75,7 +76,7 @@ all: ${OBJECTS} libm.a
 %.d: %
 	CFLAGS="${CFLAGS}" ${MAKE} -C $< XGCC="${XGCC}" SRCDIR="${SRCDIR}" ARCH="${ARCH}"
 
-libm.a:
+${LIB}:
 	@echo "done."
 	@echo "Creating static library $@"
 	@ar cru $@ ${OBJECTS}
@@ -84,10 +85,10 @@ install: ${DESTDIR}
 	${INSTALL} -m ${BINMODE} libm.a ${DESTDIR}${ULIBDIR}/
 
 install-local:
-	/bin/cp -uv libm.a ${XLIBDIR}/
+	/bin/cp -uv ${LIB} ${LIBDIR}/
 
 lib-clean:
-	/bin/rm -f libm.a
+	/bin/rm -f ${LIB}
 
 all-clean: lib-clean
 	/bin/rm -f *.o

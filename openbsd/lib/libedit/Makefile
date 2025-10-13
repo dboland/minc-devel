@@ -14,9 +14,9 @@ all: ${INCSRC} ${TMPDIR} .patch
 	@${MAKE} -C readline source
 	TMPDIR=${TMPDIR} /bin/patch -p 2 -d . <../libedit.patch
 
-${XINCDIR}/readline:
-	@/bin/cp -vu ${HEADERS} ${XINCDIR}/
+${INCDIR}/readline:
+	@/bin/cp -vu ${HEADERS} ${INCDIR}/
 
 install-local:
-	@/bin/cp -uv ${HEADERS} ${XINCDIR}/
+	@/bin/cp -uv ${HEADERS} ${INCDIR}/
 	@${MAKE} -C readline install-local

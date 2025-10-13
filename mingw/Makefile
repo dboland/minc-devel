@@ -5,7 +5,7 @@ include ${ROOTDIR}/Makefile.inc
 LIBS= libadvapi32.a libkernel32.a libshell32.a libuser32.a \
 	libmoldname.a libgmon.a libmsvcrt.a
 ULIBDIR= /usr/lib
-GCCBIN= ${XBINDIR}/gcc.exe ${XBINDIR}/cpp.exe ${XBINDIR}/g++.exe ${XBINDIR}/c++.exe
+GCCBIN= ${BINDIR}/gcc.exe ${BINDIR}/cpp.exe ${BINDIR}/g++.exe ${BINDIR}/c++.exe
 
 all: ${LIBS} libiphlpapi.dll.a
 	@${MAKE} -C libgcc
@@ -26,24 +26,19 @@ ${BINDIR}/%.exe: ${MINGW}/bin/%.exe
 ${BINDIR}:
 	@/bin/mkdir -p $@
 
-${XBINDIR}/%.exe: ${MINGW}/bin/%.exe
-	@/bin/cp -vu $^ $@
-
-${XBINDIR}:
-	@/bin/mkdir -p $@
-
-${XLIBXDIR}:
+${LIBXDIR}:
 	@/bin/mkdir -p $@
 	/bin/cp -ru ${MINGW}/libexec/gcc $@/
 
 # GetIpStatisticsEx() is missing in vanilla MinGW (libiphlpapi.dll.a)
 
 install-cross:
-	/bin/cp -vu libmsvcrt.a ${_LIBDIR}/
-
-install-local: ${MINGW} ${XBINDIR} ${GCCBIN} ${XLIBXDIR}
 	@/bin/mkdir -p ${XLIBDIR}
-	/bin/cp -vu ${LIBS} ${XLIBDIR}/
+	/bin/cp -vu libmsvcrt.a ${XLIBDIR}/
+
+install-local: ${MINGW} ${BINDIR} ${GCCBIN} ${LIBXDIR} install-cross
+	@/bin/mkdir -p ${LIBDIR}
+	/bin/cp -vu ${LIBS} ${LIBDIR}/
 	/bin/cp -vu libiphlpapi.dll.a ${MINGW}/lib/
 	@${MAKE} -C libgcc install-local
 

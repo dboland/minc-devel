@@ -7,7 +7,7 @@ OBJECTS= crt1.o version.o
 LIBS= asr.a net.a rpc.a
 LIBSOCKET= libsocket.so.${RELEASE}
 IMPLIB= libsocket.dll.a
-GCCDIR= ${XLIBDIR}/gcc/mingw32/${GCCVER}
+GCCDIR= ${LIBDIR}/gcc/mingw32/${GCCVER}
 ULIBDIR= /usr/lib
 
 all: ${LIBS} ${LIBSOCKET} libsocket.a
@@ -29,7 +29,7 @@ version.o: version.rc
 ${LIBSOCKET}: ${OBJECTS}
 	${LD} -s -shared ${LDFLAGS} -e _DllMainCRTStartup@12 --out-implib=${IMPLIB} \
 	-o $@ crt1.o --image-base=${IMGBASE_LIBSOCKET} $(shell /bin/ls */*.so) version.o \
-	-L${XLIBDIR} -L${GCCDIR} -lmingw32 -lmingwex -lmsvcrt -lgcc
+	-L${LIBDIR} -L${GCCDIR} -lmingw32 -lmingwex -lmsvcrt -lgcc
 
 lib-clean:
 	/bin/rm -f *.o ${LIBSOCKET} ${IMPLIB} libsocket.a
@@ -44,15 +44,15 @@ release: release-clean all
 
 # Perl needs libsocket.so
 
-install-cross: ${_LIBDIR}
-	/bin/cp -vu ${IMPLIB} ${_LIBDIR}/libsocket.so
-	/bin/cp -vu libsocket.a ${_LIBDIR}/
-
-install-local:
-	/bin/cp -vu ${LIBSOCKET} ${XBINDIR}/
+install-cross:
 	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libsocket.so
 	/bin/cp -vu libsocket.a ${XLIBDIR}/
-	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/
+
+install-local: install-cross
+	/bin/cp -vu ${LIBSOCKET} ${BINDIR}/
+	/bin/cp -vu ${IMPLIB} ${LIBDIR}/libsocket.so
+	/bin/cp -vu libsocket.a ${LIBDIR}/
+	/bin/cp -vu ${IMPLIB} ${LIBDIR}/
 
 install: ${DESTDIR}
 	${INSTALL} -m ${BINMODE} ${LIBSOCKET} libsocket.a ${DESTDIR}${ULIBDIR}/

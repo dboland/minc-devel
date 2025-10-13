@@ -15,7 +15,7 @@ OBJECTS+= getmaxpartitions.o
 # BSD Auth
 OBJECTS+= passwd.o check_expire.o login_fbtab.o imsg.o imsg-buffer.o login.o
 
-HEADERS= ${XINCDIR}/util.h ${XINCDIR}/imsg.h ${XINCDIR}/ohash.h
+HEADERS= ${INCDIR}/util.h ${INCDIR}/imsg.h ${INCDIR}/ohash.h
 CFLAGS+= -DNOPIE
 ULIBDIR= /usr/lib
 
@@ -25,7 +25,7 @@ all: ${HEADERS} libutil.a
 	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -o $@ $<
 
-${XINCDIR}/%.h: ${SRCDIR}/lib/libutil/%.h
+${INCDIR}/%.h: ${SRCDIR}/lib/libutil/%.h
 	@/bin/cp -vu $< $@
 
 libutil.a: ${OBJECTS}
@@ -34,7 +34,7 @@ libutil.a: ${OBJECTS}
 	@ar cru $@ ${OBJECTS}
 
 install-local:
-	/bin/cp -vu libutil.a ${XLIBDIR}/
+	/bin/cp -vu libutil.a ${LIBDIR}/
 
 install:
 	${INSTALL} -m ${BINMODE} libutil.a ${DESTDIR}${ULIBDIR}/

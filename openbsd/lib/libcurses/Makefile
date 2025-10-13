@@ -13,8 +13,8 @@ all: ${INCSRC} ${TMPDIR} .patch
 .patch: ${HEADERS} curses.h
 	TMPDIR=${TMPDIR} /bin/patch -p 2 -d . <../libcurses.patch
 
-${XINCDIR}/ncurses.h: curses.h
+${INCDIR}/ncurses.h: curses.h
 	@/bin/cp -vu $< $@
 
-install-local: ${XINCDIR}/ncurses.h
-	/bin/cp -uv ${HEADERS} ${XINCDIR}/
+install-local: ${INCDIR}/ncurses.h
+	/bin/cp -uv ${HEADERS} ${INCDIR}/

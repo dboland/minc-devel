@@ -11,7 +11,7 @@ LIBS+= arch/string.a arch/gen.a arch/net.a arch/sys.a
 LIBS+= db/btree.a db/db.a db/hash.a db/mpool.a db/recno.a
 SHOBJECTS= $(shell /bin/ls arch/*/*.o */*.o db/*/*.o)
 LIBC= libc.so.${RELEASE}
-GCCDIR= ${XLIBDIR}/gcc/mingw32/${GCCVER}
+GCCDIR= ${LIBDIR}/gcc/mingw32/${GCCVER}
 CFLAGS+= -g -DNOPIE
 IMPLIB= libc.dll.a
 ULIBDIR= /usr/lib
@@ -51,8 +51,8 @@ version.o: version.rc
 
 ${LIBC}: ${OBJECTS}
 	${LD} -s -shared ${LDFLAGS} -e _DllMainCRTStartup@12 --out-implib=${IMPLIB} \
-	-o $@ --image-base=${IMGBASE_LIBC} ${XLIBDIR}/dllcrt2.o ${SHOBJECTS} ${OBJECTS} version.o \
-	-L${XLIBDIR} -L${GCCDIR} -lmingw32 -lmsvcrt -lgcc
+	-o $@ --image-base=${IMGBASE_LIBC} ${LIBDIR}/dllcrt2.o ${SHOBJECTS} ${OBJECTS} version.o \
+	-L${LIBDIR} -L${GCCDIR} -lmingw32 -lmsvcrt -lgcc
 
 lib-clean:
 	/bin/rm -f ${OBJECTS} ${LIBC} ${IMPLIB} libc.a
@@ -75,20 +75,20 @@ patch-clean:
 
 release: release-clean all
 
-install-cross: ${_LIBDIR}
-	@/bin/mkdir -p ${_LIBDIR}
-	@/bin/cp -vu libc.a ${_LIBDIR}/
-	@/bin/cp -vu ${IMPLIB} ${_LIBDIR}/libc.so
+install-cross:
+	@/bin/mkdir -p ${XLIBDIR}
+	@/bin/cp -vu libc.a ${XLIBDIR}/
+	@/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libc.so
 
 # Perl needs libc.so
 
-install-local:
-	@/bin/cp -vu ${LIBC} ${XBINDIR}/
-	@/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libc.so
-	@/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libmingwex.dll.a
-	@/bin/cp -vu ${IMPLIB} ${XLIBDIR}/
-	@/bin/cp -vu libc.a ${XLIBDIR}/libmingwex.a
-	@/bin/cp -vu libc.a ${XLIBDIR}/
+install-local: install-cross
+	@/bin/cp -vu ${LIBC} ${BINDIR}/
+	@/bin/cp -vu ${IMPLIB} ${LIBDIR}/libc.so
+	@/bin/cp -vu ${IMPLIB} ${LIBDIR}/libmingwex.dll.a
+	@/bin/cp -vu ${IMPLIB} ${LIBDIR}/
+	@/bin/cp -vu libc.a ${LIBDIR}/libmingwex.a
+	@/bin/cp -vu libc.a ${LIBDIR}/
 
 install: ${DESTDIR}
 	@${MKDIR} -p ${DESTDIR}${ULIBDIR}

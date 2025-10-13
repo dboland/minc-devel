@@ -13,7 +13,7 @@ all: ${INCSRC} ${TMPDIR} .patch
 .patch: curses.h
 	@TMPDIR=${TMPDIR} /bin/patch -p 2 -d . <../libocurses.patch
 
-${XINCDIR}/ocurses.h: curses.h
+${INCDIR}/ocurses.h: curses.h
 	@/bin/cp -vu $< $@
 
-install-local: ${XINCDIR}/ocurses.h
+install-local: ${INCDIR}/ocurses.h
