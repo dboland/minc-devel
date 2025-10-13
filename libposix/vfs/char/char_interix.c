@@ -36,7 +36,7 @@
 
 static LPCSTR __ANSI_CURSOR[] = {
 	"",		/* 0x2F: VK_HELP */
-	"\177",		/* 0x2E: VK_DELETE: previously \e[M */
+	"\177",		/* 0x2E: VK_DELETE: ncurses 6.1.20181013 (was \e[M) */
 	"\e[L",		/* 0x2D: VK_INSERT */
 	"",		/* 0x2C: VK_SNAPSHOT */
 	"",		/* 0x2B: VK_EXECUTE */

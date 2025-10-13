@@ -1,8 +1,6 @@
-include ${ROOTDIR}/config.inc
+DESTDIR=${SYSTEMDRIVE}/minc-release
 
-ifndef DESTDIR
-	DESTDIR=${SYSTEMDRIVE}/minc-release
-endif
+include ${ROOTDIR}/config.inc
 
 .SUFFIXES:
 .DEFAULT:
