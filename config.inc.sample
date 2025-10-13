@@ -6,7 +6,7 @@ MINGW=/C/MinGW
 SRCDIR=/D/openbsd-master
 ARCH=i386
 
-# locations for native BSD system
+# locations for Poor Man's Cross Compiler
 
 PREFIX=/opt/minc
 BINDIR=${PREFIX}/bin
@@ -16,6 +16,14 @@ LIBXDIR=${PREFIX}/libexec
 SHDIR=${PREFIX}/share
 TMPDIR=${PREFIX}/tmp
 
+# locations for GNU Cross Compiler
+
+XPREFIX=/usr/i686-openbsd-pe
+XBINDIR=${XPREFIX}/bin
+XLIBDIR=${XPREFIX}/lib
+XINCDIR=${XPREFIX}/include
+XLIBXDIR=${XPREFIX}/libexec
+
 # locations of BSD install programs
 
 MKDIR=${BINDIR}/mkdir
@@ -23,15 +31,7 @@ INSTALL=${BINDIR}/install
 ID=${BINDIR}/id
 CP=${BINDIR}/cp
 LN=${BINDIR}/ln
-
-# locations for Poor Man's Cross Compiler
-
-XPREFIX=${PREFIX}/cross
-XBINDIR=${XPREFIX}/bin
-XLIBDIR=${XPREFIX}/lib
-XINCDIR=${XPREFIX}/include
-XLIBXDIR=${XPREFIX}/libexec
-XGCC=${XBINDIR}/gcc
+XGCC=${BINDIR}/gcc
 
 # install modes
 
