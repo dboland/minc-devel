@@ -8,7 +8,8 @@ OBJECTS= kdump.o ioctl.o kdump_subr.o ktrstruct.o
 BINSRC= ${SRCDIR}/usr.bin/kdump
 KTRSRC= ${BINSRC}/../ktrace
 SYS_DIR= ${SRCDIR}/sys
-CFLAGS+=-I${BINSRC}/../ktrace -I${BINSRC} -I${SYS_DIR}
+CFLAGS+= -I${BINSRC}/../ktrace -I${BINSRC} -I${SYS_DIR}
+CFLAGS+= -Wno-implicit-function-declaration
 UBINDEST= ${DESTDIR}/usr/bin
 
 all: ${TMPDIR} .patch ${PROG}
@@ -19,6 +20,9 @@ all: ${TMPDIR} .patch ${PROG}
 %.o: %.c
 	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -DNOPIE -o $@ $<
+
+.patch: ${SOURCES}
+	TMPDIR=${TMPDIR} /bin/patch -p 2 -d . <../kdump.patch
 
 kdump_subr.c: mksubr
 	@sh mksubr ${SYS_DIR} > $@
@@ -60,9 +64,6 @@ ioctl.c: ${BINSRC}/mkioctls
 
 mksubr: ${BINSRC}/mksubr
 	@/bin/cp -uv $< $@
-
-.patch: ${SOURCES}
-	TMPDIR=${TMPDIR} /bin/patch -p 2 -d . <../kdump.patch
 
 ${PROG}: ${OBJECTS}
 	@echo "done."

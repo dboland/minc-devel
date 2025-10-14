@@ -1,0 +1,144 @@
+--- share/mk/.patch	1970-01-01 01:00:00 +0100
++++ share/mk/.patch	2025-09-12 11:34:13 +0200
+@@ -0,0 +1 @@
++This directory has been patched.
+--- share/mk/bsd.lib.mk	2014-05-19 17:05:13 +0200
++++ share/mk/bsd.lib.mk	2025-10-06 17:23:44 +0200
+@@ -36,8 +36,8 @@
+ DIST_CFLAGS+=	-Os
+ 
+ .c.o:
+-	@echo "${COMPILE.c} ${.IMPSRC} -o ${.TARGET}"
+-	@${COMPILE.c} ${.IMPSRC}  -o ${.TARGET}.o
++	@echo "${COMPILE.c} ${AFLAGS} ${.IMPSRC} -o ${.TARGET}"
++	@${COMPILE.c} ${AFLAGS} ${.IMPSRC} -o ${.TARGET}.o
+ 	@${LD} -X -r ${.TARGET}.o -o ${.TARGET}
+ 	@rm -f ${.TARGET}.o
+ 
+@@ -171,6 +171,7 @@
+ .if defined(SHLIB_MAJOR) && defined(SHLIB_MINOR)
+ _LIBS+=lib${LIB}.so.${SHLIB_MAJOR}.${SHLIB_MINOR}
+ .endif
++AFLAGS=	${NOPIE_FLAGS}
+ .endif
+ 
+ all: ${_LIBS} _SUBDIRUSE
+@@ -202,7 +203,7 @@
+ 	@echo building shared ${LIB} library \(version ${SHLIB_MAJOR}.${SHLIB_MINOR}\)
+ 	@rm -f lib${LIB}.so.${SHLIB_MAJOR}.${SHLIB_MINOR}
+ 	${CC} -shared ${PICFLAG} \
+-	    -o lib${LIB}.so.${SHLIB_MAJOR}.${SHLIB_MINOR} \
++	    -o lib${LIB}.so.${SHLIB_MAJOR}.${SHLIB_MINOR} -Wl,--out-implib=lib${LIB}.dll.a \
+ 	    `${LORDER} ${SOBJS}|tsort -q` ${LDADD}
+ 
+ # all .do files...
+--- share/mk/bsd.man.mk	2014-05-19 17:05:13 +0200
++++ share/mk/bsd.man.mk	2025-10-06 17:23:44 +0200
+@@ -54,7 +54,7 @@
+ .for page in ${MAN}
+ .  for sub in ${MANSUBDIR}
+ _MAN_INST=${DESTDIR}${MANDIR}${page:E}${sub}${page:T}
+-${_MAN_INST}: ${page}
++${_MAN_INST}: ${SRCDIR}${page}
+ 	${INSTALL} ${INSTALL_COPY} -o ${MANOWN} -g ${MANGRP} -m ${MANMODE} \
+ 		${.ALLSRC} ${.TARGET}
+ 
+@@ -64,15 +64,15 @@
+ .  endfor
+ .endfor
+ 
+-# Install the manual hardlinks, if any.
++# Install the manual symbolic links, if any.
+ maninstall:
+ .if defined(MLINKS) && !empty(MLINKS)
+ .  for sub in ${MANSUBDIR}
+ .     for lnk file in ${MLINKS}
+-	@l=${DESTDIR}${MANDIR}${lnk:E}${sub}${lnk}; \
++	@l=${MANDIR}${lnk:E}${sub}${lnk}; \
+ 	t=${DESTDIR}${MANDIR}${file:E}${sub}${file}; \
+ 	echo $$t -\> $$l; \
+-	rm -f $$t; ln $$l $$t;
++	ln -sf $$l $$t;
+ .     endfor
+ .  endfor
+ .endif
+--- share/mk/bsd.own.mk	2014-05-19 17:05:13 +0200
++++ share/mk/bsd.own.mk	2025-10-06 17:23:44 +0200
+@@ -13,7 +13,7 @@
+ # Set `SKEY' to `yes' to build with support for S/key authentication.
+ SKEY?=		yes
+ # Set `YP' to `yes' to build with support for NIS/YP.
+-YP?=		yes
++YP?=		no
+ # Set `DEBUGLIBS' to `yes' to build libraries with debugging symbols
+ DEBUGLIBS?=	no
+ 
+@@ -40,8 +40,7 @@
+ .endif
+ 
+ .if !empty(PIE_ARCH:M${_arch})
+-NOPIE_FLAGS?=-fno-pie
+-NOPIE_LDFLAGS?=-nopie
++NOPIE_FLAGS?=-DNOPIE
+ PIE_DEFAULT?=${DEFAULT_PIE_DEF}
+ .else
+ NOPIE_FLAGS?=
+@@ -77,7 +76,7 @@
+ LIBDIR?=	/usr/lib
+ LIBGRP?=	${BINGRP}
+ LIBOWN?=	${BINOWN}
+-LIBMODE?=	${NONBINMODE}
++LIBMODE?=	${BINMODE}
+ 
+ DOCDIR?=	/usr/share/doc
+ DOCGRP?=	bin
+@@ -134,8 +133,6 @@
+ # pic relocation flags.
+ .if (${MACHINE_ARCH} == "alpha") || (${MACHINE_ARCH} == "sparc64")
+ PICFLAG?=-fPIC
+-.else
+-PICFLAG?=-fpic
+ .endif
+ 
+ .if ${MACHINE_ARCH} == "sparc" || ${MACHINE_ARCH} == "sparc64"
+@@ -153,9 +150,7 @@
+ 
+ # don't try to generate PROFILED versions of libraries on machines
+ # which don't support profiling.
+-.if 0
+ NOPROFILE=
+-.endif
+ 
+ BSD_OWN_MK=Done
+ 
+--- share/mk/bsd.README	2014-05-19 17:05:13 +0200
++++ share/mk/bsd.README	2025-10-06 17:23:44 +0200
+@@ -180,7 +180,7 @@
+ 
+ LIBOWN		Library owner. [${BINOWN}]
+ 
+-LIBMODE		Library mode. [${NONBINMODE}]
++LIBMODE		Library mode. [${BINMODE}]
+ 
+ DOCDIR		Base path for system documentation
+ 	        installation. [/usr/share/doc]
+--- share/mk/sys.mk	2014-05-19 17:05:13 +0200
++++ share/mk/sys.mk	2025-10-06 17:23:44 +0200
+@@ -32,7 +32,7 @@
+ 
+ PIPE?=		-pipe
+ 
+-CFLAGS?=	-O2 ${PIPE} ${DEBUG}
++CFLAGS?=	${PIPE} ${DEBUG}
+ COMPILE.c?=	${CC} ${CFLAGS} ${CPPFLAGS} -c
+ LINK.c?=	${CC} ${CFLAGS} ${CPPFLAGS} ${LDFLAGS}
+ 
+@@ -47,7 +47,7 @@
+ CPPFLAGS?=	
+ 
+ FC?=		f77
+-FFLAGS?=	-O2
++FFLAGS?=	
+ RFLAGS?=
+ COMPILE.f?=	${FC} ${FFLAGS} -c
+ LINK.f?=	${FC} ${FFLAGS} ${LDFLAGS}

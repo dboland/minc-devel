@@ -1,2 +1,3 @@
-share/mk
+*.mk
+bsd.README
 !libexec/ld.so

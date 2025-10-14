@@ -24,6 +24,6 @@ BUILD= $(shell date +%s)
 
 CC= gcc
 CFLAGS= -ffreestanding -Wl,--disable-auto-import
-#CFLAGS+=  -Wimplicit-function-declaration -Werror
+CFLAGS+= -Wimplicit-function-declaration -Werror
 CFLAGS+= -Wno-pointer-sign
 LDFLAGS= --disable-auto-import
