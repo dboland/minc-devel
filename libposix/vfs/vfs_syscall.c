@@ -60,7 +60,7 @@ VfsStatHandle(HANDLE Handle, WIN_VATTR *Result)
 		return(FALSE);
 	}else if (GetFileInformationByHandle(Handle, (BY_HANDLE_FILE_INFORMATION *)Result)){
 		bResult = vfs_acl_stat(psd, Result);
-	}else if (ERROR_INVALID_FUNCTION == GetLastError()){	/* Windows device names (COM, AUX) */
+	}else if (ERROR_INVALID_FUNCTION == GetLastError()){	/* Windows devices: COM, AUX (rm.exe) */
 		SetLastError(ERROR_FILE_NOT_FOUND);
 	}else{
 		WIN_ERR("GetFileInformationByHandle(%d): %s\n", Handle, win_strerror(GetLastError()));

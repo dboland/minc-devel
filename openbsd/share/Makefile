@@ -5,7 +5,7 @@ include ${ROOTDIR}/Makefile.inc
 SHSRC= ${SRCDIR}/share
 SHDEST= ${DESTDIR}/usr/share
 
-all: ${SHSRC} ${TMPDIR} ${SHSRC}/.patch
+all: ${SHSRC} ${SHSRC}/.patch
 	@${MAKE} -C mk
 
 ${SHSRC}:
@@ -20,6 +20,3 @@ ${SHSRC}/.patch:
 
 install:
 	@${MAKE} -C mk install
-
-clean:
-	/bin/rm -rf ${SHDIR}/*

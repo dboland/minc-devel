@@ -1,0 +1,48 @@
+--- openbsd-master/bin/.patch	1970-01-01 01:00:00 +0100
++++ openbsd-master/bin/.patch	2025-09-12 11:34:13 +0200
+@@ -0,0 +1 @@
++This directory has been patched.
+--- openbsd-master/bin/ls/main.c
++++ openbsd-master/bin/ls/main.c	Tue Oct  7 10:37:26 2025
+@@ -4,10 +4,19 @@
+  * Public domain - no warranty.
+  */
+ 
++#include <locale.h>
++
+ int ls_main(int argc, char **argv);
+ 
+ int
+ main(int argc, char *argv[])
+ {
+-	return ls_main(argc, argv);
++       int result;
++
++       /* To encode utf8, Windows uses a UTF-16 variant, called UCS
++        */
++       setlocale(LC_CTYPE, "en_US.CP1251");
++       result = ls_main(argc, argv);
++       setlocale(LC_CTYPE, "C");
++       return result;
+ }
+--- openbsd-master/bin/pax/pax.c
++++ openbsd-master/bin/pax/pax.c	Wed Oct 15 08:10:00 2025
+@@ -408,7 +408,7 @@
+ 	    (sigaction(SIGXCPU, &o_hand, &o_hand) < 0))
+ 		goto out;
+ 
+-	n_hand.sa_handler = SIG_IGN;
++//	n_hand.sa_handler = SIG_IGN;	/* don't break user space */
+ 	if ((sigaction(SIGPIPE, &n_hand, &o_hand) < 0) ||
+ 	    (sigaction(SIGXFSZ, &n_hand, &o_hand) < 0))
+ 		goto out;
+--- openbsd-master/bin/pax/tar.c
++++ openbsd-master/bin/pax/tar.c	Wed Oct  1 07:44:41 2025
+@@ -162,6 +162,7 @@
+ 	/*
+ 	 * term selects the appropriate character(s) for the end of the string
+ 	 */
++	val = val % 1000000;	/* mask off WinNT Auth bits */
+ 	pt = str + len - 1;
+ 	switch (term) {
+ 	case 3:

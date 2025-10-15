@@ -2,7 +2,7 @@
 +++ openbsd-master/sys/.patch	2025-09-12 11:34:13 +0200
 @@ -0,0 +1 @@
 +This directory has been patched.
---- -	Mon Oct  6 14:52:56 2025
+--- openbsd-master/sys/arch/i386/include/asm.h
 +++ openbsd-master/sys/arch/i386/include/asm.h	Sun Oct  5 08:56:18 2025
 @@ -58,7 +58,7 @@
  #define PIC_GOTOFF(x)	x
@@ -22,7 +22,7 @@
  
  #if defined(PROF) || defined(GPROF)
  # define _PROF_PROLOGUE	\
---- -	Mon Oct  6 14:52:57 2025
+--- openbsd-master/sys/arch/i386/include/cdefs.h
 +++ openbsd-master/sys/arch/i386/include/cdefs.h	Sun Oct  5 08:56:18 2025
 @@ -4,18 +4,64 @@
   * Written by J.T. Conklin <jtc@wimsey.com> 01/17/95.
@@ -98,7 +98,7 @@
 +	extern __typeof(symbol) symbol __attribute__((deprecated(msg)))
  
  #endif /* !_MACHINE_CDEFS_H_ */
---- -	Mon Oct  6 14:52:57 2025
+--- openbsd-master/sys/arch/i386/include/exec.h
 +++ openbsd-master/sys/arch/i386/include/exec.h	Sun Oct  5 08:56:18 2025
 @@ -40,7 +40,6 @@
  #define ELF_TARG_MACH		EM_386 /* XXX - EM_486 is currently unused
@@ -108,7 +108,7 @@
  #define _KERN_DO_ELF
  
  #endif  /* _MACHINE_EXEC_H_ */
---- -	Mon Oct  6 14:52:57 2025
+--- openbsd-master/sys/arch/i386/include/_types.h
 +++ openbsd-master/sys/arch/i386/include/_types.h	Sun Oct  5 08:56:18 2025
 @@ -35,6 +35,12 @@
  #ifndef _MACHINE__TYPES_H_
@@ -141,7 +141,7 @@
  #endif
  typedef int			__wint_t;
  typedef	int			__rune_t;
---- -	Mon Oct  6 14:52:57 2025
+--- openbsd-master/sys/netinet6/in6.h
 +++ openbsd-master/sys/netinet6/in6.h	Wed Sep 24 17:39:09 2025
 @@ -127,20 +127,20 @@
  #define IN6MASK128	{{{ 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, \
@@ -174,7 +174,7 @@
  
  #if __BSD_VISIBLE
  /*
---- -	Mon Oct  6 14:52:57 2025
+--- openbsd-master/sys/sys/types.h
 +++ openbsd-master/sys/sys/types.h	Wed Sep 24 17:39:09 2025
 @@ -267,4 +267,10 @@
  
@@ -187,7 +187,7 @@
 +extern __import char *__progname;
 +
  #endif /* !_SYS_TYPES_H_ */
---- -	Mon Oct  6 14:52:57 2025
+--- openbsd-master/sys/sys/ucred.h
 +++ openbsd-master/sys/sys/ucred.h	Wed Sep 24 17:39:09 2025
 @@ -35,6 +35,8 @@
  #ifndef _SYS_UCRED_H_

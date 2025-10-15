@@ -2,8 +2,8 @@
 +++ openbsd-master/share/.patch	2025-09-12 11:34:13 +0200
 @@ -0,0 +1 @@
 +This directory has been patched.
---- -	Tue Oct 14 09:28:31 2025
-+++ openbsd-master/share/termtypes/termtypes.master	Tue Oct 14 07:03:02 2025
+--- openbsd-master/share/termtypes/termtypes.master
++++ openbsd-master/share/termtypes/termtypes.master	Tue Oct 14 11:44:20 2025
 @@ -6913,7 +6913,7 @@
  	cuu1=\E[A, dl=\E[%p1%dM, dl1=\E[M, ed=\E[J, el=\E[K,
  	home=\E[H, ht=^I, il=\E[%p1%dL, il1=\E[L, ind=\E[S,

@@ -2,7 +2,7 @@
 +++ openbsd-master/include/.patch	2025-09-12 11:34:13 +0200
 @@ -0,0 +1 @@
 +This directory has been patched.
---- -	Mon Oct  6 14:28:09 2025
+--- openbsd-master/include/ctype.h
 +++ openbsd-master/include/ctype.h	Mon Oct  6 12:33:00 2025
 @@ -53,9 +53,9 @@
  
@@ -17,7 +17,7 @@
  
  #if defined(__GNUC__) || defined(_ANSI_LIBRARY)
  int	isalnum(int);
---- -	Mon Oct  6 14:28:09 2025
+--- openbsd-master/include/getopt.h
 +++ openbsd-master/include/getopt.h	Mon Oct  6 12:33:00 2025
 @@ -65,11 +65,11 @@
  #define _GETOPT_DEFINED_
@@ -36,7 +36,7 @@
  #endif
  __END_DECLS
   
---- -	Mon Oct  6 14:28:09 2025
+--- openbsd-master/include/math.h
 +++ openbsd-master/include/math.h	Mon Oct  6 12:33:00 2025
 @@ -24,7 +24,7 @@
  /*
@@ -47,7 +47,7 @@
  #if __GNUC_PREREQ__(3, 3) && !defined(__vax__)
  #define HUGE_VAL	__builtin_huge_val()
  #else /* __GNUC_PREREQ__(3, 3) && !__vax__ */
---- -	Mon Oct  6 14:28:09 2025
+--- openbsd-master/include/netdb.h
 +++ openbsd-master/include/netdb.h	Mon Oct  6 12:33:00 2025
 @@ -144,7 +144,7 @@
  };
@@ -58,7 +58,7 @@
  
  /*
   * Error return codes from gethostbyname() and gethostbyaddr()
---- -	Mon Oct  6 14:28:09 2025
+--- openbsd-master/include/resolv.h
 +++ openbsd-master/include/resolv.h	Mon Oct  6 12:33:00 2025
 @@ -91,6 +91,7 @@
  #include <sys/types.h>
@@ -68,7 +68,7 @@
  
  /*
   * Revision information.  This is the release date in YYYYMMDD format.
---- -	Mon Oct  6 14:28:10 2025
+--- openbsd-master/include/signal.h
 +++ openbsd-master/include/signal.h	Mon Oct  6 12:33:00 2025
 @@ -43,8 +43,8 @@
  
@@ -81,7 +81,7 @@
  #endif
  
  int	raise(int);
---- -	Mon Oct  6 14:28:10 2025
+--- openbsd-master/include/stdio.h
 +++ openbsd-master/include/stdio.h	Mon Oct  6 12:33:00 2025
 @@ -140,7 +140,7 @@
  } FILE;
@@ -118,7 +118,7 @@
  
  #define feof(p)		(!__isthreaded ? __sfeof(p) : (feof)(p))
  #define ferror(p)	(!__isthreaded ? __sferror(p) : (ferror)(p))
---- -	Mon Oct  6 14:28:10 2025
+--- openbsd-master/include/stdlib.h
 +++ openbsd-master/include/stdlib.h	Mon Oct  6 12:33:00 2025
 @@ -34,6 +34,7 @@
  
@@ -146,7 +146,7 @@
  
  int	 mkstemps(char *, int);
  
---- -	Mon Oct  6 14:28:10 2025
+--- openbsd-master/include/time.h
 +++ openbsd-master/include/time.h	Mon Oct  6 12:33:00 2025
 @@ -150,7 +150,7 @@
  #endif
@@ -157,7 +157,7 @@
  void tzset(void);
  #endif
  
---- -	Mon Oct  6 14:28:10 2025
+--- openbsd-master/include/unistd.h
 +++ openbsd-master/include/unistd.h	Mon Oct  6 12:33:00 2025
 @@ -68,7 +68,7 @@
  #define _POSIX_CLOCK_SELECTION			(-1)

@@ -2,7 +2,7 @@ ROOTDIR= ../../..
 
 include ${ROOTDIR}/Makefile.inc
 
-PROG= ksh.exe
+PROG= ksh
 #CFLAGS+=-DDEBUG
 #CFLAGS+=-DDEBUG_JOBS
 #CFLAGS+=-DDEBUG_SUBST

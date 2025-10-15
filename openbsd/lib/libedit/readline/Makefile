@@ -12,8 +12,8 @@ all: ${INCSRC}
 
 source: ${HEADERS}
 
-${XINCDIR}/readline:
-	@/bin/mkdir -p ${XINCDIR}/readline
-	@/bin/cp -vu ${HEADERS} ${XINCDIR}/readline/
+${INCDIR}/readline:
+	@/bin/mkdir -p ${INCDIR}/readline
+	@/bin/cp -vu ${HEADERS} ${INCDIR}/readline/
 
-install-local: ${XINCDIR}/readline
+install-local: ${INCDIR}/readline

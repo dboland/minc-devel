@@ -62,16 +62,16 @@ diff_zip()
 			exit 1
 		elif [[ $file == *.out ]]; then
 			continue
-		elif [[ $file == *.save ]]; then
-			continue
 		elif [[ $file == */.patch ]]; then
-			continue
-		elif [[ $file == *.a ]]; then
-			continue
+			echo "$file: patched directory" >&2
+		elif [[ $file == */BSDMakefile ]]; then
+			echo "$file: alternative make file" >&2
+		elif [[ $file == *.dll.a ]]; then
+			echo "$file: import library" >&2
 		elif [ "$LIST" ]; then
 			echo "$file"
 		else
-			unzip -p $SOURCE "$file" | diff -au - "$file"
+			unzip -p $SOURCE "$file" | diff -L "$file" -au - "$file"
 		fi
 	done
 }

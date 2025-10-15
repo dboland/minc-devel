@@ -8,7 +8,7 @@ OBJECTS= ${XPROGS} cat echo
 CFLAGS+= -DNOPIE -s -static
 BINSRC= ${SRCDIR}/bin
 
-all: ${BINSRC} ${OBJECTS}
+all: ${BINSRC} ${BINSRC}/.patch ${OBJECTS}
 	@${MAKE} -C ksh
 
 ${BINSRC}:
@@ -17,6 +17,9 @@ ${BINSRC}:
 	@echo "| you extracted this directory from the source archive."
 	@echo " ---------------------------------------------------"
 	@exit 1
+
+${BINSRC}/.patch:
+	TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${BINSRC} <../bin.patch
 
 ${BINDIR}: ${PROGS}
 	@/bin/mkdir -p ${BINDIR}
