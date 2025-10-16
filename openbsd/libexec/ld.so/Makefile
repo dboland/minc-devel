@@ -2,7 +2,7 @@ ROOTDIR= ../../..
 
 include ${ROOTDIR}/Makefile.inc
 
-OBJECTS= libdl.o
+OBJECTS= libdl.o version.o
 IMPLIB= libdl.dll.a
 LDFLAGS+= -shared -s
 LIBDL= ld.so
@@ -17,9 +17,9 @@ all: ${LIBDL}
 version.o: version.rc
 	windres -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@
 
-${LIBDL}: ${OBJECTS} version.o
+${LIBDL}: ${OBJECTS}
 	${LD} ${LDFLAGS} -e _DllMainCRTStartup@12 --out-implib=${IMPLIB} \
-	-o $@ --image-base=${IMGBASE_LIBDL} ${LIBDIR}/dllcrt2.o ${OBJECTS} version.o \
+	-o $@ --image-base=${IMGBASE_LIBDL} ${LIBDIR}/dllcrt2.o ${OBJECTS} \
 	-L${LIBDIR} -lmingw32
 
 # create /usr/libexec/ld.so for configure scripts to detect shared libs
@@ -30,10 +30,13 @@ ${LIBXDIR}: ${LIBDL}
 
 install-cross:
 	@/bin/mkdir -p ${XLIBXDIR}
-	/bin/cp -vu ${IMPLIB} ${XLIBXDIR}/libdl.a
+	/bin/cp -vu ${LIBDL} ${XLIBXDIR}/
+	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libdl.a
 
-install-local: install-cross
-	/bin/cp -vu ${IMPLIB} ${LIBXDIR}/
+install-local:
+	@/bin/mkdir -p ${LIBXDIR}
+	/bin/cp -vu ${LIBDL} ${LIBXDIR}/
+	/bin/cp -vu ${IMPLIB} ${LIBDIR}/
 
 install: ${DESTDIR}
 	@${MKDIR} -p ${DESTDIR}${ULIBXDIR}
@@ -46,5 +49,5 @@ release-clean:
 release: release-clean all
 
 clean:
-	/bin/rm -f *.o *.a ${LIBDL}
+	/bin/rm -f *.a ${OBJECTS} ${LIBDL}
 

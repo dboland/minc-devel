@@ -45,10 +45,10 @@ release: release-clean all
 # Perl needs libsocket.so
 
 install-cross:
-	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libsocket.so
 	/bin/cp -vu libsocket.a ${XLIBDIR}/
+	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libsocket.so
 
-install-local: install-cross
+install-local:
 	/bin/cp -vu ${LIBSOCKET} ${BINDIR}/
 	/bin/cp -vu ${IMPLIB} ${LIBDIR}/libsocket.so
 	/bin/cp -vu libsocket.a ${LIBDIR}/

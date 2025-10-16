@@ -18,6 +18,12 @@ all: ${TMPDIR} ${LIBSRC}/.patch
 ${LIBSRC}/.patch:
 	TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${LIBSRC} <../lib.patch
 
+install-cross:
+	@${MAKE} -C libc install-cross
+	@${MAKE} -C libsocket install-cross
+	@${MAKE} -C libutil install-cross
+	@${MAKE} -C libcurses install-cross
+
 install:
 	@${MAKE} -C libc install
 	@${MAKE} -C libsocket install

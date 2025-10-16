@@ -18,6 +18,9 @@ ${LIBXSRC}:
 install-local:
 	@${MAKE} -C ld.so install-local
 
+install-cross:
+	@${MAKE} -C ld.so install-cross
+
 install:
 	@${MAKE} -C ld.so install
 

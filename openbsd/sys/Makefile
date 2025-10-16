@@ -2,10 +2,11 @@ ROOTDIR= ../..
 
 include ${ROOTDIR}/Makefile.inc
 
-SYSDIRS= ${INCDIR}/net ${INCDIR}/machine ${INCDIR}/netinet ${INCDIR}/netinet6 \
-	${INCDIR}/uvm ${INCDIR}/dev ${INCDIR}/dev/wscons \
+SYSDIRS= ${INCDIR}/machine ${INCDIR}/sys ${INCDIR}/dev ${INCDIR}/net \
+	${INCDIR}/net80211 ${INCDIR}/netinet ${INCDIR}/netinet6 \
+	${INCDIR}/uvm ${INCDIR}/dev/wscons \
 	${INCDIR}/ufs/ext2fs ${INCDIR}/ufs/ffs ${INCDIR}/ufs/mfs \
-	${INCDIR}/ufs/ufs ${INCDIR}/sys
+	${INCDIR}/ufs/ufs
 SYSSRC= ${SRCDIR}/sys
 
 all: ${SYSSRC} ${TMPDIR} ${SYSSRC}/.patch

@@ -18,14 +18,16 @@ OBJECTS+= passwd.o check_expire.o login_fbtab.o imsg.o imsg-buffer.o login.o
 HEADERS= ${INCDIR}/util.h ${INCDIR}/imsg.h ${INCDIR}/ohash.h
 CFLAGS+= -DNOPIE
 ULIBDIR= /usr/lib
+LIBSRC= ${SRCDIR}/lib/libutil
+IMPLIB= ${LIBSRC}/libutil.dll.a
 
 all: ${HEADERS} libutil.a
 
-%.o: ${SRCDIR}/lib/libutil/%.c
+%.o: ${LIBSRC}/%.c
 	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -o $@ $<
 
-${INCDIR}/%.h: ${SRCDIR}/lib/libutil/%.h
+${INCDIR}/%.h: ${LIBSRC}/%.h
 	@/bin/cp -vu $< $@
 
 libutil.a: ${OBJECTS}
@@ -35,6 +37,9 @@ libutil.a: ${OBJECTS}
 
 install-local:
 	/bin/cp -vu libutil.a ${LIBDIR}/
+
+install-cross: ${IMPLIB}
+	@/bin/cp -uv ${IMPLIB} ${XLIBDIR}/libutil.a
 
 install:
 	${INSTALL} -m ${BINMODE} libutil.a ${DESTDIR}${ULIBDIR}/

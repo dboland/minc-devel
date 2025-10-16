@@ -51,7 +51,7 @@ Section
 	# Put files there
 	File /r 'miniroot'
 
-	ExecDos::exec /DETAILED 'cacls . /E /R "$USERNAME"'
+	ExecDos::exec /DETAILED 'cacls $INSTDIR /E /R "$USERNAME"'
 	ExecDos::exec /DETAILED '.\miniroot\chmod -R 00755 miniroot'
 
 SectionEnd

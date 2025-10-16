@@ -20,6 +20,11 @@ install-local: ${TMPDIR}
 	@${MAKE} -C include all install-local
 	@${MAKE} -C sys all install-local
 
+install-cross:
+	@${MAKE} -C lib install-cross
+	@${MAKE} -C libexec install-cross
+	@${MAKE} -C include install-cross
+
 install: ${DESTDIR}
 	@${MAKE} -C lib install
 	@${MAKE} -C bin install

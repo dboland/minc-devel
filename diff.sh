@@ -41,11 +41,11 @@ diff_dir()
 			echo "$file: cannot diff: directory not clean" >&2
 			exit 1
 			;;
-		*.S|*.o|*.a|*/Makefile|*/BSDmakefile|*/.gitignore|*/.patch)
+		*.S|*.o|*.a|*.so|*.gitignore|*.patch|*/Makefile|*/BSDmakefile)
 			continue
 			;;
 		*.minc.*)
-			#echo "$file: MinC replacement" >&2
+			echo "MinC: $file" >&2
 			;;
 		*)
 			diff -au "$SOURCE/$file" "$file" | sed "s:$SOURCE/::"
@@ -63,11 +63,11 @@ diff_zip()
 		elif [[ $file == *.out ]]; then
 			continue
 		elif [[ $file == */.patch ]]; then
-			echo "$file: patched directory" >&2
-		elif [[ $file == */BSDMakefile ]]; then
-			echo "$file: alternative make file" >&2
+			echo "Patch: $file" >&2
+		elif [[ $file == */BSDmakefile ]]; then
+			echo "Alternative: $file" >&2
 		elif [[ $file == *.dll.a ]]; then
-			echo "$file: import library" >&2
+			echo "Import: $file" >&2
 		elif [ "$LIST" ]; then
 			echo "$file"
 		else

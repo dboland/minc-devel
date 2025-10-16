@@ -37,22 +37,12 @@ InstallDirRegKey HKLM ${REGFILE} "BuildTools"
 
 #!addplugindir "C:\Program Files\NSIS\Plugins"
 
-;Var SYSTEMDRIVE
 Var USERNAME
-;Var LOCATION
 
 ;LogSet on
 
 ;--------------------------------
 
-Function .onInit
-	ReadEnvStr $USERNAME USERNAME
-;	ReadEnvStr $SYSTEMDRIVE SystemDrive
-;	StrCpy $INSTDIR "$SYSTEMDRIVE\MinC"
-;        ReadRegStr $LOCATION HKLM "Software\MinC" "BuildTools"
-;        IfErrors +2
-;        StrCpy $INSTDIR $LOCATION
-FunctionEnd
 Section
 
 	# Set output path to the installation directory.
@@ -60,13 +50,9 @@ Section
 
 	# Put files there
 	File /r 'miniroot'
+	File '*.cmd'
 
 	ExecDos::exec /DETAILED 'cacls . /E /R "$USERNAME"'
-
-	${If} ${AtMostWin2003}
-		ExecDos::exec /DETAILED '.\miniroot\scacls . /E /G S-1-5-11:R'
-	${EndIf}
-
 	ExecDos::exec /DETAILED '.\miniroot\chmod -R 00755 miniroot'
 
 SectionEnd
@@ -76,7 +62,6 @@ Section "Kernel" SecKernel
 	SectionIn RO
 
 	File 'test61.tgz'
-	File '*.cmd'
 
 	# Make sure tar.exe does not see /dev/tty
 	Delete .\dev\*.*
@@ -84,9 +69,9 @@ Section "Kernel" SecKernel
 	DetailPrint "Installing kernel..."
 	ExecDos::exec /DETAILED '.\install.cmd test61.tgz'
 
-	# Remember last chosen directory
-	WriteRegStr HKLM "Software\MinC" "Location" "$INSTDIR"
-
+SectionEnd
+Section "Test" SecTest
+	DetailPrint "Installing Test section..."
 SectionEnd
 Section
 	DetailPrint "Configuring..."
@@ -94,6 +79,13 @@ Section
 	RMDir /r "$INSTDIR\miniroot"
 	Delete "$INSTDIR\*.cmd"
 SectionEnd
+Function .onInit
+	ReadEnvStr $USERNAME USERNAME
+	StrCpy $0 0
+	IfFileExists $INSTDIR\usr\lib\libc.so +2 0
+	StrCpy $0 ${SF_SELECTED}
+	SectionSetFlags ${SecTest} $0
+FunctionEnd
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 !insertmacro MUI_DESCRIPTION_TEXT ${SecKernel} "MinC kernel"

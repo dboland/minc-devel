@@ -3,19 +3,16 @@ ROOTDIR= ../../..
 include ${ROOTDIR}/Makefile.inc
 
 HEADERS= unctrl.h term.h termcap.h
-INCSRC= ${SRCDIR}/lib/libcurses
-XIMPLIB= ${XLIBDIR}/libcurses.a
+LIBSRC= ${SRCDIR}/lib/libcurses
+IMPLIB= ${LIBSRC}/libcurses.dll.a
 
-all: ${INCSRC} ${TMPDIR} .patch
+all: ${LIBSRC} ${TMPDIR} .patch
 
-%.h: ${INCSRC}/%.h
+%.h: ${LIBSRC}/%.h
 	@/bin/cp -vu $< $@
 
 .patch: ${HEADERS} curses.h
 	TMPDIR=${TMPDIR} /bin/patch -p 2 -d . <../libcurses.patch
-
-${XLIBDIR}/%.a: ${INCSRC}/%.dll.a
-	/bin/cp -u $< $@
 
 ${INCDIR}/ncurses.h: curses.h
 	@/bin/cp -vu $< $@
@@ -23,4 +20,5 @@ ${INCDIR}/ncurses.h: curses.h
 install-local: ${INCDIR}/ncurses.h
 	/bin/cp -uv ${HEADERS} ${INCDIR}/
 
-install-cross: ${XIMPLIB}
+install-cross: ${IMPLIB}
+	@/bin/cp -uv ${IMPLIB} ${XLIBDIR}/libncurses.a

@@ -77,12 +77,12 @@ release: release-clean all
 
 install-cross:
 	@/bin/mkdir -p ${XLIBDIR}
-	@/bin/cp -vu libc.a ${XLIBDIR}/
-	@/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libc.so
+	/bin/cp -vu libc.a ${XLIBDIR}/
+	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libc.so
 
 # Perl needs libc.so
 
-install-local: install-cross
+install-local:
 	@/bin/cp -vu ${LIBC} ${BINDIR}/
 	@/bin/cp -vu ${IMPLIB} ${LIBDIR}/libc.so
 	@/bin/cp -vu ${IMPLIB} ${LIBDIR}/libmingwex.dll.a
