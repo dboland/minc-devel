@@ -8,7 +8,7 @@ TRACEDIR= ${ROOTDIR}/libtrace
 SBINSRC= ${SRCDIR}/sbin
 SBINDIR= /sbin
 
-all: ${SBINSRC} ${OBJECTS} bsd.exe
+all: ${SBINSRC} ${SBINSRC}/.patch ${OBJECTS} bsd.exe
 
 ${SBINSRC}:
 	@echo " ---------------------------------------------------"
@@ -22,6 +22,9 @@ ${SBINSRC}:
 
 %.exe: %.o
 	${XGCC} -s ${CFLAGS} -o $@ $<
+
+${SBINSRC}/.patch:
+	TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${SBINSRC} <../sbin.patch
 
 ${BINDIR}: ${PROGS}
 	@/bin/mkdir -p ${BINDIR}

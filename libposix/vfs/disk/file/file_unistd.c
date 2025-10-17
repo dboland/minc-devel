@@ -51,9 +51,8 @@ file_rename(WIN_NAMEIDATA *Path, WIN_NAMEIDATA *Result)
 	BOOL bResult = FALSE;
 	DWORD dwFlags = MOVEFILE_REPLACE_EXISTING | MOVEFILE_COPY_ALLOWED;
 
-	/* When target file is a hard link, it must be
-	 * deleted first. Otherwise the user would get a "corrupted file"
-	 * message in their GUI (perl.exe).
+	/* We can't use MoveFile() here, because when target file is a hard link,
+	 * the user would get a "corrupted file" message in their GUI (perl.exe).
 	 */
 	if (*Path->Last == '\\' || *Result->Last == '\\'){	/* GNU conftest.exe */
 		SetLastError(ERROR_BAD_PATHNAME);
@@ -61,10 +60,10 @@ file_rename(WIN_NAMEIDATA *Path, WIN_NAMEIDATA *Result)
 		bResult = MoveFileW(Path->Resolved, Result->Resolved);
 	}else if (Result->FileType != WIN_VREG){
 		SetLastError(ERROR_FILE_EXISTS);
-	}else if (DeleteFileW(Result->Resolved)){
-		bResult = MoveFileExW(Path->Resolved, Result->Resolved, dwFlags);
-//	}else{
-//		WIN_ERR("file_rename(%ls): %s\n", Result->Resolved, win_strerror(GetLastError()));
+	}else if (ReplaceFileW(Result->Resolved, Path->Resolved, NULL, 0, NULL, NULL)){
+		bResult = TRUE;
+	}else if (ERROR_SHARING_VIOLATION == GetLastError()){	/* same file, different case */
+		bResult = TRUE;
 	}
 	return(bResult);
 }

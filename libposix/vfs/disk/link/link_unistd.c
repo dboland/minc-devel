@@ -41,8 +41,10 @@ link_rename(WIN_NAMEIDATA *Path, WIN_NAMEIDATA *Result)
 		bResult = MoveFileW(Path->Resolved, Result->Resolved);
 	}else if (Result->FileType != WIN_VLNK){
 		SetLastError(ERROR_FILE_EXISTS);
-	}else if (DeleteFileW(Result->Resolved)){
-		bResult = MoveFileExW(Path->Resolved, Result->Resolved, MOVEFILE_COPY_ALLOWED);
+	}else if (ReplaceFileW(Result->Resolved, Path->Resolved, NULL, 0, NULL, NULL)){
+		bResult = TRUE;
+	}else if (ERROR_SHARING_VIOLATION == GetLastError()){	/* same file, different case */
+		bResult = TRUE;
 	}
 	return(bResult);
 }
