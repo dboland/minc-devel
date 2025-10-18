@@ -2,9 +2,8 @@ ROOTDIR= ../..
 
 include ${ROOTDIR}/Makefile.inc
 
-PROGS= gzip id find
-XPROGS= arch uname touch find
-OBJECTS= ${XPROGS} id du sed cap_mkdb sort xargs tsort mktemp join printf
+PROGS= gzip id find arch uname touch find
+OBJECTS= ${PROGS} id du sed cap_mkdb sort xargs tsort mktemp join printf
 UBINSRC= ${SRCDIR}/usr.bin
 UBINDIR= /usr/bin
 
@@ -24,18 +23,6 @@ ${UBINSRC}:
 
 ${UBINSRC}/.patch:
 	TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${UBINSRC} <../usr.bin.patch
-
-${BINDIR}: ${PROGS} xinstall
-	@/bin/mkdir -p ${BINDIR}
-	/bin/cp -vu ${PROGS} ${BINDIR}/
-	/bin/cp -vu xinstall ${BINDIR}/install
-	/bin/cp -vu manifest ${BINDIR}/install.exe.manifest
-
-${XBINDIR}: ${XPROGS} xinstall
-	@/bin/mkdir -p ${XBINDIR}
-	/bin/cp -vu ${XPROGS} ${XBINDIR}/
-	/bin/cp -vu xinstall ${XBINDIR}/install
-	/bin/cp -vu manifest ${XBINDIR}/install.exe.manifest
 
 uname: ${UBINSRC}/uname/uname.c
 	@echo -n "$@ "
@@ -113,7 +100,11 @@ cap_mkdb: ${UBINSRC}/cap_mkdb/cap_mkdb.c ${UBINSRC}/cap_mkdb/getinfo.c
 	@echo -n "$@ "
 	@${XGCC} -s ${CFLAGS} -o $@ $^
 
-install-local: ${BINDIR} ${XBINDIR}
+install-local:
+	@/bin/mkdir -p ${BINDIR}
+	/bin/cp -vu ${PROGS} ${BINDIR}/
+	/bin/cp -vu xinstall ${BINDIR}/install
+	/bin/cp -vu manifest ${BINDIR}/install.exe.manifest
 
 install: ${DESTDIR} ${OBJECTS} xinstall
 	@${MKDIR} -p ${DESTDIR}${UBINDIR}

@@ -21,4 +21,4 @@ install-local: ${INCDIR}/ncurses.h
 	/bin/cp -uv ${HEADERS} ${INCDIR}/
 
 install-cross: ${IMPLIB}
-	@/bin/cp -uv ${IMPLIB} ${XLIBDIR}/libncurses.a
+	/bin/cp -uv ${IMPLIB} ${XLIBDIR}/libncurses.a

@@ -25,7 +25,9 @@ echo " ---------------------------------------------------"
 
 /bin/rm -f ${DESTDIR}/dev/*
 
-/bin/make install
+if ! /bin/make install; then
+	exit 1
+fi
 
 PATH=${DESTDIR}/sbin
 

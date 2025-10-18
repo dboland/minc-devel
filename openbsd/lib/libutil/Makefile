@@ -39,7 +39,7 @@ install-local:
 	/bin/cp -vu libutil.a ${LIBDIR}/
 
 install-cross: ${IMPLIB}
-	@/bin/cp -uv ${IMPLIB} ${XLIBDIR}/libutil.a
+	/bin/cp -uv ${IMPLIB} ${XLIBDIR}/libutil.a
 
 install:
 	${INSTALL} -m ${BINMODE} libutil.a ${DESTDIR}${ULIBDIR}/

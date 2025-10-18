@@ -49,10 +49,10 @@ BOOL
 file_rename(WIN_NAMEIDATA *Path, WIN_NAMEIDATA *Result)
 {
 	BOOL bResult = FALSE;
-	DWORD dwFlags = MOVEFILE_REPLACE_EXISTING | MOVEFILE_COPY_ALLOWED;
+	DWORD dwFlags = MOVEFILE_REPLACE_EXISTING;
 
-	/* We can't use MoveFile() here, because when target file is a hard link,
-	 * the user would get a "corrupted file" message in their GUI (perl.exe).
+	/* We can't use MoveFile() first. When target file is a hard link,
+	 * user would get a "corrupted file" message in their GUI (perl.exe).
 	 */
 	if (*Path->Last == '\\' || *Result->Last == '\\'){	/* GNU conftest.exe */
 		SetLastError(ERROR_BAD_PATHNAME);
@@ -62,6 +62,8 @@ file_rename(WIN_NAMEIDATA *Path, WIN_NAMEIDATA *Result)
 		SetLastError(ERROR_FILE_EXISTS);
 	}else if (ReplaceFileW(Result->Resolved, Path->Resolved, NULL, 0, NULL, NULL)){
 		bResult = TRUE;
+	}else if (ERROR_UNABLE_TO_MOVE_REPLACEMENT == GetLastError()){	/* cross-device */
+		bResult = MoveFileExW(Path->Resolved, Result->Resolved, dwFlags);
 	}else if (ERROR_SHARING_VIOLATION == GetLastError()){	/* same file, different case */
 		bResult = TRUE;
 	}

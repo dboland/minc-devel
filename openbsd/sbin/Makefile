@@ -6,7 +6,7 @@ PROGS= mknod wtrace
 OBJECTS= ${PROGS} wrc mkent mount_refs
 TRACEDIR= ${ROOTDIR}/libtrace
 SBINSRC= ${SRCDIR}/sbin
-SBINDIR= /sbin
+SBINDEST= ${DESTDIR}/sbin
 
 all: ${SBINSRC} ${SBINSRC}/.patch ${OBJECTS} bsd.exe
 
@@ -25,10 +25,6 @@ ${SBINSRC}:
 
 ${SBINSRC}/.patch:
 	TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${SBINSRC} <../sbin.patch
-
-${BINDIR}: ${PROGS}
-	@/bin/mkdir -p ${BINDIR}
-	/bin/cp -vu mknod ${BINDIR}/
 
 libwtrace.o: libwtrace.c
 	${CC} -c ${CFLAGS} -I${ROOTDIR}/include -o $@ $<
@@ -57,13 +53,15 @@ wtrace: libwtrace.o wtrace.o
 mount_refs: ${SBINSRC}/mount_ntfs/mount_ntfs.c ${SBINSRC}/mount/getmntopts.c
 	${XGCC} -s ${CFLAGS} -I${SBINSRC}/mount -o $@ $^
 
-install-local: ${BINDIR}
+install-local:
+	@/bin/mkdir -p ${BINDIR}
+	/bin/cp -vu ${PROGS} ${BINDIR}/
 
 install: ${DESTDIR} ${OBJECTS}
-	@${MKDIR} -p ${DESTDIR}${SBINDIR}
-	${INSTALL} ${OBJECTS} ${DESTDIR}${SBINDIR}/
-	${INSTALL} -m 02555 -o 0 -g 0 bsd.exe ${DESTDIR}${SBINDIR}/
-	${INSTALL} -m 00754 -o 0 -g 0 setup.sh ${DESTDIR}${SBINDIR}/
+	@${MKDIR} -p ${SBINDEST}
+	${INSTALL} ${OBJECTS} ${SBINDEST}/
+	${INSTALL} -m 02555 -o 0 -g 0 bsd.exe ${SBINDEST}/
+	${INSTALL} -m 00754 -o 0 -g 0 setup.sh ${SBINDEST}/
 
 release-clean:
 	rm -f version.o

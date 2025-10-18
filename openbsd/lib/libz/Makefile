@@ -7,6 +7,7 @@ OBJECTS= adler32.o compress.o crc32.o deflate.o gzio.o infback.o \
 	inffast.o inflate.o inftrees.o trees.o uncompr.o zutil.o
 HEADERS= zlib.h zconf.h
 ULIBDEST= ${DESTDIR}/usr/lib
+IMPLIB= ${SRCDIR}/lib/libz/libz.dll.a
 
 all: ${HEADERS} ${LIB}
 
@@ -24,6 +25,9 @@ ${LIB}: ${OBJECTS}
 
 install-local:
 	/bin/cp -vu ${LIB} ${LIBDIR}/
+
+install-cross: ${IMPLIB}
+	/bin/cp -uv ${IMPLIB} ${XLIBDIR}/libz.a
 
 install:
 	${INSTALL} -m ${BINMODE} ${LIB} ${ULIBDEST}/

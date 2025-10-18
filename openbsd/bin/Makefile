@@ -2,9 +2,8 @@ ROOTDIR= ../..
 
 include ${ROOTDIR}/Makefile.inc
 
-PROGS= ln mkdir chmod ls cp
-XPROGS= ${PROGS} mv rmdir test chown chgrp
-OBJECTS= ${XPROGS} cat echo
+PROGS= ln mkdir chmod ls cp mv rmdir test chown chgrp
+OBJECTS= ${PROGS} cat echo
 CFLAGS+= -DNOPIE -s -static
 BINSRC= ${SRCDIR}/bin
 
@@ -20,14 +19,6 @@ ${BINSRC}:
 
 ${BINSRC}/.patch:
 	TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${BINSRC} <../bin.patch
-
-${BINDIR}: ${PROGS}
-	@/bin/mkdir -p ${BINDIR}
-	/bin/cp -vu ${PROGS} ${BINDIR}/
-
-${XBINDIR}: ${XPROGS}
-	@/bin/mkdir -p ${XBINDIR}
-	/bin/cp -vu ${XPROGS} ${XBINDIR}/
 
 chmod: ${BINSRC}/chmod/chmod.c
 	${XGCC} ${CFLAGS} -o $@ $<
@@ -66,7 +57,9 @@ ls: ${BINSRC}/ls/main.c ${BINSRC}/ls/print.c ${BINSRC}/ls/cmp.c ${BINSRC}/ls/uti
 cp: ${BINSRC}/cp/utils.c ${BINSRC}/cp/cp.c
 	${XGCC} ${CFLAGS} -o $@ $^
 
-install-local: ${BINDIR} ${XBINDIR}
+install-local:
+	@/bin/mkdir -p ${BINDIR}
+	/bin/cp -vu ${PROGS} ${BINDIR}/
 
 install: ${DESTDIR} ${OBJECTS}
 	@${MKDIR} -p ${DESTDIR}/bin

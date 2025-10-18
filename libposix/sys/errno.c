@@ -181,6 +181,7 @@ errno_posix(DWORD Error)
 			result = EAGAIN;
 			break;
 		case ERROR_NOT_SAME_DEVICE:
+		case ERROR_UNABLE_TO_MOVE_REPLACEMENT:
 			result = EXDEV;
 			break;
 		case ERROR_GEN_FAILURE:			/* 31: A device attached to the system is not functioning. */

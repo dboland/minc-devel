@@ -23,6 +23,7 @@ install-cross:
 	@${MAKE} -C libsocket install-cross
 	@${MAKE} -C libutil install-cross
 	@${MAKE} -C libcurses install-cross
+	@${MAKE} -C libz install-cross
 
 install:
 	@${MAKE} -C libc install
