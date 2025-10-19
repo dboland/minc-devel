@@ -43,14 +43,8 @@ Section
 	# Put files there
 	File /r 'miniroot'
 	File '*.cmd'
-	File 'comp61.tgz'
 
 	ExecDos::exec /DETAILED '.\miniroot\chmod -R 00755 miniroot'
-
-	IfFileExists .\usr\lib\libc.so +3 0
-	DetailPrint "Installing base libraries..."
-	ExecDos::exec /DETAILED '.\install.cmd comp61.tgz'
-	Delete 'comp61.tgz'
 
         # Remember last chosen directory
         WriteRegStr HKLM ${REGFILE} "BuildTools" $INSTDIR
@@ -86,6 +80,11 @@ Section "Vim editor" SecVim
 	DetailPrint "Installing vim 8.1..."
 	ExecDos::exec /DETAILED '.\install.cmd vim81.tgz'
 SectionEnd
+Section "Base libraries" SecBase
+	File 'comp61.tgz'
+	DetailPrint "Installing base libraries..."
+	ExecDos::exec /DETAILED '.\install.cmd comp61.tgz'
+SectionEnd
 Section
 	DetailPrint "Cleaning up..."
 	RMDir /r "$INSTDIR\miniroot"
@@ -93,6 +92,7 @@ Section
 SectionEnd
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+!insertmacro MUI_DESCRIPTION_TEXT ${SecBase} "OpenBSD 6.1 Base libraries"
 !insertmacro MUI_DESCRIPTION_TEXT ${SecCurl} "curl - transfer a URL"
 !insertmacro MUI_DESCRIPTION_TEXT ${SecGCC} 'gcc - GNU project C and C++ compiler'
 !insertmacro MUI_DESCRIPTION_TEXT ${SecBinUtils} 'ld - The GNU linker'
@@ -100,3 +100,10 @@ SectionEnd
 !insertmacro MUI_DESCRIPTION_TEXT ${SecMake} 'gmake - GNU make utility to maintain groups of programs'
 !insertmacro MUI_DESCRIPTION_TEXT ${SecVim} "Vi IMproved, a programmer's text editor"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
+
+Function .onInit
+        StrCpy $0 0
+        IfFileExists $INSTDIR\usr\lib\libc.so +2 0
+        StrCpy $0 ${SF_SELECTED}
+        SectionSetFlags ${SecBase} $0
+FunctionEnd

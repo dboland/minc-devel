@@ -22,8 +22,6 @@ ${LIBDL}: ${OBJECTS}
 	-o $@ --image-base=${IMGBASE_LIBDL} ${LIBDIR}/dllcrt2.o ${OBJECTS} \
 	-L${LIBDIR} -lmingw32
 
-# create /usr/libexec/ld.so for configure scripts to detect shared libs
-
 ${LIBXDIR}: ${LIBDL}
 	@/bin/mkdir -p ${LIBXDIR}
 	/bin/cp -vu ${LIBDL} ${LIBXDIR}/
@@ -33,9 +31,11 @@ install-cross:
 	/bin/cp -vu ${LIBDL} ${XLIBXDIR}/
 	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libdl.a
 
+# create /usr/libexec/ld.so for configure scripts to enable shared libs
+
 install-local:
-	@/bin/mkdir -p ${LIBXDIR}
-	/bin/cp -vu ${LIBDL} ${LIBXDIR}/
+	@/bin/mkdir -p ${ULIBXDIR}
+	/bin/cp -vu ${LIBDL} ${ULIBXDIR}/
 	/bin/cp -vu ${IMPLIB} ${LIBDIR}/
 
 install: ${DESTDIR}

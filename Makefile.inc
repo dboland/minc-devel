@@ -5,6 +5,14 @@ include ${ROOTDIR}/config.inc
 .SUFFIXES:
 .DEFAULT:
 
+# locations for GNU Cross Compiler
+
+XPREFIX=/usr/i686-openbsd-pe
+XBINDIR=${XPREFIX}/bin
+XLIBDIR=${XPREFIX}/lib
+XINCDIR=${XPREFIX}/include
+XLIBXDIR=${XPREFIX}/libexec
+
 # PIC default: 0x10000000 (library space)
 # PIE default: 0x00400000 (program space)
 

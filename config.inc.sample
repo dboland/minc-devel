@@ -16,14 +16,6 @@ LIBXDIR=${PREFIX}/libexec
 SHDIR=${PREFIX}/share
 TMPDIR=${PREFIX}/tmp
 
-# locations for GNU Cross Compiler
-
-XPREFIX=/usr/i686-openbsd-pe
-XBINDIR=${XPREFIX}/bin
-XLIBDIR=${XPREFIX}/lib
-XINCDIR=${XPREFIX}/include
-XLIBXDIR=${XPREFIX}/libexec
-
 # locations of BSD install programs
 
 MKDIR=${BINDIR}/mkdir

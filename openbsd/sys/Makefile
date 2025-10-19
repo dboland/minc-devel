@@ -4,7 +4,7 @@ include ${ROOTDIR}/Makefile.inc
 
 SYSDIRS= ${INCDIR}/machine ${INCDIR}/sys ${INCDIR}/dev ${INCDIR}/net \
 	${INCDIR}/net80211 ${INCDIR}/netinet ${INCDIR}/netinet6 \
-	${INCDIR}/uvm ${INCDIR}/dev/wscons \
+	${INCDIR}/crypto ${INCDIR}/uvm ${INCDIR}/dev/wscons \
 	${INCDIR}/ufs/ext2fs ${INCDIR}/ufs/ffs ${INCDIR}/ufs/mfs \
 	${INCDIR}/ufs/ufs
 SYSSRC= ${SRCDIR}/sys

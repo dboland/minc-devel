@@ -2,8 +2,25 @@
 +++ openbsd-master/lib/.patch	2025-09-12 11:34:13 +0200
 @@ -0,0 +1 @@
 +This directory has been patched.
+--- openbsd-master/lib/libcrypto/crypto/arch/i386/Makefile.inc
++++ openbsd-master/lib/libcrypto/crypto/arch/i386/Makefile.inc	Sun Oct 19 10:28:04 2025
+@@ -52,7 +52,7 @@
+ ${f}.S: ${LCRYPTO_SRC}/${dir}/asm/${f}.pl ${LCRYPTO_SRC}/perlasm/x86gas.pl
+ 	/usr/bin/perl -I${LCRYPTO_SRC}/perlasm -I${LCRYPTO_SRC}/${dir}/asm \
+ 		${LCRYPTO_SRC}/${dir}/asm/${f}.pl \
+-		    openbsd-elf ${CFLAGS} 386 ${PICFLAG} > ${.TARGET}
++		    openbsd-coff ${CFLAGS} ${PICFLAG} > ${.TARGET}
+ .endfor
+ 
+ CFLAGS+= -DOPENSSL_CPUID_OBJ
+@@ -61,4 +61,4 @@
+ 
+ x86cpuid.S: ${LCRYPTO_SRC}/x86cpuid.pl ${LCRYPTO_SRC}/perlasm/x86gas.pl
+ 	/usr/bin/perl -I${LCRYPTO_SRC}/perlasm ${LCRYPTO_SRC}/x86cpuid.pl \
+-		openbsd-elf ${CFLAGS} 386 ${PICFLAG} > ${.TARGET}
++		openbsd-coff ${CFLAGS} ${PICFLAG} > ${.TARGET}
 --- openbsd-master/lib/libcrypto/crypto/Makefile
-+++ openbsd-master/lib/libcrypto/crypto/Makefile	Sat Oct 11 16:21:31 2025
++++ openbsd-master/lib/libcrypto/crypto/Makefile	Sun Oct 19 07:49:51 2025
 @@ -397,8 +397,7 @@
  	    mkdir ${DESTDIR}/usr/include/openssl
  	@cd ${SSL_SRC}; \
@@ -56,17 +73,6 @@
  		-DHAVE_STDINT_H=1 -DHAVE_INTTYPES_H=1 \
  		-DHAVE_GMTIME_R=1 \
  		-DHAVE_LOCALTIME_R=1 \
---- openbsd-master/lib/libssl/src/crypto/asn1/asn1.h
-+++ openbsd-master/lib/libssl/src/crypto/asn1/asn1.h	Fri Oct 10 10:22:29 2025
-@@ -403,7 +403,7 @@
- #define ASN1_ITEM_rptr(ref) (&(ref##_it))
- 
- #define DECLARE_ASN1_ITEM(name) \
--	OPENSSL_EXTERN const ASN1_ITEM name##_it;
-+	OPENSSL_EXTERN __import const ASN1_ITEM name##_it;
- 
- #else
- 
 --- openbsd-master/lib/libssl/src/crypto/perlasm/x86asm.pl
 +++ openbsd-master/lib/libssl/src/crypto/perlasm/x86asm.pl	Fri Oct 10 10:22:29 2025
 @@ -234,6 +234,8 @@

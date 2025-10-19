@@ -10,6 +10,7 @@ all: ${TMPDIR} ${LIBSRC}/.patch
 	@${MAKE} -C libsocket all install-local
 	@${MAKE} -C libm all install-local
 	@${MAKE} -C libz all install-local
+	@${MAKE} -C libssl all install-local
 	@${MAKE} -C libutil all install-local
 	@${MAKE} -C libedit all install-local
 	@${MAKE} -C libcurses all install-local
@@ -24,6 +25,8 @@ install-cross:
 	@${MAKE} -C libutil install-cross
 	@${MAKE} -C libcurses install-cross
 	@${MAKE} -C libz install-cross
+	@${MAKE} -C libcrypto install-cross
+	@${MAKE} -C libssl install-cross
 
 install:
 	@${MAKE} -C libc install
