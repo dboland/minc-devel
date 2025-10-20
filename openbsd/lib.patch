@@ -20,7 +20,16 @@
 -		openbsd-elf ${CFLAGS} 386 ${PICFLAG} > ${.TARGET}
 +		openbsd-coff ${CFLAGS} ${PICFLAG} > ${.TARGET}
 --- openbsd-master/lib/libcrypto/crypto/Makefile
-+++ openbsd-master/lib/libcrypto/crypto/Makefile	Sun Oct 19 07:49:51 2025
++++ openbsd-master/lib/libcrypto/crypto/Makefile	Mon Oct 20 05:00:54 2025
+@@ -16,7 +16,7 @@
+ PICFLAG=-fPIC
+ .endif
+ 
+-CFLAGS+= -DTERMIOS
++CFLAGS+= -DTERMIOS -DLIBSSL_IMPORT=
+ # Hardware engines
+ CFLAGS+= -DOPENSSL_NO_HW_PADLOCK # XXX enable this?
+ 
 @@ -397,8 +397,7 @@
  	    mkdir ${DESTDIR}/usr/include/openssl
  	@cd ${SSL_SRC}; \
@@ -73,6 +82,17 @@
  		-DHAVE_STDINT_H=1 -DHAVE_INTTYPES_H=1 \
  		-DHAVE_GMTIME_R=1 \
  		-DHAVE_LOCALTIME_R=1 \
+--- openbsd-master/lib/libssl/src/crypto/asn1/asn1.h
++++ openbsd-master/lib/libssl/src/crypto/asn1/asn1.h	Sun Oct 19 18:30:13 2025
+@@ -403,7 +403,7 @@
+ #define ASN1_ITEM_rptr(ref) (&(ref##_it))
+ 
+ #define DECLARE_ASN1_ITEM(name) \
+-	OPENSSL_EXTERN const ASN1_ITEM name##_it;
++	OPENSSL_EXTERN LIBSSL_IMPORT const ASN1_ITEM name##_it;
+ 
+ #else
+ 
 --- openbsd-master/lib/libssl/src/crypto/perlasm/x86asm.pl
 +++ openbsd-master/lib/libssl/src/crypto/perlasm/x86asm.pl	Fri Oct 10 10:22:29 2025
 @@ -234,6 +234,8 @@

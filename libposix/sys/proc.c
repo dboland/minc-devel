@@ -122,11 +122,13 @@ kproc_posix(struct kinfo_proc *proc, WIN_TASK *Task)
 	proc->p_iticks = (u_int64_t)(Task->IdleTime * 0.000001);
 	proc->p_cpticks = (u_int32_t)(proc->p_uticks + proc->p_sticks);
 
-	/* FSCALE is used to pack a decimal into an integer, but 
-	 * the result is not yet optimal (see: sys/kern/sched_bsd.c:227)
-	 */
-	rticks = (u_int32_t)(rtime * 0.001);		/* milliseconds */
-	proc->p_pctcpu = (proc->p_cpticks * FSCALE) / rticks;
+	if (!(Task->Flags & WIN_PS_NOZOMBIE)){
+		/* FSCALE is used to pack a decimal into an integer, but 
+		 * the result is not yet optimal (see: sys/kern/sched_bsd.c:227)
+		 */
+		rticks = (u_int32_t)(rtime * 0.001);		/* milliseconds */
+		proc->p_pctcpu = (proc->p_cpticks * FSCALE) / rticks;
+	}
 
 	proc->p_stat = Task->State;			/* CHAR: S* process status (from LWP). */
 	proc->p_cpuid = Task->Processor;		/* LONG: CPU id */

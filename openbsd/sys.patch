@@ -23,8 +23,8 @@
  #if defined(PROF) || defined(GPROF)
  # define _PROF_PROLOGUE	\
 --- openbsd-master/sys/arch/i386/include/cdefs.h
-+++ openbsd-master/sys/arch/i386/include/cdefs.h	Sun Oct  5 08:56:18 2025
-@@ -4,18 +4,64 @@
++++ openbsd-master/sys/arch/i386/include/cdefs.h	Sun Oct 19 18:35:30 2025
+@@ -4,18 +4,67 @@
   * Written by J.T. Conklin <jtc@wimsey.com> 01/17/95.
   * Public domain.
   */
@@ -80,6 +80,9 @@
 +#endif
 +#ifndef NETDB_IMPORT
 +#define NETDB_IMPORT	__import
++#endif
++#ifndef LIBSSL_IMPORT
++#define LIBSSL_IMPORT	__import
 +#endif
 +
 +/* weak aliases are kind of broken in MinGW32 ld.exe:

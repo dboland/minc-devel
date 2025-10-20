@@ -38,11 +38,15 @@ version.o: version.rc
 arch/%.o: arch/${PROCESSOR_ARCHITECTURE}/%.S
 	${XGCC} -c ${CFLAGS} -o $@ $<
 
+# make sure msvcrt.dll is always linked right after ntdll.dll
+# ultimately, we want to remove the C++ runtime dependency
+#
 ${LIBPOSIX}: ${OBJECTS}
 	${LD} -shared -s ${LDFLAGS} -e _DllMainCRTStartup@12 --out-implib=${IMPLIB} \
 	-o $@ --image-base=${IMGBASE_LIBPOSIX} ${OBJECTS} \
-	-L${MINGW}/lib -L${GCCDIR} -L${TRACEDIR} -lmsvcrt -ladvapi32 -lshell32 -luser32 -lntdll -lkernel32 \
-	-lnetapi32 -lws2_32 -liphlpapi -lrpcrt4 -lmpr -lgcc -ltrace
+	-L${MINGW}/lib -L${GCCDIR} -L${TRACEDIR} -ladvapi32 -lshell32 -luser32 \
+	-lntdll -lmsvcrt -lkernel32 -lnetapi32 -lws2_32 -liphlpapi -lrpcrt4 \
+	-lgcc -ltrace
 
 ${XLIBDIR}:
 	/bin/mkdir -p ${XLIBDIR}
