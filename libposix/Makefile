@@ -51,13 +51,13 @@ ${LIBPOSIX}: ${OBJECTS}
 ${XLIBDIR}:
 	/bin/mkdir -p ${XLIBDIR}
 
-# make sure we always have access to the kernel
-
 install-cross:
 	@/bin/mkdir -p ${XLIBDIR}
-	@/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libposix.so
+	/bin/cp -vu ${IMPLIB} ${XLIBDIR}/libposix.so
 
-install-local: install-cross
+# make sure we always have access to the kernel
+
+install-local:
 	@/bin/cp -vu ${LIBPOSIX} /usr/bin/
 	@/bin/cp -vu ${IMPLIB} ${LIBDIR}/libmingw32.a
 
