@@ -11,6 +11,6 @@ cp /bin/chmod "${MINIROOT}/chmod.exe"
 cp /bin/sh "${MINIROOT}/sh.exe"
 cp /sbin/libposix-6.1.0.dll "${MINIROOT}/"
 if ! cp ${BINDIR}/gzip.exe "${MINIROOT}/"; then
-	exit
+	exit 1
 fi
 echo "done."

@@ -114,6 +114,7 @@ vfs_nanosleep(WIN_TASK *Task, DWORDLONG TimeOut, DWORDLONG *Remain)
 	DWORD dwStatus;
 	DWORDLONG dwlTime = Task->ClockTime + TimeOut;
 
+	Task->State = WIN_SSLEEP;
 	liTimeOut.QuadPart = (LONGLONG)(TimeOut * -0.01);	/* 100-nanosecond intervals */
 	if (!SetWaitableTimer(hTimer, &liTimeOut, 0, NULL, NULL, FALSE)){
 		WIN_ERR("SetWaitableTimer(%I64d): %s\n", TimeOut, win_strerror(GetLastError()));
@@ -127,8 +128,9 @@ vfs_nanosleep(WIN_TASK *Task, DWORDLONG TimeOut, DWORDLONG *Remain)
 			bResult = TRUE;
 		}
 	}
-	NtClose(hTimer);		/* don't clear last error */
 	*Remain = Task->ClockTime - dwlTime;
+	NtClose(hTimer);		/* don't clear last error */
+	Task->State = WIN_SONPROC;
 	return(bResult);
 }
 BOOL 

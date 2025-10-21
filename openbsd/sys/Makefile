@@ -25,12 +25,8 @@ ${INCDIR}/%: ${SRCDIR}/sys/%
 	@/bin/mkdir -p $@
 	/bin/cp -u $</*.h $@/
 
-${INCDIR}/machine:
+${INCDIR}/machine: ${SRCDIR}/sys/arch/${ARCH}/include
 	@/bin/mkdir -p $@
-	/bin/cp -ru  ${SRCDIR}/sys/arch/${ARCH}/include/* $@/
-
-${XINCDIR}: ${INCDIR}
-	@/bin/mkdir -p ${XINCDIR}
-	/bin/cp -ru ${INCDIR}/* ${XINCDIR}/
+	/bin/cp -ru  $</* $@/
 
 install-local: ${INCDIR} ${SYSDIRS}

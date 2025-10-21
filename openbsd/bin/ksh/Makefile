@@ -9,7 +9,7 @@ PROG= ksh
 #CFLAGS+=-DDEBUG_EXIT
 #CFLAGS+=-DKSH_DEBUG
 CFLAGS+=-DSMALL
-#CFLAGS+=-DJOBS
+CFLAGS+=-DJOBS
 KSHSRC= ${SRCDIR}/bin/ksh
 MANFILES= ${KSHSRC}/sh.1
 CFLAGS+= -I.
@@ -30,8 +30,8 @@ OBJECTS= alloc.o c_ksh.o c_sh.o c_test.o c_ulimit.o edit.o emacs.2021.o eval.o \
 	misc.o path.o shf.o syn.o table.o trap.o tree.o tty.o var.o \
 	version.o vi.2021.o
 
-# temporary debugging code
-#OBJECTS+= debug.o
+# auxiliary debugging routines
+OBJECTS+= debug.o
 
 # Flags for using gmon. MinGW uses libgmon.a, which contains the 
 # mcount() function. In OpenBSD, this function is inluded in libc.
@@ -60,7 +60,7 @@ all: ${TMPDIR} .patch ${PROG}
 ksh.1: ${KSHSRC}/ksh.1
 	@/bin/cp -u $< $@
 
-.patch: ${SOURCES}
+.patch:
 	TMPDIR=${TMPDIR} /bin/patch -p 2 -d . <../ksh.patch
 
 ${PROG}: ${HEADERS} ${OBJECTS}

@@ -258,8 +258,6 @@ win_execve(LPSTR Command, LPCSTR Path, STARTUPINFO *Info)
 	Info->dwFlags = STARTF_USESTDHANDLES;
 	if (CreateProcess(NULL, Command, NULL, NULL, TRUE, NORMAL_PRIORITY_CLASS, NULL, Path, Info, &pi)){
 		CloseHandle(Info->hStdInput);
-		CloseHandle(Info->hStdOutput);
-		CloseHandle(Info->hStdError);
 		CloseHandle(pi.hThread);
 		WaitForSingleObject(pi.hProcess, INFINITE);
 		bResult = CloseHandle(pi.hProcess);

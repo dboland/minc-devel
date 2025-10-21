@@ -43,7 +43,7 @@ ${INCDIR}/termios.h:
 install-local: ${INCDIR} ${HEADERS}
 
 install-cross:
-	/bin/cp -ruv ${INCDIR} ${XPREFIX}/
+	/bin/cp -ru ${INCDIR} ${XPREFIX}/
 
 ${INCDEST}: ${INCDIR}
 	${CP} -R ${INCDIR} ${DESTDIR}/usr/
