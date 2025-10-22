@@ -48,12 +48,18 @@ dir_rename(WIN_NAMEIDATA *Path, WIN_NAMEIDATA *Result)
 	BOOL bResult = FALSE;
 	DWORD dwFlags = MOVEFILE_COPY_ALLOWED;
 
+	/* The first MoveFile() is to determine if we are renaming
+	 * the same directory. This will yield ERROR_SUCCESS. Otherwise,
+	 * we can safely remove the existing one first.
+	 */
 	if (Path->MountId != Result->MountId){
 		SetLastError(ERROR_NOT_SAME_DEVICE);
 	}else if (Result->Attribs == -1){
 		bResult = MoveFileExW(Path->Resolved, Result->Resolved, dwFlags);
 	}else if (Result->FileType != WIN_VDIR){
 		SetLastError(ERROR_DIRECTORY);
+	}else if (MoveFileExW(Path->Resolved, Result->Resolved, dwFlags)){
+		bResult = TRUE;
 	}else if (RemoveDirectoryW(Result->Resolved)){
 		bResult = MoveFileExW(Path->Resolved, Result->Resolved, dwFlags);
 	}
