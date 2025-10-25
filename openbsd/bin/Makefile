@@ -3,7 +3,7 @@ ROOTDIR= ../..
 include ${ROOTDIR}/Makefile.inc
 
 PROGS= ln mkdir chmod ls cp mv rmdir test chown chgrp
-OBJECTS= ${PROGS} cat echo
+OBJECTS= ${PROGS} cat echo rm
 CFLAGS+= -DNOPIE -s -static
 BINSRC= ${SRCDIR}/bin
 
@@ -36,6 +36,9 @@ mkdir: ${BINSRC}/mkdir/mkdir.c
 	${XGCC} ${CFLAGS} -o $@ $<
 
 mv: ${BINSRC}/mv/mv.c
+	${XGCC} ${CFLAGS} -o $@ $<
+
+rm: ${BINSRC}/rm/rm.c
 	${XGCC} ${CFLAGS} -o $@ $<
 
 rmdir: ${BINSRC}/rmdir/rmdir.c
