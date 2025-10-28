@@ -64,7 +64,7 @@ const char const* __C_TYPE[] = {
 	"CKEYWD",
 	"CTALIAS"
 };
-const char const* __X_TYPE[] = {
+const char const *__X_TYPE[] = {
 	"XBASE",
 	"XSUB",
 	"XARGSEP",
@@ -74,8 +74,35 @@ const char const* __X_TYPE[] = {
 	"XSUBMID"
 };
 
-char __X_BUF[255];
+char __X_BUF[255] = "";
 
+char *
+__TF_FLAGS(int flags)
+{
+	char *buf = __X_BUF;
+
+	if (flags & TF_SHELL_USES)
+		buf += sprintf(buf, "[SHELL_USES]");
+	if (flags & TF_USER_SET)
+		buf += sprintf(buf, "[USER_SET]");
+	if (flags & TF_ORIG_IGN)
+		buf += sprintf(buf, "[ORIG_IGN]");
+	if (flags & TF_ORIG_DFL)
+		buf += sprintf(buf, "[ORIG_DFL]");
+	if (flags & TF_EXEC_IGN)
+		buf += sprintf(buf, "[EXEC_IGN]");
+	if (flags & TF_EXEC_DFL)
+		buf += sprintf(buf, "[EXEC_DFL]");
+	if (flags & TF_DFL_INTR)
+		buf += sprintf(buf, "[DFL_INTR]");
+	if (flags & TF_TTY_INTR)
+		buf += sprintf(buf, "[TTY_INTR]");
+	if (flags & TF_CHANGED)
+		buf += sprintf(buf, "[CHANGED]");
+	if (flags & TF_FATAL)
+		buf += sprintf(buf, "[FATAL]");
+	return(__X_BUF);
+}
 char *
 __X_FLAGS(int flags)
 {

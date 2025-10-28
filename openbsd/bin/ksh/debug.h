@@ -35,3 +35,4 @@ extern const char const* __X_TYPE[];
 
 char *__X_FLAGS(int flags);
 char *__JW_FLAGS(int flags);
+char *__TF_FLAGS(int flags);

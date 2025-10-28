@@ -107,23 +107,12 @@ InputInsert(DWORD KeyState, CHAR *Buffer)
 	return(bResult);
 }
 BOOL 
-InputPause(DWORD KeyState, WIN_TERMIO *Attribs, CHAR *Buffer)
-{
-	BOOL bResult = TRUE;
-
-	if (!(Attribs->IFlags & WIN_BRKINT)){
-		InputChar('\n', KeyState, Buffer);
-	}else if (vfs_raise(WM_COMMAND, CTRL_C_EVENT, 0)){
-		bResult = FALSE;
-	}
-	return(TRUE);
-}
-BOOL 
 InputKey(KEY_EVENT_RECORD *Event, WIN_TERMIO *Attribs, CHAR *Buffer)
 {
 	BOOL bResult = TRUE;
 	CHAR CH = Event->uChar.AsciiChar;
 	WORD VK = Event->wVirtualKeyCode;
+
 
 	if (!Event->bKeyDown){
 		*Buffer = 0;
@@ -133,9 +122,6 @@ InputKey(KEY_EVENT_RECORD *Event, WIN_TERMIO *Attribs, CHAR *Buffer)
 		bResult = InputTabulator(Event->dwControlKeyState, Buffer);
 	}else if (CH){
 		bResult = InputChar(CH, Event->dwControlKeyState, Buffer);
-	}else if (VK == VK_PAUSE){
-WIN_ERR("[%d]", CH);
-		bResult = InputPause(Event->dwControlKeyState, Attribs, Buffer);
 	}else if (VK == VK_INSERT){
 		bResult = InputInsert(Event->dwControlKeyState, Buffer);
 	}else if (VK <= VK_MODIFY){

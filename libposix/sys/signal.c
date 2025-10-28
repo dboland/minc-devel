@@ -144,18 +144,6 @@ context_posix(ucontext_t *ucontext, CONTEXT *Context)
 	return(ucontext);
 }
 int 
-__sigsuspend(WIN_TASK *Task, const sigset_t *mask)
-{
-	int result = 0;
-
-	if (!mask){
-		result = -EFAULT;
-	}else if (!vfs_sigsuspend(Task, mask)){
-		result -= errno_posix(GetLastError());
-	}
-	return(result);
-}
-int 
 sigproc_default(WIN_TASK *Task, int signum)
 {
 	sigset_t sigbit = sigmask(signum);
@@ -167,7 +155,6 @@ sigproc_default(WIN_TASK *Task, int signum)
 	if (sigbit & SIGMASK_STOP){
 		Task->Status = _WSTOPPED;
 		SetEvent(__Interrupt);
-		__sigsuspend(Task, &mask);
 	}else if (sigbit & ~SIGMASK_IGNORE){
 		Task->Status = signum;
 		__exit(Task, 127);
@@ -316,7 +303,14 @@ sys_sigprocmask(call_t call, int how, const sigset_t *restrict set, sigset_t *re
 int 
 sys_sigsuspend(call_t call, const sigset_t *mask)
 {
-	return(__sigsuspend(call.Task, mask));
+	int result = 0;
+
+	if (!mask){
+		result = -EFAULT;
+	}else if (!vfs_sigsuspend(call.Task, mask)){
+		result -= errno_posix(GetLastError());
+	}
+	return(result);
 }
 int 
 sys_sigpending(call_t call, sigset_t *set)

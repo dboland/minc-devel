@@ -10,6 +10,7 @@ SRCTYPE=dir
 LIST=
 DEPTH=
 COMMAND=diff
+REVERT=
 
 diff_head()
 {
@@ -20,7 +21,11 @@ diff_head()
 }
 diff_file()
 {
-	diff -Nau "$SOURCE/$1" "$1" | sed "s:$SOURCE/::"
+	if [ -z "$REVERT" ]; then
+		diff -au "$SOURCE/$1" "$1" | sed "s:$SOURCE/::"
+	else
+		diff -au "$1" "$SOURCE/$1" | sed "s:$SOURCE/::"
+	fi
 }
 diff_list()
 {
@@ -48,7 +53,8 @@ diff_dir()
 			echo "MinC: $file" >&2
 			;;
 		*)
-			diff -au "$SOURCE/$file" "$file" | sed "s:$SOURCE/::"
+#			diff -au "$SOURCE/$file" "$file" | sed "s:$SOURCE/::"
+			diff_file "$file"
 			;;
 	esac
 	done
@@ -117,6 +123,9 @@ while [ -n "$1" ]; do
 			DEPTH="-maxdepth $2"
 			shift
 			;;
+		-r|--revert)
+			REVERT=yes
+			;;
 		list|usage)
 			COMMAND=$1
 			;;
@@ -136,6 +145,7 @@ do_usage()
 	printf " -a,--archive\t\tspecify ZIP archive as source\n"
 	printf " -l,--list\t\tprint files only, do not diff\n"
 	printf " -d,--depth\t\tlimit file search to depth\n"
+	printf " -r,--revert\t\trevert source/destination\n"
 }
 do_list()
 {
