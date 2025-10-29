@@ -5,6 +5,7 @@ include ${ROOTDIR}/Makefile.inc
 PROG= ksh
 #CFLAGS+=-DDEBUG
 #CFLAGS+=-DDEBUG_JOBS
+#CFLAGS+=-DDEBUG_TRAPS
 #CFLAGS+=-DDEBUG_SUBST
 #CFLAGS+=-DDEBUG_EXIT
 #CFLAGS+=-DKSH_DEBUG
@@ -40,6 +41,7 @@ OBJECTS+= debug.o
 # after compiling with below flags, execute once, then:
 # gprof -q ksh.exe (gprof.exe comes with the GNU binutils suite)
 
+CFLAGS+= -DSMALL
 #CFLAGS+=-pg
 #OBJECTS+=/usr/lib/gcrt0.o
 
@@ -75,5 +77,4 @@ patch-clean:
 	/bin/rm -f ${SOURCES} .patch
 
 clean:
-	/bin/rm -f *.o ${HEADERS} ${PROG}
-
+	/bin/rm -f *.o *.exe ${HEADERS}

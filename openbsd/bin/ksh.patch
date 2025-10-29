@@ -3,7 +3,7 @@
 @@ -0,0 +1 @@
 +This directory has been patched.
 --- bin/ksh/edit.h	2014-05-19 17:05:13 +0200
-+++ bin/ksh/edit.h	2025-09-14 04:26:52 +0200
++++ bin/ksh/edit.h	2025-10-01 12:02:48 +0200
 @@ -35,7 +35,7 @@
  	int eof;
  } X_chars;
@@ -14,7 +14,7 @@
  /* x_cf_glob() flags */
  #define XCF_COMMAND	BIT(0)	/* Do command completion */
 --- bin/ksh/eval.c	2014-05-19 17:05:13 +0200
-+++ bin/ksh/eval.c	2025-09-14 09:30:00 +0200
++++ bin/ksh/eval.c	2025-10-01 12:02:48 +0200
 @@ -854,6 +854,7 @@
  	if (t == NULL)
  		return XBASE;
@@ -32,7 +32,7 @@
  }
  
 --- bin/ksh/exec.c	2014-05-19 17:05:13 +0200
-+++ bin/ksh/exec.c	2025-09-14 09:33:06 +0200
++++ bin/ksh/exec.c	2025-10-01 12:02:48 +0200
 @@ -57,7 +57,9 @@
  	}
  	 */
@@ -115,7 +115,7 @@
  	builtin_flag = tp->flag;
  	shf_reopen(1, SHF_WR, shl_stdout);
 --- bin/ksh/io.c	2014-05-19 17:05:13 +0200
-+++ bin/ksh/io.c	2025-09-14 04:22:38 +0200
++++ bin/ksh/io.c	2025-10-01 12:02:48 +0200
 @@ -93,6 +93,7 @@
  	va_end(va);
  	shf_putchar('\n', shl_out);
@@ -134,7 +134,7 @@
  void
  initio(void)
 --- bin/ksh/jobs.c	2014-05-19 17:05:13 +0200
-+++ bin/ksh/jobs.c	2025-09-14 09:37:26 +0200
++++ bin/ksh/jobs.c	2025-10-29 08:01:27 +0100
 @@ -105,24 +105,24 @@
  
  struct timeval	j_systime, j_usrtime;	/* user and system time of last j_waitjed job */
@@ -218,15 +218,7 @@
  		nzombie = 0;
  #ifdef JOBS
  		ttypgrp_ok = 0;
-@@ -530,7 +535,6 @@
- #endif /* JOBS */
- 		Flag(FTALKING) = 0;
- 		tty_close();
--		cleartraps();
- 		execute(t, (flags & XERROK) | XEXEC, NULL); /* no return */
- 		internal_errorf(0, "exchild: execute() returned");
- 		unwind(LLEAVE);
-@@ -540,6 +544,7 @@
+@@ -540,6 +545,7 @@
  	/* shell (parent) stuff */
  	/* Ensure next child gets a (slightly) different $RANDOM sequence */
  	change_random();
@@ -234,7 +226,7 @@
  	if (!(flags & XPIPEO)) {	/* last process in a job */
  #ifdef JOBS
  		/* YYY: Is this needed? (see also YYY above)
-@@ -565,6 +570,7 @@
+@@ -565,6 +571,7 @@
  		} else
  			rv = j_waitj(j, JW_NONE, "jw:last proc");
  	}
@@ -242,7 +234,7 @@
  
  	sigprocmask(SIG_SETMASK, &omask, (sigset_t *) 0);
  
-@@ -598,6 +604,7 @@
+@@ -598,6 +605,7 @@
  	sigprocmask(SIG_BLOCK, &sm_sigchld, &omask);
  
  	j = last_job;
@@ -250,7 +242,7 @@
  	if (!j || !(j->flags & JF_STARTED)) {
  		if (!j)
  			warningf(true, "waitlast: no last job");
-@@ -1027,6 +1034,7 @@
+@@ -1027,6 +1035,7 @@
  
  	while ((volatile int) j->state == PRUNNING ||
  	    ((flags & JW_STOPPEDWAIT) && (volatile int) j->state == PSTOPPED)) {
@@ -258,7 +250,7 @@
  		sigsuspend(&sm_default);
  		if (fatal_trap) {
  			int oldf = j->flags & (JF_WAITING|JF_W_ASYNCNOTIFY);
-@@ -1129,6 +1137,7 @@
+@@ -1129,6 +1138,7 @@
  	    (!Flag(FMONITOR) || !(flags & JW_ASYNCNOTIFY)))
  		remove_job(j, where);
  
@@ -266,7 +258,7 @@
  	return rv;
  }
  
-@@ -1147,6 +1156,7 @@
+@@ -1147,6 +1157,7 @@
  	int		status;
  	struct rusage	ru0, ru1;
  
@@ -274,7 +266,7 @@
  	/* Don't wait for any processes if a job is partially started.
  	 * This is so we don't do away with the process group leader
  	 * before all the processes in a pipe line are started (so the
-@@ -1200,6 +1210,7 @@
+@@ -1200,6 +1211,7 @@
  
  		check_job(j);	/* check to see if entire job is done */
  	} while (1);
@@ -282,7 +274,7 @@
  
  finished:
  	errno = errno_;
-@@ -1228,6 +1239,7 @@
+@@ -1228,6 +1240,7 @@
  
  	jstate = PRUNNING;
  	for (p=j->proc_list; p != (Proc *) 0; p = p->next) {
@@ -290,7 +282,7 @@
  		if (p->state == PRUNNING)
  			return;	/* some processes still running */
  		if (p->state > jstate)
-@@ -1510,8 +1522,8 @@
+@@ -1510,8 +1523,8 @@
  	return (Job *) 0;
  }
  
@@ -301,7 +293,7 @@
  
  /* allocate a new job and fill in the job number.
   *
-@@ -1570,6 +1582,7 @@
+@@ -1570,6 +1583,7 @@
  	Proc	*p, *tmp;
  	Job	**prev, *curr;
  
@@ -310,7 +302,7 @@
  	curr = *prev;
  	for (; curr != (Job *) 0 && curr != j; prev = &curr->next, curr = *prev)
 --- bin/ksh/ksh.1	2014-05-19 17:05:13 +0200
-+++ bin/ksh/ksh.1	2025-09-14 06:25:34 +0200
++++ bin/ksh/ksh.1	2025-10-01 12:02:48 +0200
 @@ -5609,7 +5609,7 @@
      System Interface (POSIX) \- Part 2: Shell and Utilities
  .Re
@@ -321,7 +313,7 @@
  .Sh AUTHORS
  .An -nosplit
 --- bin/ksh/main.c	2014-05-19 17:05:13 +0200
-+++ bin/ksh/main.c	2025-09-14 09:40:26 +0200
++++ bin/ksh/main.c	2025-10-28 12:11:23 +0100
 @@ -512,6 +512,7 @@
  	if (interactive)
  		really_exit = 0;
@@ -363,7 +355,7 @@
  		remove_temps(ep->temps);
  }
 --- bin/ksh/path.c	2014-05-19 17:05:13 +0200
-+++ bin/ksh/path.c	2025-09-14 09:42:01 +0200
++++ bin/ksh/path.c	2025-10-01 12:02:48 +0200
 @@ -42,6 +42,7 @@
  	int	plen = 0;
  	char	*xp = Xstring(*xsp, xp);
@@ -389,7 +381,7 @@
  
  char *
 --- bin/ksh/sh.h	2014-05-19 17:05:13 +0200
-+++ bin/ksh/sh.h	2025-09-14 04:26:52 +0200
++++ bin/ksh/sh.h	2025-10-29 07:18:01 +0100
 @@ -69,13 +69,13 @@
  #define	LINE	2048		/* input line size */
  #define	PATH	1024		/* pathname size (todo: PATH_MAX/pathconf()) */
@@ -459,7 +451,7 @@
 +EXTERN __thread	volatile sig_atomic_t fatal_trap;/* received a fatal signal */
  extern	volatile sig_atomic_t got_sigwinch;
 -extern	Trap	sigtraps[NSIG+1];
-+extern __thread	Trap	sigtraps[NSIG+1];
++extern __thread Trap	sigtraps[NSIG+1];
  
  /*
   * TMOUT support
@@ -524,7 +516,7 @@
  /* be sure not to interfere with anyone else's idea about EXTERN */
  #ifdef EXTERN_DEFINED
 --- bin/ksh/shf.c	2014-05-19 17:05:13 +0200
-+++ bin/ksh/shf.c	2025-09-14 04:22:38 +0200
++++ bin/ksh/shf.c	2025-10-01 12:02:48 +0200
 @@ -214,6 +214,7 @@
  {
  	int ret = 0;
@@ -534,7 +526,7 @@
  		ret = shf_flush(shf);
  		if (close(shf->fd) < 0)
 --- bin/ksh/shf.h	2014-05-19 17:05:13 +0200
-+++ bin/ksh/shf.h	2025-09-14 04:26:52 +0200
++++ bin/ksh/shf.h	2025-10-01 12:02:48 +0200
 @@ -57,7 +57,7 @@
  	Area *areap;		/* area shf/buf were allocated in */
  };
@@ -545,7 +537,7 @@
  struct shf *shf_open(const char *, int, int, int);
  struct shf *shf_fdopen(int, int, struct shf *);
 --- bin/ksh/syn.c	2014-05-19 17:05:13 +0200
-+++ bin/ksh/syn.c	2025-09-14 09:43:03 +0200
++++ bin/ksh/syn.c	2025-10-01 12:02:48 +0200
 @@ -40,12 +40,12 @@
  		    int);
  static void	dbtestp_error(Test_env *, int, const char *);
@@ -564,38 +556,81 @@
  #define	REJECT	(reject = 1)
  #define	ACCEPT	(reject = 0)
 --- bin/ksh/trap.c	2014-05-19 17:05:13 +0200
-+++ bin/ksh/trap.c	2025-09-14 09:43:55 +0200
-@@ -6,9 +6,9 @@
++++ bin/ksh/trap.c	2025-10-29 11:33:24 +0100
+@@ -6,7 +6,7 @@
  
  #include "sh.h"
  
 -Trap sigtraps[NSIG + 1];
 +__thread Trap sigtraps[NSIG + 1];
  
--static struct sigaction Sigact_ign, Sigact_trap;
-+static __thread struct sigaction Sigact_ign, Sigact_trap;
+ static struct sigaction Sigact_ign, Sigact_trap;
  
- void
- inittraps(void)
 @@ -45,6 +45,7 @@
  	setsig(&sigtraps[SIGQUIT], trapsig, SS_RESTORE_ORIG);
  	setsig(&sigtraps[SIGTERM], trapsig, SS_RESTORE_ORIG);
  	setsig(&sigtraps[SIGHUP], trapsig, SS_RESTORE_ORIG);
-+__DEBUG_JOBS("inittraps: trapsig(0x%x)\n", trapsig)
++__DEBUG_TRAPS("inittraps: trapsig(0x%x)\n", trapsig)
  }
  
  static void alarm_catcher(int sig);
-@@ -122,6 +123,8 @@
+@@ -115,6 +116,7 @@
+ 	Trap *p = &sigtraps[i];
+ 	int errno_ = errno;
+ 
++__DEBUG_TRAPS("trapsig(%s) flags(%s)\n", p->name, __TF_FLAGS(p->flags))
+ 	trap = p->set = 1;
+ 	if (p->flags & TF_DFL_INTR)
+ 		intrsig = 1;
+@@ -122,6 +124,8 @@
  		fatal_trap = 1;
  		intrsig = 1;
  	}
-+__DEBUG_JOBS("trapsig(%s): cursig(0x%x) shtrap(0x%x) trap(%s)\n", 
-+		p->name, p->cursig, p->shtrap, p->trap)
++__DEBUG_TRAPS("trapsig(%s): cursig(0x%x) shtrap(0x%x) trap(%s) set(%d) intrsig(%d)\n", 
++		p->name, p->cursig, p->shtrap, p->trap, p->set, intrsig)
  	if (p->shtrap)
  		(*p->shtrap)(i);
  	errno = errno_;
+@@ -133,8 +137,10 @@
+ void
+ intrcheck(void)
+ {
+-	if (intrsig)
++	if (intrsig){
++__DEBUG_TRAPS("intrcheck()\n")
+ 		runtraps(TF_DFL_INTR|TF_FATAL);
++	}
+ }
+ 
+ /* called after EINTR to check if a signal with normally causes process
+@@ -181,6 +187,7 @@
+ 	int i;
+ 	Trap *p;
+ 
++__DEBUG_TRAPS("runtraps(0x%x) intrsig(%d)\n", flag, intrsig)
+ 	if (ksh_tmout_state == TMOUT_LEAVING) {
+ 		ksh_tmout_state = TMOUT_EXECUTING;
+ 		warningf(false, "timed out waiting for input");
+@@ -210,6 +217,8 @@
+ 	int	oexstat;
+ 	int	old_changed = 0;
+ 
++__DEBUG_TRAPS("runtrap(%s): cursig(0x%x) shtrap(0x%x) trap(%s) set(%d) flags(%s)\n", 
++		p->name, p->cursig, p->shtrap, p->trap, p->set, __TF_FLAGS(p->flags))
+ 	p->set = 0;
+ 	if (trapstr == (char *) 0) { /* SIG_DFL */
+ 		if (p->flags & TF_FATAL) {
+@@ -390,6 +399,8 @@
+ 		sigaction(p->signal, &sigact, (struct sigaction *) 0);
+ 	}
+ 
++__DEBUG_TRAPS("setsig(%s): cursig(0x%x) shtrap(0x%x) trap(%s) set(%d) flags(%s)\n", 
++		p->name, p->cursig, p->shtrap, p->trap, p->set, __TF_FLAGS(p->flags))
+ 	return 1;
+ }
+ 
 --- bin/ksh/tty.h	2014-05-19 17:05:13 +0200
-+++ bin/ksh/tty.h	2025-09-14 04:26:52 +0200
++++ bin/ksh/tty.h	2025-10-01 12:02:48 +0200
 @@ -22,7 +22,7 @@
  
  #include <termios.h>
@@ -606,7 +641,7 @@
  EXTERN struct termios	tty_state;	/* saved tty state */
  
 --- bin/ksh/version.c	2014-05-19 17:05:13 +0200
-+++ bin/ksh/version.c	2025-09-14 04:22:38 +0200
++++ bin/ksh/version.c	2025-10-01 12:02:48 +0200
 @@ -7,4 +7,4 @@
  #include "sh.h"
  

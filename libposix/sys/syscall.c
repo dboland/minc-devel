@@ -468,7 +468,7 @@ sys_setsid(call_t call)
 	pid_t result = 0;
 	WIN_TASK *pwTask = call.Task;
 
-	if (!vfs_setsid(pwTask)){
+	if (!proc_setsid(pwTask)){
 		result -= errno_posix(GetLastError());
 	}else{
 		result = pwTask->SessionId;

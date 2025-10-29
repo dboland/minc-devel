@@ -107,6 +107,24 @@ proc_dup(WIN_TASK *Parent, WIN_THREAD_STRUCT *Thread)
 	return(ptResult);
 }
 BOOL 
+proc_setsid(WIN_TASK *Task)
+{
+	BOOL bResult = FALSE;
+
+	if (Task->TaskId == Task->GroupId){
+		SetLastError(ERROR_INVALID_OPERATION);
+	}else{
+		Task->GroupId = Task->TaskId;
+		Task->SessionId = Task->TaskId;
+//		if (Task->TerminalId){
+//			FreeConsole();
+//		}
+//		Task->TerminalId = 0;
+		bResult = TRUE;
+	}
+	return(bResult);
+}
+BOOL 
 proc_close(WIN_TASK *Task)
 {
 	BOOL bResult = FALSE;

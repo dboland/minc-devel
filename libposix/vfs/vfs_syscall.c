@@ -218,21 +218,3 @@ vfs_pipe(WIN_VNODE Result[2])
 	}
 	return(bResult);
 }
-BOOL 
-vfs_setsid(WIN_TASK *Task)
-{
-	BOOL bResult = FALSE;
-
-	if (Task->TaskId == Task->GroupId){
-		SetLastError(ERROR_INVALID_OPERATION);
-	}else{
-		Task->GroupId = Task->TaskId;
-		Task->SessionId = Task->TaskId;
-//		if (Task->TerminalId){
-//			FreeConsole();
-//		}
-//		Task->TerminalId = 0;
-		bResult = TRUE;
-	}
-	return(bResult);
-}

@@ -14,6 +14,12 @@ int msvc_printf(const char *format, ...);
 #define __DEBUG_JOBS(...)
 #endif
 
+#ifdef DEBUG_TRAPS
+#define __DEBUG_TRAPS(...)	__PRINTF(" " __VA_ARGS__)
+#else
+#define __DEBUG_TRAPS(...)
+#endif
+
 #ifdef DEBUG_EXIT
 #define __DEBUG_EXIT(...)	__PRINTF(" " __VA_ARGS__)
 #else

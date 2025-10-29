@@ -82,25 +82,25 @@ __TF_FLAGS(int flags)
 	char *buf = __X_BUF;
 
 	if (flags & TF_SHELL_USES)
-		buf += sprintf(buf, "[SHELL_USES]");
+		buf += sprintf(buf, "[TF_SHELL_USES]");
 	if (flags & TF_USER_SET)
-		buf += sprintf(buf, "[USER_SET]");
+		buf += sprintf(buf, "[TF_USER_SET]");
 	if (flags & TF_ORIG_IGN)
-		buf += sprintf(buf, "[ORIG_IGN]");
+		buf += sprintf(buf, "[TF_ORIG_IGN]");
 	if (flags & TF_ORIG_DFL)
-		buf += sprintf(buf, "[ORIG_DFL]");
+		buf += sprintf(buf, "[TF_ORIG_DFL]");
 	if (flags & TF_EXEC_IGN)
-		buf += sprintf(buf, "[EXEC_IGN]");
+		buf += sprintf(buf, "[TF_EXEC_IGN]");
 	if (flags & TF_EXEC_DFL)
-		buf += sprintf(buf, "[EXEC_DFL]");
+		buf += sprintf(buf, "[TF_EXEC_DFL]");
 	if (flags & TF_DFL_INTR)
-		buf += sprintf(buf, "[DFL_INTR]");
+		buf += sprintf(buf, "[TF_DFL_INTR]");
 	if (flags & TF_TTY_INTR)
-		buf += sprintf(buf, "[TTY_INTR]");
+		buf += sprintf(buf, "[TF_TTY_INTR]");
 	if (flags & TF_CHANGED)
-		buf += sprintf(buf, "[CHANGED]");
+		buf += sprintf(buf, "[TF_CHANGED]");
 	if (flags & TF_FATAL)
-		buf += sprintf(buf, "[FATAL]");
+		buf += sprintf(buf, "[TF_FATAL]");
 	return(__X_BUF);
 }
 char *

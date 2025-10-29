@@ -73,7 +73,6 @@ BOOL vfs_setegid(WIN_TASK *Task, SID8 *Sid);
 BOOL vfs_setlogin(WIN_TASK *Task, LPCSTR Name);
 BOOL vfs_getlogin(WIN_TASK *Task, LPSTR Name, DWORD Size);
 BOOL vfs_pipe(WIN_VNODE Result[2]);
-BOOL vfs_setsid(WIN_TASK *Task);
 BOOL vfs_setugid(WIN_TASK *Task);
 
 /* vfs_termios.c */
@@ -206,6 +205,7 @@ BOOL proc_orphanize(WIN_TASK *Task);
 PVOID proc_malloc(WIN_TASK *Task, ULONG Size);
 BOOL proc_realloc(WIN_TASK *Task, ULONG Size, PVOID Buffer, PVOID *Result);
 VOID proc_free(WIN_TASK *Task, PVOID Buffer);
+BOOL proc_setsid(WIN_TASK *Task);
 
 /* drive.c */
 
