@@ -32,7 +32,7 @@
  }
  
 --- bin/ksh/exec.c	2014-05-19 17:05:13 +0200
-+++ bin/ksh/exec.c	2025-10-01 12:02:48 +0200
++++ bin/ksh/exec.c	2025-10-30 07:23:41 +0100
 @@ -57,7 +57,9 @@
  	}
  	 */
@@ -51,7 +51,7 @@
  	switch (t->type) {
  	case TCOM:
  		rv = comexec(t, tp, ap, flags, xerrok);
-@@ -356,10 +359,10 @@
+@@ -356,10 +359,11 @@
  		break;
  
  	case TEXEC:		/* an eval'd TCOM */
@@ -60,10 +60,11 @@
  		ap = makenv();
  		restoresigs();
 -		cleanup_proc_env();
++//		cleanup_proc_env();
  		execve(t->str, t->args, ap);
  		if (errno == ENOEXEC)
  			scriptexec(t, ap);
-@@ -371,13 +374,18 @@
+@@ -371,13 +375,18 @@
  
  	quitenv(NULL);		/* restores IO */
  	if ((flags&XEXEC))
@@ -83,7 +84,7 @@
  	return rv;
  }
  
-@@ -399,6 +407,7 @@
+@@ -399,6 +408,7 @@
  	int fcflags = FC_BI|FC_FUNC|FC_PATH;
  	int bourne_function_call = 0;
  
@@ -91,7 +92,7 @@
  	/* snag the last argument for $_ XXX not the same as at&t ksh,
  	 * which only seems to set $_ after a newline (but not in
  	 * functions/dot scripts, but in interactive and script) -
-@@ -677,10 +686,13 @@
+@@ -677,10 +687,13 @@
  		break;
  	}
    Leave:
@@ -106,7 +107,7 @@
  	return rv;
  }
  
-@@ -1008,6 +1020,7 @@
+@@ -1008,6 +1021,7 @@
  {
  	int rv;
  
@@ -134,7 +135,7 @@
  void
  initio(void)
 --- bin/ksh/jobs.c	2014-05-19 17:05:13 +0200
-+++ bin/ksh/jobs.c	2025-10-29 08:01:27 +0100
++++ bin/ksh/jobs.c	2025-10-31 06:39:19 +0100
 @@ -105,24 +105,24 @@
  
  struct timeval	j_systime, j_usrtime;	/* user and system time of last j_waitjed job */
@@ -218,6 +219,15 @@
  		nzombie = 0;
  #ifdef JOBS
  		ttypgrp_ok = 0;
+@@ -530,7 +535,7 @@
+ #endif /* JOBS */
+ 		Flag(FTALKING) = 0;
+ 		tty_close();
+-		cleartraps();
++//		cleartraps();	/* segfaults when sending things to bg */
+ 		execute(t, (flags & XERROK) | XEXEC, NULL); /* no return */
+ 		internal_errorf(0, "exchild: execute() returned");
+ 		unwind(LLEAVE);
 @@ -540,6 +545,7 @@
  	/* shell (parent) stuff */
  	/* Ensure next child gets a (slightly) different $RANDOM sequence */
@@ -556,7 +566,7 @@
  #define	REJECT	(reject = 1)
  #define	ACCEPT	(reject = 0)
 --- bin/ksh/trap.c	2014-05-19 17:05:13 +0200
-+++ bin/ksh/trap.c	2025-10-29 11:33:24 +0100
++++ bin/ksh/trap.c	2025-10-30 16:04:34 +0100
 @@ -6,7 +6,7 @@
  
  #include "sh.h"

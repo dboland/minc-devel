@@ -46,7 +46,7 @@ vim to edit it and define the indicated variables.
 ## Step 2: build a minimal OpenBSD system
 
 The kernel will be built using a combination of vanilla MinGW 
-and our *poor man's cross-compiler*, residing in */opt/minc/cross*. 
+and our *poor man's cross-compiler*, residing in */opt/minc*. 
 To test if this all works, make the kernel first:
 
 	make kernel

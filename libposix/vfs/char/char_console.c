@@ -42,9 +42,11 @@ ConControlHandler(DWORD CtrlType)
 	 * our code. Let's make sure it uses our Task struct too:
 	 */
 	TlsSetValue(__TlsIndex, (PVOID)__Process->TaskId);
-	if (__Process->GroupId == __CTTY->GroupId){
-		if (vfs_raise(WM_COMMAND, CtrlType, 0)){
-			SetEvent(__Interrupt);		/* ping6.exe */
+	if (__CTTY->Attribs.LFlags & WIN_ISIG){
+		if (__Process->GroupId == __CTTY->GroupId){
+			if (vfs_raise(WM_COMMAND, CtrlType, 0)){
+				SetEvent(__Interrupt);		/* ping6.exe */
+			}
 		}
 	}
 	return(bResult);

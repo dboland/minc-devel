@@ -29,18 +29,13 @@
  */
 
 #include <stdlib.h>
+#include <libgen.h>
+#include <errno.h>
 
 #include "win/windows.h"
 #include "win_posix.h"
 #include "vfs_posix.h"
 #include "arch_posix.h"
-
-#include <libgen.h>
-#include <errno.h>
-
-/* atexit.c */
-
-//char *malloc_options;        /* compile-time options */
 
 /****************************************************/
 

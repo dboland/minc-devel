@@ -69,7 +69,7 @@ diff_zip()
 		elif [[ $file == *.out ]]; then
 			continue
 		elif [[ $file == */.patch ]]; then
-			echo "Patch: $file" >&2
+			echo "Patched: $file" >&2
 		elif [[ $file == */BSDmakefile ]]; then
 			echo "Alternative: $file" >&2
 		elif [[ $file == *.dll.a ]]; then
