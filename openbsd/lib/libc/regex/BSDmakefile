@@ -1,7 +1,0 @@
-SRCDIR=/mnt/d/openbsd-master/lib/libc/regex/
-
-MAN+=   regex.3 re_format.7
-
-MLINKS+=regex.3 regcomp.3 regex.3 regexec.3 regex.3 regerror.3 regex.3 regfree.3
-
-.include <bsd.man.mk>
