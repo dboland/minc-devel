@@ -28,7 +28,7 @@
  *
  */
 
-#include <sys/sched.h>
+#include <sys/task.h>
 
 /* OpenBSD has an elaborate algorithm to forget 90% of usage statistics,
  * which they call 'digital decay' or 'exponential decay value' (KERN_CCPU).

@@ -3,7 +3,7 @@
 @@ -0,0 +1 @@
 +This directory has been patched.
 --- share/mk/bsd.lib.mk	2014-05-19 17:05:13 +0200
-+++ share/mk/bsd.lib.mk	2025-11-01 06:14:17 +0100
++++ share/mk/bsd.lib.mk	2025-11-01 11:47:26 +0100
 @@ -36,8 +36,8 @@
  DIST_CFLAGS+=	-Os
  
@@ -32,11 +32,13 @@
  	    `${LORDER} ${SOBJS}|tsort -q` ${LDADD}
  
  # all .do files...
-@@ -295,7 +296,6 @@
+@@ -294,8 +295,7 @@
+ .  endfor
  .endif
  
- install: maninstall _SUBDIRUSE
+-install: maninstall _SUBDIRUSE
 -maninstall: afterinstall
++install: afterinstall maninstall _SUBDIRUSE
  afterinstall: realinstall
  realinstall: beforeinstall
  .endif

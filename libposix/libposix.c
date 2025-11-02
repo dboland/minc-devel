@@ -33,6 +33,7 @@
 #include <wchar.h>
 
 #include <sys/sysctl.h>
+#include <sys/sched.h>
 
 #include "win/windows.h"		/* minimal Win32 */
 #include "win/winsock2.h"		/* minimal Windows Sockets v.2 */
@@ -104,7 +105,7 @@ CHAR 			*__PROGNAME;		/* ktrace.c */
 #include "sys/unistd.c"
 #include "sys/wait.c"
 #include "sys/signal.c"
-#include "sys/sched.c"
+#include "sys/task.c"
 #include "sys/mman.c"
 #include "sys/poll.c"
 #include "sys/select.c"
