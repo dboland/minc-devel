@@ -66,7 +66,6 @@ typedef struct {
  */
 char *__progname;
 char **environ __attribute__((dllexport));
-//int h_errno;
 
 tlsentry __offsets[GOT_MAX];
 

@@ -52,5 +52,17 @@ in their days. I am working on a solution which will maintain the
 mount table in semi real-time, like I have done with the /etc/passwd 
 and /etc/group tables.
 
-October, 2025
+## Networking
+
+Only the "read" part of networking has been implemented, so you 
+can run **ifconfig** to show your network configuration, but you 
+can't configure the network with it. Likewise, you can run 
+**route show** to show your routing table, but adding or deleting 
+network routes does not work.
+
+I intend to implement the missing parts but these have a low 
+priority at the moment. Create an issue if you need to have one 
+of them implemented.
+
+November, 2025
 Daniel Boland
