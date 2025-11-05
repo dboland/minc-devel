@@ -136,10 +136,7 @@ ws2_accept(WIN_TASK *Task, WIN_VNODE *Node, LPSOCKADDR Address, LPINT Length, WI
 			break;
 		}else if (dwResult){
 			bResult = WSAcceptFile(Node, Address, Length, Result);
-			break;
-		}else if (!sock_select(Node, INFINITE)){
-			break;
-		}else if (proc_poll(Task)){
+		}else if (!sock_select(Task, Node, INFINITE)){
 			break;
 		}
 	}

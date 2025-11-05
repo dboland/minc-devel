@@ -45,6 +45,9 @@ ConControlHandler(DWORD CtrlType)
 	if (__Process->GroupId == __CTTY->GroupId){
 		if (vfs_raise(WM_COMMAND, CtrlType, 0)){
 			SetEvent(__Interrupt);		/* ping6.exe */
+		}else{
+			__Process->Flags |= WIN_PS_EXITING;
+			bResult = FALSE;	/* causes ExitProcess() */
 		}
 	}
 	return(bResult);

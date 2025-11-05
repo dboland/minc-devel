@@ -37,18 +37,16 @@ pipe_close(WIN_VNODE *Node)
 {
 	BOOL bResult = FALSE;
 
-	if (Node->Handle == INVALID_HANDLE_VALUE){	/* socket not bound (init.exe) */
-		bResult = TRUE;
-	}else if (!CloseHandle(Node->Handle)){
-		WIN_ERR("pipe_close(%d): %s\n", Node->Handle, win_strerror(GetLastError()));
-	}else if (!SetEvent(Node->Event)){
-		WIN_ERR("SetEvent(%d): %s\n", Node->Event, win_strerror(GetLastError()));
-//	}else if (!CloseHandle(Node->Event)){
-//		WIN_ERR("pipe_close(%d): %s\n", Node->Event, win_strerror(GetLastError()));
-	}else{
-		bResult = TRUE;
+	switch (Node->FileType){
+		case WIN_VSOCK:
+			bResult = sock_close(Node);
+			break;
+		case WIN_VFIFO:
+			bResult = fifo_close(Node);
+			break;
+		default:
+			SetLastError(ERROR_BAD_FILE_TYPE);
 	}
-	ZeroMemory(Node, sizeof(WIN_VNODE));
 	return(bResult);
 }
 BOOL 

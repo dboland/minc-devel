@@ -25,18 +25,18 @@ terminal used. MinC uses the Windows Console by default. Its
 *ncurses* name in the environment is **interix**. This makes MinC 
 compatible as a terminal with **VS Code** and **Windows Terminal**. 
 But it also means that Ctrl+Z (**suspend**) does not work, but 
-Ctrl+S (motor stop) does. Use this instead to suspend the current 
+Ctrl+S (XOFF) does. Use this instead to suspend the current 
 task. Or just use the **Pause** key.
 
 This also means that Ctrl-V (**paste**) does not work. Use the 
-Shift-Ins key combination instead to paste text from the Windows 
+Shift+Insert key combination instead to paste text from the Windows 
 Clipboard in any editing program.
 
 Another thing is that one can't interrupt (Ctrl+C) certain running 
 scripts. For example, the following line will run forever and 
 cannot be interrupted:
 
-	while [ "ok" ]; do echo -n [H]; done
+	while :; do echo [H]; done
 
 I tested this on Debain Linux and my OpenBSD server. To my surprise 
 they both have the same issue. Appearently, this is a feature, not 

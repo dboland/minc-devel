@@ -33,7 +33,7 @@
 /************************************************************/
 
 BOOL 
-sock_select(WIN_VNODE *Node, DWORD TimeOut)
+sock_select(WIN_TASK *Task, WIN_VNODE *Node, DWORD TimeOut)
 {
 	BOOL bResult = FALSE;
 	DWORD dwStatus = 0;
@@ -47,9 +47,7 @@ sock_select(WIN_VNODE *Node, DWORD TimeOut)
 		WIN_ERR("sock_select(%s): %s\n", win_strobj(hObjects, 2), win_strerror(WSAGetLastError()));
 	}else if (dwStatus == WSA_WAIT_TIMEOUT){
 		WSASetLastError(WSAETIMEDOUT);
-//	}else if (!dwStatus){
-//		SetLastError(ERROR_SIGNAL_PENDING);
-	}else{
+	}else if (!proc_poll(Task)){
 		bResult = TRUE;
 	}
 	return(bResult);

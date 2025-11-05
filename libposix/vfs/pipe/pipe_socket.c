@@ -50,7 +50,7 @@ pipe_bind(WIN_TASK *Task, WIN_VNODE *Node, LPSOCKADDR Name, INT Length)
 	BOOL bResult = FALSE;
 	WIN_MODE wMode = {WIN_VSOCK, WIN_S_IRW, WIN_S_IRW, WIN_S_IRW, 0};
 	WCHAR szName[MAX_NAME];
-	DWORD dwAttribs = FILE_FLAG_OVERLAPPED + PIPE_READMODE_MESSAGE;
+	DWORD dwAttribs = FILE_FLAG_OVERLAPPED | PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE;
 
 	if (!PipeCreateFile(VfsCreateName(szName), dwAttribs, __PipeEvent, Node)){
 		return(FALSE);

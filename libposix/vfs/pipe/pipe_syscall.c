@@ -37,8 +37,8 @@ PipeCreateFile(LPCWSTR Name, DWORD Attribs, HANDLE Event, WIN_VNODE *Result)
 {
 	BOOL bResult = FALSE;
 	ACCESS_MASK aMask = GENERIC_READ + GENERIC_WRITE;
-	DWORD dwOpenMode = (Attribs & 0xFFFF0000) + PIPE_ACCESS_DUPLEX;
-	DWORD dwPipeMode = (Attribs & 0x0000FFFF) + PIPE_TYPE_MESSAGE + PIPE_WAIT;
+	DWORD dwOpenMode = (Attribs & 0xFFFF0000) | PIPE_ACCESS_DUPLEX;
+	DWORD dwPipeMode = (Attribs & 0x0000FFFF) | PIPE_WAIT;
 	WCHAR szPath[MAX_PATH] = L"\\\\.\\PIPE\\";
 	DWORD dwMax = PIPE_UNLIMITED_INSTANCES;
 	HANDLE hResult;

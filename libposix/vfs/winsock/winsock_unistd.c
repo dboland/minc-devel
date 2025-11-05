@@ -46,9 +46,9 @@ ws2_close(WIN_VNODE *Node)
 //		WIN_ERR("closesocket(%d): %s\n", Node->Socket, win_strerror(WSAGetLastError()));
 		return(FALSE);
 	}else{
-		ZeroMemory(Node, sizeof(WIN_VNODE));
 		bResult = TRUE;
 	}
+	ZeroMemory(Node, sizeof(WIN_VNODE));
 	return(bResult);
 }
 BOOL 
@@ -68,10 +68,7 @@ ws2_read(WIN_TASK *Task, WIN_VNODE *Node, LPSTR Buffer, DWORD Size, DWORD *Resul
 			break;
 		}else if (dwResult){
 			bResult = fifo_read(Node, Buffer, Size, Result);
-			break;
-		}else if (!sock_select(Node, INFINITE)){
-			break;
-		}else if (proc_poll(Task)){
+		}else if (!sock_select(Task, Node, INFINITE)){
 			break;
 		}
 	}

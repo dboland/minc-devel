@@ -33,6 +33,31 @@
 /****************************************************/
 
 BOOL 
+sock_close(WIN_VNODE *Node)
+{
+	BOOL bResult = FALSE;
+	DWORD dwResult;
+	OVERLAPPED ovl = {0, 0, 0, 0, Node->Event};
+
+	/* Since this is a bi-directional pipe, CloseHandle()
+	 * will block when the thread on the other side is 
+	 * reading or peeking. So we send one last NULL byte
+	 * to let the other side know there is nothing to read.
+	 */
+	WriteFile(Node->Handle, "", 0, &dwResult, &ovl);
+	if (Node->Handle == INVALID_HANDLE_VALUE){	/* socket not bound (init.exe) */
+		bResult = TRUE;
+	}else if (!CloseHandle(Node->Handle)){
+		WIN_ERR("sock_close(%d): %s\n", Node->Handle, win_strerror(GetLastError()));
+//	}else if (!CloseHandle(Node->Event)){
+//		WIN_ERR("sock_close(%d): %s\n", Node->Event, win_strerror(GetLastError()));
+	}else{
+		bResult = TRUE;
+	}
+	ZeroMemory(Node, sizeof(WIN_VNODE));
+	return(bResult);
+}
+BOOL 
 sock_read(WIN_TASK *Task, WIN_VNODE *Node, LPSTR Buffer, DWORD Size, DWORD *Result)
 {
 	BOOL bResult = FALSE;
@@ -40,13 +65,10 @@ sock_read(WIN_TASK *Task, WIN_VNODE *Node, LPSTR Buffer, DWORD Size, DWORD *Resu
 
 	while (!bResult){
 		if (!pipe_FIONREAD(Node, &ulResult)){
-			bResult = TRUE;		/* POSIX result for read() */
+			bResult = TRUE;		/* POSIX result for read() of 0 bytes */
 		}else if (ulResult){
 			bResult = fifo_read(Node, Buffer, Size, Result);
-			break;
-		}else if (!sock_select(Node, INFINITE)){
-			break;
-		}else if (proc_poll(Task)){
+		}else if (!sock_select(Task, Node, INFINITE)){
 			break;
 		}
 	}

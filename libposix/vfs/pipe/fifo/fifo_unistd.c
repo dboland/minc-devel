@@ -33,6 +33,19 @@
 /****************************************************/
 
 BOOL 
+fifo_close(WIN_VNODE *Node)
+{
+	BOOL bResult = FALSE;
+
+	if (!CloseHandle(Node->Handle)){
+		WIN_ERR("fifo_close(%d): %s\n", Node->Handle, win_strerror(GetLastError()));
+	}else{
+		ZeroMemory(Node, sizeof(WIN_VNODE));
+		bResult = TRUE;
+	}
+	return(bResult);
+}
+BOOL 
 fifo_read(WIN_VNODE *Node, LPSTR Buffer, DWORD Size, DWORD *Result)
 {
 	BOOL bResult = FALSE;

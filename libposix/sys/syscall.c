@@ -606,7 +606,7 @@ sys_execve(call_t call, const char *path, char *const argv[], char *const envp[]
 __dead void 
 __exit(WIN_TASK *Task, int status)
 {
-	Task->Status = (status * 0x100);
+	Task->Status |= (status * 0x100);
 	Task->Flags |= WIN_PS_EXITING;
 	if (Task->Flags & WIN_PS_CONTROLT){
 		pdo_revoke(DEVICE(__CTTY->DeviceId));
