@@ -39,10 +39,10 @@ sock_close(WIN_VNODE *Node)
 	DWORD dwResult;
 	OVERLAPPED ovl = {0, 0, 0, 0, Node->Event};
 
-	/* Since this is a bi-directional pipe, CloseHandle()
-	 * will block when the thread on the other side is 
-	 * reading or peeking. So we send one last NULL byte
-	 * to let the other side know there is nothing to read.
+	/* Since this is a bi-directional pipe, CloseHandle() will block
+	 * when the thread on the other side is reading or peeking. So
+	 * we send one last NULL byte to let the other side know there
+	 * is nothing to read (tcpdump.exe).
 	 */
 	WriteFile(Node->Handle, "", 0, &dwResult, &ovl);
 	if (Node->Handle == INVALID_HANDLE_VALUE){	/* socket not bound (init.exe) */

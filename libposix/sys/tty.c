@@ -30,6 +30,9 @@
 
 #include <sys/tty.h>
 
+#undef TTYDEF_IFLAG
+#define TTYDEF_IFLAG    (ICRNL | IMAXBEL | IXON | IXANY)
+
 /****************************************************/
 
 void 

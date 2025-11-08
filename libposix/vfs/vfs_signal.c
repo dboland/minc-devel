@@ -58,7 +58,7 @@ SigExceptionProc(PEXCEPTION_POINTERS ExceptionInfo)
 			break;
 		case STATUS_STACK_OVERFLOW:
 			WIN_ERR("Stack overflow\n");
-			dwCtrlType = CTRL_ABORT_EVENT;
+			dwCtrlType = CTRL_BREAK_EVENT;
 			break;
 		default:
 			WIN_ERR("ExceptionProc(0x%x) %s: Not implemented.\n", dwExceptionCode, nt_strerror(GetLastError()));

@@ -81,7 +81,7 @@ ScreenScrollUp(HANDLE Handle, CONSOLE_SCREEN_BUFFER_INFO *Info)
 
 	sRect.Top = 1;
 	sRect.Bottom = Info->dwSize.Y - 1;
-	return(ScrollConsoleScreenBuffer(Handle, &sRect, NULL, cPos, &cInfo));
+	return(ScrollConsoleScreenBuffer(Handle, &sRect, &Info->srWindow, cPos, &cInfo));
 }
 BOOL 
 ScreenLineFeed(HANDLE Handle, UINT Flags, CONSOLE_SCREEN_BUFFER_INFO *Info)

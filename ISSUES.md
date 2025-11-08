@@ -17,8 +17,8 @@ issues, but it is already enough for normal sh usage. The remaining
 issues with ksh are:
 
 * large 'configure' scripts (GNU autotools) will not run;
-* Command Substitution works up to 64 times, then you get: 
-/bin/ksh: too many files open in shell
+* Command Substitution works up to 64 times, then you get: */bin/ksh: 
+too many files open in shell*
 
 Also, some of the Korn Shell features are dependent on the type of 
 terminal used. MinC uses the Windows Console by default. Its 
@@ -39,8 +39,9 @@ cannot be interrupted:
 	while :; do echo [H]; done
 
 I tested this on Debain Linux and my OpenBSD server. To my surprise 
-they both have the same issue. Appearently, this is a feature, not 
-a bug.
+they both have the same issue when using the MinC Console. With PuTTY 
+Ctrl+C works fine. Appearently, this is a feature, not a bug. I'm 
+working on it.
 
 ## Mounting
 

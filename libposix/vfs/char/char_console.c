@@ -37,6 +37,11 @@ ConControlHandler(DWORD CtrlType)
 {
 	BOOL bResult = TRUE;
 
+	if (CtrlType == CTRL_BREAK_EVENT){
+		if (__CTTY->Attribs.IFlags & WIN_BRKINT){
+			CtrlType = CTRL_C_EVENT;
+		}
+	}
 	/* To deliver signals, Windows (CSRSS.EXE) actually forks!
 	 * Copying the call stack to a new thread and executing
 	 * our code. Let's make sure it uses our Task struct too:

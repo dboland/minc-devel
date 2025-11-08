@@ -408,13 +408,13 @@ typedef struct _WIN_VATTR {
 #define WM_QUIT			18
 #define WIN_NSIG		33
 
-#define CTRL_C_EVENT			0	/* SIGINT */
-#define CTRL_BREAK_EVENT		1	/* SIGTSTP */
-#define CTRL_CLOSE_EVENT		2	/* SIGKILL */
+#define CTRL_C_EVENT			0	/* SIGINT (Console) */
+#define CTRL_BREAK_EVENT		1	/* SIGABRT (Console) */
+#define CTRL_CLOSE_EVENT		2	/* SIGKILL (Console) */
 #define CTRL_ACCESS_VIOLATION_EVENT	3	/* SIGSEGV */
 #define CTRL_ILLEGAL_INSTRUCTION_EVENT	4	/* SIGILL */
-#define CTRL_LOGOFF_EVENT		5	/* SIGHUP */
-#define CTRL_SHUTDOWN_EVENT		6	/* SIGTERM */
+#define CTRL_LOGOFF_EVENT		5	/* SIGHUP (Console) */
+#define CTRL_SHUTDOWN_EVENT		6	/* SIGTERM (Console) */
 #define CTRL_DIVIDE_BY_ZERO_EVENT	7	/* SIGFPE */
 #define CTRL_SIZE_EVENT			8	/* SIGWINCH */
 #define CTRL_CHILD_EVENT		9	/* SIGCHLD */
@@ -422,7 +422,7 @@ typedef struct _WIN_VATTR {
 #define CTRL_DETACH_EVENT		11	/* SIGTHR */
 #define CTRL_QUIT_EVENT			12	/* SIGQUIT */
 #define CTRL_PIPE_EVENT			13	/* SIGPIPE */
-#define CTRL_ABORT_EVENT		14	/* SIGABRT */
+#define CTRL_TERMINAL_STOP_EVENT	14	/* SIGTSTP */
 #define CTRL_VTIMER_EVENT		15	/* SIGVTALRM */
 #define CTRL_URGENT_EVENT		16	/* SIGURG */
 #define CTRL_USER1_EVENT		17	/* SIGUSR1 */
@@ -623,7 +623,7 @@ typedef struct _WIN_TTY {
 #define COMMON_LVB_REVERSE_VIDEO	0x4000
 #define COMMON_LVB_UNDERSCORE		0x8000
 
-/* Local */
+/* sys/termios.h */
 
 #define WIN_ECHO		0x00000008
 #define WIN_ISIG		0x00000080
@@ -631,6 +631,7 @@ typedef struct _WIN_TTY {
 
 /* line In */
 
+#define WIN_IGNBRK		0x00000001      /* ignore BREAK condition */
 #define WIN_BRKINT		0x00000002      /* map BREAK to SIGINT */
 #define WIN_IXON		0x00000200	/* enable output flow control */
 #define WIN_IXOFF		0x00000400	/* enable input flow control */

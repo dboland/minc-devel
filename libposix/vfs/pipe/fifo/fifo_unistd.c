@@ -40,9 +40,9 @@ fifo_close(WIN_VNODE *Node)
 	if (!CloseHandle(Node->Handle)){
 		WIN_ERR("fifo_close(%d): %s\n", Node->Handle, win_strerror(GetLastError()));
 	}else{
-		ZeroMemory(Node, sizeof(WIN_VNODE));
 		bResult = TRUE;
 	}
+	ZeroMemory(Node, sizeof(WIN_VNODE));
 	return(bResult);
 }
 BOOL 
@@ -67,11 +67,18 @@ fifo_write(WIN_VNODE *Node, LPCSTR Buffer, DWORD Size, DWORD *Result)
 {
 	BOOL bResult = FALSE;
 	OVERLAPPED ovl = {0, 0, 0, 0, Node->Event};
+	DWORD dwSize = Size;
 
-	/* Unlike named pipes, anonymous pipes don't block when Size
-	 * is larger than WIN_PIPE_BUF.
+	/* Non-blocking file I/O can be achieved by limiting the number
+	 * of bytes to write to the size of the pipe buffer, without
+	 * having to put the pipe in PIPE_NOWAIT mode (rsync.exe).
 	 */
-	if (WriteFile(Node->Handle, Buffer, Size, Result, &ovl)){
+	if (Node->Attribs & FILE_FLAG_OVERLAPPED){
+		if (dwSize > WIN_PIPE_BUF){
+			dwSize = WIN_PIPE_BUF;
+		}
+	}
+	if (WriteFile(Node->Handle, Buffer, dwSize, Result, &ovl)){
 		bResult = TRUE;
 	}else if (ERROR_BROKEN_PIPE == GetLastError()){	/* read end closed */
 		SetLastError(ERROR_PIPE_NOT_CONNECTED);

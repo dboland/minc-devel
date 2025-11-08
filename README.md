@@ -19,6 +19,12 @@ to:
 
 https://minc.commandlinerevolution.nl/english/home.html
 
+## Known Issues
+
+MinC is already pretty much functional for normal usage, but 
+there are still some issues which need to be solved. Read 
+about them in the ISSUES.md document.
+
 ## Contribute
 
 If you want to contribute to the MinC project, these are 
@@ -40,3 +46,4 @@ in the *Issues* section.
 architect of Windows NT. Please use MinC before, while and after 
 you contribute code. It is really satisfying seeing you own 
 code run.
+

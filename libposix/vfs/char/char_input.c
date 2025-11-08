@@ -30,6 +30,10 @@
 
 #include <wincon.h>
 
+#define CH_DC1	0x11	/* Ctrl+Q (XON) */
+#define CH_DC3	0x13	/* Ctrl+S (XOFF) */
+#define CH_FS	0x1C	/* Ctrl+\ */
+
 /****************************************************/
 
 DWORD 
@@ -112,18 +116,19 @@ InputKey(KEY_EVENT_RECORD *Event, WIN_TERMIO *Attribs, CHAR *Buffer)
 	BOOL bResult = TRUE;
 	CHAR CH = Event->uChar.AsciiChar;
 	WORD VK = Event->wVirtualKeyCode;
+	DWORD dwState = Event->dwControlKeyState;
 
-
+//WIN_ERR("[%d]", CH);
 	if (!Event->bKeyDown){
 		*Buffer = 0;
 	}else if (VK == VK_RETURN){
-		bResult = InputReturn(Event->dwControlKeyState, Attribs, Buffer);
+		bResult = InputReturn(dwState, Attribs, Buffer);
 	}else if (VK == VK_TAB){
-		bResult = InputTabulator(Event->dwControlKeyState, Buffer);
+		bResult = InputTabulator(dwState, Buffer);
 	}else if (CH){
-		bResult = InputChar(CH, Event->dwControlKeyState, Buffer);
+		bResult = InputChar(CH, dwState, Buffer);
 	}else if (VK == VK_INSERT){
-		bResult = InputInsert(Event->dwControlKeyState, Buffer);
+		bResult = InputInsert(dwState, Buffer);
 	}else if (VK <= VK_MODIFY){
 		*Buffer = 0;
 	}else if (VK <= VK_CURSOR){
@@ -195,7 +200,8 @@ InputReadLine(HANDLE Handle, WIN_TERMIO *Attribs, CHAR *Buffer)
 
 	if (!ReadFile(Handle, Buffer, WIN_MAX_INPUT, &lCount, NULL)){
 		WIN_ERR("ReadFile(%d): %s\n", Handle, win_strerror(GetLastError()));
-	}else if (lCount-- > 0){
+	}else if (lCount > 0){
+		lCount--;
 		if (Attribs->LFlags & WIN_ISIG){	/* ENABLE_PROCESSED_INPUT */
 			Buffer[lCount--] = 0;		/* remove NL, leave CR */
 		}
@@ -240,21 +246,16 @@ BOOL
 InputWaitChar(HANDLE Handle, DWORD Mode, LPSTR Buffer)
 {
 	BOOL bResult = FALSE;
-	HANDLE hObjects[2] = {__Interrupt, Handle};
 	DWORD dwStatus;
 
-//	dwStatus = WaitForMultipleObjectsEx(2, hObjects, FALSE, INFINITE, TRUE);
 	dwStatus = WaitForSingleObjectEx(Handle, INFINITE, TRUE);
 	if (dwStatus == WAIT_FAILED){
-		WIN_ERR("WaitForMultipleObjectsEx(%s): %s\n", win_strobj(hObjects, 2), win_strerror(GetLastError()));
-//	}else if (!dwStatus){
-//		bResult = TRUE;
+		WIN_ERR("WaitForMultipleObjectsEx(%d): %s\n", Handle, win_strerror(GetLastError()));
 	}else if (Mode & ENABLE_LINE_INPUT){
 		bResult = InputReadLine(Handle, &__CTTY->Attribs, Buffer);
 	}else{
 		bResult = InputReadEvent(Handle, &__CTTY->Attribs, Buffer);
 	}
-	__Index = 0;
 	return(bResult);
 }
 SHORT 
@@ -334,6 +335,7 @@ input_read(WIN_TASK *Task, HANDLE Handle, LPSTR Buffer, DWORD Size, DWORD *Resul
 			lSize--;
 			__Input++;
 		}else if (dwResult){
+			__Index = 0;
 			bResult = TRUE;
 		}else if (__Clipboard){
 			InputReadClipboard(__INPUT_BUF);
