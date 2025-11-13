@@ -36,7 +36,7 @@ VfsInputMode(LPSTR Buffer, LPCSTR Label, DWORD Mode)
 	LPSTR psz = Buffer;
 	DWORD dwRemain = Mode;
 
-	psz += sprintf(psz, "%s(input): [0x%x]", Label, dwRemain);
+	psz += sprintf(psz, "%s(0x%x): ", Label, dwRemain);
 	psz = WinFlagName(psz, ENABLE_ECHO_INPUT, "ECHO_INPUT", dwRemain, &dwRemain);
 	psz = WinFlagName(psz, ENABLE_INSERT_MODE, "INSERT_MODE", dwRemain, &dwRemain);
 	psz = WinFlagName(psz, ENABLE_LINE_INPUT, "LINE_INPUT", dwRemain, &dwRemain);

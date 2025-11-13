@@ -100,7 +100,7 @@ int __SIG_POSIX[NSIG] = {
 	SIGTHR,
 	SIGQUIT,		/* SIGTERM with coredump */
 	SIGPIPE,
-	SIGTSTP,
+	SIGTSTP,		/* Software flow control (XON/XOFF) */
 	SIGVTALRM,		/* SIGALRM in program time */
 	SIGURG,
 	SIGUSR1,
@@ -109,7 +109,7 @@ int __SIG_POSIX[NSIG] = {
 	SIGEMT,		/* 20 */
 	SIGBUS,
 	SIGINFO,
-	SIGSTOP,		/* Motor stop feature (CuriousMark, 2018) */
+	SIGSTOP,		/* Motor stop feature (CuriousMarc, 2018) */
 	SIGCONT,
 	SIGTTIN,
 	SIGTTOU,
@@ -181,9 +181,9 @@ sigproc_posix(WIN_TASK *Task, int signum, ucontext_t *ucontext)
 	if (Task->TracePoints & KTRFAC_PSIG){
 		ktrace_PSIG(Task, signum, handler, &info);
 	}
-	if (flags & SA_RESTART){		/* supersedes SIG_IGN */
-		result = -1;
-	}
+//	if (flags & SA_RESTART){		/* supersedes SIG_IGN */
+//		result = -1;
+//	}
 	/* This will hang during boot.
 	 */
 //	if (Task->ProcMask & sigbit){

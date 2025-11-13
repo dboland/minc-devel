@@ -569,7 +569,6 @@ typedef struct _WIN_POLLFD {
 #define WIN_POLLRDNORM		0x0040		/* Normal data may be read without blocking */
 #define WIN_POLLRDBAND		0x0080		/* Priority data may be read without blocking */
 #define WIN_POLLWRBAND		0x0100
-#define WIN_POLLREMOVE		0x0200		/* Remove event from queue */
 #define WIN_POLLIGNORE		(WIN_POLLERR | WIN_POLLHUP | WIN_POLLNVAL)
 
 /*

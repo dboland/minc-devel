@@ -87,8 +87,8 @@ UCHAR 		__Char;
 HGLOBAL		__Lock;			/* Clipboard lock */
 DWORD		__ThreadCount;
 DWORD 		__TlsIndex;
-
-DWORD		__Index;
+DWORD		__Index;		/* index into input buffer */
+DWORD		__Buffer;		/* number of characters in buffer */
 
 WIN_SESSION	*__Session;
 WIN_TASK	*__Tasks;
@@ -101,6 +101,7 @@ CHAR 		*__Escape;
 CHAR		*__Input = __INPUT_BUF;
 CONST WCHAR	*__Clipboard;		/* Clipboard buffer */
 WIN_TASK	*__Process;
+DWORD		*__ConMode;
 
 BOOL proc_poll(WIN_TASK *Task);
 BOOL vfs_F_GETFL(HANDLE Handle, ACCESS_MASK *Result);
@@ -157,6 +158,7 @@ vfs_PROCESS_ATTACH(HINSTANCE Instance, LPVOID Reserved)
 	__Mounts = __Session->Mounts;
 	__Strings = __Session->Strings;
 	__Globals = __Session->Globals;
+	__ConMode = __Globals->ConMode;
 	__SidMachine = &__Globals->SidMachine;
 	__SidNone = &__Globals->SidNone;
 	__Frequency = &__Globals->Frequency;

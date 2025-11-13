@@ -58,6 +58,10 @@ WSAPollEvents(WIN_VNODE *Node, LONG Events)
 		Node->Pending = WIN_POLLHUP;	/* lynx.exe */
 		sResult |= WIN_POLLHUP;
 	}
+	/* make sure we see unhandled events */
+	if (Events & ~(FD_WRITE | FD_READ | FD_CONNECT | FD_ACCEPT | FD_CLOSE)){
+		WIN_ERR("[WSAPollEvents:0x%x]", Events);
+	}
 	return(sResult);
 }
 SHORT 

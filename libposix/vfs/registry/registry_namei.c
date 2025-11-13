@@ -62,24 +62,6 @@ RegReadPath(LPCWSTR Source, LPWSTR Destination)
 	*Destination = 0;
 	return(pszBase);
 }
-BOOL 
-RegOpenFile(HKEY Key, LPCWSTR Path, REGSAM Access, WIN_VNODE *Result)
-{
-	BOOL bResult = FALSE;
-	LONG lResult;
-	HKEY hkResult;
-
-	lResult = RegOpenKeyExW(Key, Path, 0, Access, &hkResult);
-	if (lResult != ERROR_SUCCESS){
-		SetLastError(lResult);
-	}else{
-		Result->Key = hkResult;
-		Result->FSType = FS_TYPE_REGISTRY;
-		bResult = TRUE;
-	}
-	return(bResult);
-}
-
 /****************************************************/
 
 WIN_NAMEIDATA *

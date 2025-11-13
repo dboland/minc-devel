@@ -2,6 +2,8 @@ ROOTDIR= ..
 
 include ${ROOTDIR}/Makefile.inc
 
+LIB= libtrace.a
+
 all: win.d vfs.d libtrace.a
 
 %.d: %
@@ -13,8 +15,8 @@ ${ROOTDIR}/config.inc:
 	@echo " ---------------------------------------------------"
 	@exit 1
 
-libtrace.a:
+${LIB}:
 	ar cru $@ $(shell /bin/ls -f win/*.o vfs/*.o)
 
 clean:
-	/bin/rm -f win/*.o vfs/*.o
+	/bin/rm -f win/*.o vfs/*.o ${LIB}

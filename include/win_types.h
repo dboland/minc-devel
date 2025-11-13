@@ -338,6 +338,7 @@ typedef struct _WIN_GLOBALS {
 	LARGE_INTEGER Frequency;	/* result of QueryPerformanceFrequency() */
 	LUID AuthId;
 	ULONG PageSize;
+	DWORD ConMode[2];		/* console mode defaults */
 	WCHAR Root[MAX_PATH];
 	CHAR Path[WIN_PATH_MAX];
 	CHAR SystemRoot[MAX_PATH];

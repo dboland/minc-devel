@@ -44,11 +44,10 @@ pollfd_win(WIN_TASK *Task, WIN_VNODE *Nodes[], WIN_POLLFD *Info[], struct pollfd
 		return(FALSE);
 	}else while (i < nfds){
 		fd = fds->fd;
-		if (fd < 0){
-			fds->revents = 0;
-		}else if (fd >= OPEN_MAX){
+		fds->revents = 0;
+		if (fd >= OPEN_MAX){
 			fds->revents = POLLNVAL;
-		}else if (fds->events){
+		}else if (fd >= 0 && fds->events){
 			Nodes[count] = &vnList[fd];
 			Info[count] = (WIN_POLLFD *)fds;
 			count++;

@@ -96,9 +96,9 @@ ws2_connect(WIN_VNODE *Node, CONST LPSOCKADDR Address, INT Length)
 	if (SOCKET_ERROR != connect(Node->Socket, Address, Length)){
 		bResult = TRUE;
 	}else if (WSAEWOULDBLOCK == WSAGetLastError()){
-		WSASetLastError(WSAEINPROGRESS);
-	}else if (WSAEINVAL == WSAGetLastError()){	/* lynx.exe */
-		WSASetLastError(WSAEISCONN);
+		WSASetLastError(WSAEINPROGRESS);	/* connection specific */
+	}else if (WSAEINVAL == WSAGetLastError()){
+		WSASetLastError(WSAEISCONN);		/* lynx.exe */
 	}
 	return(bResult);
 }

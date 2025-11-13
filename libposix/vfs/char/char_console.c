@@ -50,9 +50,9 @@ ConControlHandler(DWORD CtrlType)
 	if (__Process->GroupId == __CTTY->GroupId){
 		if (vfs_raise(WM_COMMAND, CtrlType, 0)){
 			SetEvent(__Interrupt);		/* ping6.exe */
-		}else{
-			__Process->Flags |= WIN_PS_EXITING;
-			bResult = FALSE;	/* causes ExitProcess() */
+//		}else{
+//			__Process->Flags |= WIN_PS_EXITING;
+//			bResult = FALSE;	/* causes ExitProcess() */
 		}
 	}
 	return(bResult);
@@ -90,11 +90,16 @@ con_TIOCSETA(WIN_DEVICE *Device, WIN_TERMIO *Attribs)
 BOOL 
 con_poll(WIN_DEVICE *Device, WIN_POLLFD *Info, DWORD *Result)
 {
-	if (!input_poll(Device->Input, Info, Result)){
+	DWORD dwResult = 0;
+
+	if (!input_poll(Device->Input, Info, &dwResult)){
 		return(FALSE);
 	}
-	if (!screen_poll(Device->Output, Info, Result)){
+	if (!screen_poll(Device->Output, Info, &dwResult)){
 		return(FALSE);
+	}
+	if (dwResult){
+		*Result += 1;
 	}
 	return(TRUE);
 }

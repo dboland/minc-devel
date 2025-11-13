@@ -71,6 +71,9 @@ unsigned char		_verbose;
 unsigned char		_boot;
 unsigned char		_home;
 
+char *_term = "interix";
+char *_lctype = "en_US.UTF-8";
+
 /* src/sys/netinet/ip_input.c */
 void tty_init(void);
 
@@ -208,6 +211,9 @@ args(int argc, char *argv[])
 		case 'h':
 			_home++;
 			break;
+		case 't':
+			_term = optarg;
+			break;
 		}
 	}
 }
@@ -259,8 +265,8 @@ multi(void)
 void 
 state(int level)
 {
-	setenv("TERM", "interix", 0);
-	setenv("LC_CTYPE", "en_US.UTF-8", 0);
+	setenv("TERM", _term, 0);
+	setenv("LC_CTYPE", _lctype, 0);
 	if (_boot)
 		boot();
 	else if (!level)

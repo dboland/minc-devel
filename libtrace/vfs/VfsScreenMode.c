@@ -36,12 +36,12 @@ VfsScreenMode(LPSTR Buffer, LPCSTR Label, DWORD Mode)
 	LPSTR psz = Buffer;
 	DWORD dwRemain = Mode;
 
-	psz += sprintf(psz, "%s(screen): 0x%x: ", Label, dwRemain);
+	psz += sprintf(psz, "%s(0x%x): ", Label, dwRemain);
 	psz = WinFlagName(psz, ENABLE_PROCESSED_OUTPUT, "PROCESSED_OUTPUT", dwRemain, &dwRemain);
 	psz = WinFlagName(psz, ENABLE_WRAP_AT_EOL_OUTPUT, "WRAP_AT_EOL_OUTPUT", dwRemain, &dwRemain);
 	psz = WinFlagName(psz, ENABLE_VIRTUAL_TERMINAL_PROCESSING, "VIRTUAL_TERMINAL_PROCESSING", dwRemain, &dwRemain);
 	psz = WinFlagName(psz, DISABLE_NEWLINE_AUTO_RETURN, "DISABLE_NEWLINE_AUTO_RETURN", dwRemain, &dwRemain);
 	psz = WinFlagName(psz, ENABLE_LVB_GRID_WORLDWIDE, "LVB_GRID_WORLDWIDE", dwRemain, &dwRemain);
-	psz += sprintf(psz, " remain(0x%x)\n", dwRemain);
+	psz += sprintf(psz, " [0x%x]\n", dwRemain);
 	return(psz);
 }

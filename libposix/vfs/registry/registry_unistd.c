@@ -38,7 +38,7 @@ RegReadFile(HKEY Key, LPCWSTR Name, DWORD Type, LPVOID Buffer, DWORD *Size)
 	BOOL bResult = FALSE;
 	LONG lResult;
 
-	lResult = RegQueryValueExW(Key, Name, 0, &Type, Buffer, Size);
+	lResult = RegQueryValueExW(Key, Name, NULL, &Type, Buffer, Size);
 	if (lResult != ERROR_SUCCESS){
 		SetLastError(lResult);
 	}else{

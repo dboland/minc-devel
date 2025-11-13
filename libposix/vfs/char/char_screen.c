@@ -35,7 +35,7 @@
 DWORD 
 ScreenMode(WIN_TERMIO *Attribs)
 {
-	DWORD dwResult = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
+	DWORD dwResult = __ConMode[1] | ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
 	UINT uiFlags = WIN_OPOST | WIN_ONLCR;
 
 	if ((Attribs->OFlags & uiFlags) != uiFlags){
@@ -81,7 +81,7 @@ ScreenScrollUp(HANDLE Handle, CONSOLE_SCREEN_BUFFER_INFO *Info)
 
 	sRect.Top = 1;
 	sRect.Bottom = Info->dwSize.Y - 1;
-	return(ScrollConsoleScreenBuffer(Handle, &sRect, &Info->srWindow, cPos, &cInfo));
+	return(ScrollConsoleScreenBuffer(Handle, &sRect, NULL, cPos, &cInfo));
 }
 BOOL 
 ScreenLineFeed(HANDLE Handle, UINT Flags, CONSOLE_SCREEN_BUFFER_INFO *Info)
@@ -186,23 +186,20 @@ ScreenPutString(HANDLE Handle, LPCSTR Buffer, DWORD Count, CONSOLE_SCREEN_BUFFER
 	}
 	return(Count);
 }
-
-/****************************************************/
-
 BOOL 
-screen_write(HANDLE Handle, LPCSTR Buffer, DWORD Size, DWORD *Result)
+ScreenWriteFile(HANDLE Handle, LPCSTR Buffer, DWORD Size, DWORD *Result)
 {
 	BOOL bResult = TRUE;
 	LONG lSize = Size;
 	DWORD dwCount = 0;
 	DWORD dwResult = 0;
-	DWORD dwMode = ScreenMode(&__CTTY->Attribs);
-	UINT uiFlags = __CTTY->Attribs.OFlags;
+	WIN_TERMIO *pwAttribs = &__CTTY->Attribs;
+	UINT uiOutFlags = pwAttribs->OFlags;
+	UINT uiInFlags = pwAttribs->IFlags;
 	CONSOLE_SCREEN_BUFFER_INFO *psbInfo = &__CTTY->Info;
+	LONG lOverflow = Size - 1024;
 
-	if (dwMode & ENABLE_VIRTUAL_TERMINAL_PROCESSING){
-		bResult = WriteFile(Handle, Buffer, Size, &dwResult, NULL);
-	}else if (!ScreenRenderWindow(Handle, psbInfo)){
+	if (!ScreenRenderWindow(Handle, psbInfo)){
 		return(FALSE);
 	}else while (lSize > 0){
 		__Char = Buffer[dwCount];
@@ -217,28 +214,28 @@ screen_write(HANDLE Handle, LPCSTR Buffer, DWORD Size, DWORD *Result)
 			dwCount = 0;
 			if (!__Char){			/* NULL Filler */
 				Buffer++;
-			}else if (__Char == 1){		/* SOH: Start of header (raspbian telnet) */
+			}else if (__Char == CC_SOH){	/* Raspbian telnet */
 				Buffer++;
-			}else if (__Char == '\e'){
+			}else if (__Char == CC_ESC){
 				__Escape = __ANSI_BUF.Buf;
 				__ANSI_BUF.Arg1 = 1;
 				__ANSI_BUF.Char1 = 0;
 				__ANSI_BUF.CSI = 0;
 				__ANSI_BUF.Args = __Escape;
 				Buffer++;
-			}else if (__Char == 8){		/* BS: Back space */
+			}else if (__Char == CC_BS){
 				AnsiCursorBack(Handle, psbInfo, 1);
 				Buffer++;
-			}else if (__Char == 10){	/* LF: Line feed */
-				ScreenLineFeed(Handle, uiFlags, psbInfo);
+			}else if (__Char == CC_LF){
+				ScreenLineFeed(Handle, uiOutFlags, psbInfo);
 				Buffer++;
-			}else if (__Char == 13){	/* CR: Carriage return */
-				ScreenCarriageReturn(Handle, uiFlags, psbInfo);
+			}else if (__Char == CC_CR){
+				ScreenCarriageReturn(Handle, uiOutFlags, psbInfo);
 				Buffer++;
-			}else if (__Char == 14){	/* SO: Shift out (Switch to an alternative character set) */
-				SetConsoleOutputCP(437);
+			}else if (__Char == CC_SO){	/* Switch to alternative character set */
+				SetConsoleOutputCP(GetACP());
 				Buffer++;
-			}else if (__Char == 15){	/* SI: Shift in (Return to regular character set) */
+			}else if (__Char == CC_SI){	/* Return to regular character set */
 				SetConsoleOutputCP(CP_UTF8);
 				Buffer++;
 			}else{
@@ -248,21 +245,42 @@ screen_write(HANDLE Handle, LPCSTR Buffer, DWORD Size, DWORD *Result)
 			dwCount++;
 		}
 		dwResult++;
+		__Buffer++;
 		lSize--;
 	}
 	if (dwCount){
 		ScreenPutString(Handle, Buffer, dwCount, psbInfo);
 	}
+//	if (__Buffer >= 1024){
+//		sprintf(__Input, "%c%c", CC_DC3, CC_DC1);
+//		__Buffer = 0;
+//	}
 	*Result = dwResult;
+	return(bResult);
+}
+
+/****************************************************/
+
+BOOL 
+screen_write(HANDLE Handle, LPCSTR Buffer, DWORD Size, DWORD *Result)
+{
+	BOOL bResult = TRUE;
+
+	if (__ConMode[1] & ENABLE_VIRTUAL_TERMINAL_PROCESSING){
+		bResult = WriteFile(Handle, Buffer, Size, Result, NULL);
+	}else{
+		bResult = ScreenWriteFile(Handle, Buffer, Size, Result);
+	}
 	return(bResult);
 }
 BOOL 
 screen_poll(HANDLE Handle, WIN_POLLFD *Info, DWORD *Result)
 {
 	BOOL bResult = TRUE;
-	SHORT sResult = Info->Result | WIN_POLLOUT;	/* ssh.exe */
+	SHORT sResult = WIN_POLLOUT;	/* ssh.exe */
+	SHORT sMask = Info->Events | WIN_POLLIGNORE;
 
-	if (Info->Result = sResult & Info->Events){
+	if (Info->Result |= sResult & sMask){
 		*Result += 1;
 	}
 	return(bResult);

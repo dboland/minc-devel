@@ -186,15 +186,12 @@ ktrace_STRUCT(WIN_TASK *Task, const char *name, size_t len, const void *data, si
 		{(PVOID)data, size}
 	};
 	ULONG ulResult;
-	LONGLONG llTime;
 
 	header.ktr_type = KTR_STRUCT;
 	header.ktr_pid = Task->TaskId;
 	header.ktr_tid = Task->ThreadId;
 	header.ktr_len = len + 1 + size;
-	if (win_clock_gettime_MONOTONIC(&llTime)){
-		ttime_posix(&header.ktr_time, &llTime);
-	}
+	ttime_posix(&header.ktr_time, &Task->ClockTime);
 	win_strlcpy(header.ktr_comm, __PROGNAME, MAXCOMLEN);
 	win_writev(Task->TraceHandle, iovData, 3, &ulResult);
 }
@@ -209,15 +206,12 @@ ktrace_USER(WIN_TASK *Task, const char *label, void *addr, size_t len)
 		{addr, len}
 	};
 	ULONG ulResult;
-	LONGLONG llTime;
 
 	header.ktr_type = KTR_USER;
 	header.ktr_pid = Task->TaskId;
 	header.ktr_tid = Task->ThreadId;
 	header.ktr_len = sizeof(struct ktr_user) + len;
-	if (win_clock_gettime_MONOTONIC(&llTime)){
-		ttime_posix(&header.ktr_time, &llTime);
-	}
+	ttime_posix(&header.ktr_time, &Task->ClockTime);
 	win_strlcpy(header.ktr_comm, __PROGNAME, MAXCOMLEN);
 	win_strlcpy(data.ktr_id, label, KTR_USER_MAXIDLEN);
 	win_writev(Task->TraceHandle, iovData, 3, &ulResult);

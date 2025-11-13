@@ -83,6 +83,9 @@ vfs_ktrace(LPCWSTR Label, STRUCT_TYPE Type, PVOID Data)
 		case STRUCT_NAMEI:
 			vfs_NAMEI((WIN_NAMEIDATA *)Data, pszBuffer);
 			break;
+		case STRUCT_CONSOLE:
+			vfs_CONSOLE((DWORD *)Data, pszBuffer);
+			break;
 	}
 	WIN_ERR("%ls%s", Label, pszBuffer);
 	LocalFree(pszBuffer);

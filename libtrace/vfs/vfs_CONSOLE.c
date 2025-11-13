@@ -28,30 +28,15 @@
  *
  */
 
-#include <winreg.h>
+#include "../config.h"
 
-/****************************************************/
-
-BOOL 
-reg_TIOCGETA(LPCSTR Path, DWORD Mode[2])
+DWORD 
+vfs_CONSOLE(DWORD Mode[2], LPSTR Buffer)
 {
-	BOOL bResult = FALSE;
-	DWORD dwType = REG_DWORD;
-	DWORD dwValue = 0;
-	DWORD dwSize = sizeof(DWORD);
-	HKEY hKey;
+	LPSTR psz = Buffer;
 
-	if (ERROR_SUCCESS != RegOpenKey(HKEY_CURRENT_USER, Path, &hKey)){
-		WIN_ERR("RegOpenKey(%s): %s\n", Path, win_strerror(GetLastError()));
-	}else if (ERROR_SUCCESS == RegQueryValueEx(hKey, "VirtualTerminalLevel", NULL, &dwType, (PBYTE)&dwValue, &dwSize)){
-		if (dwValue > 0){
-			Mode[1] |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-		}
-		if (dwValue == 2){
-			Mode[0] |= ENABLE_VIRTUAL_TERMINAL_INPUT;
-		}
-		RegCloseKey(hKey);
-		bResult = TRUE;
-	}
-	return(bResult);
+	psz += sprintf(psz, ":\n");
+	psz = VfsInputMode(psz, "+ input", Mode[0]);
+	psz = VfsScreenMode(psz, "+ screen", Mode[1]);
+	return(psz - Buffer);
 }

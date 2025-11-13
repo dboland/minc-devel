@@ -28,14 +28,25 @@
  *
  */
 
-#include "../config.h"
+#include <winreg.h>
 
-DWORD 
-vfs_CONIN(DWORD Mode, LPSTR Buffer)
+/****************************************************/
+
+BOOL 
+RegOpenFile(HKEY Key, LPCWSTR Path, REGSAM Access, WIN_VNODE *Result)
 {
-	LPSTR psz = Buffer;
+	BOOL bResult = FALSE;
+	LONG lResult;
+	HKEY hkResult;
 
-	psz += sprintf(psz, ":\n");
-	psz = VfsInputMode(psz, "+ mode", Mode);
-	return(psz - Buffer);
+	lResult = RegOpenKeyExW(Key, Path, 0, Access, &hkResult);
+	if (lResult != ERROR_SUCCESS){
+		SetLastError(lResult);
+	}else{
+		Result->Key = hkResult;
+		Result->FSType = FS_TYPE_REGISTRY;
+		bResult = TRUE;
+	}
+	return(bResult);
 }
+

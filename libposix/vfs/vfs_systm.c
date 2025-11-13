@@ -40,4 +40,5 @@ consinit(VOID)
 	/* sys/arch/i386/i386/machdep.c
 	 */
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), wAttribs);
+	reg_TIOCGETA("Console\\MinC", __Globals->ConMode);
 }

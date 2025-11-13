@@ -28,6 +28,7 @@
  *
  */
 
+#include "registry_syscall.c"
 #include "registry_namei.c"
 #include "registry_fcntl.c"
 #include "registry_unistd.c"
