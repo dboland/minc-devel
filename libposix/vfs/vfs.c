@@ -88,7 +88,6 @@ HGLOBAL		__Lock;			/* Clipboard lock */
 DWORD		__ThreadCount;
 DWORD 		__TlsIndex;
 DWORD		__Index;		/* index into input buffer */
-DWORD		__Buffer;		/* number of characters in buffer */
 
 WIN_SESSION	*__Session;
 WIN_TASK	*__Tasks;

@@ -3,17 +3,18 @@
 @@ -0,0 +1 @@
 +This directory has been patched.
 --- usr.bin/kdump/ktrstruct.c	2014-05-19 17:05:13 +0200
-+++ usr.bin/kdump/ktrstruct.c	2025-10-11 20:18:23 +0200
-@@ -50,6 +50,8 @@
++++ usr.bin/kdump/ktrstruct.c	2025-11-15 09:19:48 +0100
+@@ -50,6 +50,9 @@
  #include <grp.h>
  #include <pwd.h>
  #include <unistd.h>
 +#include <fcntl.h>
 +#include <netdb.h>
++#include <termios.h>
  
  #include "kdump.h"
  #include "kdump_subr.h"
-@@ -317,6 +319,108 @@
+@@ -317,6 +320,160 @@
  	    rup->ru_nvcsw, rup->ru_nivcsw);
  }
  
@@ -119,10 +120,62 @@
 +{
 +	printf("int fd[2] { [%d][%d] }\n", sv[0], sv[1]);
 +}
++
++static void
++ktrflagname(int flag, char *name, int mask, int *remain)
++{
++	if (flag & mask){
++		printf("[%s]", name);
++		*remain &= ~flag;
++	}
++}
++
++static void
++ktrtermios(struct termios *term)
++{
++	int remain;
++
++	printf("struct termios {");
++
++	remain = term->c_lflag;
++	printf(" local=<0x%x>", remain);
++	ktrflagname(ECHOKE, "ECHOKE", remain, &remain);
++	ktrflagname(ECHOE, "ECHOE", remain, &remain);
++	ktrflagname(ECHO, "ECHO", remain, &remain);
++	ktrflagname(ECHOCTL, "ECHOCTL", remain, &remain);
++	ktrflagname(ISIG, "ISIG", remain, &remain);
++	ktrflagname(ICANON, "ICANON", remain, &remain);
++	ktrflagname(IEXTEN, "IEXTEN", remain, &remain);
++	ktrflagname(NOKERNINFO, "NOKERNINFO", remain, &remain);
++	printf("[0x%x]", remain);
++
++	remain = term->c_iflag;
++	printf(" input=<0x%x>", remain);
++	ktrflagname(INLCR, "INLCR", remain, &remain);
++	ktrflagname(ICRNL, "ICRNL", remain, &remain);
++	ktrflagname(IXANY, "IXANY", remain, &remain);
++	ktrflagname(IXON, "IXON", remain, &remain);
++	ktrflagname(PARMRK, "PARMRK", remain, &remain);
++	ktrflagname(BRKINT, "BRKINT", remain, &remain);
++	ktrflagname(IGNPAR, "IGNPAR", remain, &remain);
++	ktrflagname(IMAXBEL, "IMAXBEL", remain, &remain);
++	printf("[0x%x]", remain);
++
++	remain = term->c_oflag;
++	printf(" output=<0x%x>", remain);
++	ktrflagname(OPOST, "OPOST", remain, &remain);
++	ktrflagname(OXTABS, "OXTABS", remain, &remain);
++	ktrflagname(OCRNL, "OCRNL", remain, &remain);
++	ktrflagname(ONLCR, "ONLCR", remain, &remain);
++	printf("[0x%x]", remain);
++
++	printf(" }\n");
++}
++
  void
  ktrstruct(char *buf, size_t buflen)
  {
-@@ -407,6 +511,41 @@
+@@ -407,6 +564,48 @@
  		memcpy(fds, data, datalen);
  		ktrfdset(fds, datalen);
  		free(fds);
@@ -161,11 +214,18 @@
 +		memcpy(cmsg, data, datalen);
 +		ktrcmsghdr(cmsg, datalen);
 +		free(cmsg);
++	} else if (strcmp(name, "termios") == 0) {
++		struct termios term;
++
++		if (datalen != sizeof(term))
++			goto invalid;
++		memcpy(&term, data, datalen);
++		ktrtermios(&term);
  	} else {
  		printf("unknown structure %s\n", name);
  	}
 --- usr.bin/kdump/mksubr	2014-05-19 17:05:13 +0200
-+++ usr.bin/kdump/mksubr	2025-10-12 05:54:31 +0200
++++ usr.bin/kdump/mksubr	2025-11-15 08:48:28 +0100
 @@ -334,6 +334,8 @@
  #auto_switch_type "ptraceopname" "PT_[[:alnum:]_]+[[:space:]]+[0-9]+" "sys/ptrace.h"
  auto_orz_type "ktracefacname" "KTRFAC_[^M][[:alnum:]_]+" "sys/ktrace.h"

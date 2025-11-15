@@ -197,7 +197,7 @@ ScreenWriteFile(HANDLE Handle, LPCSTR Buffer, DWORD Size, DWORD *Result)
 	UINT uiOutFlags = pwAttribs->OFlags;
 	UINT uiInFlags = pwAttribs->IFlags;
 	CONSOLE_SCREEN_BUFFER_INFO *psbInfo = &__CTTY->Info;
-	LONG lOverflow = Size - 1024;
+//	LONG lOverflow = Size - 0x400;
 
 	if (!ScreenRenderWindow(Handle, psbInfo)){
 		return(FALSE);
@@ -245,15 +245,14 @@ ScreenWriteFile(HANDLE Handle, LPCSTR Buffer, DWORD Size, DWORD *Result)
 			dwCount++;
 		}
 		dwResult++;
-		__Buffer++;
 		lSize--;
 	}
 	if (dwCount){
 		ScreenPutString(Handle, Buffer, dwCount, psbInfo);
 	}
-//	if (__Buffer >= 1024){
-//		sprintf(__Input, "%c%c", CC_DC3, CC_DC1);
-//		__Buffer = 0;
+//	if (lOverflow >= 0 && !__Input[0]){
+//		sprintf(__INPUT_BUF, "%c%c", CC_DC3, CC_DC1);
+//		__Input = __INPUT_BUF;
 //	}
 	*Result = dwResult;
 	return(bResult);
@@ -297,7 +296,6 @@ screen_TIOCGWINSZ(HANDLE Handle, WIN_WINSIZE *Result)
 	if (!GetConsoleScreenBufferInfo(Handle, &sbInfo)){
 		WIN_ERR("GetConsoleScreenBufferInfo(%d): %s\n", Handle, win_strerror(GetLastError()));
 	}else{
-//		Result->Column = (sbInfo.srWindow.Right - sbInfo.srWindow.Left) + 1;
 		Result->Column = sbInfo.dwSize.X;
 		Result->Row = (sbInfo.srWindow.Bottom - sbInfo.srWindow.Top) + 1;
 		Result->XPixel = sbInfo.dwCursorPosition.X + 1;

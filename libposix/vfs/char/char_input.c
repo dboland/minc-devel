@@ -296,6 +296,27 @@ InputPollAnsi(HANDLE Handle, INPUT_RECORD *Record)
 	}
 	return(sResult);
 }
+SHORT 
+InputPollBufferSize(HANDLE Handle, INPUT_RECORD *Record, CONSOLE_SCREEN_BUFFER_INFO *Info)
+{
+	SHORT sResult = 0;
+	WINDOW_BUFFER_SIZE_RECORD *pbsEvent = &Record->WindowBufferSizeEvent;
+	DWORD dwSize1 = *(DWORD *)&pbsEvent->dwSize;
+	DWORD dwSize2 = *(DWORD *)&Info->dwSize;
+	DWORD dwCount;
+
+	/* When the Vista Console is in VIRTUAL_TERMINAL_PROCESSING (xterm)
+	 * mode, multiple WINDOW_BUFFER_SIZE_EVENT are sent because of
+	 * screen alternation.
+	 */
+	if (dwSize1 != dwSize2){
+		Info->dwSize = pbsEvent->dwSize;
+		sResult = WIN_POLLIN;
+	}else{
+		ReadConsoleInput(Handle, Record, 1, &dwCount);
+	}
+	return(sResult);
+}
 BOOL 
 InputPollEvent(HANDLE Handle, INPUT_RECORD *Record, SHORT *Result)
 {
@@ -307,7 +328,7 @@ InputPollEvent(HANDLE Handle, INPUT_RECORD *Record, SHORT *Result)
 			*Result = InputPollAnsi(Handle, Record);
 			break;
 		case WINDOW_BUFFER_SIZE_EVENT:
-			*Result = WIN_POLLIN;
+			*Result = InputPollBufferSize(Handle, Record, &__CTTY->Info);
 			break;
 		case MOUSE_EVENT:
 		case FOCUS_EVENT:
@@ -341,6 +362,9 @@ input_read(WIN_TASK *Task, HANDLE Handle, LPSTR Buffer, DWORD Size, DWORD *Resul
 			*Buffer++ = C;
 			dwResult++;
 			lSize--;
+//			if (C == CC_DC3){
+//				bResult = TRUE;
+//			}
 			__Input++;
 		}else if (dwResult){
 			__Index = 0;

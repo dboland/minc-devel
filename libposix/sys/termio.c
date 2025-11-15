@@ -32,48 +32,6 @@
 
 /****************************************************/
 
-void 
-termio_debug(WIN_TERMIO *Attribs, const char *lable)
-{
-	DWORD dwRemain;
-
-	WIN_ERR("%s:\n", lable);
-
-	dwRemain = Attribs->LFlags;
-	WIN_ERR("+ local([0x%x]", dwRemain);
-	win_flagname(ECHOKE, "ECHOKE", dwRemain, &dwRemain);
-	win_flagname(ECHOE, "ECHOE", dwRemain, &dwRemain);
-	win_flagname(ECHO, "ECHO", dwRemain, &dwRemain);
-	win_flagname(ECHOCTL, "ECHOCTL", dwRemain, &dwRemain);
-	win_flagname(ISIG, "ISIG", dwRemain, &dwRemain);
-	win_flagname(ICANON, "ICANON", dwRemain, &dwRemain);
-	win_flagname(IEXTEN, "IEXTEN", dwRemain, &dwRemain);
-	win_flagname(NOKERNINFO, "NOKERNINFO", dwRemain, &dwRemain);
-	WIN_ERR("[0x%x])\n", dwRemain);
-
-	dwRemain = Attribs->IFlags;
-	WIN_ERR("+ input([0x%x]", dwRemain);
-	win_flagname(INLCR, "INLCR", dwRemain, &dwRemain);
-	win_flagname(ICRNL, "ICRNL", dwRemain, &dwRemain);
-	win_flagname(IXANY, "IXANY", dwRemain, &dwRemain);
-	win_flagname(IXON, "IXON", dwRemain, &dwRemain);
-	win_flagname(PARMRK, "PARMRK", dwRemain, &dwRemain);
-	win_flagname(BRKINT, "BRKINT", dwRemain, &dwRemain);
-	win_flagname(IGNPAR, "IGNPAR", dwRemain, &dwRemain);
-	win_flagname(IMAXBEL, "IMAXBEL", dwRemain, &dwRemain);
-	WIN_ERR("[0x%x])\n", dwRemain);
-
-	dwRemain = Attribs->OFlags;
-	WIN_ERR("+ output([0x%x]", dwRemain);
-	win_flagname(OPOST, "OPOST", dwRemain, &dwRemain);
-	win_flagname(OXTABS, "OXTABS", dwRemain, &dwRemain);
-	win_flagname(OCRNL, "OCRNL", dwRemain, &dwRemain);
-	win_flagname(ONLCR, "ONLCR", dwRemain, &dwRemain);
-	WIN_ERR("[0x%x])\n", dwRemain);
-}
-
-/****************************************************/
-
 int 
 term_TIOCGWINSZ(WIN_VNODE *Node, WIN_WINSIZE *WinSize)
 {
@@ -127,11 +85,13 @@ term_TIOCGETA(WIN_VNODE *Node, WIN_TERMIO *Attribs)
 	return(result);
 }
 int 
-term_TIOCSETA(WIN_VNODE *Node, WIN_TERMIO *Attribs)
+term_TIOCSETA(WIN_TASK *Task, WIN_VNODE *Node, WIN_TERMIO *Attribs)
 {
 	int result = 0;
 
-//termio_debug(Attribs, "term_TIOCSETA");
+	if (Task->TracePoints & KTRFAC_STRUCT){
+		ktrace_STRUCT(Task, "termios", 7, Attribs, sizeof(struct termios));
+	}
 	if (!vfs_TIOCSETA(Node, Attribs, FALSE, FALSE)){
 		result -= errno_posix(GetLastError());
 	}else{
@@ -140,11 +100,13 @@ term_TIOCSETA(WIN_VNODE *Node, WIN_TERMIO *Attribs)
 	return(result);
 }
 int 
-term_TIOCSETAW(WIN_VNODE *Node, WIN_TERMIO *Attribs)
+term_TIOCSETAW(WIN_TASK *Task, WIN_VNODE *Node, WIN_TERMIO *Attribs)
 {
 	int result = 0;
 
-//termio_debug(Attribs, "term_TIOCSETAW");
+	if (Task->TracePoints & KTRFAC_STRUCT){
+		ktrace_STRUCT(Task, "termios", 7, Attribs, sizeof(struct termios));
+	}
 	if (!vfs_TIOCSETA(Node, Attribs, FALSE, TRUE)){
 		result -= errno_posix(GetLastError());
 	}else{
@@ -153,11 +115,13 @@ term_TIOCSETAW(WIN_VNODE *Node, WIN_TERMIO *Attribs)
 	return(result);
 }
 int 
-term_TIOCSETAF(WIN_VNODE *Node, WIN_TERMIO *Attribs)
+term_TIOCSETAF(WIN_TASK *Task, WIN_VNODE *Node, WIN_TERMIO *Attribs)
 {
 	int result = 0;
 
-//termio_debug(Attribs, "term_TIOCSETAF");
+	if (Task->TracePoints & KTRFAC_STRUCT){
+		ktrace_STRUCT(Task, "termios", 7, Attribs, sizeof(struct termios));
+	}
 	if (!vfs_TIOCSETA(Node, Attribs, TRUE, TRUE)){
 		result -= errno_posix(GetLastError());
 	}else{
@@ -277,13 +241,13 @@ term_ioctl(WIN_TASK *Task, int fd, unsigned long request, va_list args)
 			result = term_TIOCSWINSZ(pvNode, va_arg(args, WIN_WINSIZE *));
 			break;
 		case TIOCSETA:
-			result = term_TIOCSETA(pvNode, va_arg(args, WIN_TERMIO *));
+			result = term_TIOCSETA(Task, pvNode, va_arg(args, WIN_TERMIO *));
 			break;
 		case TIOCSETAW:
-			result = term_TIOCSETAW(pvNode, va_arg(args, WIN_TERMIO *));
+			result = term_TIOCSETAW(Task, pvNode, va_arg(args, WIN_TERMIO *));
 			break;
 		case TIOCSETAF:
-			result = term_TIOCSETAF(pvNode, va_arg(args, WIN_TERMIO *));
+			result = term_TIOCSETAF(Task, pvNode, va_arg(args, WIN_TERMIO *));
 			break;
 		case TIOCSPGRP:
 			result = term_TIOCSPGRP(pvNode, va_arg(args, UINT *));

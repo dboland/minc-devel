@@ -12,7 +12,7 @@ CFLAGS+= -I${BINSRC}/../ktrace -I${BINSRC} -I${SYS_DIR}
 CFLAGS+= -Wno-implicit-function-declaration
 UBINDEST= ${DESTDIR}/usr/bin
 
-all: ${TMPDIR} .patch ${PROG}
+all: ${TMPDIR} ${SOURCES} .patch ${PROG}
 
 %.c: ${BINSRC}/%.c
 	@/bin/cp -uv $< $@
@@ -21,7 +21,7 @@ all: ${TMPDIR} .patch ${PROG}
 	@echo -n "$@ "
 	@${XGCC} -c ${CFLAGS} -DNOPIE -o $@ $<
 
-.patch: ${SOURCES}
+.patch:
 	TMPDIR=${TMPDIR} /bin/patch -p 2 -d . <../kdump.patch
 
 kdump_subr.c: mksubr
@@ -76,4 +76,4 @@ patch-clean:
 	/bin/rm -f ${SOURCES} .patch
 
 clean:
-	/bin/rm -f *.o ioctl.c kdump_subr.c
+	/bin/rm -f *.o *.exe ioctl.c kdump_subr.c

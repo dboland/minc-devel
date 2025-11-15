@@ -40,6 +40,7 @@
 #include <regex.h>
 #include <locale.h>
 #include <dirent.h>
+#include <ttyent.h>
 
 #include <sys/stdarg.h>
 #include <sys/fcntl.h>
@@ -134,6 +135,16 @@ fs_unmount(void)
 		unmount(tab->fs_file, MNT_FORCE);
 	}
 	endfsent();
+}
+void 
+initty()
+{
+	struct ttyent *tty;
+
+	while (tty = getttyent()){
+		printf("tty: %s\t%s\n", tty->ty_name, tty->ty_type);
+	}
+	endttyent();
 }
 int
 getty(const char *path)
@@ -251,6 +262,7 @@ single(void)
 	(void) revoke(_PATH_CONSOLE);
 	setsid();
 	getty(_PATH_CONSOLE);
+//	initty();
 	shell(args);
 }
 void 

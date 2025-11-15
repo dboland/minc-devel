@@ -30,6 +30,7 @@
 
 #include "char_syscall.c"
 #include "char_interix.c"
+//#include "char_xterm.c"
 #include "char_vt100.c"
 #include "char_ansi.c"
 #include "char_null.c"
