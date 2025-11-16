@@ -95,6 +95,8 @@ char_TIOCFLUSH(WIN_VNODE *Node)
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
+		case DEV_TYPE_CONSOLE:
+		case DEV_TYPE_PTY:
 		case DEV_TYPE_INPUT:
 			bResult = input_TIOCFLUSH(Node->Handle);
 			break;
@@ -109,6 +111,8 @@ char_TIOCDRAIN(WIN_VNODE *Node)
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
+		case DEV_TYPE_CONSOLE:
+		case DEV_TYPE_PTY:
 		case DEV_TYPE_SCREEN:
 			bResult = screen_TIOCDRAIN(Node->Handle);
 			break;

@@ -30,7 +30,7 @@
 
 #include <wincon.h>
 
-#define CC_NUL	0x00	/* Ignore */
+#define CC_NUL	0x00	/* Padding (Ignore) */
 #define CC_SOH	0x01	/* Ctrl+A (Start of Header) */
 #define CC_ETX	0x03	/* Ctrl+C (End of Text) */
 #define CC_EOT	0x04	/* Ctrl+D (End of Transmission) */
@@ -322,13 +322,14 @@ InputPollEvent(HANDLE Handle, INPUT_RECORD *Record, SHORT *Result)
 {
 	BOOL bResult = TRUE;
 	DWORD dwCount;
+	SHORT sResult = 0;
 
 	switch (Record->EventType){
 		case KEY_EVENT:
-			*Result = InputPollAnsi(Handle, Record);
+			sResult = InputPollAnsi(Handle, Record);
 			break;
 		case WINDOW_BUFFER_SIZE_EVENT:
-			*Result = InputPollBufferSize(Handle, Record, &__CTTY->Info);
+			sResult = InputPollBufferSize(Handle, Record, &__CTTY->Info);
 			break;
 		case MOUSE_EVENT:
 		case FOCUS_EVENT:
@@ -336,9 +337,10 @@ InputPollEvent(HANDLE Handle, INPUT_RECORD *Record, SHORT *Result)
 			bResult = ReadConsoleInput(Handle, Record, 1, &dwCount);
 			break;
 		default:
-			*Result = WIN_POLLERR;
+			sResult = WIN_POLLERR;
 			SetLastError(ERROR_IO_DEVICE);
 	}
+	*Result = sResult;
 	return(bResult);
 }
 
@@ -362,9 +364,6 @@ input_read(WIN_TASK *Task, HANDLE Handle, LPSTR Buffer, DWORD Size, DWORD *Resul
 			*Buffer++ = C;
 			dwResult++;
 			lSize--;
-//			if (C == CC_DC3){
-//				bResult = TRUE;
-//			}
 			__Input++;
 		}else if (dwResult){
 			__Index = 0;

@@ -136,16 +136,6 @@ fs_unmount(void)
 	}
 	endfsent();
 }
-void 
-initty()
-{
-	struct ttyent *tty;
-
-	while (tty = getttyent()){
-		printf("tty: %s\t%s\n", tty->ty_name, tty->ty_type);
-	}
-	endttyent();
-}
 int
 getty(const char *path)
 {

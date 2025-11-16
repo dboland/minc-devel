@@ -250,10 +250,6 @@ ScreenWriteFile(HANDLE Handle, LPCSTR Buffer, DWORD Size, DWORD *Result)
 	if (dwCount){
 		ScreenPutString(Handle, Buffer, dwCount, psbInfo);
 	}
-//	if (lOverflow >= 0 && !__Input[0]){
-//		sprintf(__INPUT_BUF, "%c%c", CC_DC3, CC_DC1);
-//		__Input = __INPUT_BUF;
-//	}
 	*Result = dwResult;
 	return(bResult);
 }

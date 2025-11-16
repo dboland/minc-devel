@@ -3,7 +3,7 @@
 @@ -0,0 +1 @@
 +This directory has been patched.
 --- usr.bin/kdump/ktrstruct.c	2014-05-19 17:05:13 +0200
-+++ usr.bin/kdump/ktrstruct.c	2025-11-15 09:19:48 +0100
++++ usr.bin/kdump/ktrstruct.c	2025-11-16 05:25:00 +0100
 @@ -50,6 +50,9 @@
  #include <grp.h>
  #include <pwd.h>
@@ -14,7 +14,7 @@
  
  #include "kdump.h"
  #include "kdump_subr.h"
-@@ -317,6 +320,160 @@
+@@ -317,6 +320,177 @@
  	    rup->ru_nvcsw, rup->ru_nivcsw);
  }
  
@@ -122,11 +122,11 @@
 +}
 +
 +static void
-+ktrflagname(int flag, char *name, int mask, int *remain)
++ktrflagname(int flag, char *name, int *mask)
 +{
-+	if (flag & mask){
++	if (flag & *mask){
 +		printf("[%s]", name);
-+		*remain &= ~flag;
++		*mask &= ~flag;
 +	}
 +}
 +
@@ -138,35 +138,52 @@
 +	printf("struct termios {");
 +
 +	remain = term->c_lflag;
-+	printf(" local=<0x%x>", remain);
-+	ktrflagname(ECHOKE, "ECHOKE", remain, &remain);
-+	ktrflagname(ECHOE, "ECHOE", remain, &remain);
-+	ktrflagname(ECHO, "ECHO", remain, &remain);
-+	ktrflagname(ECHOCTL, "ECHOCTL", remain, &remain);
-+	ktrflagname(ISIG, "ISIG", remain, &remain);
-+	ktrflagname(ICANON, "ICANON", remain, &remain);
-+	ktrflagname(IEXTEN, "IEXTEN", remain, &remain);
-+	ktrflagname(NOKERNINFO, "NOKERNINFO", remain, &remain);
++	printf(" local(0x%x)=", remain);
++	ktrflagname(ECHOKE, "ECHOKE", &remain);
++	ktrflagname(ECHOE, "ECHOE", &remain);
++	ktrflagname(ECHO, "ECHO", &remain);
++	ktrflagname(ECHOCTL, "ECHOCTL", &remain);
++	ktrflagname(ISIG, "ISIG", &remain);
++	ktrflagname(ICANON, "ICANON", &remain);
++	ktrflagname(IEXTEN, "IEXTEN", &remain);
++	ktrflagname(NOKERNINFO, "NOKERNINFO", &remain);
 +	printf("[0x%x]", remain);
 +
 +	remain = term->c_iflag;
-+	printf(" input=<0x%x>", remain);
-+	ktrflagname(INLCR, "INLCR", remain, &remain);
-+	ktrflagname(ICRNL, "ICRNL", remain, &remain);
-+	ktrflagname(IXANY, "IXANY", remain, &remain);
-+	ktrflagname(IXON, "IXON", remain, &remain);
-+	ktrflagname(PARMRK, "PARMRK", remain, &remain);
-+	ktrflagname(BRKINT, "BRKINT", remain, &remain);
-+	ktrflagname(IGNPAR, "IGNPAR", remain, &remain);
-+	ktrflagname(IMAXBEL, "IMAXBEL", remain, &remain);
++	printf(" input(0x%x)=", remain);
++	ktrflagname(INLCR, "INLCR", &remain);
++	ktrflagname(ICRNL, "ICRNL", &remain);
++	ktrflagname(IXANY, "IXANY", &remain);
++	ktrflagname(IXON, "IXON", &remain);
++	ktrflagname(PARMRK, "PARMRK", &remain);
++	ktrflagname(BRKINT, "BRKINT", &remain);
++	ktrflagname(IGNPAR, "IGNPAR", &remain);
++	ktrflagname(IMAXBEL, "IMAXBEL", &remain);
 +	printf("[0x%x]", remain);
 +
 +	remain = term->c_oflag;
-+	printf(" output=<0x%x>", remain);
-+	ktrflagname(OPOST, "OPOST", remain, &remain);
-+	ktrflagname(OXTABS, "OXTABS", remain, &remain);
-+	ktrflagname(OCRNL, "OCRNL", remain, &remain);
-+	ktrflagname(ONLCR, "ONLCR", remain, &remain);
++	printf(" output(0x%x)=", remain);
++	ktrflagname(OPOST, "OPOST", &remain);
++	ktrflagname(OXTABS, "OXTABS", &remain);
++	ktrflagname(OCRNL, "OCRNL", &remain);
++	ktrflagname(ONLCR, "ONLCR", &remain);
++	printf("[0x%x]", remain);
++
++	remain = term->c_cflag;
++	printf(" control(0x%x)=", remain);
++	ktrflagname(CIGNORE, "CIGNORE", &remain);
++	ktrflagname(CS5, "CS5", &remain);
++	ktrflagname(CS6, "CS6", &remain);
++	ktrflagname(CS7, "CS7", &remain);
++	ktrflagname(CS8, "CS8", &remain);
++	ktrflagname(CSTOPB, "CSTOPB", &remain);
++	ktrflagname(CREAD, "CREAD", &remain);
++	ktrflagname(PARENB, "PARENB", &remain);
++	ktrflagname(PARODD, "PARODD", &remain);
++	ktrflagname(HUPCL, "HUPCL", &remain);
++	ktrflagname(CLOCAL, "CLOCAL", &remain);
++	ktrflagname(CRTSCTS, "CRTSCTS", &remain);
++	ktrflagname(MDMBUF, "MDMBUF", &remain);
 +	printf("[0x%x]", remain);
 +
 +	printf(" }\n");
@@ -175,7 +192,7 @@
  void
  ktrstruct(char *buf, size_t buflen)
  {
-@@ -407,6 +564,48 @@
+@@ -407,6 +581,48 @@
  		memcpy(fds, data, datalen);
  		ktrfdset(fds, datalen);
  		free(fds);
