@@ -38,10 +38,6 @@ char_TIOCGWINSZ(WIN_VNODE *Node, WIN_WINSIZE *WinSize)
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
-		case DEV_TYPE_CONSOLE:
-		case DEV_TYPE_PTY:
-			bResult = con_TIOCGWINSZ(DEVICE(Node->DeviceId), WinSize);
-			break;
 		case DEV_TYPE_SCREEN:
 			bResult = screen_TIOCGWINSZ(Node->Handle, WinSize);
 			break;
@@ -56,10 +52,6 @@ char_TIOCSWINSZ(WIN_VNODE *Node, WIN_WINSIZE *WinSize)
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
-		case DEV_TYPE_CONSOLE:
-		case DEV_TYPE_PTY:
-			bResult = con_TIOCSWINSZ(DEVICE(Node->DeviceId), WinSize);
-			break;
 		case DEV_TYPE_SCREEN:
 			bResult = screen_TIOCSWINSZ(Node->Handle, WinSize);
 			break;
@@ -74,10 +66,6 @@ char_TIOCSETA(WIN_VNODE *Node, WIN_TERMIO *Attribs)
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
-		case DEV_TYPE_CONSOLE:
-		case DEV_TYPE_PTY:
-			bResult = con_TIOCSETA(DEVICE(Node->DeviceId), Attribs);
-			break;
 		case DEV_TYPE_INPUT:
 			bResult = SetConsoleMode(Node->Handle, InputMode(Attribs));
 			break;
@@ -95,8 +83,6 @@ char_TIOCFLUSH(WIN_VNODE *Node)
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
-		case DEV_TYPE_CONSOLE:
-		case DEV_TYPE_PTY:
 		case DEV_TYPE_INPUT:
 			bResult = input_TIOCFLUSH(Node->Handle);
 			break;
@@ -111,8 +97,6 @@ char_TIOCDRAIN(WIN_VNODE *Node)
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
-		case DEV_TYPE_CONSOLE:
-		case DEV_TYPE_PTY:
 		case DEV_TYPE_SCREEN:
 			bResult = screen_TIOCDRAIN(Node->Handle);
 			break;
@@ -128,12 +112,18 @@ char_TIOCSCTTY(WIN_DEVICE *Device, WIN_TTY *Terminal)
 		FILE_SHARE_READ | FILE_SHARE_WRITE, 
 		OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0};
 	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, TRUE};
+	DWORD dwMode;
 
 	Device->Input = CharOpenFile("CONIN$", &wFlags, &sa);
 	Device->Output = CharOpenFile("CONOUT$", &wFlags, &sa);
 	Device->Event = Device->Input;
+	Device->Index = Terminal->Index;
 	SetConsoleTextAttribute(Device->Output, BACKGROUND_BLACK | FOREGROUND_WHITE);
 	GetConsoleScreenBufferInfo(Device->Output, &Terminal->Info);
+	Terminal->DeviceType = Device->DeviceType;
+	Terminal->DeviceId = Device->DeviceId;
+	Terminal->Event = Device->Input;
+//	Terminal->Flags = TIOCFLAG_ACTIVE;
 	SetConsoleOutputCP(CP_UTF8);
 	return(TRUE);
 }

@@ -33,7 +33,7 @@
 /****************************************************/
 
 BOOL 
-pdo_F_DUPFD(WIN_DEVICE *Device, HANDLE Process, DWORD Options, WIN_VNODE *Result)
+pdo_F_DUPFD_OLD(WIN_DEVICE *Device, HANDLE Process, DWORD Options, WIN_VNODE *Result)
 {
 	BOOL bResult = FALSE;
 	HANDLE hDevice = NULL;
@@ -51,7 +51,24 @@ pdo_F_DUPFD(WIN_DEVICE *Device, HANDLE Process, DWORD Options, WIN_VNODE *Result
 	}else{
 		Result->Handle = hResult;
 		Result->Event = Device->Event;
-		Result->FSType = Device->FSType;
+//		Result->FSType = Device->FSType;
+		bResult = TRUE;
+	}
+	return(bResult);
+}
+BOOL 
+pdo_F_DUPFD(WIN_VNODE *Node, HANDLE Process, DWORD Options, WIN_VNODE *Result)
+{
+	BOOL bResult = FALSE;
+	HANDLE hResult = NULL;
+
+	if (!Node->Handle){
+		SetLastError(ERROR_IO_DEVICE);
+	}else if (!DuplicateHandle(GetCurrentProcess(), Node->Handle, Process, &hResult, 0, TRUE, Options)){
+		WIN_ERR("pdo_F_DUPFD(%d): %s\n", Node->Handle, win_strerror(GetLastError()));
+	}else{
+		Result->Handle = hResult;
+//		Result->Event = DEVICE(Node->DeviceId)->Event;
 		bResult = TRUE;
 	}
 	return(bResult);
@@ -61,7 +78,7 @@ pdo_F_LOOKUP(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
 {
 	BOOL bResult = TRUE;
 
-	if (Flags & WIN_REQUIREOBJECT){
+	if (Flags & WIN_NEEDHANDLE){
 		Result->Object = Handle;
 	}else{
 		bResult = CloseHandle(Handle);
@@ -69,7 +86,7 @@ pdo_F_LOOKUP(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
 	return(bResult);
 }
 BOOL 
-pdo_F_CREATE(LPWSTR FileName, DWORD FileType, SECURITY_ATTRIBUTES *Attribs, DWORD DeviceId)
+pdo_F_BIND(LPWSTR FileName, DWORD FileType, SECURITY_ATTRIBUTES *Attribs, DWORD DeviceId)
 {
 	BOOL bResult = FALSE;
 	DWORD dwResult;
@@ -97,7 +114,7 @@ pdo_open(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_VNODE *Result)
 	if (!PdoOpenFile(Path, Flags, Result)){
 		SetLastError(ERROR_DEVICE_NOT_AVAILABLE);
 	}else switch (Result->DeviceType){
-		case DEV_CLASS_TTY:
+		case DEV_TYPE_TTY:
 			bResult = tty_open(__CTTY, Flags, Result);
 			break;
 		case DEV_TYPE_NULL:

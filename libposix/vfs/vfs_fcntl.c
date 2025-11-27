@@ -55,7 +55,7 @@ vfs_F_DUPFD(WIN_VNODE *Node, BOOL CloseExec, WIN_VNODE *Result)
 			bResult = disk_F_DUPFD(Node, hProcess, dwOptions, Result);
 			break;
 		case FS_TYPE_PDO:
-			bResult = pdo_F_DUPFD(DEVICE(Node->DeviceId), hProcess, dwOptions, Result);
+			bResult = pdo_F_DUPFD(Node, hProcess, dwOptions, Result);
 			break;
 		case FS_TYPE_MAILSLOT:
 			bResult = mail_F_DUPFD(DEVICE(Node->DeviceId), hProcess, dwOptions, Result);
@@ -83,7 +83,7 @@ vfs_F_INHERIT(WIN_VNODE *Node, HANDLE Process)
 			bResult = disk_F_DUPFD(Node, Process, dwOptions, Node);
 			break;
 		case FS_TYPE_PDO:
-			bResult = pdo_F_DUPFD(DEVICE(Node->DeviceId), Process, dwOptions, Node);
+			bResult = pdo_F_DUPFD(Node, Process, dwOptions, Node);
 			break;
 		case FS_TYPE_MAILSLOT:
 			bResult = mail_F_DUPFD(DEVICE(Node->DeviceId), Process, dwOptions, Node);

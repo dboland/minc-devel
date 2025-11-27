@@ -147,18 +147,17 @@ vfs_TIOCSETA(WIN_VNODE *Node, WIN_TERMIO *Attribs, BOOL Flush, BOOL Drain)
 	return(bResult);
 }
 BOOL 
-vfs_TIOCSCTTY(WIN_VNODE *Node, WIN_TASK *Task)
+vfs_TIOCSCTTY(WIN_VNODE *Node, WIN_TASK *Task, WIN_TTY *Terminal)
 {
 	BOOL bResult = FALSE;
-	WIN_TTY *pwTerminal = &__Terminals[Node->Index];
 
 	if (Task->Flags & WIN_PS_CONTROLT){
 		SetLastError(ERROR_LOGON_SESSION_EXISTS);
-	}else if (pdo_TIOCSCTTY(DEVICE(Node->DeviceId), pwTerminal)){
-		pwTerminal->SessionId = Task->SessionId;
-		pwTerminal->GroupId = Task->GroupId;
+	}else if (pdo_TIOCSCTTY(DEVICE(Node->DeviceId), Terminal)){
+		Terminal->SessionId = Task->SessionId;
+		Terminal->GroupId = Task->GroupId;
 		Task->Flags |= WIN_PS_CONTROLT;
-		Task->CTTY = pwTerminal->Index;
+		Task->CTTY = Terminal->Index;
 		bResult = TRUE;
 	}
 	return(bResult);

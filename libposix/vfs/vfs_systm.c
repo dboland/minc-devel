@@ -30,15 +30,27 @@
 
 #include <winbase.h>
 
+#define CON_MODE_OUTPUT	(ENABLE_PROCESSED_OUTPUT)
+#define CON_MODE_INPUT	(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_WINDOW_INPUT | \
+	ENABLE_PROCESSED_INPUT | ENABLE_INSERT_MODE)
+
 /****************************************************/
 
 VOID 
 consinit(VOID)
 {
 	WORD wAttribs = BACKGROUND_BLUE | FOREGROUND_WHITE | FOREGROUND_INTENSITY;
+	HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);
+	HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+	DWORD *dwMode = __Globals->ConMode;
 
 	/* sys/arch/i386/i386/machdep.c
 	 */
-	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), wAttribs);
-	reg_TIOCGETA("Console\\MinC", __Globals->ConMode);
+	SetConsoleTextAttribute(hOutput, wAttribs);
+	GetConsoleMode(hInput, &dwMode[0]);
+	GetConsoleMode(hOutput, &dwMode[1]);
+	reg_TIOCGETA("Console\\MinC", dwMode);
+	dwMode[0] &= ~CON_MODE_INPUT;
+	dwMode[1] &= ~CON_MODE_OUTPUT;
+//	vfs_ktrace(L"consinit", STRUCT_CONSOLE, dwMode);
 }

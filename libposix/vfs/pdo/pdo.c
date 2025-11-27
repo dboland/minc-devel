@@ -37,6 +37,7 @@
 #include "pdo_wsconsio.c"
 #include "pdo_ptm.c"
 #include "pdo_root.c"
+#include "pdo_tty.c"
 #include "pdo_fcntl.c"
 #include "pdo_unistd.c"
 #include "pdo_poll.c"
@@ -51,20 +52,22 @@ pdo_init(WIN_DEV_CLASS Devices[])
 {
 	__Devices = Devices;
 
-	config_init("mem", FS_TYPE_PDO, WIN_VCHR, DEV_TYPE_MEM);
-	config_init("kmem", FS_TYPE_PDO, WIN_VCHR, DEV_TYPE_KMEM);
-	config_init("null", FS_TYPE_CHAR, WIN_VCHR, DEV_TYPE_NULL);
-	config_init("random", FS_TYPE_PDO, WIN_VCHR, DEV_TYPE_RANDOM);
-	config_init("urandom", FS_TYPE_PDO, WIN_VCHR, DEV_TYPE_URANDOM);
-	config_init("route", FS_TYPE_PDO, WIN_VCHR, DEV_TYPE_ROUTE);
-	config_init("stdin", FS_TYPE_PROCESS, WIN_VCHR, DEV_TYPE_STDIN);
-	config_init("stdout", FS_TYPE_PROCESS, WIN_VCHR, DEV_TYPE_STDOUT);
-	config_init("stderr", FS_TYPE_PROCESS, WIN_VCHR, DEV_TYPE_STDERR);
-	config_init("root", FS_TYPE_PDO, WIN_VBLK, DEV_TYPE_ROOT);
-	config_init("swap", FS_TYPE_PDO, WIN_VBLK, DEV_TYPE_SWAP);
+	config_init("mem", WIN_VCHR, DEV_TYPE_MEM);
+	config_init("kmem", WIN_VCHR, DEV_TYPE_KMEM);
+	config_init("null", WIN_VCHR, DEV_TYPE_NULL);
+	config_init("random", WIN_VCHR, DEV_TYPE_RANDOM);
+	config_init("urandom", WIN_VCHR, DEV_TYPE_URANDOM);
+	config_init("route", WIN_VCHR, DEV_TYPE_ROUTE);
+	config_init("stdin", WIN_VCHR, DEV_TYPE_STDIN);
+	config_init("stdout", WIN_VCHR, DEV_TYPE_STDOUT);
+	config_init("stderr", WIN_VCHR, DEV_TYPE_STDERR);
+	config_init("root", WIN_VBLK, DEV_TYPE_ROOT);
+	config_init("swap", WIN_VBLK, DEV_TYPE_SWAP);
 
-	config_init("console", FS_TYPE_CHAR, WIN_VCHR, DEV_TYPE_CONSOLE);
-	config_init("tty", FS_TYPE_PDO, WIN_VCHR, DEV_CLASS_TTY);
-	config_init("ptm", FS_TYPE_PDO, WIN_VCHR, DEV_TYPE_PTM);
+	config_init("tty", WIN_VCHR, DEV_TYPE_TTY);
+	config_init("console", WIN_VCHR, DEV_TYPE_CONSOLE);
+	config_init("ptm", WIN_VCHR, DEV_TYPE_PTM);
+	config_init("input", WIN_VCHR, DEV_TYPE_INPUT);
+	config_init("screen", WIN_VCHR, DEV_TYPE_SCREEN);
 
 }

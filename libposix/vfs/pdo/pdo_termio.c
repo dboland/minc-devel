@@ -153,10 +153,14 @@ pdo_TIOCSCTTY(WIN_DEVICE *Device, WIN_TTY *Terminal)
 {
 	BOOL bResult = FALSE;
 
-	switch (Device->FSType){
-		case FS_TYPE_CHAR:
+	switch (Device->DeviceType){
+		case DEV_TYPE_PTY:
+		case DEV_TYPE_CONSOLE:
 			bResult = char_TIOCSCTTY(Device, Terminal);
 			break;
+//		case DEV_TYPE_PTY:
+//			bResult = mail_TIOCSCTTY(Device, Terminal);
+//			break;
 		default:
 			SetLastError(ERROR_CTX_NOT_CONSOLE);
 	}

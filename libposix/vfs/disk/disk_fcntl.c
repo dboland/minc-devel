@@ -79,7 +79,7 @@ disk_F_LOOKUP(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
 	return(bResult);
 }
 BOOL 
-disk_F_CREATE(LPWSTR FileName, DWORD FileType, SECURITY_ATTRIBUTES *Attribs, LPWSTR Target)
+disk_F_BIND(LPWSTR FileName, DWORD FileType, SECURITY_ATTRIBUTES *Attribs, LPWSTR Target)
 {
 	BOOL bResult = FALSE;
 	DWORD dwResult;

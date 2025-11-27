@@ -44,12 +44,11 @@
 /****************************************************/
 
 BOOL 
-config_init(LPCSTR Name, DWORD FSType, DWORD FileType, DWORD DeviceType)
+config_init(LPCSTR Name, DWORD FileType, DWORD DeviceType)
 {
 	WIN_DEVICE *pwDevice = DEVICE(DeviceType);
 
 	win_strlcpy(pwDevice->Name, Name, MAX_NAME);
-	pwDevice->FSType = FSType;
 	pwDevice->FileType = FileType;
 	pwDevice->DeviceType = DeviceType;
 	pwDevice->DeviceId = DeviceType;
@@ -57,11 +56,12 @@ config_init(LPCSTR Name, DWORD FSType, DWORD FileType, DWORD DeviceType)
 	return(TRUE);
 }
 BOOL 
-config_found(LPCSTR Name, DWORD FSType, DWORD FileType, WIN_DEVICE *Device)
+config_found(LPCSTR Name, DWORD FileType, WIN_DEVICE *Device)
 {
-	Device->FSType = FSType;
+	UINT uiUnit = Device->DeviceId - Device->DeviceType;
+
 	Device->FileType = FileType;
-	_itoa(Device->DeviceId - Device->DeviceType, win_stpcpy(Device->Name, Name), 10);
+	_itoa(uiUnit, win_stpcpy(Device->Name, Name), 10);
 	Device->Flags |= WIN_DVF_CONFIG_READY;
 	return(TRUE);
 }
@@ -75,16 +75,16 @@ dull_attach(WIN_DEVICE *Device)
 
 	switch (Device->DeviceType){
 		case DEV_TYPE_SWD:
-			bResult = config_found("swd", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("swd", WIN_VCHR, Device);
 			break;
 		case DEV_TYPE_BIOS:
-			bResult = config_found("bios", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("bios", WIN_VCHR, Device);
 			break;
 		case DEV_TYPE_USBT:
-			bResult = config_found("ubt", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("ubt", WIN_VCHR, Device);
 			break;
 		case DEV_TYPE_NVME:
-			bResult = config_found("nvme", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("nvme", WIN_VCHR, Device);
 			break;
 		default:
 			bResult = FALSE;
@@ -98,13 +98,13 @@ system_attach(WIN_DEVICE *Device)
 
 	switch (Device->DeviceType){
 		case DEV_TYPE_ENUM:
-			bResult = config_found("enum", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("enum", WIN_VCHR, Device);
 			break;
 		case DEV_TYPE_ACPI:
-			bResult = config_found("acpi", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("acpi", WIN_VCHR, Device);
 			break;
 		case DEV_TYPE_PCI:
-			bResult = config_found("pci", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("pci", WIN_VCHR, Device);
 			break;
 		default:
 			bResult = FALSE;
@@ -118,10 +118,10 @@ cpu_attach(WIN_DEVICE *Device)
 
 	switch (Device->DeviceType){
 		case DEV_TYPE_RAMDISK:
-			bResult = config_found("rd", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("rd", WIN_VCHR, Device);
 			break;
 		case DEV_TYPE_PROCESSOR:
-			bResult = config_found("cpu", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("cpu", WIN_VCHR, Device);
 			break;
 		default:
 			bResult = FALSE;
@@ -135,19 +135,19 @@ disk_attach(WIN_DEVICE *Device)
 
 	switch (Device->DeviceType){
 		case DEV_TYPE_SCSI:
-			bResult = config_found("scsi", FS_TYPE_PDO, WIN_VBLK, Device);
+			bResult = config_found("scsi", WIN_VBLK, Device);
 			break;
 		case DEV_TYPE_WDC:
-			bResult = config_found("wdc", FS_TYPE_PDO, WIN_VBLK, Device);
+			bResult = config_found("wdc", WIN_VBLK, Device);
 			break;
 		case DEV_TYPE_USB:
-			bResult = config_found("usb", FS_TYPE_PDO, WIN_VBLK, Device);
+			bResult = config_found("usb", WIN_VBLK, Device);
 			break;
 		case DEV_TYPE_FDC:
-			bResult = config_found("fdc", FS_TYPE_PDO, WIN_VBLK, Device);
+			bResult = config_found("fdc", WIN_VBLK, Device);
 			break;
 		case DEV_TYPE_AHCI:
-			bResult = config_found("ahci", FS_TYPE_PDO, WIN_VBLK, Device);
+			bResult = config_found("ahci", WIN_VBLK, Device);
 			break;
 		default:
 			bResult = FALSE;
@@ -161,28 +161,28 @@ ifnet_attach(WIN_DEVICE *Device)
 
 	switch (Device->DeviceType){
 		case DEV_TYPE_NDIS:
-			bResult = config_found("ndis", FS_TYPE_PDO, WIN_VSOCK, Device);
+			bResult = config_found("ndis", WIN_VSOCK, Device);
 			break;
 		case DEV_TYPE_TUNNEL:
-			bResult = config_found("gif", FS_TYPE_PDO, WIN_VSOCK, Device);
+			bResult = config_found("gif", WIN_VSOCK, Device);
 			break;
 		case DEV_TYPE_NIC:
-			bResult = config_found("nic", FS_TYPE_PDO, WIN_VSOCK, Device);
+			bResult = config_found("nic", WIN_VSOCK, Device);
 			break;
 		case DEV_TYPE_LOOPBACK:
-			bResult = config_found("lo", FS_TYPE_PDO, WIN_VSOCK, Device);
+			bResult = config_found("lo", WIN_VSOCK, Device);
 			break;
 		case DEV_TYPE_ETH:
-			bResult = config_found("eth", FS_TYPE_PDO, WIN_VSOCK, Device);
+			bResult = config_found("eth", WIN_VSOCK, Device);
 			break;
 		case DEV_TYPE_WLAN:
-			bResult = config_found("wlan", FS_TYPE_PDO, WIN_VSOCK, Device);
+			bResult = config_found("wlan", WIN_VSOCK, Device);
 			break;
 		case DEV_TYPE_PPP:
-			bResult = config_found("ppp", FS_TYPE_PDO, WIN_VSOCK, Device);
+			bResult = config_found("ppp", WIN_VSOCK, Device);
 			break;
 		case DEV_TYPE_REMOTE:
-			bResult = config_found("smb", FS_TYPE_DRIVE, WIN_VBLK, Device);
+			bResult = config_found("smb", WIN_VBLK, Device);
 			break;
 		default:
 			bResult = FALSE;
@@ -196,39 +196,19 @@ media_attach(WIN_DEVICE *Device)
 
 	switch (Device->DeviceType){
 		case DEV_TYPE_MAGTAPE:
-			bResult = config_found("mt", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("mt", WIN_VCHR, Device);
 			break;
 		case DEV_TYPE_MEDIA:
-			bResult = config_found("media", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("media", WIN_VCHR, Device);
 			break;
 		case DEV_TYPE_USBVIDEO:
-			bResult = config_found("uvideo", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("uvideo", WIN_VCHR, Device);
 			break;
 		case DEV_TYPE_AUDIO:
-			bResult = config_found("audio", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("audio", WIN_VCHR, Device);
 			break;
 		default:
 			bResult = FALSE;
-	}
-	return(bResult);
-}
-BOOL 
-pty_attach(WIN_DEVICE *Device)
-{
-	BOOL bResult = FALSE;
-
-	if (tty_attach(Device)){
-		bResult = config_found("pty", FS_TYPE_CHAR, WIN_VCHR, Device);
-	}
-	return(bResult);
-}
-BOOL 
-com_attach(WIN_DEVICE *Device)
-{
-	BOOL bResult = FALSE;
-
-	if (tty_attach(Device)){
-		bResult = config_found("pccom", FS_TYPE_PDO, WIN_VCHR, Device);
 	}
 	return(bResult);
 }
@@ -239,16 +219,16 @@ serial_attach(WIN_DEVICE *Device)
 
 	switch (Device->DeviceType){
 		case DEV_TYPE_LOG:		/* Vista */
-			bResult = config_init("printk", FS_TYPE_DISK, WIN_VCHR, DEV_TYPE_LOG);
+			bResult = config_init("printk", WIN_VCHR, DEV_TYPE_LOG);
 			break;
-		case DEV_TYPE_TTY:
-			bResult = config_found("tty", FS_TYPE_PIPE, WIN_VCHR, Device);
-			break;
+//		case DEV_TYPE_TTY:
+//			bResult = config_found("tty", WIN_VCHR, Device);
+//			break;
 		case DEV_TYPE_PTY:
-			bResult = pty_attach(Device);
+			bResult = config_found("pty", WIN_VCHR, Device);
 			break;
 		case DEV_TYPE_COM:
-			bResult = com_attach(Device);
+			bResult = config_found("pccom", WIN_VCHR, Device);
 			break;
 		default:
 			bResult = FALSE;
@@ -262,13 +242,13 @@ printer_attach(WIN_DEVICE *Device)
 
 	switch (Device->DeviceType){
 		case DEV_TYPE_QUEUE:
-			bResult = config_found("queue", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("queue", WIN_VCHR, Device);
 			break;
 		case DEV_TYPE_USBPRINT:
-			bResult = config_found("ulpt", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("ulpt", WIN_VCHR, Device);
 			break;
 		case DEV_TYPE_LPT:
-			bResult = config_found("parallel", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("parallel", WIN_VCHR, Device);
 			break;
 		default:
 			bResult = FALSE;
@@ -282,10 +262,10 @@ display_attach(WIN_DEVICE *Device)
 
 	switch (Device->DeviceType){
 		case DEV_TYPE_VGA:
-			bResult = config_found("vga", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("vga", WIN_VCHR, Device);
 			break;
 		default:
-			bResult = config_found("wsdisplay", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("wsdisplay", WIN_VCHR, Device);
 	}
 	return(bResult);
 }
@@ -296,13 +276,13 @@ keyboard_attach(WIN_DEVICE *Device)
 
 	switch (Device->DeviceType){
 		case DEV_TYPE_COMKBD:
-			bResult = config_found("comkbd", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("comkbd", WIN_VCHR, Device);
 			break;
 		case DEV_TYPE_HIDKBD:
-			bResult = config_found("ukbd", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("ukbd", WIN_VCHR, Device);
 			break;
 		default:
-			bResult = config_found("wskbd", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("wskbd", WIN_VCHR, Device);
 	}
 	return(bResult);
 }
@@ -313,13 +293,13 @@ mouse_attach(WIN_DEVICE *Device)
 
 	switch (Device->DeviceType){
 		case DEV_TYPE_COMMOUSE:
-			bResult = config_found("comms", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("comms", WIN_VCHR, Device);
 			break;
 		case DEV_TYPE_HIDMOUSE:
-			bResult = config_found("ums", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("ums", WIN_VCHR, Device);
 			break;
 		default:
-			bResult = config_found("wsmouse", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("wsmouse", WIN_VCHR, Device);
 	}
 	return(bResult);
 }
@@ -330,16 +310,16 @@ storage_attach(WIN_DEVICE *Device)
 
 	switch (Device->DeviceType){
 		case DEV_TYPE_FIXED:
-			bResult = config_found("vol", FS_TYPE_DRIVE, WIN_VBLK, Device);
+			bResult = config_found("vol", WIN_VBLK, Device);
 			break;
 		case DEV_TYPE_CDROM:
-			bResult = config_found("cd", FS_TYPE_DRIVE, WIN_VBLK, Device);
+			bResult = config_found("cd", WIN_VBLK, Device);
 			break;
 		case DEV_TYPE_FLOPPY:
-			bResult = config_found("fd", FS_TYPE_DRIVE, WIN_VBLK, Device);
+			bResult = config_found("fd", WIN_VBLK, Device);
 			break;
 		case DEV_TYPE_SD:
-			bResult = config_found("sd", FS_TYPE_DRIVE, WIN_VBLK, Device);
+			bResult = config_found("sd", WIN_VBLK, Device);
 			break;
 		default:
 			bResult = FALSE;
@@ -353,19 +333,19 @@ usb_attach(WIN_DEVICE *Device)
 
 	switch (Device->DeviceType){
 		case DEV_TYPE_OHCI:
-			bResult = config_found("ohci", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("ohci", WIN_VCHR, Device);
 			break;
 		case DEV_TYPE_UHCI:
-			bResult = config_found("uhci", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("uhci", WIN_VCHR, Device);
 			break;
 		case DEV_TYPE_UHUB:
-			bResult = config_found("uhub", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("uhub", WIN_VCHR, Device);
 			break;
 		case DEV_TYPE_BTHUB:
-			bResult = config_found("bthub", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("bthub", WIN_VCHR, Device);
 			break;
 		case DEV_TYPE_ITE:
-			bResult = config_found("ite", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("ite", WIN_VCHR, Device);
 			break;
 		default:
 			bResult = FALSE;
@@ -379,13 +359,13 @@ hid_attach(WIN_DEVICE *Device)
 
 	switch (Device->DeviceType){
 		case DEV_TYPE_EHCI:
-			bResult = config_found("ehci", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("ehci", WIN_VCHR, Device);
 			break;
 		case DEV_TYPE_UHIDEV:
-			bResult = config_found("uhidev", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("uhidev", WIN_VCHR, Device);
 			break;
 		default:
-			bResult = config_found("hid", FS_TYPE_PDO, WIN_VCHR, Device);
+			bResult = config_found("hid", WIN_VCHR, Device);
 	}
 	return(bResult);
 }

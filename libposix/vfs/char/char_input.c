@@ -49,8 +49,10 @@
 DWORD 
 InputMode(WIN_TERMIO *Attribs)
 {
-	DWORD dwResult = __ConMode[0] | ENABLE_WINDOW_INPUT | ENABLE_INSERT_MODE | 
-		ENABLE_QUICK_EDIT_MODE | ENABLE_EXTENDED_FLAGS | ENABLE_MOUSE_INPUT;
+//	DWORD dwResult = ENABLE_WINDOW_INPUT | ENABLE_INSERT_MODE | 
+//		ENABLE_QUICK_EDIT_MODE | ENABLE_EXTENDED_FLAGS | ENABLE_MOUSE_INPUT;
+	DWORD dwResult = __ConMode[0] | ENABLE_INSERT_MODE | \
+		ENABLE_WINDOW_INPUT;
 
 	if (Attribs->LFlags & WIN_ECHO){
 		dwResult |= ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT;
@@ -144,10 +146,7 @@ InputKey(KEY_EVENT_RECORD *Event, WIN_TERMIO *Attribs, CHAR *Buffer)
 		*Buffer = 0;
 	}else if (VK <= VK_FUNCTION){
 		win_strcpy(Buffer, ANSI_FUNCTION(VK));
-	}else{
-		*Buffer = 0;
 	}
-	__Input = Buffer;
 	return(bResult);
 }
 BOOL 
@@ -181,6 +180,7 @@ InputReadEvent(HANDLE Handle, WIN_TERMIO *Attribs, CHAR *Buffer)
 	INPUT_RECORD iRecord;
 	DWORD dwCount = 0;
 
+	*Buffer = 0;
 	if (!ReadConsoleInput(Handle, &iRecord, 1, &dwCount)){
 		WIN_ERR("ReadConsoleInput(%d): %s\n", Handle, win_strerror(GetLastError()));
 	}else switch (iRecord.EventType){
@@ -190,14 +190,17 @@ InputReadEvent(HANDLE Handle, WIN_TERMIO *Attribs, CHAR *Buffer)
 		case WINDOW_BUFFER_SIZE_EVENT:
 			bResult = InputBufferSize(&iRecord.WindowBufferSizeEvent);
 			break;
+		case MOUSE_EVENT:
+			bResult = InputMouse(&iRecord.MouseEvent, Buffer);
+			break;
 		case FOCUS_EVENT:
 		case MENU_EVENT:
-		case MOUSE_EVENT:
 			bResult = TRUE;
 			break;
 		default:
 			SetLastError(ERROR_IO_DEVICE);
 	}
+	__Input = Buffer;
 	return(bResult);
 }
 BOOL 
@@ -266,17 +269,18 @@ InputWaitChar(HANDLE Handle, WIN_TERMIO *Attribs, LPSTR Buffer)
 	return(bResult);
 }
 SHORT 
-InputPollAnsi(HANDLE Handle, INPUT_RECORD *Record)
+InputPollKey(HANDLE Handle, INPUT_RECORD *Record)
 {
 	SHORT sResult = 0;
 	KEY_EVENT_RECORD *Event = &Record->KeyEvent;
 	WORD VK = Event->wVirtualKeyCode;
+	CHAR CH = Event->uChar.AsciiChar;
 	BOOL bIsAnsi = FALSE;
 	DWORD dwCount;
 
 	if (!Event->bKeyDown){
 		bIsAnsi = FALSE;
-	}else if (Event->uChar.AsciiChar){
+	}else if (CH){
 		bIsAnsi = TRUE;
 	}else if (VK <= VK_MODIFY){
 		bIsAnsi = FALSE;
@@ -317,6 +321,20 @@ InputPollBufferSize(HANDLE Handle, INPUT_RECORD *Record, CONSOLE_SCREEN_BUFFER_I
 	}
 	return(sResult);
 }
+SHORT 
+InputPollMouse(HANDLE Handle, INPUT_RECORD *Record)
+{
+	SHORT sResult = 0;
+	MOUSE_EVENT_RECORD *pmEvent = &Record->MouseEvent;
+	DWORD dwCount;
+
+	if (pmEvent->dwEventFlags == MOUSE_WHEELED){
+		sResult = WIN_POLLIN;
+	}else{
+		ReadConsoleInput(Handle, Record, 1, &dwCount);
+	}
+	return(sResult);
+}
 BOOL 
 InputPollEvent(HANDLE Handle, INPUT_RECORD *Record, SHORT *Result)
 {
@@ -326,12 +344,14 @@ InputPollEvent(HANDLE Handle, INPUT_RECORD *Record, SHORT *Result)
 
 	switch (Record->EventType){
 		case KEY_EVENT:
-			sResult = InputPollAnsi(Handle, Record);
+			sResult = InputPollKey(Handle, Record);
 			break;
 		case WINDOW_BUFFER_SIZE_EVENT:
 			sResult = InputPollBufferSize(Handle, Record, &__CTTY->Info);
 			break;
 		case MOUSE_EVENT:
+			sResult = InputPollMouse(Handle, Record);
+			break;
 		case FOCUS_EVENT:
 		case MENU_EVENT:
 			bResult = ReadConsoleInput(Handle, Record, 1, &dwCount);
@@ -343,11 +363,8 @@ InputPollEvent(HANDLE Handle, INPUT_RECORD *Record, SHORT *Result)
 	*Result = sResult;
 	return(bResult);
 }
-
-/****************************************************/
-
 BOOL 
-input_read(WIN_TASK *Task, HANDLE Handle, LPSTR Buffer, DWORD Size, DWORD *Result)
+InputReadFile(WIN_TASK *Task, HANDLE Handle, LPSTR Buffer, DWORD Size, DWORD *Result)
 {
 	BOOL bResult = FALSE;
 	CHAR C = 0;
@@ -355,9 +372,7 @@ input_read(WIN_TASK *Task, HANDLE Handle, LPSTR Buffer, DWORD Size, DWORD *Resul
 	LONG lSize = Size;
 	WIN_TERMIO *pwAttribs = &__CTTY->Attribs;
 
-	if (__ConMode[0] & ENABLE_VIRTUAL_TERMINAL_INPUT){
-		bResult = ReadFile(Handle, Buffer, Size, &dwResult, NULL);
-	}else while (!bResult){
+	while (!bResult){
 		if (lSize < 1){
 			bResult = TRUE;
 		}else if (C = *__Input){
@@ -379,6 +394,21 @@ input_read(WIN_TASK *Task, HANDLE Handle, LPSTR Buffer, DWORD Size, DWORD *Resul
 	*Result = dwResult;
 	return(bResult);
 }
+
+/****************************************************/
+
+BOOL 
+input_read(WIN_TASK *Task, HANDLE Handle, LPSTR Buffer, DWORD Size, DWORD *Result)
+{
+	BOOL bResult = FALSE;
+
+	if (__ConMode[0] & ENABLE_VIRTUAL_TERMINAL_INPUT){
+		bResult = ReadFile(Handle, Buffer, Size, Result, NULL);
+	}else{
+		bResult = InputReadFile(Task, Handle, Buffer, Size, Result);
+	}
+	return(bResult);
+}
 BOOL 
 input_poll(HANDLE Handle, WIN_POLLFD *Info, DWORD *Result)
 {
@@ -392,10 +422,12 @@ input_poll(HANDLE Handle, WIN_POLLFD *Info, DWORD *Result)
 		sResult = WIN_POLLIN;
 	}else if (!PeekConsoleInput(Handle, &iRecord, 1, &dwCount)){
 		bResult = FALSE;
-	}else if (dwCount){
-		bResult = InputPollEvent(Handle, &iRecord, &sResult);
-	}else{
+	}else if (!dwCount){
 		sResult = 0;
+	}else if (__ConMode[0] & ENABLE_VIRTUAL_TERMINAL_INPUT){
+		bResult = XTermPollEvent(Handle, &iRecord, &sResult);
+	}else{
+		bResult = InputPollEvent(Handle, &iRecord, &sResult);
 	}
 	if (Info->Result |= sResult & sMask){
 		*Result += 1;
@@ -412,9 +444,7 @@ input_TIOCFLUSH(HANDLE Handle)
 
 	/* "Handle is invalid" if CONIN$ buffer empty
 	 */
-	if (!FlushConsoleInputBuffer(Handle)){
-		WIN_ERR("FlushConsoleInputBuffer(%d): %s\n", Handle, win_strerror(GetLastError()));
-	}else{
+	if (FlushConsoleInputBuffer(Handle)){
 		bResult = TRUE;
 	}
 	return(bResult);

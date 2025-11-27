@@ -84,7 +84,7 @@ BOOL vfs_TIOCDRAIN(WIN_VNODE *Node);
 BOOL vfs_TIOCGETA(WIN_VNODE *Node, WIN_TERMIO *Mode);
 BOOL vfs_TIOCSETA(WIN_VNODE *Node, WIN_TERMIO *Mode, BOOL Flush, BOOL Drain);
 BOOL vfs_PTMGET(WIN_VNODE *Node, WIN_VNODE *Master, WIN_VNODE *Slave);
-BOOL vfs_TIOCSCTTY(WIN_VNODE *Node, WIN_TASK *Task);
+BOOL vfs_TIOCSCTTY(WIN_VNODE *Node, WIN_TASK *Task, WIN_TTY *Terminal);
 BOOL vfs_TIOCGPGRP(WIN_VNODE *Node, UINT *Result);
 BOOL vfs_TIOCSPGRP(WIN_VNODE *Node, UINT GroupId);
 BOOL vfs_TIOCGFLAGS(WIN_TTY *Terminal, UINT *Result);
@@ -186,10 +186,6 @@ BOOL vfs_poll(WIN_TASK *Task, WIN_VNODE *Nodes[], WIN_POLLFD *Info[], DWORD *Tim
 /* vfs_wait.c */
 
 BOOL vfs_wait4(WIN_TASK *Task, WIN_TASK *Children[], BOOL NoHang, DWORD Status, WIN_RUSAGE *Result);
-
-/* vfs_tty.c */
-
-BOOL tty_attach(WIN_DEVICE *Device);
 
 /****************************************************/
 

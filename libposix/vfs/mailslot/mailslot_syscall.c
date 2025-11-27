@@ -70,7 +70,7 @@ MailCreateSlave(WIN_DEVICE *Device, WIN_VNODE *Result)
 	HANDLE hResult = NULL;
 
 	if (MailCreateDevice(win_strcat(szPath, Device->Name), Device)){
-		Result->FSType = Device->FSType;
+//		Result->FSType = Device->FSType;
 		Result->FileType = Device->FileType;
 		Result->DeviceType = Device->DeviceType;
 		Result->DeviceId = Device->DeviceId;

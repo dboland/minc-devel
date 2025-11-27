@@ -311,7 +311,7 @@ sys_open(call_t call, const char *path, int flags, ...)
 		return(-ENOENT);
 	}
 	va_start(args, flags);
-	result = __openat(call.Task, path_win(&wPath, path, flags | O_OBJECT), flags, args);
+	result = __openat(call.Task, path_win(&wPath, path, flags | O_INODE), flags, args);
 	va_end(args);
 	return(result);
 }
@@ -321,7 +321,7 @@ sys_openat(call_t call, int dirfd, const char *path, int flags, ...)
 	int result;
 	va_list args;
 	WIN_NAMEIDATA wPath = {0};
-	int atflags = AT_OBJECT;
+	int atflags = AT_INODE;
 
 	if (flags & O_NOFOLLOW){
 		atflags |= AT_SYMLINK_NOFOLLOW;

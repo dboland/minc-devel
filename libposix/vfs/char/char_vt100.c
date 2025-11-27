@@ -41,8 +41,7 @@ DECSetMode(HANDLE Handle, WORD Arg)
 
 	if (!GetConsoleMode(Handle, &dwMode)){
 		return(FALSE);
-	}else if (Arg == 4){		// DECSCLM scroll mode, smooth
-		__CTTY->ScrollRate = 1;
+//	}else if (Arg == 4){		// DECSCLM scroll mode, smooth
 //	}else if (Arg == 6){		// DECOM origin mode, line 1 is relative to margin
 	}else if (Arg == 7){		// DECAWM autowrap
 		bResult = SetConsoleMode(Handle, dwMode | ENABLE_WRAP_AT_EOL_OUTPUT);
@@ -68,8 +67,7 @@ DECResetMode(HANDLE Handle, WORD Arg)
 
 	if (!GetConsoleMode(Handle, &dwMode)){
 		bResult = FALSE;
-	}else if (Arg == 4){		// DECSCLM scroll mode, jump
-		__CTTY->ScrollRate = 6;
+//	}else if (Arg == 4){		// DECSCLM scroll mode, jump
 //	}else if (Arg == 1){		// DECCKM ANSI cursor, needs DECKPAM (ESC =)
 	}else if (Arg == 7){		// DECAWM autowrap mode
 		bResult = SetConsoleMode(Handle, dwMode & ~ENABLE_WRAP_AT_EOL_OUTPUT);

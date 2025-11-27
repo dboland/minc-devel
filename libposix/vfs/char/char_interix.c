@@ -32,7 +32,7 @@
 
 #define VK_MODIFY		0x1F
 #define VK_CURSOR		0x2F
-#define ANSI_CURSOR(vk)		__ANSI_CURSOR[VK_CURSOR - vk]
+#define ANSI_CURSOR(vk)	__ANSI_CURSOR[VK_CURSOR - vk]
 
 static LPCSTR __ANSI_CURSOR[] = {
 	"",		/* 0x2F: VK_HELP */

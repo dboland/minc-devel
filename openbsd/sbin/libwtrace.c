@@ -205,6 +205,14 @@ wtrace_MOUNT(CHAR Char, LPSTR Buffer)
 		WIN_ERR("wtrace_MOUNT(%c): %s\n", Char, win_strerror(GetLastError()));
 	}
 }
+VOID 
+wtrace_NAMEI(WIN_NAMEIDATA *Path, LPSTR Buffer)
+{
+	Buffer += sprintf(Buffer, "wtrace_NAMEI");
+	if (!vfs_NAMEI(Path, Buffer)){
+		WIN_ERR("wtrace_NAMEI(%ls): %s\n", Path->Resolved, win_strerror(GetLastError()));
+	}
+}
 
 /************************************************************/
 
@@ -243,6 +251,9 @@ win_ktrace(STRUCT_TYPE Type, LONG Size, PVOID Data)
 			break;
 		case STRUCT_MOUNT:
 			wtrace_MOUNT(*(CHAR *)Data, pszBuffer);
+			break;
+		case STRUCT_NAMEI:
+			wtrace_NAMEI((WIN_NAMEIDATA *)Data, pszBuffer);
 			break;
 	}
 	printf(pszBuffer);

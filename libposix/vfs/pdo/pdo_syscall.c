@@ -30,8 +30,6 @@
 
 #include <winbase.h>
 
-GENERIC_MAPPING AccessMap = {WIN_S_IREAD, WIN_S_IWRITE, WIN_S_IEXEC, WIN_S_IRWX};
-
 /****************************************************/
 
 BOOL 
@@ -44,16 +42,16 @@ PdoOpenFile(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_VNODE *Result)
 		CloseHandle(Path->Object);
 	}else{
 		Result->DeviceType = pwDevice->DeviceType;
-		Result->FSType = FS_TYPE_PDO;
+//		Result->FSType = FS_TYPE_PDO;
 		Result->Index = pwDevice->Index;
+		Result->Event = pwDevice->Event;
+		Result->FSType = Path->FSType;
 		Result->DeviceId = Path->DeviceId;
 		Result->FileType = Path->FileType;
-		Result->Object = Path->Object;
 		Result->Attribs = Path->Attribs;
-		Result->Handle = INVALID_HANDLE_VALUE;
+		Result->Handle = Path->Object;
 		Result->CloseExec = Flags->CloseExec;
 		Result->Access = Flags->Access;
-//		MapGenericMask(&Result->Access, &AccessMap);
 		Result->Flags = HANDLE_FLAG_INHERIT;
 		bResult = TRUE;
 	}

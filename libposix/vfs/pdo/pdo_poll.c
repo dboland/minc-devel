@@ -37,13 +37,14 @@ pdo_poll(WIN_DEVICE *Device, WIN_POLLFD *Info, DWORD *Result)
 {
 	BOOL bResult = FALSE;
 
-	switch (Device->FSType){
-		case FS_TYPE_CHAR:
-			bResult = input_poll(Device->Input, Info, Result);
+	switch (Device->DeviceType){
+		case DEV_TYPE_PTY:
+		case DEV_TYPE_CONSOLE:
+			bResult = con_poll(Device, Info, Result);
 			break;
-		case FS_TYPE_MAILSLOT:
-			bResult = mail_poll(Device->Input, Info, Result);
-			break;
+//		case DEV_TYPE_PTY:
+//			bResult = mail_poll(Device, Info, Result);
+//			break;
 		default:
 			SetLastError(ERROR_BAD_DEVICE);
 	}

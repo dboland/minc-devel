@@ -424,6 +424,20 @@ sysctl_MACHDEP(const int *name, void *oldp, size_t *oldlenp, void *newp, size_t 
 /****************************************************/
 
 int 
+sysctl_USER_NAMEI(const int *name, void *oldp, size_t *oldlenp, void *newp, size_t newlen)
+{
+	int result = 0;
+
+	switch (name[2]){
+		case NAMEI_TTY:		/* tty.c */
+			result = tty_USER_NAMEI_TTY(name[3], oldp, *oldlenp);
+			break;
+		default:
+			result = -ENOENT;
+	}
+	return(result);
+}
+int 
 sysctl_USER(const int *name, void *oldp, size_t *oldlenp, void *newp, size_t newlen)
 {
 	int result = 0;
@@ -434,6 +448,9 @@ sysctl_USER(const int *name, void *oldp, size_t *oldlenp, void *newp, size_t new
 			break;
 		case USER_GRP:		/* grp.c */
 			result = grp_USER_GRP(name, oldp, oldlenp);
+			break;
+		case USER_NAMEI:
+			result = sysctl_USER_NAMEI(name, oldp, oldlenp, newp, newlen);
 			break;
 		default:
 			result = -ENOENT;

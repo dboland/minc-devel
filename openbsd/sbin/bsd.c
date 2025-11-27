@@ -72,13 +72,8 @@ unsigned char		_verbose;
 unsigned char		_boot;
 unsigned char		_home;
 
-char *_term = "interix";
+char _term[NAME_MAX] = "interix";
 char *_lctype = "en_US.UTF-8";
-
-/* src/sys/netinet/ip_input.c */
-void tty_init(void);
-
-/* sys/arch/i386/stand/boot/crt0.c */
 
 /************************************************************/
 
@@ -137,11 +132,14 @@ fs_unmount(void)
 	endfsent();
 }
 int
-getty(const char *path)
+getty(const char *name)
 {
 	int result = -1;
 	int fd;
+	struct ttyent *term;
+	char path[PATH_MAX] = _PATH_DEV;
 
+	strcat(path, name);
 	/* copy of ./lib/libutil/login_tty.c
 	 */
 	fd = open(path, O_RDWR);
@@ -157,6 +155,13 @@ getty(const char *path)
 			close(fd);
 		result = 0;
 	}
+	while (term = getttyent()){
+		if (!strcmp(term->ty_name, name)){
+			strcpy(_term, term->ty_type);
+		}
+	}
+	endttyent();
+	setenv("TERM", _term, 1);
 	return(result);
 }
 int 
@@ -213,7 +218,7 @@ args(int argc, char *argv[])
 			_home++;
 			break;
 		case 't':
-			_term = optarg;
+			strcpy(_term, optarg);
 			break;
 		}
 	}
@@ -224,7 +229,6 @@ boot(void)
 	char *args[] = {"/sbin/init", NULL};
 
 	consinit();
-	tty_init();
 	ifinit();
 	cpu_configure();
 	fs_unmount();		// fsck.exe operation?
@@ -240,7 +244,6 @@ single(void)
 	char *args[] = {"/bin/ksh", "-l", NULL};
 
 	consinit();
-	tty_init();
 	ifinit();
 	cpu_configure();
 	fs_unmount();
@@ -251,8 +254,7 @@ single(void)
 //	close(2);
 	(void) revoke(_PATH_CONSOLE);
 	setsid();
-	getty(_PATH_CONSOLE);
-//	initty();
+	getty("console");
 	shell(args);
 }
 void 
@@ -261,13 +263,12 @@ multi(void)
 	char *args[] = {"/bin/ksh", "-l", NULL};
 
 	setsid();
-	getty(PATH_PTMDEV);
+	getty("ptm");
 	shell(args);
 }
 void 
 state(int level)
 {
-	setenv("TERM", _term, 0);
 	setenv("LC_CTYPE", _lctype, 0);
 	if (_boot)
 		boot();

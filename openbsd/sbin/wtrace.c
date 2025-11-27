@@ -80,6 +80,9 @@ main(int argc, char* argv[])
 		case 'p':
 			win_ktrace(STRUCT_ACL_PROCESS, 0x0800, token);
 			break;
+		case 's':
+			win_ktrace(STRUCT_NAMEI, 0x1000, path_win(&wPath, token, O_NOFOLLOW));
+			break;
 		default:
 			printf("%s: No such option.\n", cmd);
 	}

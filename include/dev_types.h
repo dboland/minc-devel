@@ -112,13 +112,13 @@
 #define DEV_TYPE_AUDIO		(DEV_CLASS_MEDIA + DEV_BUS_PCI)
 #define DEV_TYPE_MAGTAPE	(DEV_CLASS_MEDIA + DEV_BUS_SCSI)
 
+#define DEV_TYPE_TTY		(DEV_CLASS_TTY)
 #define DEV_TYPE_CONSOLE	(DEV_CLASS_TTY + 1)		/* system console master device */
 #define DEV_TYPE_PTM		(DEV_CLASS_TTY + 2)		/* serial multiplex device */
 #define DEV_TYPE_LOG		(DEV_CLASS_TTY + 3)		/* boot time output device (printf for kernel) */
-#define DEV_TYPE_INPUT		(DEV_CLASS_TTY + 4)		/* interix input multiplex device */
-#define DEV_TYPE_SCREEN		(DEV_CLASS_TTY + 5)		/* interix output multiplex device */
+#define DEV_TYPE_INPUT		(DEV_CLASS_TTY + 4)		/* generic input device */
+#define DEV_TYPE_SCREEN		(DEV_CLASS_TTY + 5)		/* generic output device */
 #define DEV_TYPE_PTY		(DEV_CLASS_TTY + 8)		/* pseudo serial master device */
-#define DEV_TYPE_TTY		(DEV_CLASS_TTY + 24)		/* all serial slave devices */
 #define DEV_TYPE_COM		(DEV_CLASS_TTY + DEV_BUS_ISA)	/* EIA RS232 serial master device */
 
 #define DEV_TYPE_QUEUE		(DEV_CLASS_PRINTER)

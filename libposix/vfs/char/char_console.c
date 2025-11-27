@@ -37,11 +37,6 @@ ConControlHandler(DWORD CtrlType)
 {
 	BOOL bResult = TRUE;
 
-	if (CtrlType == CTRL_BREAK_EVENT){
-		if (__CTTY->Attribs.IFlags & WIN_BRKINT){
-			CtrlType = CTRL_C_EVENT;
-		}
-	}
 	/* To deliver signals, Windows (CSRSS.EXE) actually forks!
 	 * Copying the call stack to a new thread and executing
 	 * our code. Let's make sure it uses our Task struct too:
@@ -50,9 +45,6 @@ ConControlHandler(DWORD CtrlType)
 	if (__Process->GroupId == __CTTY->GroupId){
 		if (vfs_raise(WM_COMMAND, CtrlType, 0)){
 			SetEvent(__Interrupt);		/* ping6.exe */
-//		}else{
-//			__Process->Flags |= WIN_PS_EXITING;
-//			bResult = FALSE;	/* causes ExitProcess() */
 		}
 	}
 	return(bResult);

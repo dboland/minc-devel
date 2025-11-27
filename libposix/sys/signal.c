@@ -181,9 +181,9 @@ sigproc_posix(WIN_TASK *Task, int signum, ucontext_t *ucontext)
 	if (Task->TracePoints & KTRFAC_PSIG){
 		ktrace_PSIG(Task, signum, handler, &info);
 	}
-//	if (flags & SA_RESTART){		/* supersedes SIG_IGN */
-//		result = -1;
-//	}
+	if (flags & SA_RESTART){		/* supersedes SIG_IGN (ftp.exe) */
+		result = -1;
+	}
 	/* This will hang during boot.
 	 */
 //	if (Task->ProcMask & sigbit){

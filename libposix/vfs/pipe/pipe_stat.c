@@ -82,7 +82,7 @@ pipe_mknod(WIN_TASK *Task, LPWSTR FileName, WIN_MODE *Mode, LPWSTR NtName)
 	}else if (!vfs_acl_init(&wControl, 0, Mode->Special, &sd)){
 		WIN_ERR("vfs_acl_init(%ls): %s\n", szDirName, win_strerror(GetLastError()));
 	}else if (vfs_acl_create(&wControl, Mode, 0, &sd)){
-		bResult = pipe_F_CREATE(FileName, Mode->FileType, &sa, NtName);
+		bResult = pipe_F_BIND(FileName, Mode->FileType, &sa, NtName);
 	}
 	vfs_acl_free(&wControl);
 	return(bResult);

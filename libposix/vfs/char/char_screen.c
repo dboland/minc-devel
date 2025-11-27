@@ -35,15 +35,13 @@
 DWORD 
 ScreenMode(WIN_TERMIO *Attribs)
 {
-	DWORD dwResult = __ConMode[1] | ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
+//	DWORD dwResult = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
+	DWORD dwResult = __ConMode[1] | ENABLE_PROCESSED_OUTPUT;
 	UINT uiFlags = WIN_OPOST | WIN_ONLCR;
 
-	if ((Attribs->OFlags & uiFlags) != uiFlags){
-//		dwResult |= DISABLE_NEWLINE_AUTO_RETURN;	/* Vista xterm */
-	}
-	if (!Attribs->OFlags){
-		dwResult |= ENABLE_WRAP_AT_EOL_OUTPUT;		/* nano */
-	}
+//	if (!Attribs->OFlags){
+//		dwResult |= ENABLE_WRAP_AT_EOL_OUTPUT;		/* nano */
+//	}
 	return(dwResult);
 }
 BOOL 
@@ -197,7 +195,6 @@ ScreenWriteFile(HANDLE Handle, LPCSTR Buffer, DWORD Size, DWORD *Result)
 	UINT uiOutFlags = pwAttribs->OFlags;
 	UINT uiInFlags = pwAttribs->IFlags;
 	CONSOLE_SCREEN_BUFFER_INFO *psbInfo = &__CTTY->Info;
-//	LONG lOverflow = Size - 0x400;
 
 	if (!ScreenRenderWindow(Handle, psbInfo)){
 		return(FALSE);
@@ -259,7 +256,7 @@ ScreenWriteFile(HANDLE Handle, LPCSTR Buffer, DWORD Size, DWORD *Result)
 BOOL 
 screen_write(HANDLE Handle, LPCSTR Buffer, DWORD Size, DWORD *Result)
 {
-	BOOL bResult = TRUE;
+	BOOL bResult = FALSE;
 
 	if (__ConMode[1] & ENABLE_VIRTUAL_TERMINAL_PROCESSING){
 		bResult = WriteFile(Handle, Buffer, Size, Result, NULL);

@@ -28,25 +28,6 @@
  *
  */
 
-typedef enum _WIN_FS_TYPE {
-	FS_TYPE_UNKNOWN,
-	FS_TYPE_DISK,
-	FS_TYPE_CHAR,
-	FS_TYPE_PIPE,
-	FS_TYPE_MAILSLOT,
-	FS_TYPE_PDO,
-	FS_TYPE_DRIVE,
-	FS_TYPE_PROCESS,
-	FS_TYPE_WINSOCK,
-	FS_TYPE_REGISTRY,
-	FS_TYPE_VOLUME,
-	FS_TYPE_NPF,
-	FS_TYPE_LINK,
-	FS_TYPE_NDIS,
-	FS_TYPE_SHELL,
-	FS_TYPE_MAX
-} WIN_FS_TYPE;
-
 typedef enum _WIN_VTYPE {
 	WIN_VNON,
 	WIN_VREG,
@@ -90,6 +71,28 @@ typedef enum _WIN_DTYPE {
 	WIN_DTYPE_MAX
 } WIN_DTYPE;
 
+/* These are hard-coded on disk. Used for identifying symlinks,
+ * devices and sockets. Don't change them.
+ */
+typedef enum _WIN_FS_TYPE {
+	FS_TYPE_UNKNOWN,
+	FS_TYPE_DISK,
+	FS_TYPE_CHAR,
+	FS_TYPE_PIPE,
+	FS_TYPE_MAILSLOT,
+	FS_TYPE_PDO,
+	FS_TYPE_DRIVE,
+	FS_TYPE_PROCESS,
+	FS_TYPE_WINSOCK,
+	FS_TYPE_REGISTRY,
+	FS_TYPE_VOLUME,
+	FS_TYPE_NPF,
+	FS_TYPE_LINK,
+	FS_TYPE_NDIS,
+	FS_TYPE_SHELL,
+	FS_TYPE_MAX
+} WIN_FS_TYPE;
+
 /* sys/syslimits.h */
 
 #define WIN_NAME_MAX		16
@@ -105,7 +108,6 @@ typedef struct _WIN_DEVICE {
 	WIN_VTYPE FileType;
 	DWORD DeviceType;
 	DWORD DeviceId;
-	WIN_FS_TYPE FSType;		/* file system Handles are from */
 	CHAR Name[MAX_NAME];
 	HANDLE Event;
 	HANDLE Input;
@@ -212,7 +214,7 @@ typedef struct _WIN_NAMEIDATA {
 } WIN_NAMEIDATA;
 
 #define WIN_PATHCOPY		0x00400000	/* copy path verbatim */
-#define WIN_REQUIREOBJECT	0x01000000
+#define WIN_NEEDHANDLE		0x01000000	/* keep handle open (if special file)
 
 /* sys/namei.h */
 
@@ -597,20 +599,18 @@ typedef struct _WIN_TERMIO {
 
 typedef struct _WIN_TTY {
 	DWORD Index;
+	HANDLE Event;
 	DWORD DeviceType;
 	DWORD DeviceId;
 	DWORD GroupId;
 	DWORD SessionId;
 	WIN_WINSIZE WinSize;
 	WIN_TERMIO Attribs;
-	DWORD ScrollRate;
 	BOOL VEdit;
 	COORD Cursor;
 	CONSOLE_SCREEN_BUFFER_INFO Info;
 	DWORD Flags;
-	DWORD Offset;				/* offset into output buffer */
 	CHAR Name[MAX_NAME];
-	CHAR Buffer[WIN_MAX_INPUT + 1];
 } WIN_TTY;
 
 #define COMMON_LVB_LEADING_BYTE		0x0100

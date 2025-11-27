@@ -110,9 +110,9 @@ __select(WIN_TASK *Task, int nfds, fd_set *restrict readfds, fd_set *restrict wr
 		nfds = WSA_MAXIMUM_WAIT_EVENTS;
 	}
 	if (!pollfd_win(Task, vnVector, fdVector, fds, nfds)){
-		return(-EINVAL);
+		result = -EINVAL;
 	}else if (!vfs_poll(Task, vnVector, fdVector, &dwTimeOut, &dwResult)){
-		return(-errno_posix(GetLastError()));
+		result -= errno_posix(GetLastError());
 	}
 	if (Task->TracePoints & KTRFAC_STRUCT){
 		ktrace_STRUCT(Task, "pollfd", 6, fds, sizeof(struct pollfd) * nfds);

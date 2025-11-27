@@ -2,7 +2,15 @@ if ! cd "$PKGROOT/minc-base"; then
         exit 1
 fi
 
-copy_file /etc "$ETC"
+copy_src()
+{
+        for file in $2; do
+                cp "${DEVROOT}/openbsd/$1/$file" "./$1/$file"
+        done
+}
+
+copy_src etc "$ETC"
+
 copy_file /sbin "$SBIN"
 copy_file /usr/bin "$UBIN"
 

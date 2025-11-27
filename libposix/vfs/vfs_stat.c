@@ -129,7 +129,7 @@ vfs_mknod(WIN_NAMEIDATA *Path, WIN_MODE *Mode, DWORD DeviceId)
 	}else if (!vfs_acl_init(&wControl, Path->MountId, Mode->Special, &sd)){
 		WIN_ERR("vfs_acl_init(%s): %s\n", szDirName, win_strerror(GetLastError()));
 	}else if (vfs_acl_create(&wControl, Mode, 0, &sd)){
-		bResult = pdo_F_CREATE(Path->Resolved, Mode->FileType, &sa, DeviceId);
+		bResult = pdo_F_BIND(Path->Resolved, Mode->FileType, &sa, DeviceId);
 	}
 	vfs_acl_free(&wControl);
 	return(bResult);

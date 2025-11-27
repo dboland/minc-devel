@@ -89,6 +89,9 @@ vfs_ktrace(LPCWSTR Label, STRUCT_TYPE Type, PVOID Data)
 		case STRUCT_DEVICE:
 			vfs_DEVICE((WIN_DEVICE *)Data, pszBuffer);
 			break;
+		case STRUCT_NETFLAGS:
+			vfs_NETFLAGS(*(LONG *)Data, pszBuffer);
+			break;
 	}
 	WIN_ERR("%ls%s", Label, pszBuffer);
 	LocalFree(pszBuffer);

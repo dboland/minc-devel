@@ -101,7 +101,7 @@ VfsStatNode(WIN_NAMEIDATA *Path, DWORD Flags, HANDLE *Result)
 	if (hResult == INVALID_HANDLE_VALUE){
 		return(FALSE);
 	}else if (!ReadFile(hResult, &iNode, sizeof(WIN_INODE), &dwSize, NULL)){
-		WIN_ERR("ReadFile(%ls): %s\n", Path->Resolved, win_strerror(GetLastError()));
+		WIN_ERR("VfsStatNode(%ls): %s\n", Path->Resolved, win_strerror(GetLastError()));
 	}else if (iNode.Magic == TypeNameVirtual){
 		Path->DeviceId = iNode.DeviceId;
 		Path->FileType = iNode.FileType;
@@ -110,7 +110,7 @@ VfsStatNode(WIN_NAMEIDATA *Path, DWORD Flags, HANDLE *Result)
 		*Result = hResult;
 		bResult = TRUE;
 	}else if (CloseHandle(hResult)){
-		SetLastError(ERROR_BAD_ARGUMENTS);
+		WIN_ERR("VfsStatNode(%ls): %s\n", Path->Resolved, win_strerror(ERROR_BAD_ARGUMENTS));
 	}
 	return(bResult);
 }
@@ -186,8 +186,10 @@ vfs_setlogin(WIN_TASK *Task, LPCSTR Name)
 
 	if (!win_group_member(&SidAdmins)){
 		SetLastError(ERROR_PRIVILEGE_NOT_HELD);
-	}else if (AclLookup(Name, &sid, &dwSize)){
-		bResult = vfs_seteuid(Task, &sid);
+//	}else if (AclLookup(Name, &sid, &dwSize)){
+	}else{
+//		bResult = vfs_seteuid(Task, &sid);
+		bResult = TRUE;
 	}
 	return(bResult);
 }

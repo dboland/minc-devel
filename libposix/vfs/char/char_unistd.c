@@ -38,10 +38,6 @@ char_read(WIN_TASK *Task, WIN_VNODE *Node, LPSTR Buffer, LONG Size, DWORD *Resul
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
-		case DEV_TYPE_CONSOLE:
-		case DEV_TYPE_PTY:
-			bResult = input_read(Task, Node->Handle, Buffer, Size, Result);
-			break;
 		case DEV_TYPE_INPUT:
 		case DEV_TYPE_NULL:
 			bResult = ReadFile(Node->Handle, Buffer, Size, Result, NULL);
@@ -57,10 +53,6 @@ char_write(WIN_VNODE *Node, LPCSTR Buffer, DWORD Size, DWORD *Result)
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
-		case DEV_TYPE_CONSOLE:
-		case DEV_TYPE_PTY:
-			bResult = screen_write(Node->Handle, Buffer, Size, Result);
-			break;
 		case DEV_TYPE_SCREEN:
 		case DEV_TYPE_NULL:
 			bResult = WriteFile(Node->Handle, Buffer, Size, Result, NULL);
@@ -84,7 +76,9 @@ char_revoke(WIN_DEVICE *Device)
 	}else{
 		Device->Input = NULL;
 		Device->Output = NULL;
-		Device->Flags = 0;
+		if (Device->DeviceType != DEV_TYPE_CONSOLE){
+			Device->Flags = 0;
+		}
 		__Terminals[Device->Index].Flags = 0;
 		bResult = TRUE;
 	}

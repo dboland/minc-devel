@@ -11,7 +11,7 @@ OBJECTS= assert.o \
 	isnan.o isnormal.o signbit.o lockf.o \
 	nftw.o pause.o popen.o psignal.o \
 	pw_dup.o readpassphrase.o scandir.o \
-	setjmperr.o setmode.o \
+	setjmperr.o setmode.o ttyname.o \
 	siginterrupt.o siglist.o signame.o \
 	sigsetops.o sleep.o strtofflags.o \
 	time.o times.o timezone.o getlogin.o \
@@ -23,7 +23,7 @@ OBJECTS= assert.o \
 	nice.o alarm.o sysctl.o getcwd.o devname.o sysconf.o \
 	getpagesize.o getloadavg.o getdomainname.o setdomainname.o \
 	gethostname.o sethostname.o uname.o isatty.o initgroups.o disklabel.o \
-	getnetgrent.o ttyname.o ualarm.o raise.o nlist.o \
+	getnetgrent.o ualarm.o raise.o nlist.o \
 	vwarn.o vwarnc.o vwarnx.o verr.o verrc.o verrx.o \
 	opendir.o readdir.o readdir_r.o rewinddir.o seekdir.o dirfd.o \
 	telldir.o closedir.o exec.o posix_spawn.o shm_open.o

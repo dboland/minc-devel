@@ -2,7 +2,8 @@ ROOTDIR= ../..
 
 include ${ROOTDIR}/Makefile.inc
 
-SOURCES= man.conf motd gettytab login.conf sysctl.conf ftpchroot ftpusers
+SOURCES= man.conf motd gettytab login.conf sysctl.conf ftpchroot ftpusers \
+	syslog.conf
 ETCSRC= ${SRCDIR}/etc
 ETCDEST= ${DESTDIR}/etc
 

@@ -94,7 +94,7 @@ pipe_F_LOOKUP(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
 	BOOL bResult = FALSE;
 	DWORD dwResult;
 
-	if (Flags & WIN_REQUIREOBJECT){
+	if (Flags & WIN_NEEDHANDLE){
 		Result->Object = Handle;
 	}else if (!(Flags & WIN_FOLLOW)){
 		bResult = CloseHandle(Handle);
@@ -106,7 +106,7 @@ pipe_F_LOOKUP(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
 	return(bResult);
 }
 BOOL 
-pipe_F_CREATE(LPWSTR FileName, DWORD FileType, SECURITY_ATTRIBUTES *Attribs, LPWSTR NtName)
+pipe_F_BIND(LPWSTR FileName, DWORD FileType, SECURITY_ATTRIBUTES *Attribs, LPWSTR NtName)
 {
 	BOOL bResult = FALSE;
 	DWORD dwResult;

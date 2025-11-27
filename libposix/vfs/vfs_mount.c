@@ -84,15 +84,12 @@ vfs_mount(WIN_VNODE *Node, WIN_NAMEIDATA *Path, DWORD Flags, WIN_MODE *Mode)
 		return(FALSE);
 	}else if (Path->FileType != WIN_VDIR){
 		SetLastError(ERROR_DIRECTORY);
-	}else switch (pwDevice->FSType){
-		case FS_TYPE_DRIVE:
-			bResult = drive_mount(pwDevice, Path, Flags, Mode);
-			break;
-		case FS_TYPE_PDO:
+	}else switch (Node->DeviceType){
+		case DEV_TYPE_ROOT:
 			bResult = pdo_mount(pwDevice, Path, Flags, Mode);
 			break;
 		default:
-			SetLastError(ERROR_BAD_FILE_TYPE);
+			bResult = drive_mount(pwDevice, Path, Flags, Mode);
 	}
 	return(bResult);
 }

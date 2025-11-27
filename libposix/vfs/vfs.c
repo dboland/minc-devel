@@ -110,7 +110,6 @@ BOOL vfs_F_GETFL(HANDLE Handle, ACCESS_MASK *Result);
 #include "vfs_statvfs.c"
 #include "vfs_libgen.c"
 #include "vfs_syscall.c"
-#include "vfs_tty.c"
 #include "vfs_device.c"
 #include "vfs_ktrace.c"
 #include "registry/registry.c"

@@ -38,27 +38,6 @@ tty_open(WIN_TTY *Terminal, WIN_FLAGS *Flags, WIN_VNODE *Result)
 	Result->DeviceType = Terminal->DeviceType;
 	Result->DeviceId = Terminal->DeviceId;
 	Result->Index = Terminal->Index;
+	Result->Event = Terminal->Event;
 	return(TRUE);
-}
-BOOL 
-tty_attach(WIN_DEVICE *Device)
-{
-	DWORD dwIndex = 0;
-	WIN_TTY *pwTerminal = __Terminals;
-
-	while (dwIndex < WIN_TTY_MAX){
-		if (!pwTerminal->Flags){
-			pwTerminal->Flags = TIOCFLAG_ACTIVE;
-			pwTerminal->Index = dwIndex;
-			pwTerminal->DeviceType = Device->DeviceType;
-			pwTerminal->DeviceId = Device->DeviceId;
-			win_strcpy(pwTerminal->Name, Device->Name);
-			Device->Index = dwIndex;
-			return(TRUE);
-		}
-		dwIndex++;
-		pwTerminal++;
-	}	
-	SetLastError(ERROR_NOT_ENOUGH_MEMORY);
-	return(FALSE);
 }

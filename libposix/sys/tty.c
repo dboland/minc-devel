@@ -32,20 +32,43 @@
 
 /****************************************************/
 
-void 
-tty_init(void)
+int 
+tty_USER_NAMEI_TTY(dev_t id, char *buf, size_t buflen)
 {
+	int result = -ENOENT;
+	int index = 0;
 	WIN_TTY *pwTerminal = __Terminals;
-	DWORD dwIndex = 0;
-	struct termios attr = {TTYDEF_IFLAG, TTYDEF_OFLAG, TTYDEF_CFLAG, 
-		TTYDEF_LFLAG, {0}, TTYDEF_SPEED, TTYDEF_SPEED};
 
-	win_memcpy(attr.c_cc, ttydefchars, sizeof(ttydefchars));
-	while (dwIndex < WIN_TTY_MAX){
-		win_memcpy(&pwTerminal->Attribs, &attr, sizeof(WIN_TERMIO));
-		pwTerminal->ScrollRate = 1;
+	while (index < WIN_TTY_MAX){
+		if (pwTerminal->DeviceId == id){
+			win_strlcpy(buf, pwTerminal->Name, buflen);
+			result = 0;
+			break;
+		}
+		index++;
 		pwTerminal++;
-		dwIndex++;
 	}
-	tty_attach(DEVICE(DEV_TYPE_CONSOLE));
+	return(result);
+}
+
+/****************************************************/
+
+WIN_TTY * 
+tty_attach(void)
+{
+	int index = 0;
+	WIN_TTY *pwTerminal = __Terminals;
+
+	while (index < WIN_TTY_MAX){
+		if (!pwTerminal->Flags){
+			pwTerminal->Flags = TIOCFLAG_ACTIVE;
+			pwTerminal->Index = index;
+			_itoa(index, win_stpcpy(pwTerminal->Name, "tty"), 10);
+			return(pwTerminal);
+		}
+		index++;
+		pwTerminal++;
+	}
+	SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+	return(NULL);
 }

@@ -257,7 +257,6 @@ win_execve(LPSTR Command, LPCSTR Path, STARTUPINFO *Info)
 	Info->lpDesktop = "";			/* Vista */
 	Info->dwFlags = STARTF_USESTDHANDLES;
 	if (CreateProcess(NULL, Command, NULL, NULL, TRUE, NORMAL_PRIORITY_CLASS, NULL, Path, Info, &pi)){
-		CloseHandle(Info->hStdInput);
 		CloseHandle(pi.hThread);
 		WaitForSingleObject(pi.hProcess, INFINITE);
 		bResult = CloseHandle(pi.hProcess);
