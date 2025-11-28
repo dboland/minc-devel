@@ -4,7 +4,7 @@ include ${ROOTDIR}/Makefile.inc
 
 SOURCES= man.conf motd gettytab login.conf sysctl.conf ftpchroot ftpusers \
 	syslog.conf
-FILES= ${ETCDEST}/profile ${ETCDEST}/ttys ${ETCDEST}/console.reg
+FILES= ${ETCDEST}/profile ${ETCDEST}/ttys ${ETCDEST}/vi.exrc
 ETCSRC= ${SRCDIR}/etc
 ETCDEST= ${DESTDIR}/etc
 
@@ -29,7 +29,13 @@ ${ETCDEST}: ${SOURCES} MAKEDEV
 
 # install first-time only
 
-${ETCDEST}/%:
-	${INSTALL} $< ${ETCDEST}/
+${ETCDEST}/profile:
+	${INSTALL} profile ${ETCDEST}/
+
+${ETCDEST}/ttys:
+	${INSTALL} ttys ${ETCDEST}/
+
+${ETCDEST}/vi.exrc:
+	${INSTALL} vi.exrc ${ETCDEST}/
 
 install: ${ETCDEST} ${FILES}

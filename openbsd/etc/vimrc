@@ -1,0 +1,15 @@
+" Home/End/Delete key (xterm)
+set t_kh=0H
+set t_@7=0F
+set t_kD=
+
+" don't delete original file
+set nobackup
+set nowritebackup
+set noswapfile
+
+" no autoindent when pasting
+set paste
+
+" default for programming
+set nowrap
