@@ -1,6 +1,6 @@
 set verbose showmode
+set nolock
 
 " Home/End/Delete keys
-map [7~ ^
-map [8~ $
-map  x
+map 0H ^
+map 0F $

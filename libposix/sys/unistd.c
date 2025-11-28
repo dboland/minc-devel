@@ -698,9 +698,9 @@ sys_revoke(call_t call, const char *path)
 	return(result);
 }
 int 
-sys_acct(call_t call, const char *filename)
+sys_acct(call_t call, const char *path)
 {
-	WIN_ERR("acct(%s)\n", filename);
+	WIN_ERR("acct(%s)\n", path);
 	return(0);
 }
 int 

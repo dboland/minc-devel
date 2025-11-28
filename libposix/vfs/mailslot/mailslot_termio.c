@@ -28,69 +28,42 @@
  *
  */
 
-#include <wincon.h>
-
-/* By setting the 'VirtualTerminalLevel' registry key to a DWORD value greater
- * than 0, the Vista Console goes into XTerm mode. This gets you:
- * - overall faster screen drawing;
- * - underlined terms in man pages;
- * - beautiful mouse scrolling in vim;
- * - colour coded file listings on remote Linux systems;
- * - the alternate screen feature (MS calls it 'application mode');
- */
+#include <winbase.h>
 
 /****************************************************/
 
-DWORD 
-XTermScreenMode(WIN_TERMIO *Attribs)
+BOOL 
+mail_PTMGET(WIN_DEVICE *Master, WIN_DEVICE *Slave)
 {
-	DWORD dwResult = 0;
-	UINT uiFlags = WIN_OPOST | WIN_ONLCR;
+	BOOL bResult = FALSE;
+	HANDLE hMaster = Master->Output;
+	HANDLE hSlave = Slave->Output;
 
-	if ((Attribs->OFlags & uiFlags) != uiFlags){
-		dwResult |= DISABLE_NEWLINE_AUTO_RETURN;
-	}
-	return(dwResult);
-}
-SHORT 
-XTermPollKey(HANDLE Handle, INPUT_RECORD *Record)
-{
-	SHORT sResult = 0;
-	KEY_EVENT_RECORD *pkEvent = &Record->KeyEvent;
-	DWORD dwCount;
-
-	if (pkEvent->bKeyDown){
-		sResult = WIN_POLLIN;
+	if (Slave->Flags & WIN_DVF_ACTIVE){
+		SetLastError(ERROR_NOT_READY);
 	}else{
-		ReadConsoleInput(Handle, Record, 1, &dwCount);
+		Master->Output = hSlave;
+		Slave->Output = hMaster;
+		Slave->Flags |= WIN_DVF_ACTIVE;
+		bResult = TRUE;
 	}
-	return(sResult);
+	return(bResult);
 }
 BOOL 
-XTermPollEvent(HANDLE Handle, INPUT_RECORD *Record, SHORT *Result)
+mail_TIOCSCTTY(WIN_DEVICE *Device, WIN_TTY *Terminal)
 {
-	BOOL bResult = TRUE;
-	DWORD dwCount;
-	SHORT sResult = 0;
+	BOOL bResult = FALSE;
+	HANDLE hResult = NULL;
+	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, TRUE};
+	CHAR szPath[MAX_PATH] = "\\\\.\\MAILSLOT\\slave\\";
 
-	switch (Record->EventType){
-		case KEY_EVENT:
-			sResult = XTermPollKey(Handle, Record);
-			break;
-		case MOUSE_EVENT:
-			sResult = WIN_POLLIN;
-			break;
-		case WINDOW_BUFFER_SIZE_EVENT:
-//			bResult = InputBufferSize(&Record->WindowBufferSizeEvent);
-//			break;
-		case FOCUS_EVENT:
-		case MENU_EVENT:
-			bResult = ReadConsoleInput(Handle, Record, 1, &dwCount);
-			break;
-		default:
-			sResult = WIN_POLLERR;
-			SetLastError(ERROR_IO_DEVICE);
+	hResult = CreateMailslot(win_strcat(szPath, Device->Name), WIN_MAX_INPUT, MAILSLOT_WAIT_FOREVER, &sa);
+	if (hResult == INVALID_HANDLE_VALUE){
+		WIN_ERR("CreateMailslot(%s): %s\n", szPath, win_strerror(GetLastError()));
+	}else{
+		Device->Input = hResult;
+		Device->Output = MailOpenFile(szPath);
+		bResult = TRUE;
 	}
-	*Result = sResult;
 	return(bResult);
 }

@@ -154,7 +154,8 @@ sigproc_default(WIN_TASK *Task, int signum)
 	 */
 	if (sigbit & SIGMASK_STOP){
 		Task->Status = _WSTOPPED;
-		SetEvent(__Interrupt);
+		SuspendThread(Task->Handle);
+//		SetEvent(__Interrupt);
 	}else if (sigbit & ~SIGMASK_IGNORE){
 		Task->Status = signum;
 		__exit(Task, 127);

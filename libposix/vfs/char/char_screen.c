@@ -39,9 +39,9 @@ ScreenMode(WIN_TERMIO *Attribs)
 	DWORD dwResult = __ConMode[1] | ENABLE_PROCESSED_OUTPUT;
 	UINT uiFlags = WIN_OPOST | WIN_ONLCR;
 
-//	if (!Attribs->OFlags){
-//		dwResult |= ENABLE_WRAP_AT_EOL_OUTPUT;		/* nano */
-//	}
+	if (__ConMode[1] & ENABLE_VIRTUAL_TERMINAL_PROCESSING){
+		dwResult |= XTermScreenMode(Attribs);
+	}
 	return(dwResult);
 }
 BOOL 

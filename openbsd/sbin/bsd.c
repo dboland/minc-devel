@@ -139,9 +139,9 @@ getty(const char *name)
 	struct ttyent *term;
 	char path[PATH_MAX] = _PATH_DEV;
 
-	strcat(path, name);
 	/* copy of ./lib/libutil/login_tty.c
 	 */
+	strcat(path, name);
 	fd = open(path, O_RDWR);
 	if (fd < 0){
 		fprintf(stderr, "open(%s): %s\n", path, strerror(errno));
