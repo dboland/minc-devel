@@ -132,7 +132,7 @@ vfs_kill_SYS(DWORD CallerId, UINT Message, WPARAM WParam, LPARAM LParam)
 	if (!win_group_member(&SidAdmins)){
 		SetLastError(ERROR_PRIVILEGE_NOT_HELD);
 		return(FALSE);
-	}else while (dwIndex >= WIN_PID_INIT){
+	}else while (dwIndex > 0){
 		if (pwTask->Flags && pwTask->TaskId != CallerId){
 			if (vfs_kill_PID(pwTask->ThreadId, Message, WParam, LParam)){
 				dwCount++;
@@ -141,11 +141,6 @@ vfs_kill_SYS(DWORD CallerId, UINT Message, WPARAM WParam, LPARAM LParam)
 		dwIndex--;
 		pwTask--;
 	}
-	/* no lethal signals for pid 1
-	 */
-//	if (WParam != CTRL_CLOSE_EVENT && WParam != CTRL_STOP_EVENT){
-//		vfs_kill_PID(pwTask->ThreadId, Message, WParam, LParam);
-//	}
 	if (!dwCount){
 		SetLastError(ERROR_INVALID_THREAD_ID);
 	}else{

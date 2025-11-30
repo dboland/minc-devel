@@ -40,9 +40,6 @@ Var USERNAME
 
 ;--------------------------------
 
-Function .onInit
-	ReadEnvStr $USERNAME USERNAME
-FunctionEnd
 Section
 
 	# Set output path to the installation directory.
@@ -97,7 +94,6 @@ Section "Base system" SecBase
 	SectionIn RO
 
 	File 'base61.tgz'
-	File 'comp61.tgz'
 	File '*.cmd'
 
 	# Make sure tar.exe does not see /dev/tty
@@ -124,9 +120,11 @@ Section "Base system" SecBase
 	WriteUninstaller "$INSTDIR\sbin\uninstall.exe"
 	WriteRegStr HKLM ${REGFILE} "UninstallString" "$INSTDIR\sbin\uninstall.exe"
 
+SectionEnd
+Section "Base libraries" SecComp
+	File 'comp61.tgz'
 	DetailPrint "Installing base libraries..."
 	ExecDos::exec /DETAILED '.\install.cmd comp61.tgz'
-
 SectionEnd
 Section "Nano editor" SecNano
 	File 'nano64.tgz'
@@ -213,6 +211,7 @@ SectionEnd
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 !insertmacro MUI_DESCRIPTION_TEXT ${SecBase} "The OpenBSD/i386 6.1 base binary distribution"
+!insertmacro MUI_DESCRIPTION_TEXT ${SecComp} "The OpenBSD/i386 6.1 base libraries distribution"
 !insertmacro MUI_DESCRIPTION_TEXT ${SecNano} "GNU nano -- an enhanced clone of the Pico text editor"
 !insertmacro MUI_DESCRIPTION_TEXT ${SecLynx} "lynx - a general purpose distributed information browser for the World Wide Web"
 !insertmacro MUI_DESCRIPTION_TEXT ${SecWGet} "Wget - The non-interactive network downloader"
@@ -228,3 +227,11 @@ SectionEnd
 !insertmacro MUI_DESCRIPTION_TEXT ${SecBind} "Bind DNS tools"
 !insertmacro MUI_DESCRIPTION_TEXT ${SecSasl} "SASL - SASL authentication library"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
+
+Function .onInit
+	ReadEnvStr $USERNAME USERNAME
+	StrCpy $0 0
+	IfFileExists $INSTDIR\usr\lib\libc.so +2 0
+	StrCpy $0 ${SF_SELECTED}
+	SectionSetFlags ${SecComp} $0
+FunctionEnd

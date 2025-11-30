@@ -121,16 +121,6 @@
  
  BSD_OWN_MK=Done
  
---- share/mk/bsd.prog.mk	2014-05-19 17:05:13 +0200
-+++ share/mk/bsd.prog.mk	2025-11-01 06:24:33 +0100
-@@ -128,7 +128,6 @@
- .  endfor
- .endif
- 
--maninstall: afterinstall
- afterinstall: realinstall
- realinstall: beforeinstall
- .endif
 --- share/mk/bsd.README	2014-05-19 17:05:13 +0200
 +++ share/mk/bsd.README	2025-10-14 09:15:46 +0200
 @@ -180,7 +180,7 @@
