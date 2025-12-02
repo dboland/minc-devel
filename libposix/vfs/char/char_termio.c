@@ -38,11 +38,15 @@ char_TIOCGWINSZ(WIN_VNODE *Node, WIN_WINSIZE *WinSize)
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
+		case DEV_TYPE_PTY:
+		case DEV_TYPE_CONSOLE:
+			bResult = con_TIOCGWINSZ(TERMINAL(Node->Index), WinSize);
+			break;
 		case DEV_TYPE_SCREEN:
 			bResult = screen_TIOCGWINSZ(Node->Handle, WinSize);
 			break;
 		default:
-			SetLastError(ERROR_BAD_DEVICE);
+			SetLastError(ERROR_CTX_NOT_CONSOLE);
 	}
 	return(bResult);
 }
@@ -52,11 +56,15 @@ char_TIOCSWINSZ(WIN_VNODE *Node, WIN_WINSIZE *WinSize)
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
+		case DEV_TYPE_PTY:
+		case DEV_TYPE_CONSOLE:
+			bResult = con_TIOCSWINSZ(TERMINAL(Node->Index), WinSize);
+			break;
 		case DEV_TYPE_SCREEN:
 			bResult = screen_TIOCSWINSZ(Node->Handle, WinSize);
 			break;
 		default:
-			SetLastError(ERROR_BAD_DEVICE);
+			SetLastError(ERROR_CTX_NOT_CONSOLE);
 	}
 	return(bResult);
 }
@@ -66,6 +74,10 @@ char_TIOCSETA(WIN_VNODE *Node, WIN_TERMIO *Attribs)
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
+		case DEV_TYPE_PTY:
+		case DEV_TYPE_CONSOLE:
+			bResult = con_TIOCSETA(TERMINAL(Node->Index), Attribs);
+			break;
 		case DEV_TYPE_INPUT:
 			bResult = SetConsoleMode(Node->Handle, InputMode(Attribs));
 			break;
@@ -73,7 +85,7 @@ char_TIOCSETA(WIN_VNODE *Node, WIN_TERMIO *Attribs)
 			bResult = SetConsoleMode(Node->Handle, ScreenMode(Attribs));
 			break;
 		default:
-			SetLastError(ERROR_BAD_DEVICE);
+			SetLastError(ERROR_CTX_NOT_CONSOLE);
 	}
 	return(TRUE);
 }
@@ -83,11 +95,15 @@ char_TIOCFLUSH(WIN_VNODE *Node)
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
+		case DEV_TYPE_PTY:
+		case DEV_TYPE_CONSOLE:
+			bResult = input_TIOCFLUSH(TERMINAL(Node->Index));
+			break;
 		case DEV_TYPE_INPUT:
-			bResult = input_TIOCFLUSH(Node->Handle);
+			bResult = FlushConsoleInputBuffer(Node->Handle);
 			break;
 		default:
-			SetLastError(ERROR_BAD_DEVICE);
+			SetLastError(ERROR_CTX_NOT_CONSOLE);
 	}
 	return(bResult);
 }
@@ -97,33 +113,33 @@ char_TIOCDRAIN(WIN_VNODE *Node)
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
+		case DEV_TYPE_PTY:
+		case DEV_TYPE_CONSOLE:
+			bResult = screen_TIOCDRAIN(TERMINAL(Node->Index));
+			break;
 		case DEV_TYPE_SCREEN:
-			bResult = screen_TIOCDRAIN(Node->Handle);
+			bResult = TRUE;		/* CONOUT$ not buffered */
 			break;
 		default:
-			SetLastError(ERROR_BAD_DEVICE);
+			SetLastError(ERROR_CTX_NOT_CONSOLE);
 	}
 	return(bResult);
 }
 BOOL 
-char_TIOCSCTTY(WIN_DEVICE *Device, WIN_TTY *Terminal)
+char_TIOCSCTTY(WIN_DEVICE *Device, WIN_TTY **Result)
 {
-	WIN_FLAGS wFlags = {GENERIC_READ | GENERIC_WRITE, 
-		FILE_SHARE_READ | FILE_SHARE_WRITE, 
-		OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0};
-	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, TRUE};
-	DWORD dwMode;
+	BOOL bResult = FALSE;
 
-	Device->Input = CharOpenFile("CONIN$", &wFlags, &sa);
-	Device->Output = CharOpenFile("CONOUT$", &wFlags, &sa);
-	Device->Event = Device->Input;
-	Device->Index = Terminal->Index;
-	SetConsoleTextAttribute(Device->Output, BACKGROUND_BLACK | FOREGROUND_WHITE);
-	GetConsoleScreenBufferInfo(Device->Output, &Terminal->Info);
-	Terminal->DeviceType = Device->DeviceType;
-	Terminal->DeviceId = Device->DeviceId;
-	Terminal->Event = Device->Input;
-//	Terminal->Flags = TIOCFLAG_ACTIVE;
-	SetConsoleOutputCP(CP_UTF8);
-	return(TRUE);
+	switch (Device->DeviceType){
+		case DEV_TYPE_CONSOLE:
+			*Result = __Terminals;
+			bResult = TRUE;
+			break;
+		case DEV_TYPE_PTY:
+			bResult = con_TIOCSCTTY(Device, Result);
+			break;
+		default:
+			SetLastError(ERROR_CTX_NOT_CONSOLE);
+	}
+	return(bResult);
 }

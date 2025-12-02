@@ -89,17 +89,14 @@ pdo_write(WIN_DEVICE *Device, LPCSTR Buffer, DWORD Size, DWORD *Result)
 	return(bResult);
 }
 BOOL 
-pdo_fsync(WIN_DEVICE *Device)
+pdo_unlink(WIN_NAMEIDATA *Path)
 {
 	BOOL bResult = FALSE;
 
-	switch (Device->DeviceType){
-		case DEV_TYPE_PTY:
-		case DEV_TYPE_CONSOLE:		/* less.exe */
-			bResult = FlushConsoleInputBuffer(Device->Input);
-			break;
-		default:
-			SetLastError(ERROR_BAD_DEVICE);
+	if (*Path->Last == '\\'){		/* GNU conftest.exe */
+		SetLastError(ERROR_BAD_PATHNAME);
+	}else{
+		bResult = DeleteFileW(Path->Resolved);
 	}
 	return(bResult);
 }
@@ -109,27 +106,11 @@ pdo_revoke(WIN_DEVICE *Device)
 	BOOL bResult = FALSE;
 
 	switch (Device->DeviceType){
-		case DEV_TYPE_PTY:
 		case DEV_TYPE_CONSOLE:
-			bResult = char_revoke(Device);
-			break;
-		case DEV_TYPE_COM:
-			bResult = TRUE;
+			SetLastError(ERROR_CTX_NOT_CONSOLE);
 			break;
 		default:
 			SetLastError(ERROR_BAD_DEVICE);
-	}
-	return(bResult);
-}
-BOOL 
-pdo_unlink(WIN_NAMEIDATA *Path)
-{
-	BOOL bResult = FALSE;
-
-	if (*Path->Last == '\\'){		/* GNU conftest.exe */
-		SetLastError(ERROR_BAD_PATHNAME);
-	}else{
-		bResult = DeleteFileW(Path->Resolved);
 	}
 	return(bResult);
 }

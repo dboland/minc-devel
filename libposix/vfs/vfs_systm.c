@@ -43,10 +43,12 @@ consinit(VOID)
 	HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);
 	HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 	DWORD *dwMode = __Globals->ConMode;
+	WIN_TTY *pwTerminal;
 
 	/* sys/arch/i386/i386/machdep.c
 	 */
 	SetConsoleTextAttribute(hOutput, wAttribs);
+	SetConsoleOutputCP(CP_UTF8);
 	GetConsoleMode(hInput, &dwMode[0]);
 	GetConsoleMode(hOutput, &dwMode[1]);
 	reg_TIOCGETA("Console\\MinC", dwMode);

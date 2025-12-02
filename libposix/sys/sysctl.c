@@ -430,7 +430,7 @@ sysctl_USER_NAMEI(const int *name, void *oldp, size_t *oldlenp, void *newp, size
 
 	switch (name[2]){
 		case NAMEI_TTY:		/* tty.c */
-			result = tty_USER_NAMEI_TTY(name[3], oldp, *oldlenp);
+			result = term_USER_NAMEI_TTY(name[3], oldp, *oldlenp);
 			break;
 		default:
 			result = -ENOENT;

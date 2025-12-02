@@ -11,6 +11,6 @@ OBJECTS += vfs_CAP_CONTROL.o vfs_VNODE.o vfs_NAMEI.o vfs_DEVICE.o vfs_MOUNT.o \
 all: ${OBJECTS}
 	@echo "done."
 
-%.o: %.c
+%.o: %.c ${ROOTDIR}/include/vfs_types.h
 	@echo -n "$@ "
 	@${CC} -c ${CFLAGS} -I${ROOTDIR}/include -o $@ $<

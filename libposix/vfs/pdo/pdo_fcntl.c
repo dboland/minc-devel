@@ -33,47 +33,6 @@
 /****************************************************/
 
 BOOL 
-pdo_F_DUPFD_OLD(WIN_DEVICE *Device, HANDLE Process, DWORD Options, WIN_VNODE *Result)
-{
-	BOOL bResult = FALSE;
-	HANDLE hDevice = NULL;
-	HANDLE hResult = NULL;
-
-	if (!Result->FileId){
-		hDevice = Device->Input;
-	}else{
-		hDevice = Device->Output;
-	}
-	if (!hDevice){
-		SetLastError(ERROR_IO_DEVICE);
-	}else if (!DuplicateHandle(GetCurrentProcess(), hDevice, Process, &hResult, 0, TRUE, Options)){
-		WIN_ERR("pdo_F_DUPFD(%d): %s\n", hDevice, win_strerror(GetLastError()));
-	}else{
-		Result->Handle = hResult;
-		Result->Event = Device->Event;
-//		Result->FSType = Device->FSType;
-		bResult = TRUE;
-	}
-	return(bResult);
-}
-BOOL 
-pdo_F_DUPFD(WIN_VNODE *Node, HANDLE Process, DWORD Options, WIN_VNODE *Result)
-{
-	BOOL bResult = FALSE;
-	HANDLE hResult = NULL;
-
-	if (!Node->Handle){
-		SetLastError(ERROR_IO_DEVICE);
-	}else if (!DuplicateHandle(GetCurrentProcess(), Node->Handle, Process, &hResult, 0, TRUE, Options)){
-		WIN_ERR("pdo_F_DUPFD(%d): %s\n", Node->Handle, win_strerror(GetLastError()));
-	}else{
-		Result->Handle = hResult;
-//		Result->Event = DEVICE(Node->DeviceId)->Event;
-		bResult = TRUE;
-	}
-	return(bResult);
-}
-BOOL 
 pdo_F_LOOKUP(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
 {
 	BOOL bResult = TRUE;
@@ -114,6 +73,9 @@ pdo_open(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_VNODE *Result)
 	if (!PdoOpenFile(Path, Flags, Result)){
 		SetLastError(ERROR_DEVICE_NOT_AVAILABLE);
 	}else switch (Result->DeviceType){
+		case DEV_TYPE_CONSOLE:
+			bResult = ptm_open(DEVICE(DEV_TYPE_CONSOLE), Flags, Result);
+			break;
 		case DEV_TYPE_TTY:
 			bResult = tty_open(__CTTY, Flags, Result);
 			break;

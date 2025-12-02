@@ -364,13 +364,14 @@ InputPollEvent(HANDLE Handle, INPUT_RECORD *Record, SHORT *Result)
 	return(bResult);
 }
 BOOL 
-InputReadFile(WIN_TASK *Task, HANDLE Handle, LPSTR Buffer, DWORD Size, DWORD *Result)
+InputReadFile(WIN_TASK *Task, WIN_TTY *Terminal, LPSTR Buffer, DWORD Size, DWORD *Result)
 {
 	BOOL bResult = FALSE;
 	CHAR C = 0;
 	DWORD dwResult = 0;
 	LONG lSize = Size;
-	WIN_TERMIO *pwAttribs = &__CTTY->Attribs;
+	WIN_TERMIO *pwAttribs = &Terminal->Attribs;
+	HANDLE hInput = Terminal->Input;
 
 	while (!bResult){
 		if (lSize < 1){
@@ -385,7 +386,7 @@ InputReadFile(WIN_TASK *Task, HANDLE Handle, LPSTR Buffer, DWORD Size, DWORD *Re
 			bResult = TRUE;
 		}else if (__Clipboard){
 			InputReadClipboard(__INPUT_BUF);
-		}else if (!InputWaitChar(Handle, pwAttribs, __INPUT_BUF)){
+		}else if (!InputWaitChar(hInput, pwAttribs, __INPUT_BUF)){
 			break;
 		}else if (proc_poll(Task)){
 			break;
@@ -398,14 +399,14 @@ InputReadFile(WIN_TASK *Task, HANDLE Handle, LPSTR Buffer, DWORD Size, DWORD *Re
 /****************************************************/
 
 BOOL 
-input_read(WIN_TASK *Task, HANDLE Handle, LPSTR Buffer, DWORD Size, DWORD *Result)
+input_read(WIN_TASK *Task, WIN_TTY *Terminal, LPSTR Buffer, DWORD Size, DWORD *Result)
 {
 	BOOL bResult = FALSE;
 
 	if (__ConMode[0] & ENABLE_VIRTUAL_TERMINAL_INPUT){
-		bResult = ReadFile(Handle, Buffer, Size, Result, NULL);
+		bResult = ReadFile(Terminal->Input, Buffer, Size, Result, NULL);
 	}else{
-		bResult = InputReadFile(Task, Handle, Buffer, Size, Result);
+		bResult = InputReadFile(Task, Terminal, Buffer, Size, Result);
 	}
 	return(bResult);
 }
@@ -438,13 +439,13 @@ input_poll(HANDLE Handle, WIN_POLLFD *Info, DWORD *Result)
 /****************************************************/
 
 BOOL 
-input_TIOCFLUSH(HANDLE Handle)
+input_TIOCFLUSH(WIN_TTY *Terminal)
 {
 	BOOL bResult = FALSE;
 
 	/* "Handle is invalid" if CONIN$ buffer empty
 	 */
-	if (FlushConsoleInputBuffer(Handle)){
+	if (FlushConsoleInputBuffer(Terminal->Input)){
 		bResult = TRUE;
 	}
 	return(bResult);

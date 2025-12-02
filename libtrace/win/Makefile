@@ -10,6 +10,6 @@ OBJECTS += win_ACL.o win_SID.o win_TOKEN.o win_SECURITY_DESCRIPTOR.o \
 all: ${OBJECTS}
 	@echo "done."
 
-%.o: %.c
+%.o: %.c ${ROOTDIR}/include/win_types.h
 	@echo -n "$@ "
 	@${CC} -c ${CFLAGS} -I${ROOTDIR}/include -o $@ $<

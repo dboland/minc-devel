@@ -33,59 +33,15 @@
 /****************************************************/
 
 BOOL 
-pdo_TIOCGWINSZ(WIN_DEVICE *Device, WIN_WINSIZE *WinSize)
-{
-	BOOL bResult = FALSE;
-
-	switch (Device->DeviceType){
-		case DEV_TYPE_PTY:
-		case DEV_TYPE_CONSOLE:
-			bResult = con_TIOCGWINSZ(Device, WinSize);
-			break;
-		case DEV_TYPE_SCREEN:
-			bResult = screen_TIOCGWINSZ(Device->Output, WinSize);
-			break;
-		case DEV_TYPE_TTY:
-			*WinSize = __Terminals[Device->Index].WinSize;
-			bResult = TRUE;
-			break;
-		default:
-			SetLastError(ERROR_BAD_DEVICE);
-	}
-	return(bResult);
-}
-BOOL 
-pdo_TIOCSWINSZ(WIN_DEVICE *Device, WIN_WINSIZE *WinSize)
-{
-	BOOL bResult = FALSE;
-
-	switch (Device->DeviceType){
-		case DEV_TYPE_PTY:
-		case DEV_TYPE_CONSOLE:
-			bResult = con_TIOCSWINSZ(Device, WinSize);
-			break;
-		case DEV_TYPE_SCREEN:
-			bResult = screen_TIOCSWINSZ(Device->Output, WinSize);
-			break;
-		case DEV_TYPE_TTY:
-			*WinSize = __Terminals[Device->Index].WinSize;
-			bResult = TRUE;
-			break;
-		default:
-			SetLastError(ERROR_BAD_DEVICE);
-	}
-	return(bResult);
-}
-BOOL 
 pdo_TIOCFLUSH(WIN_DEVICE *Device)
 {
 	BOOL bResult = FALSE;
 
 	switch (Device->DeviceType){
-		case DEV_TYPE_PTY:
-		case DEV_TYPE_CONSOLE:
-			bResult = input_TIOCFLUSH(Device->Input);
-			break;
+//		case DEV_TYPE_PTY:
+//		case DEV_TYPE_CONSOLE:
+//			bResult = input_TIOCFLUSH(Device->Input);
+//			break;
 		case DEV_TYPE_TTY:
 			bResult = TRUE;
 			break;
@@ -100,10 +56,10 @@ pdo_TIOCDRAIN(WIN_DEVICE *Device)
 	BOOL bResult = FALSE;
 
 	switch (Device->DeviceType){
-		case DEV_TYPE_PTY:
-		case DEV_TYPE_CONSOLE:
-			bResult = screen_TIOCDRAIN(Device->Output);
-			break;
+//		case DEV_TYPE_PTY:
+//		case DEV_TYPE_CONSOLE:
+//			bResult = screen_TIOCDRAIN(Device->Output);
+//			break;
 		case DEV_TYPE_TTY:
 			bResult = TRUE;
 			break;
@@ -118,10 +74,10 @@ pdo_TIOCSETA(WIN_DEVICE *Device, WIN_TERMIO *Attribs)
 	BOOL bResult = FALSE;
 
 	switch (Device->DeviceType){
-		case DEV_TYPE_PTY:
-		case DEV_TYPE_CONSOLE:
-			bResult = con_TIOCSETA(Device, Attribs);
-			break;
+//		case DEV_TYPE_PTY:
+//		case DEV_TYPE_CONSOLE:
+//			bResult = con_TIOCSETA(Device, Attribs);
+//			break;
 		case DEV_TYPE_TTY:
 			bResult = TRUE;
 			break;
@@ -149,20 +105,20 @@ pdo_PTMGET(WIN_DEVICE *Master, WIN_DEVICE *Slave)
 	return(bResult);
 }
 BOOL 
-pdo_TIOCSCTTY(WIN_DEVICE *Device, WIN_TTY *Terminal)
+pdo_TIOCSCTTY(WIN_DEVICE *Device, WIN_TTY **Result)
 {
 	BOOL bResult = FALSE;
 
 	switch (Device->DeviceType){
 		case DEV_TYPE_PTY:
 		case DEV_TYPE_CONSOLE:
-			bResult = char_TIOCSCTTY(Device, Terminal);
+			bResult = con_TIOCSCTTY(Device, Result);
 			break;
 //		case DEV_TYPE_PTY:
-//			bResult = mail_TIOCSCTTY(Device, Terminal);
+//			bResult = mail_TIOCSCTTY(Terminal);
 //			break;
 		default:
-			SetLastError(ERROR_CTX_NOT_CONSOLE);
+			SetLastError(ERROR_BAD_DEVICE);
 	}
 	return(bResult);
 }

@@ -53,24 +53,51 @@ ConControlHandler(DWORD CtrlType)
 /****************************************************/
 
 BOOL 
-con_TIOCGWINSZ(WIN_DEVICE *Device, WIN_WINSIZE *WinSize)
+con_TIOCSCTTY(WIN_DEVICE *Device, WIN_TTY **Result)
 {
-	return(screen_TIOCGWINSZ(Device->Output, WinSize));
+	BOOL bResult = FALSE;
+	WIN_FLAGS wFlags = {GENERIC_READ | GENERIC_WRITE, 
+		FILE_SHARE_READ | FILE_SHARE_WRITE, 
+		OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0};
+	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, TRUE};
+	WIN_TTY *pwTerminal = NULL;
+
+	if (pwTerminal = tty_attach()){
+		pwTerminal->Input = CharOpenFile("CONIN$", &wFlags, &sa);
+		pwTerminal->Output = CharOpenFile("CONOUT$", &wFlags, &sa);
+		pwTerminal->Event = pwTerminal->Input;
+		pwTerminal->FSType = FS_TYPE_CHAR;
+		pwTerminal->DeviceType = Device->DeviceType;
+		pwTerminal->DeviceId = Device->DeviceId;
+		SetConsoleTextAttribute(pwTerminal->Output, BACKGROUND_BLACK | FOREGROUND_WHITE);
+		GetConsoleScreenBufferInfo(pwTerminal->Output, &pwTerminal->Info);
+		Device->FSType = FS_TYPE_CHAR;
+		Device->Index = pwTerminal->Index;
+//pwTerminal->Flags = TIOCFLAG_ACTIVE;
+		*Result = pwTerminal;
+		bResult = TRUE;
+	}
+	return(bResult);
 }
 BOOL 
-con_TIOCSWINSZ(WIN_DEVICE *Device, WIN_WINSIZE *WinSize)
+con_TIOCGWINSZ(WIN_TTY *Terminal, WIN_WINSIZE *WinSize)
 {
-	return(screen_TIOCSWINSZ(Device->Output, WinSize));
+	return(screen_TIOCGWINSZ(Terminal->Output, WinSize));
 }
 BOOL 
-con_TIOCSETA(WIN_DEVICE *Device, WIN_TERMIO *Attribs)
+con_TIOCSWINSZ(WIN_TTY *Terminal, WIN_WINSIZE *WinSize)
+{
+	return(screen_TIOCSWINSZ(Terminal->Output, WinSize));
+}
+BOOL 
+con_TIOCSETA(WIN_TTY *Terminal, WIN_TERMIO *Attribs)
 {
 	BOOL bResult = FALSE;
 
-	if (!SetConsoleMode(Device->Input, InputMode(Attribs))){
-		WIN_ERR("SetConsoleMode(%d): %s\n", Device->Input, win_strerror(GetLastError()));
-	}else if (!SetConsoleMode(Device->Output, ScreenMode(Attribs))){
-		WIN_ERR("SetConsoleMode(%d): %s\n", Device->Output, win_strerror(GetLastError()));
+	if (!SetConsoleMode(Terminal->Input, InputMode(Attribs))){
+		WIN_ERR("SetConsoleMode(%d): %s\n", Terminal->Input, win_strerror(GetLastError()));
+	}else if (!SetConsoleMode(Terminal->Output, ScreenMode(Attribs))){
+		WIN_ERR("SetConsoleMode(%d): %s\n", Terminal->Output, win_strerror(GetLastError()));
 	}else{
 		bResult = TRUE;
 	}
@@ -79,19 +106,55 @@ con_TIOCSETA(WIN_DEVICE *Device, WIN_TERMIO *Attribs)
 
 /****************************************************/
 
+HANDLE 
+con_F_OSFHANDLE(WIN_TTY *Terminal, DWORD Index)
+{
+	if (!Index){
+		return(Terminal->Input);
+	}else{
+		return(Terminal->Output);
+	}
+}
+
+/****************************************************/
+
 BOOL 
-con_poll(WIN_DEVICE *Device, WIN_POLLFD *Info, DWORD *Result)
+con_fsync(WIN_TTY *Terminal)
+{
+	return(FlushConsoleInputBuffer(Terminal->Input));
+}
+BOOL 
+con_poll(WIN_TTY *Terminal, WIN_POLLFD *Info, DWORD *Result)
 {
 	DWORD dwResult = 0;
 
-	if (!input_poll(Device->Input, Info, &dwResult)){
+	if (!input_poll(Terminal->Input, Info, &dwResult)){
 		return(FALSE);
 	}
-	if (!screen_poll(Device->Output, Info, &dwResult)){
+	if (!screen_poll(Terminal->Output, Info, &dwResult)){
 		return(FALSE);
 	}
 	if (dwResult){
 		*Result += 1;
 	}
 	return(TRUE);
+}
+BOOL 
+con_revoke(WIN_TTY *Terminal, WIN_DEVICE *Device)
+{
+	BOOL bResult = FALSE;
+
+	if (!CloseHandle(Terminal->Output)){
+		WIN_ERR("CloseHandle(%d): %s\n", Terminal->Output, win_strerror(GetLastError()));
+	}else if (!CloseHandle(Terminal->Input)){
+		WIN_ERR("CloseHandle(%d): %s\n", Terminal->Input, win_strerror(GetLastError()));
+	}else{
+		Terminal->Input = NULL;
+		Terminal->Output = NULL;
+		Terminal->Flags = 0;
+		Device->Flags = 0;
+		Device->FSType = FS_TYPE_PDO;
+		bResult = TRUE;
+	}
+	return(bResult);
 }

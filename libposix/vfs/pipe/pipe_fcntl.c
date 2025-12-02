@@ -125,15 +125,3 @@ pipe_F_BIND(LPWSTR FileName, DWORD FileType, SECURITY_ATTRIBUTES *Attribs, LPWST
 	}
 	return(bResult);
 }
-
-/****************************************************/
-
-BOOL 
-pipe_open(WIN_DEVICE *Device, WIN_FLAGS *Flags, WIN_VNODE *Result)
-{
-	Result->DeviceType = Device->DeviceType;
-	Result->DeviceId = Device->DeviceId;
-	Result->Event = Device->Event;
-	Result->Index = Device->Index;
-	return(TRUE);
-}

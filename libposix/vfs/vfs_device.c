@@ -48,11 +48,12 @@ config_init(LPCSTR Name, DWORD FileType, DWORD DeviceType)
 {
 	WIN_DEVICE *pwDevice = DEVICE(DeviceType);
 
-	win_strlcpy(pwDevice->Name, Name, MAX_NAME);
 	pwDevice->FileType = FileType;
+	pwDevice->FSType = FS_TYPE_PDO;
 	pwDevice->DeviceType = DeviceType;
 	pwDevice->DeviceId = DeviceType;
 	pwDevice->Flags |= WIN_DVF_CONFIG_READY;
+	win_strlcpy(pwDevice->Name, Name, MAX_NAME);
 	return(TRUE);
 }
 BOOL 
@@ -61,8 +62,9 @@ config_found(LPCSTR Name, DWORD FileType, WIN_DEVICE *Device)
 	UINT uiUnit = Device->DeviceId - Device->DeviceType;
 
 	Device->FileType = FileType;
-	_itoa(uiUnit, win_stpcpy(Device->Name, Name), 10);
+	Device->FSType = FS_TYPE_PDO;
 	Device->Flags |= WIN_DVF_CONFIG_READY;
+	_itoa(uiUnit, win_stpcpy(Device->Name, Name), 10);
 	return(TRUE);
 }
 

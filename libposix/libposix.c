@@ -88,6 +88,7 @@ CHAR 			*__PROGNAME;		/* ktrace.c */
 #include "sys/msgbuf.c"
 #include "sys/systm.c"		/* cpu_configure() */
 #include "sys/stat.c"
+#include "sys/tty.c"
 #include "sys/syscall.c"
 #include "sys/fcntl.c"
 #include "sys/time.c"
@@ -95,7 +96,6 @@ CHAR 			*__PROGNAME;		/* ktrace.c */
 #include "netinet/in.c"
 #include "netinet6/in6.c"
 #include "sys/socket.c"
-#include "sys/tty.c"
 #include "sys/termio.c"
 #include "sys/filio.c"
 #include "sys/dkio.c"

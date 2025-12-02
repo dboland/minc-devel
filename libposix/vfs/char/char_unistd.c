@@ -38,6 +38,10 @@ char_read(WIN_TASK *Task, WIN_VNODE *Node, LPSTR Buffer, LONG Size, DWORD *Resul
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
+		case DEV_TYPE_PTY:
+		case DEV_TYPE_CONSOLE:
+			bResult = input_read(Task, TERMINAL(Node->Index), Buffer, Size, Result);
+			break;
 		case DEV_TYPE_INPUT:
 		case DEV_TYPE_NULL:
 			bResult = ReadFile(Node->Handle, Buffer, Size, Result, NULL);
@@ -53,6 +57,10 @@ char_write(WIN_VNODE *Node, LPCSTR Buffer, DWORD Size, DWORD *Result)
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
+		case DEV_TYPE_PTY:
+		case DEV_TYPE_CONSOLE:
+			bResult = screen_write(TERMINAL(Node->Index), Buffer, Size, Result);
+			break;
 		case DEV_TYPE_SCREEN:
 		case DEV_TYPE_NULL:
 			bResult = WriteFile(Node->Handle, Buffer, Size, Result, NULL);
@@ -63,24 +71,37 @@ char_write(WIN_VNODE *Node, LPCSTR Buffer, DWORD Size, DWORD *Result)
 	return(bResult);
 }
 BOOL 
-char_revoke(WIN_DEVICE *Device)
+char_fsync(WIN_VNODE *Node)
 {
 	BOOL bResult = FALSE;
 
-	if (!Device->Output){
-		bResult = TRUE;
-	}else if (!CloseHandle(Device->Output)){
-		WIN_ERR("CloseHandle(%d): %s\n", Device->Input, win_strerror(GetLastError()));
-	}else if (!CloseHandle(Device->Input)){
-		WIN_ERR("CloseHandle(%d): %s\n", Device->Output, win_strerror(GetLastError()));
-	}else{
-		Device->Input = NULL;
-		Device->Output = NULL;
-		if (Device->DeviceType != DEV_TYPE_CONSOLE){
-			Device->Flags = 0;
-		}
-		__Terminals[Device->Index].Flags = 0;
-		bResult = TRUE;
+	switch (Node->DeviceType){
+		case DEV_TYPE_PTY:
+		case DEV_TYPE_CONSOLE:		/* less.exe */
+			bResult = con_fsync(TERMINAL(Node->Index));
+			break;
+		case DEV_TYPE_INPUT:
+			bResult = FlushConsoleInputBuffer(Node->Handle);
+			break;
+		default:
+			SetLastError(ERROR_BAD_DEVICE);
+	}
+	return(bResult);
+}
+BOOL 
+char_revoke(WIN_VNODE *Node)
+{
+	BOOL bResult = FALSE;
+
+	switch (Node->DeviceType){
+		case DEV_TYPE_CONSOLE:
+			bResult = TRUE;
+			break;
+		case DEV_TYPE_PTY:
+			bResult = con_revoke(TERMINAL(Node->Index), DEVICE(Node->DeviceId));
+			break;
+		default:
+			SetLastError(ERROR_BAD_DEVICE);
 	}
 	return(bResult);
 }

@@ -84,7 +84,7 @@ BOOL vfs_TIOCDRAIN(WIN_VNODE *Node);
 BOOL vfs_TIOCGETA(WIN_VNODE *Node, WIN_TERMIO *Mode);
 BOOL vfs_TIOCSETA(WIN_VNODE *Node, WIN_TERMIO *Mode, BOOL Flush, BOOL Drain);
 BOOL vfs_PTMGET(WIN_VNODE *Node, WIN_VNODE *Master, WIN_VNODE *Slave);
-BOOL vfs_TIOCSCTTY(WIN_VNODE *Node, WIN_TASK *Task, WIN_TTY *Terminal);
+BOOL vfs_TIOCSCTTY(WIN_VNODE *Node, WIN_TTY **Terminal);
 BOOL vfs_TIOCGPGRP(WIN_VNODE *Node, UINT *Result);
 BOOL vfs_TIOCSPGRP(WIN_VNODE *Node, UINT GroupId);
 BOOL vfs_TIOCGFLAGS(WIN_TTY *Terminal, UINT *Result);
@@ -117,6 +117,7 @@ BOOL vfs_F_SETLK(WIN_VNODE *Node, DWORD Flags, LARGE_INTEGER *Offset, LARGE_INTE
 BOOL vfs_F_SETFL(WIN_VNODE *Node, WIN_FLAGS *Flags);
 BOOL vfs_F_GETPATH(WIN_VNODE *Node, SID8 *Owner, SID8 *Group, WIN_NAMEIDATA *Result);
 BOOL vfs_F_DUPFD(WIN_VNODE *Node, BOOL CloseExec, WIN_VNODE *Result);
+HANDLE vfs_F_OSFHANDLE(WIN_VNODE Nodes[], DWORD Index);
 
 /* vfs_mount.c */
 
@@ -229,7 +230,10 @@ BOOL pdo_match(LPCWSTR NtName, DWORD DeviceType, WIN_CFDRIVER *Driver);
 BOOL pdo_DIOCGDINFO(WIN_DEVICE *Device);
 BOOL pdo_WSKBDIO_GTYPE(UINT *Type, UINT *SubType, UINT *FKeys);
 BOOL rand_read(LPSTR Buffer, DWORD Size, DWORD *Result);
-BOOL pdo_revoke(WIN_DEVICE *Device);
+
+/* char.c */
+
+BOOL con_revoke(WIN_TTY *Terminal, WIN_DEVICE *Device);
 
 /* volume.c */
 

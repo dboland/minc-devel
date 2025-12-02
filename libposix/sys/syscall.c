@@ -609,7 +609,7 @@ __exit(WIN_TASK *Task, int status)
 	Task->Status |= (status * 0x100);
 	Task->Flags |= WIN_PS_EXITING;
 	if (Task->Flags & WIN_PS_CONTROLT){
-		pdo_revoke(DEVICE(__CTTY->DeviceId));
+		term_revoke(__CTTY);
 	}
 	proc_exit(status);
 }

@@ -38,13 +38,10 @@ vfs_TIOCGWINSZ(WIN_VNODE *Node, WIN_WINSIZE *WinSize)
 	BOOL bResult = FALSE;
 
 	switch (Node->FSType){
-		case FS_TYPE_PDO:
-			bResult = pdo_TIOCGWINSZ(DEVICE(Node->DeviceId), WinSize);
-			break;
 		case FS_TYPE_CHAR:			/* stty.exe */
 			bResult = char_TIOCGWINSZ(Node, WinSize);
 			break;
-		case FS_TYPE_PIPE:
+		case FS_TYPE_MAILSLOT:
 			*WinSize = __Terminals[Node->Index].WinSize;
 			bResult = TRUE;
 			break;
@@ -59,13 +56,10 @@ vfs_TIOCSWINSZ(WIN_VNODE *Node, WIN_WINSIZE *WinSize)
 	BOOL bResult = FALSE;
 
 	switch (Node->FSType){
-		case FS_TYPE_PDO:
-			bResult = pdo_TIOCSWINSZ(DEVICE(Node->DeviceId), WinSize);
-			break;
 		case FS_TYPE_CHAR:
 			bResult = char_TIOCSWINSZ(Node, WinSize);
 			break;
-		case FS_TYPE_PIPE:
+		case FS_TYPE_MAILSLOT:
 			__Terminals[Node->Index].WinSize = *WinSize;
 			bResult = TRUE;
 			break;
@@ -147,18 +141,19 @@ vfs_TIOCSETA(WIN_VNODE *Node, WIN_TERMIO *Attribs, BOOL Flush, BOOL Drain)
 	return(bResult);
 }
 BOOL 
-vfs_TIOCSCTTY(WIN_VNODE *Node, WIN_TASK *Task, WIN_TTY *Terminal)
+vfs_TIOCSCTTY(WIN_VNODE *Node, WIN_TTY **Result)
 {
 	BOOL bResult = FALSE;
 
-	if (Task->Flags & WIN_PS_CONTROLT){
-		SetLastError(ERROR_LOGON_SESSION_EXISTS);
-	}else if (pdo_TIOCSCTTY(DEVICE(Node->DeviceId), Terminal)){
-		Terminal->SessionId = Task->SessionId;
-		Terminal->GroupId = Task->GroupId;
-		Task->Flags |= WIN_PS_CONTROLT;
-		Task->CTTY = Terminal->Index;
-		bResult = TRUE;
+	switch (Node->FSType){
+		case FS_TYPE_CHAR:
+			bResult = char_TIOCSCTTY(DEVICE(Node->DeviceId), Result);
+			break;
+		case FS_TYPE_PDO:
+			bResult = pdo_TIOCSCTTY(DEVICE(Node->DeviceId), Result);
+			break;
+		default:
+			SetLastError(ERROR_BAD_FILE_TYPE);
 	}
 	return(bResult);
 }

@@ -30,33 +30,6 @@
 
 /************************************************************/
 
-HANDLE 
-CompatDevice(DWORD Index, WIN_DEVICE *Device)
-{
-	if (!Index){
-		return(Device->Input);
-	}else{
-		return(Device->Output);
-	}
-}
-HANDLE 
-CompatHandle(DWORD Index, WIN_VNODE Nodes[])
-{
-	HANDLE hResult;
-	WIN_VNODE *pwNode = &Nodes[Index];
-
-	switch (pwNode->FSType){
-		case FS_TYPE_PDO:
-			hResult = CompatDevice(Index, DEVICE(pwNode->DeviceId));
-			break;
-		default:
-			hResult = win_F_SETFD(pwNode->Handle, HANDLE_FLAG_INHERIT);
-	}
-	return(hResult);
-}
-
-/************************************************************/
-
 int 
 runcmd(char *argv[])
 {
@@ -66,9 +39,9 @@ runcmd(char *argv[])
 	WIN_VNODE *Nodes = pwTask->Node;
 	STARTUPINFO si = {0};
 
-	si.hStdInput = CompatHandle(0, Nodes);
-	si.hStdOutput = CompatHandle(1, Nodes);
-	si.hStdError = CompatHandle(2, Nodes);
+	si.hStdInput = vfs_F_OSFHANDLE(Nodes, 0);
+	si.hStdOutput = vfs_F_OSFHANDLE(Nodes, 1);
+	si.hStdError = vfs_F_OSFHANDLE(Nodes, 2);
 	win_wcstombs(szPath, __Strings[pwTask->TaskId].Path, PATH_MAX);
 	if (!win_execve(argv_win(pwTask, *argv, argv), szPath, &si)){
 		result -= errno_posix(GetLastError());

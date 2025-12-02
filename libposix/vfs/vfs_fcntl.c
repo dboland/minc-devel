@@ -48,20 +48,11 @@ vfs_F_DUPFD(WIN_VNODE *Node, BOOL CloseExec, WIN_VNODE *Result)
 		case FS_TYPE_PIPE:
 			bResult = pipe_F_DUPFD(Node, hProcess, dwOptions, Result);
 			break;
-		case FS_TYPE_CHAR:
-			bResult = char_F_DUPFD(Node, hProcess, dwOptions, Result);
-			break;
-		case FS_TYPE_DISK:
-			bResult = disk_F_DUPFD(Node, hProcess, dwOptions, Result);
-			break;
-		case FS_TYPE_PDO:
-			bResult = pdo_F_DUPFD(Node, hProcess, dwOptions, Result);
-			break;
 		case FS_TYPE_MAILSLOT:
 			bResult = mail_F_DUPFD(DEVICE(Node->DeviceId), hProcess, dwOptions, Result);
 			break;
 		default:
-			SetLastError(ERROR_BAD_FILE_TYPE);
+			bResult = disk_F_DUPFD(Node, hProcess, dwOptions, Result);
 	}
 	return(bResult);
 }
@@ -76,20 +67,11 @@ vfs_F_INHERIT(WIN_VNODE *Node, HANDLE Process)
 		case FS_TYPE_PIPE:
 			bResult = pipe_F_DUPFD(Node, Process, dwOptions, Node);
 			break;
-		case FS_TYPE_CHAR:
-			bResult = char_F_DUPFD(Node, Process, dwOptions, Node);
-			break;
-		case FS_TYPE_DISK:
-			bResult = disk_F_DUPFD(Node, Process, dwOptions, Node);
-			break;
-		case FS_TYPE_PDO:
-			bResult = pdo_F_DUPFD(Node, Process, dwOptions, Node);
-			break;
 		case FS_TYPE_MAILSLOT:
 			bResult = mail_F_DUPFD(DEVICE(Node->DeviceId), Process, dwOptions, Node);
 			break;
 		default:
-			SetLastError(ERROR_BAD_FILE_TYPE);
+			bResult = disk_F_DUPFD(Node, Process, dwOptions, Node);
 	}
 	return(bResult);
 }
@@ -176,6 +158,21 @@ vfs_F_SETLK(WIN_VNODE *Node, DWORD Flags, LARGE_INTEGER *Offset, LARGE_INTEGER *
 			SetLastError(ERROR_BAD_FILE_TYPE);
 	}
 	return(bResult);
+}
+HANDLE 
+vfs_F_OSFHANDLE(WIN_VNODE Nodes[], DWORD Index)
+{
+	HANDLE hResult = NULL;
+	WIN_VNODE *pwNode = &Nodes[Index];
+
+	switch (pwNode->FSType){
+		case FS_TYPE_CHAR:
+			hResult = char_F_OSFHANDLE(pwNode, Index);
+			break;
+		default:
+			hResult = win_F_SETFD(pwNode->Handle, HANDLE_FLAG_INHERIT);
+	}
+	return(hResult);
 }
 
 /****************************************************/

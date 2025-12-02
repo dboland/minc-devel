@@ -130,19 +130,27 @@ term_TIOCSETAF(WIN_TASK *Task, WIN_VNODE *Node, WIN_TERMIO *Attribs)
 	return(result);
 }
 int 
-term_TIOCSCTTY(WIN_TASK *Task, WIN_VNODE *Node, WIN_TTY *Terminal)
+term_TIOCSCTTY(WIN_TASK *Task, WIN_VNODE *Node)
 {
 	int result = 0;
 	WIN_TERMIO tAttribs = {TTYDEF_IFLAG, TTYDEF_OFLAG, TTYDEF_CFLAG, 
 		TTYDEF_LFLAG, {0}, TTYDEF_SPEED, TTYDEF_SPEED};
+	WIN_TTY *pwTerminal;
 
-	if (!vfs_TIOCSCTTY(Node, Task, Terminal)){
+	if (Task->Flags & WIN_PS_CONTROLT){
+		result = -EPERM;
+	}else if (!vfs_TIOCSCTTY(Node, &pwTerminal)){
 		result -= errno_posix(GetLastError());
 	}else{
 		win_memcpy(tAttribs.Control, ttydefchars, sizeof(ttydefchars));
-		Terminal->Attribs = tAttribs;
-		Node->Index = Terminal->Index;
-		Node->Event = Terminal->Event;
+		pwTerminal->Attribs = tAttribs;
+		Node->Index = pwTerminal->Index;
+		Node->Event = pwTerminal->Event;
+		Node->FSType = pwTerminal->FSType;
+		pwTerminal->SessionId = Task->SessionId;
+		pwTerminal->GroupId = Task->GroupId;
+		Task->Flags |= WIN_PS_CONTROLT;
+		Task->CTTY = pwTerminal->Index;
 	}
 	return(result);
 }
@@ -236,7 +244,7 @@ term_ioctl(WIN_TASK *Task, int fd, unsigned long request, va_list args)
 			result = term_PTMGET(Task, pvNode, va_arg(args, struct ptmget *));
 			break;
 		case TIOCSCTTY:
-			result = term_TIOCSCTTY(Task, pvNode, tty_attach());
+			result = term_TIOCSCTTY(Task, pvNode);
 			break;
 		case TIOCGETA:
 			result = term_TIOCGETA(pvNode, va_arg(args, WIN_TERMIO *));

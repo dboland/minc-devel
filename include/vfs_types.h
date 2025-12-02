@@ -109,7 +109,7 @@ typedef struct _WIN_DEVICE {
 	DWORD DeviceType;
 	DWORD DeviceId;
 	CHAR Name[MAX_NAME];
-	HANDLE Event;
+	WIN_FS_TYPE FSType;
 	HANDLE Input;
 	HANDLE Output;
 	DWORD Flags;			/* see below */
@@ -600,6 +600,9 @@ typedef struct _WIN_TERMIO {
 typedef struct _WIN_TTY {
 	DWORD Index;
 	HANDLE Event;
+	HANDLE Output;
+	HANDLE Input;
+	WIN_FS_TYPE FSType;
 	DWORD DeviceType;
 	DWORD DeviceId;
 	DWORD GroupId;
@@ -621,6 +624,8 @@ typedef struct _WIN_TTY {
 #define COMMON_LVB_AUTOWRAP		0x2000
 #define COMMON_LVB_REVERSE_VIDEO	0x4000
 #define COMMON_LVB_UNDERSCORE		0x8000
+
+#define TERMINAL(idx)	(&__Terminals[idx])
 
 /* sys/termios.h */
 

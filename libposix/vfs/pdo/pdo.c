@@ -40,7 +40,7 @@
 #include "pdo_tty.c"
 #include "pdo_fcntl.c"
 #include "pdo_unistd.c"
-#include "pdo_poll.c"
+//#include "pdo_poll.c"
 #include "pdo_stat.c"
 #include "pdo_statvfs.c"
 #include "pdo_mount.c"

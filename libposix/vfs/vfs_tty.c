@@ -32,27 +32,22 @@
 
 /****************************************************/
 
-BOOL 
-PdoOpenFile(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_VNODE *Result)
+WIN_TTY * 
+tty_attach(VOID)
 {
-	BOOL bResult = FALSE;
-	WIN_DEVICE *pwDevice = DEVICE(Path->DeviceId);
+	DWORD dwIndex = 0;
+	WIN_TTY *pwTerminal = __Terminals;
 
-	if (!pwDevice->Flags){
-		CloseHandle(Path->Object);
-	}else{
-		Result->DeviceType = pwDevice->DeviceType;
-		Result->Index = pwDevice->Index;
-//		Result->Event = pwDevice->Event;
-		Result->FSType = Path->FSType;
-		Result->DeviceId = Path->DeviceId;
-		Result->FileType = Path->FileType;
-		Result->Attribs = Path->Attribs;
-		Result->Handle = Path->Object;
-		Result->CloseExec = Flags->CloseExec;
-		Result->Access = Flags->Access;
-		Result->Flags = HANDLE_FLAG_INHERIT;
-		bResult = TRUE;
+	while (dwIndex < WIN_TTY_MAX){
+		if (!pwTerminal->Flags){
+			pwTerminal->Flags = TIOCFLAG_ACTIVE;
+			pwTerminal->Index = dwIndex;
+			_itoa(dwIndex, win_stpcpy(pwTerminal->Name, "tty"), 10);
+			return(pwTerminal);
+		}
+		dwIndex++;
+		pwTerminal++;
 	}
-	return(bResult);
+	SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+	return(NULL);
 }

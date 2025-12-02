@@ -399,8 +399,8 @@ vfs_fsync(WIN_VNODE *Node)
 		case FS_TYPE_DISK:
 			bResult = FlushFileBuffers(Node->Handle);
 			break;
-		case FS_TYPE_PDO:
-			bResult = pdo_fsync(DEVICE(Node->DeviceId));
+		case FS_TYPE_CHAR:
+			bResult = char_fsync(Node);
 			break;
 		default:
 			SetLastError(ERROR_BAD_FILE_TYPE);
@@ -428,6 +428,9 @@ vfs_revoke(WIN_VNODE *Node)
 	BOOL bResult = FALSE;
 
 	switch (Node->FSType){
+		case FS_TYPE_CHAR:
+			bResult = char_revoke(Node);
+			break;
 		case FS_TYPE_PDO:
 			bResult = pdo_revoke(DEVICE(Node->DeviceId));
 			break;

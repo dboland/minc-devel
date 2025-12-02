@@ -32,19 +32,18 @@
 
 /****************************************************/
 
-BOOL 
-char_F_DUPFD(WIN_VNODE *Node, HANDLE Process, DWORD Options, WIN_VNODE *Result)
+HANDLE 
+char_F_OSFHANDLE(WIN_VNODE *Node, DWORD Index)
 {
-	BOOL bResult = FALSE;
 	HANDLE hResult = NULL;
-	BOOL bInherit = (Node->Flags & HANDLE_FLAG_INHERIT);
 
-	if (!DuplicateHandle(GetCurrentProcess(), Node->Handle, Process, &hResult, 0, bInherit, Options)){
-		WIN_ERR("char_F_DUPFD(%d): %s\n", Node->Handle, win_strerror(GetLastError()));
-	}else{
-		Result->Handle = hResult;
-		Result->Event = hResult;
-		bResult = TRUE;
+	switch(Node->DeviceType){
+		case DEV_TYPE_PTY:
+		case DEV_TYPE_CONSOLE:
+			hResult = con_F_OSFHANDLE(TERMINAL(Node->Index), Index);
+			break;
+		default:
+			hResult = Node->Handle;
 	}
-	return(bResult);
+	return(hResult);
 }

@@ -38,5 +38,6 @@ ptm_open(WIN_DEVICE *Device, WIN_FLAGS *Flags, WIN_VNODE *Result)
 	Result->DeviceType = Device->DeviceType;
 	Result->DeviceId = Device->DeviceId;
 	Result->Index = Device->Index;
+	Result->FSType = Device->FSType;
 	return(TRUE);
 }

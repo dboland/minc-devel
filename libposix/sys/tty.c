@@ -33,7 +33,7 @@
 /****************************************************/
 
 int 
-tty_USER_NAMEI_TTY(dev_t id, char *buf, size_t buflen)
+term_USER_NAMEI_TTY(dev_t id, char *buf, size_t buflen)
 {
 	int result = -ENOENT;
 	int index = 0;
@@ -53,22 +53,16 @@ tty_USER_NAMEI_TTY(dev_t id, char *buf, size_t buflen)
 
 /****************************************************/
 
-WIN_TTY * 
-tty_attach(void)
+VOID 
+term_revoke(WIN_TTY *Terminal)
 {
-	int index = 0;
-	WIN_TTY *pwTerminal = __Terminals;
-
-	while (index < WIN_TTY_MAX){
-		if (!pwTerminal->Flags){
-			pwTerminal->Flags = TIOCFLAG_ACTIVE;
-			pwTerminal->Index = index;
-			_itoa(index, win_stpcpy(pwTerminal->Name, "tty"), 10);
-			return(pwTerminal);
-		}
-		index++;
-		pwTerminal++;
+	switch (Terminal->DeviceType){
+		case DEV_TYPE_CONSOLE:
+			break;
+		case DEV_TYPE_PTY:
+			con_revoke(Terminal, DEVICE(Terminal->DeviceId));
+			break;
+		default:
+			SetLastError(ERROR_CTX_NOT_CONSOLE);
 	}
-	SetLastError(ERROR_NOT_ENOUGH_MEMORY);
-	return(NULL);
 }

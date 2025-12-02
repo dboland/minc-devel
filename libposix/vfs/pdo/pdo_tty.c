@@ -39,5 +39,6 @@ tty_open(WIN_TTY *Terminal, WIN_FLAGS *Flags, WIN_VNODE *Result)
 	Result->DeviceId = Terminal->DeviceId;
 	Result->Index = Terminal->Index;
 	Result->Event = Terminal->Event;
+	Result->FSType = Terminal->FSType;
 	return(TRUE);
 }

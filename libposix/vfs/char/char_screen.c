@@ -185,28 +185,29 @@ ScreenPutString(HANDLE Handle, LPCSTR Buffer, DWORD Count, CONSOLE_SCREEN_BUFFER
 	return(Count);
 }
 BOOL 
-ScreenWriteFile(HANDLE Handle, LPCSTR Buffer, DWORD Size, DWORD *Result)
+ScreenWriteFile(WIN_TTY *Terminal, LPCSTR Buffer, DWORD Size, DWORD *Result)
 {
 	BOOL bResult = TRUE;
 	LONG lSize = Size;
 	DWORD dwCount = 0;
 	DWORD dwResult = 0;
-	WIN_TERMIO *pwAttribs = &__CTTY->Attribs;
+	WIN_TERMIO *pwAttribs = &Terminal->Attribs;
 	UINT uiOutFlags = pwAttribs->OFlags;
 	UINT uiInFlags = pwAttribs->IFlags;
-	CONSOLE_SCREEN_BUFFER_INFO *psbInfo = &__CTTY->Info;
+	CONSOLE_SCREEN_BUFFER_INFO *psbInfo = &Terminal->Info;
+	HANDLE hOutput = Terminal->Output;
 
-	if (!ScreenRenderWindow(Handle, psbInfo)){
+	if (!ScreenRenderWindow(hOutput, psbInfo)){
 		return(FALSE);
 	}else while (lSize > 0){
 		__Char = Buffer[dwCount];
 		if (__Escape){
-			ScreenEscape(Handle, __Char, &__ANSI_BUF, psbInfo);
+			ScreenEscape(hOutput, __Char, &__ANSI_BUF, psbInfo);
 			Buffer++;
 			dwCount = 0;
 		}else if (__Char < 32){
 			/* Hello David Cuttler */
-			ScreenPutString(Handle, Buffer, dwCount, psbInfo);
+			ScreenPutString(hOutput, Buffer, dwCount, psbInfo);
 			Buffer += dwCount;
 			dwCount = 0;
 			if (!__Char){			/* NULL Filler */
@@ -221,13 +222,13 @@ ScreenWriteFile(HANDLE Handle, LPCSTR Buffer, DWORD Size, DWORD *Result)
 				__ANSI_BUF.Args = __Escape;
 				Buffer++;
 			}else if (__Char == CC_BS){
-				AnsiCursorBack(Handle, psbInfo, 1);
+				AnsiCursorBack(hOutput, psbInfo, 1);
 				Buffer++;
 			}else if (__Char == CC_LF){
-				ScreenLineFeed(Handle, uiOutFlags, psbInfo);
+				ScreenLineFeed(hOutput, uiOutFlags, psbInfo);
 				Buffer++;
 			}else if (__Char == CC_CR){
-				ScreenCarriageReturn(Handle, uiOutFlags, psbInfo);
+				ScreenCarriageReturn(hOutput, uiOutFlags, psbInfo);
 				Buffer++;
 			}else if (__Char == CC_SO){	/* Switch to alternative character set */
 				SetConsoleOutputCP(GetACP());
@@ -245,7 +246,7 @@ ScreenWriteFile(HANDLE Handle, LPCSTR Buffer, DWORD Size, DWORD *Result)
 		lSize--;
 	}
 	if (dwCount){
-		ScreenPutString(Handle, Buffer, dwCount, psbInfo);
+		ScreenPutString(hOutput, Buffer, dwCount, psbInfo);
 	}
 	*Result = dwResult;
 	return(bResult);
@@ -254,14 +255,14 @@ ScreenWriteFile(HANDLE Handle, LPCSTR Buffer, DWORD Size, DWORD *Result)
 /****************************************************/
 
 BOOL 
-screen_write(HANDLE Handle, LPCSTR Buffer, DWORD Size, DWORD *Result)
+screen_write(WIN_TTY *Terminal, LPCSTR Buffer, DWORD Size, DWORD *Result)
 {
 	BOOL bResult = FALSE;
 
 	if (__ConMode[1] & ENABLE_VIRTUAL_TERMINAL_PROCESSING){
-		bResult = WriteFile(Handle, Buffer, Size, Result, NULL);
+		bResult = WriteFile(Terminal->Output, Buffer, Size, Result, NULL);
 	}else{
-		bResult = ScreenWriteFile(Handle, Buffer, Size, Result);
+		bResult = ScreenWriteFile(Terminal, Buffer, Size, Result);
 	}
 	return(bResult);
 }
@@ -314,7 +315,7 @@ screen_TIOCSWINSZ(HANDLE Handle, WIN_WINSIZE *WinSize)
 	return(bResult);
 }
 BOOL 
-screen_TIOCDRAIN(HANDLE Handle)
+screen_TIOCDRAIN(WIN_TTY *Terminal)
 {
 	return(TRUE);		/* CONOUT$ not buffered */
 }
