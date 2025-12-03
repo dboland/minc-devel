@@ -3,7 +3,7 @@
 #
 # name	getty				type	status	comments
 #
-console	"/usr/libexec/getty std.9600"	xterm	on	secure
+console	"/usr/libexec/getty std.9600"	interix	on	secure
 pccom0	"/usr/libexec/getty std.9600"	vt100	off	secure
 pccom1	"/usr/libexec/getty std.9600"	vt100	off	secure
-ptm	"/usr/libexec/getty std.9600"	xterm	off	secure
+ptm	"/usr/libexec/getty std.9600"	interix	off	secure

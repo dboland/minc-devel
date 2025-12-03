@@ -48,7 +48,6 @@ consinit(VOID)
 	/* sys/arch/i386/i386/machdep.c
 	 */
 	SetConsoleTextAttribute(hOutput, wAttribs);
-	SetConsoleOutputCP(CP_UTF8);
 	GetConsoleMode(hInput, &dwMode[0]);
 	GetConsoleMode(hOutput, &dwMode[1]);
 	reg_TIOCGETA("Console\\MinC", dwMode);

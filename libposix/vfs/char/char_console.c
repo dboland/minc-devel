@@ -71,6 +71,7 @@ con_TIOCSCTTY(WIN_DEVICE *Device, WIN_TTY **Result)
 		pwTerminal->DeviceId = Device->DeviceId;
 		SetConsoleTextAttribute(pwTerminal->Output, BACKGROUND_BLACK | FOREGROUND_WHITE);
 		GetConsoleScreenBufferInfo(pwTerminal->Output, &pwTerminal->Info);
+		SetConsoleOutputCP(CP_UTF8);
 		Device->FSType = FS_TYPE_CHAR;
 		Device->Index = pwTerminal->Index;
 //pwTerminal->Flags = TIOCFLAG_ACTIVE;

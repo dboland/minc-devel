@@ -31,12 +31,12 @@
 #include <wincon.h>
 
 /* By setting the 'VirtualTerminalLevel' registry key to a DWORD value greater
- * than 0, the Vista Console goes into XTerm mode. This gets you:
- * - overall faster screen drawing;
- * - underlined terms in man pages;
- * - beautiful mouse scrolling in vim;
- * - colour coded file listings on remote Linux systems;
- * - the alternate screen feature (MS calls it 'application mode');
+ * than 1, the Vista Console goes into full XTerm mode. This gets you:
+ * Overall faster screen drawing;
+ * Underlined terms in man pages;
+ * Beautiful mouse scrolling in vim;
+ * Colour coded file listings on remote Linux systems;
+ * The alternate screen feature (MS calls it 'application mode');
  */
 
 /****************************************************/

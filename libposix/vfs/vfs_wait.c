@@ -50,7 +50,7 @@ WaitNoHang(WIN_TASK *Children[], DWORD Status, WIN_RUSAGE *Result)
 	WIN_TASK *pwTask = NULL;
 
 	while (pwTask = *Children++){
-		if (pwTask->Flags & WIN_PS_NOZOMBIE){   /* recursive wait (NSI Installer) */
+		if (pwTask->Flags & WIN_PS_NOZOMBIE){   /* recursive wait (NSIS Installer) */
 			ZeroMemory(pwTask, sizeof(WIN_TASK));
 		}else if (pwTask->Flags & WIN_PS_ZOMBIE){
 			Result->TaskId = pwTask->TaskId;

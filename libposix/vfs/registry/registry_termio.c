@@ -45,11 +45,13 @@ reg_TIOCGETA(LPCSTR Path, DWORD Mode[2])
 		WIN_ERR("RegOpenKey(%s): %s\n", Path, win_strerror(GetLastError()));
 	}else if (ERROR_SUCCESS == RegQueryValueEx(hKey, "VirtualTerminalLevel", NULL, &dwType, (PBYTE)&dwValue, &dwSize)){
 		if (dwValue > 0){
-			Mode[0] |= ENABLE_VIRTUAL_TERMINAL_INPUT;
 			Mode[1] |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 		}
-		RegCloseKey(hKey);
+		if (dwValue == 2){
+			Mode[0] |= ENABLE_VIRTUAL_TERMINAL_INPUT;
+		}
 		bResult = TRUE;
 	}
+	RegCloseKey(hKey);
 	return(bResult);
 }

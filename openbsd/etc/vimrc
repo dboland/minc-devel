@@ -1,6 +1,6 @@
-" Home/End/Delete key (xterm)
-set t_kh=0H
-set t_@7=0F
+" Home/End/Delete key (interix)
+set t_kh=[H
+set t_@7=[F
 set t_kD=
 
 " don't delete original file

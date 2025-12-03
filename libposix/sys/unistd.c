@@ -700,7 +700,7 @@ sys_revoke(call_t call, const char *path)
 int 
 sys_acct(call_t call, const char *path)
 {
-	WIN_ERR("acct(%s)\n", path);
+//	WIN_ERR("acct(%s)\n", path);
 	return(0);
 }
 int 

@@ -164,6 +164,8 @@ InputBufferSize(WINDOW_BUFFER_SIZE_RECORD *Event)
 BOOL 
 InputMouse(MOUSE_EVENT_RECORD *Event, CHAR *Buffer)
 {
+	BOOL bResult = TRUE;
+
 	if (Event->dwEventFlags != MOUSE_WHEELED){
 		return(TRUE);
 	}else if (GET_WHEEL_DELTA_WPARAM(Event->dwButtonState) > 0){
@@ -171,7 +173,7 @@ InputMouse(MOUSE_EVENT_RECORD *Event, CHAR *Buffer)
 	}else{
 		win_strcpy(Buffer, ANSI_CURSOR(VK_DOWN));
 	}
-	return(TRUE);
+	return(bResult);
 }
 BOOL 
 InputReadEvent(HANDLE Handle, WIN_TERMIO *Attribs, CHAR *Buffer)
@@ -404,7 +406,7 @@ input_read(WIN_TASK *Task, WIN_TTY *Terminal, LPSTR Buffer, DWORD Size, DWORD *R
 	BOOL bResult = FALSE;
 
 	if (__ConMode[0] & ENABLE_VIRTUAL_TERMINAL_INPUT){
-		bResult = ReadFile(Terminal->Input, Buffer, Size, Result, NULL);
+		bResult = ReadConsole(Terminal->Input, Buffer, Size, Result, NULL);
 	}else{
 		bResult = InputReadFile(Task, Terminal, Buffer, Size, Result);
 	}

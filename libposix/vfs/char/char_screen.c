@@ -260,7 +260,7 @@ screen_write(WIN_TTY *Terminal, LPCSTR Buffer, DWORD Size, DWORD *Result)
 	BOOL bResult = FALSE;
 
 	if (__ConMode[1] & ENABLE_VIRTUAL_TERMINAL_PROCESSING){
-		bResult = WriteFile(Terminal->Output, Buffer, Size, Result, NULL);
+		bResult = WriteConsole(Terminal->Output, Buffer, Size, Result, NULL);
 	}else{
 		bResult = ScreenWriteFile(Terminal, Buffer, Size, Result);
 	}
