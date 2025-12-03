@@ -1,6 +1,5 @@
-" Home/End/Delete key (interix)
-set t_kh=[H
-set t_@7=[F
+" Swap Back-space/Delete (interix)
+set t_kb=
 set t_kD=
 
 " don't delete original file

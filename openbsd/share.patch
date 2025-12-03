@@ -3,13 +3,13 @@
 @@ -0,0 +1 @@
 +This directory has been patched.
 --- openbsd-master/share/termtypes/termtypes.master
-+++ openbsd-master/share/termtypes/termtypes.master	Tue Oct 14 11:44:20 2025
++++ openbsd-master/share/termtypes/termtypes.master	Wed Dec  3 10:19:14 2025
 @@ -6913,7 +6913,7 @@
  	cuu1=\E[A, dl=\E[%p1%dM, dl1=\E[M, ed=\E[J, el=\E[K,
  	home=\E[H, ht=^I, il=\E[%p1%dL, il1=\E[L, ind=\E[S,
  	indn=\E[%p1%dS, kbs=^H, kcbt=\E[Z, kcub1=\E[D, kcud1=\E[B,
 -	kcuf1=\E[C, kcuu1=\E[A, kdch1=\E[M, kend=\E[U, kf0=\EFA,
-+	kcuf1=\E[C, kcuu1=\E[A, kdch1=^?, kend=\E[U, kf0=\EFA,
++	khome=\E[H, kcuf1=\E[C, kcuu1=\E[A, kdch1=^?, kend=\E[U, kf0=\EFA,
  	kf1=\EF1, kf10=\EFA, kf11=\EFB, kf12=\EFC, kf13=\EFD,
  	kf14=\EFE, kf15=\EFF, kf16=\EFG, kf17=\EFH, kf18=\EFI,
  	kf19=\EFJ, kf2=\EF2, kf20=\EFK, kf21=\EFL, kf22=\EFM,
