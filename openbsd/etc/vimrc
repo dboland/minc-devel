@@ -1,7 +1,3 @@
-" Swap Back-space/Delete (interix)
-set t_kb=
-set t_kD=
-
 " don't delete original file
 set nobackup
 set nowritebackup

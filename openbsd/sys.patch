@@ -177,6 +177,18 @@
  
  #if __BSD_VISIBLE
  /*
+--- openbsd-master/sys/sys/ttydefaults.h
++++ openbsd-master/sys/sys/ttydefaults.h	Thu Dec  4 09:36:19 2025
+@@ -58,7 +58,8 @@
+ #define CTRL(x)	(x&037)
+ #define	CEOF		CTRL('d')
+ #define	CEOL		((unsigned char)'\377')	/* XXX avoid _POSIX_VDISABLE */
+-#define	CERASE		0177
++/* Some programs actually check this! (vim.exe) */
++#define	CERASE		0010
+ #define	CINTR		CTRL('c')
+ #define	CSTATUS		((unsigned char)'\377')	/* XXX avoid _POSIX_VDISABLE */
+ #define	CKILL		CTRL('u')
 --- openbsd-master/sys/sys/types.h
 +++ openbsd-master/sys/sys/types.h	Wed Sep 24 17:39:09 2025
 @@ -267,4 +267,10 @@

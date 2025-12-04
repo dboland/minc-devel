@@ -226,7 +226,6 @@ int
 term_ioctl(WIN_TASK *Task, int fd, unsigned long request, va_list args)
 {
 	int result = 0;
-	DWORD wOperation = request & 0xFF;
 	WIN_VNODE *pvNode = &Task->Node[fd];
 
 	/* tty(4)
