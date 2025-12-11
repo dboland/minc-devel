@@ -126,17 +126,20 @@ char_TIOCDRAIN(WIN_VNODE *Node)
 	return(bResult);
 }
 BOOL 
-char_TIOCSCTTY(WIN_DEVICE *Device, WIN_TTY **Result)
+char_TIOCSCTTY(WIN_DEVICE *Device, WIN_TASK *Task, WIN_TTY *Terminal)
 {
 	BOOL bResult = FALSE;
 
 	switch (Device->DeviceType){
 		case DEV_TYPE_CONSOLE:
-			*Result = __Terminals;
+			Terminal->SessionId = Task->SessionId;
+			Terminal->GroupId = Task->GroupId;
+			Task->Flags |= WIN_PS_CONTROLT;
+			Task->CTTY = Terminal->Index;
 			bResult = TRUE;
 			break;
 		case DEV_TYPE_PTY:
-			bResult = con_TIOCSCTTY(Device, Result);
+			bResult = con_TIOCSCTTY(Device, Task, Terminal);
 			break;
 		default:
 			SetLastError(ERROR_CTX_NOT_CONSOLE);

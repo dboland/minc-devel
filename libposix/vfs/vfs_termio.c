@@ -74,8 +74,8 @@ vfs_TIOCGETA(WIN_VNODE *Node, WIN_TERMIO *Attribs)
 	BOOL bResult = FALSE;
 
 	switch (Node->FSType){
-		case FS_TYPE_PDO:
 		case FS_TYPE_CHAR:
+		case FS_TYPE_MAILSLOT:
 			bResult = TRUE;
 			break;
 		default:
@@ -89,9 +89,6 @@ vfs_TIOCFLUSH(WIN_VNODE *Node)
 	BOOL bResult = FALSE;
 
 	switch (Node->FSType){
-		case FS_TYPE_PDO:
-			bResult = pdo_TIOCFLUSH(DEVICE(Node->DeviceId));
-			break;
 		case FS_TYPE_CHAR:
 			bResult = char_TIOCFLUSH(Node);
 			break;
@@ -106,9 +103,6 @@ vfs_TIOCDRAIN(WIN_VNODE *Node)
 	BOOL bResult = FALSE;
 
 	switch (Node->FSType){
-		case FS_TYPE_PDO:
-			bResult = pdo_TIOCDRAIN(DEVICE(Node->DeviceId));
-			break;
 		case FS_TYPE_CHAR:
 			bResult = char_TIOCDRAIN(Node);
 			break;
@@ -126,11 +120,11 @@ vfs_TIOCSETA(WIN_VNODE *Node, WIN_TERMIO *Attribs, BOOL Flush, BOOL Drain)
 		vfs_TIOCDRAIN(Node);
 	}
 	switch (Node->FSType){
-		case FS_TYPE_PDO:
-			bResult = pdo_TIOCSETA(DEVICE(Node->DeviceId), Attribs);
-			break;
 		case FS_TYPE_CHAR:			/* nano.exe */
 			bResult = char_TIOCSETA(Node, Attribs);
+			break;
+		case FS_TYPE_MAILSLOT:
+			bResult = TRUE;
 			break;
 		default:
 			SetLastError(ERROR_CTX_NOT_CONSOLE);
@@ -141,16 +135,19 @@ vfs_TIOCSETA(WIN_VNODE *Node, WIN_TERMIO *Attribs, BOOL Flush, BOOL Drain)
 	return(bResult);
 }
 BOOL 
-vfs_TIOCSCTTY(WIN_VNODE *Node, WIN_TTY **Result)
+vfs_TIOCSCTTY(WIN_TASK *Task, WIN_VNODE *Node)
 {
 	BOOL bResult = FALSE;
 
 	switch (Node->FSType){
 		case FS_TYPE_CHAR:
-			bResult = char_TIOCSCTTY(DEVICE(Node->DeviceId), Result);
+			bResult = char_TIOCSCTTY(DEVICE(Node->DeviceId), Task, TERMINAL(Node->Index));
 			break;
 		case FS_TYPE_PDO:
-			bResult = pdo_TIOCSCTTY(DEVICE(Node->DeviceId), Result);
+			bResult = pdo_TIOCSCTTY(DEVICE(Node->DeviceId), Task);
+			break;
+		case FS_TYPE_MAILSLOT:
+			bResult = mail_TIOCSCTTY(DEVICE(Node->DeviceId), Task, TERMINAL(Node->Index));
 			break;
 		default:
 			SetLastError(ERROR_BAD_FILE_TYPE);
@@ -158,24 +155,26 @@ vfs_TIOCSCTTY(WIN_VNODE *Node, WIN_TTY **Result)
 	return(bResult);
 }
 BOOL 
-vfs_PTMGET(WIN_VNODE *Node, WIN_VNODE *Master, WIN_VNODE *Slave)
+vfs_PTMGET(WIN_VNODE *Node, WIN_VNODE Result[2])
 {
 	BOOL bResult = FALSE;
 //	HANDLE hEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	WCHAR szName[MAX_NAME];
 
-	if (!PipeCreateFile(VfsCreateName(szName), PIPE_READMODE_BYTE, Node->Event, Master)){
-		return(FALSE);
-	}else if (PipeOpenFile(szName, Node->Event, Slave)){
-		Slave->Index = Node->Index;
-		Slave->FileType = Node->FileType;
-		Slave->DeviceType = Node->DeviceType;
-		Slave->DeviceId = Node->DeviceId;
-		Master->Index = Node->Index;
-		Master->FileType = Node->FileType;
-		Master->DeviceType = Node->DeviceType;
-		Master->DeviceId = Node->DeviceId;
-		bResult = TRUE;
+	vfs_F_DUPFD(Node, Node->CloseExec, &Result[0]);
+	vfs_F_DUPFD(Node, Node->CloseExec, &Result[1]);
+	switch (Node->FSType){
+//		case FS_TYPE_CHAR:
+//			bResult = char_PTMGET(Node, TERMINAL(Node->Index), Result);
+//			break;
+		case FS_TYPE_PDO:
+			bResult = pdo_PTMGET(DEVICE(Node->DeviceId), Result);
+			break;
+		case FS_TYPE_MAILSLOT:
+			bResult = mail_PTMGET(DEVICE(Node->DeviceId), TERMINAL(Node->Index), Result);
+			break;
+		default:
+			SetLastError(ERROR_BAD_FILE_TYPE);
 	}
 	return(bResult);
 }
@@ -185,8 +184,9 @@ vfs_TIOCGPGRP(WIN_VNODE *Node, UINT *Result)
 	BOOL bResult = FALSE;
 
 	switch (Node->FSType){
-		case FS_TYPE_PDO:
+//		case FS_TYPE_PDO:
 		case FS_TYPE_CHAR:
+		case FS_TYPE_MAILSLOT:
 			*Result = __Terminals[Node->Index].GroupId;
 			bResult = TRUE;
 			break;
@@ -201,8 +201,9 @@ vfs_TIOCSPGRP(WIN_VNODE *Node, UINT GroupId)
 	BOOL bResult = FALSE;
 
 	switch (Node->FSType){
-		case FS_TYPE_PDO:
+//		case FS_TYPE_PDO:
 		case FS_TYPE_CHAR:
+		case FS_TYPE_MAILSLOT:
 			__Terminals[Node->Index].GroupId = GroupId;
 			bResult = TRUE;
 			break;

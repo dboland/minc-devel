@@ -42,9 +42,10 @@ PipeCreateFile(LPCWSTR Name, DWORD Attribs, HANDLE Event, WIN_VNODE *Result)
 	WCHAR szPath[MAX_PATH] = L"\\\\.\\PIPE\\";
 	DWORD dwMax = PIPE_UNLIMITED_INSTANCES;
 	HANDLE hResult;
+	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, FALSE};
 
 	hResult = CreateNamedPipeW(win_wcscat(szPath, Name), dwOpenMode, dwPipeMode, 
-		dwMax, WIN_PIPE_BUF, WIN_PIPE_BUF, NMPWAIT_USE_DEFAULT_WAIT, NULL);
+		dwMax, WIN_PIPE_BUF, WIN_PIPE_BUF, NMPWAIT_USE_DEFAULT_WAIT, &sa);
 	if (hResult != INVALID_HANDLE_VALUE){
 		Result->Handle = hResult;
 		Result->Event = Event;
@@ -67,9 +68,10 @@ PipeOpenFile(LPCWSTR Name, HANDLE Event, WIN_VNODE *Result)
 	WCHAR szPath[MAX_PATH] = L"\\\\.\\PIPE\\";
 	DWORD dwAttribs = FILE_ATTRIBUTE_NORMAL;
 	HANDLE hResult;
+	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, FALSE};
 
 	hResult = CreateFileW(win_wcscat(szPath, Name), aMask, dwShare, NULL, 
-		OPEN_EXISTING, dwAttribs, NULL);
+		OPEN_EXISTING, dwAttribs, &sa);
 	if (hResult != INVALID_HANDLE_VALUE){
 		Result->Handle = hResult;
 		Result->Event = Event;

@@ -4,7 +4,7 @@ include ${ROOTDIR}/Makefile.inc
 
 SOURCES= man.conf motd gettytab login.conf sysctl.conf ftpchroot ftpusers \
 	syslog.conf
-FILES= ${ETCDEST}/profile ${ETCDEST}/ttys ${ETCDEST}/vi.exrc
+FILES= ${ETCDEST}/profile ${ETCDEST}/ttys
 ETCSRC= ${SRCDIR}/etc
 ETCDEST= ${DESTDIR}/etc
 
@@ -34,8 +34,5 @@ ${ETCDEST}/profile:
 
 ${ETCDEST}/ttys:
 	${INSTALL} ttys ${ETCDEST}/
-
-${ETCDEST}/vi.exrc:
-	${INSTALL} vi.exrc ${ETCDEST}/
 
 install: ${ETCDEST} ${FILES}

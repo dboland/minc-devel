@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Daniel Boland <dboland@xs4all.nl>.
+ * Copyright (c) 2025 Daniel Boland <dboland@xs4all.nl>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,22 +33,26 @@
 /****************************************************/
 
 BOOL 
-mail_read(WIN_VNODE *Node, LPSTR Buffer, DWORD Size, DWORD *Result)
+mail_read(WIN_TASK *Task, WIN_VNODE *Node, LPSTR Buffer, DWORD Size, DWORD *Result)
 {
 	BOOL bResult = FALSE;
 
-	if (ReadFile(Node->Handle, Buffer, Size, Result, NULL)){
-		bResult = TRUE;
+	switch (Node->DeviceType){
+		case DEV_TYPE_PTY:
+			bResult = pty_read(Task, TERMINAL(Node->Index), Buffer, Size, Result);
+			break;
+		default:
+			SetLastError(ERROR_BAD_DEVICE);
 	}
 	return(bResult);
 }
 BOOL 
-mail_write(WIN_VNODE *Node, LPCSTR Buffer, DWORD Size, DWORD *Result)
+mail_write(WIN_TTY *Terminal, LPCSTR Buffer, DWORD Size, DWORD *Result)
 {
 	BOOL bResult = FALSE;
-	OVERLAPPED ovl = {0, 0, 0, 0, Node->Event};
+	OVERLAPPED ovl = {0, 0, 0, 0, Terminal->Event};
 
-	if (WriteFile(Node->Handle, Buffer, Size, Result, &ovl)){
+	if (WriteFile(Terminal->Output, Buffer, Size, Result, &ovl)){
 		bResult = TRUE;
 	}
 	return(bResult);

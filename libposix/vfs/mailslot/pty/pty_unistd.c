@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Daniel Boland <dboland@xs4all.nl>.
+ * Copyright (c) 2025 Daniel Boland <dboland@xs4all.nl>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,26 +33,47 @@
 /****************************************************/
 
 BOOL 
-PdoOpenFile(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_VNODE *Result)
+PtyReadFile(HANDLE Handle, LPSTR Buffer)
 {
 	BOOL bResult = FALSE;
-	WIN_DEVICE *pwDevice = DEVICE(Path->DeviceId);
+	DWORD dwResult = 0;
 
-	if (!pwDevice->Flags){
-		CloseHandle(Path->Object);
-	}else{
-		Result->DeviceType = pwDevice->DeviceType;
-		Result->Index = pwDevice->Index;
-		Result->Event = pwDevice->Event;
-		Result->FSType = pwDevice->FSType;
-		Result->DeviceId = Path->DeviceId;
-		Result->FileType = Path->FileType;
-		Result->Attribs = Path->Attribs;
-		Result->Handle = Path->Object;
-		Result->CloseExec = Flags->CloseExec;
-		Result->Access = Flags->Access;
-		Result->Flags = HANDLE_FLAG_INHERIT;
+	*Buffer = 0;
+	if (ReadFile(Handle, Buffer, WIN_MAX_INPUT, &dwResult, NULL)){
+		Buffer[dwResult] = 0;
 		bResult = TRUE;
 	}
+	__Input = Buffer;
+	return(bResult);
+}
+
+/****************************************************/
+
+BOOL 
+pty_read(WIN_TASK *Task, WIN_TTY *Terminal, LPSTR Buffer, DWORD Size, DWORD *Result)
+{
+	BOOL bResult = FALSE;
+	CHAR C;
+	DWORD dwResult = 0;
+	LONG lSize = Size;
+	HANDLE hInput = Terminal->Input;
+
+	while (!bResult){
+		if (lSize < 1){
+			bResult = TRUE;
+		}else if (C = *__Input){
+			*Buffer++ = C;
+			dwResult++;
+			lSize--;
+			__Input++;
+		}else if (dwResult){
+			bResult = TRUE;
+		}else if (!PtyReadFile(hInput, __INPUT_BUF)){
+			break;
+		}else if (proc_poll(Task)){
+			break;
+		}
+	}
+	*Result = dwResult;
 	return(bResult);
 }

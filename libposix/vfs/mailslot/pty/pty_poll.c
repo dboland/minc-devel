@@ -33,26 +33,25 @@
 /****************************************************/
 
 BOOL 
-PdoOpenFile(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_VNODE *Result)
+pty_poll(HANDLE Handle, WIN_POLLFD *Info, DWORD *Result)
 {
-	BOOL bResult = FALSE;
-	WIN_DEVICE *pwDevice = DEVICE(Path->DeviceId);
+	BOOL bResult = TRUE;
+	SHORT sResult = WIN_POLLERR;
+	SHORT sMask = Info->Events | WIN_POLLIGNORE;
+	DWORD dwSize = 0;
+	DWORD dwCount = 0;
 
-	if (!pwDevice->Flags){
-		CloseHandle(Path->Object);
+	if (!GetMailslotInfo(Handle, NULL, &dwSize, &dwCount, NULL)){
+		bResult = FALSE;
+	}else if (dwSize == MAILSLOT_NO_MESSAGE){
+		sResult = WIN_POLLOUT;
+	}else if (dwSize){
+		sResult = WIN_POLLOUT | WIN_POLLIN;
 	}else{
-		Result->DeviceType = pwDevice->DeviceType;
-		Result->Index = pwDevice->Index;
-		Result->Event = pwDevice->Event;
-		Result->FSType = pwDevice->FSType;
-		Result->DeviceId = Path->DeviceId;
-		Result->FileType = Path->FileType;
-		Result->Attribs = Path->Attribs;
-		Result->Handle = Path->Object;
-		Result->CloseExec = Flags->CloseExec;
-		Result->Access = Flags->Access;
-		Result->Flags = HANDLE_FLAG_INHERIT;
-		bResult = TRUE;
+		sResult = 0;
+	}
+	if (Info->Result = sMask & sResult){
+		*Result += 1;
 	}
 	return(bResult);
 }

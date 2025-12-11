@@ -89,7 +89,7 @@ vfs_read(WIN_TASK *Task, WIN_VNODE *Node, LPVOID Buffer, DWORD Size, DWORD *Resu
 			bResult = pipe_read(Task, Node, Buffer, Size, Result);
 			break;
 		case FS_TYPE_MAILSLOT:
-			bResult = mail_read(Node, Buffer, Size, Result);
+			bResult = mail_read(Task, Node, Buffer, Size, Result);
 			break;
 		case FS_TYPE_CHAR:
 			bResult = char_read(Task, Node, Buffer, Size, Result);
@@ -106,6 +106,7 @@ BOOL
 vfs_write(WIN_VNODE *Node, LPCVOID Buffer, DWORD Size, DWORD *Result)
 {
 	BOOL bResult = FALSE;
+//	OVERLAPPED ovl = {0, 0, 0, 0, Node->Event};
 
 	switch (Node->FSType){
 		case FS_TYPE_DISK:
@@ -118,7 +119,7 @@ vfs_write(WIN_VNODE *Node, LPCVOID Buffer, DWORD Size, DWORD *Result)
 			bResult = pipe_write(Node, Buffer, Size, Result);
 			break;
 		case FS_TYPE_MAILSLOT:
-			bResult = mail_write(Node, Buffer, Size, Result);
+			bResult = mail_write(TERMINAL(Node->Index), Buffer, Size, Result);
 			break;
 		case FS_TYPE_CHAR:
 			bResult = char_write(Node, Buffer, Size, Result);

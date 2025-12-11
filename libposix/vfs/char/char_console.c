@@ -53,29 +53,27 @@ ConControlHandler(DWORD CtrlType)
 /****************************************************/
 
 BOOL 
-con_TIOCSCTTY(WIN_DEVICE *Device, WIN_TTY **Result)
+con_TIOCSCTTY(WIN_DEVICE *Device, WIN_TASK *Task, WIN_TTY *Terminal)
 {
 	BOOL bResult = FALSE;
 	WIN_FLAGS wFlags = {GENERIC_READ | GENERIC_WRITE, 
 		FILE_SHARE_READ | FILE_SHARE_WRITE, 
 		OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0};
 	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, TRUE};
-	WIN_TTY *pwTerminal = NULL;
 
-	if (pwTerminal = tty_attach()){
-		pwTerminal->Input = CharOpenFile("CONIN$", &wFlags, &sa);
-		pwTerminal->Output = CharOpenFile("CONOUT$", &wFlags, &sa);
-		pwTerminal->Event = pwTerminal->Input;
-		pwTerminal->FSType = FS_TYPE_CHAR;
-		pwTerminal->DeviceType = Device->DeviceType;
-		pwTerminal->DeviceId = Device->DeviceId;
-		SetConsoleTextAttribute(pwTerminal->Output, BACKGROUND_BLACK | FOREGROUND_WHITE);
-		GetConsoleScreenBufferInfo(pwTerminal->Output, &pwTerminal->Info);
+	if (Terminal){
+		Terminal->Input = CharOpenFile("CONIN$", &wFlags, &sa);
+		Terminal->Output = CharOpenFile("CONOUT$", &wFlags, &sa);
+		Terminal->FSType = FS_TYPE_CHAR;
+		Terminal->SessionId = Task->SessionId;
+		Terminal->GroupId = Task->GroupId;
+		SetConsoleTextAttribute(Terminal->Output, BACKGROUND_BLACK | FOREGROUND_WHITE);
+		GetConsoleScreenBufferInfo(Terminal->Output, &Terminal->Info);
 		SetConsoleOutputCP(CP_UTF8);
 		Device->FSType = FS_TYPE_CHAR;
-		Device->Index = pwTerminal->Index;
-//pwTerminal->Flags = TIOCFLAG_ACTIVE;
-		*Result = pwTerminal;
+		Device->Event = Terminal->Input;
+		Task->Flags |= WIN_PS_CONTROLT;
+		Task->CTTY = Terminal->Index;
 		bResult = TRUE;
 	}
 	return(bResult);

@@ -92,6 +92,11 @@ vfs_ktrace(LPCWSTR Label, STRUCT_TYPE Type, PVOID Data)
 		case STRUCT_NETFLAGS:
 			vfs_NETFLAGS(*(LONG *)Data, pszBuffer);
 			break;
+		case STRUCT_TTY:
+			vfs_TTY((WIN_TTY *)Data, pszBuffer);
+			break;
+		default:
+			strcpy(pszBuffer, "(%d): Not implemented.");
 	}
 	WIN_ERR("%ls%s", Label, pszBuffer);
 	LocalFree(pszBuffer);

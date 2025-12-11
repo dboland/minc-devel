@@ -86,9 +86,9 @@ CHAR 			*__PROGNAME;		/* ktrace.c */
 #include "sys/vnode.c"
 #include "sys/namei.c"
 #include "sys/msgbuf.c"
+#include "sys/tty.c"
 #include "sys/systm.c"		/* cpu_configure() */
 #include "sys/stat.c"
-#include "sys/tty.c"
 #include "sys/syscall.c"
 #include "sys/fcntl.c"
 #include "sys/time.c"

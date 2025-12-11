@@ -45,9 +45,9 @@ vfs_fstat(WIN_VNODE *Node, WIN_VATTR *Result)
 		case FS_TYPE_PIPE:
 			bResult = pipe_fstat(Node, Result);
 			break;
-		case FS_TYPE_MAILSLOT:
-			bResult = mail_fstat(Node, Result);
-			break;
+//		case FS_TYPE_MAILSLOT:
+//			bResult = mail_fstat(Node, Result);
+//			break;
 		case FS_TYPE_WINSOCK:
 			bResult = ws2_fstat(Node, Result);
 			break;

@@ -33,7 +33,7 @@
 /****************************************************/
 
 WIN_TTY * 
-tty_attach(VOID)
+tty_attach(WIN_DEVICE *Device)
 {
 	DWORD dwIndex = 0;
 	WIN_TTY *pwTerminal = __Terminals;
@@ -42,7 +42,11 @@ tty_attach(VOID)
 		if (!pwTerminal->Flags){
 			pwTerminal->Flags = TIOCFLAG_ACTIVE;
 			pwTerminal->Index = dwIndex;
+			pwTerminal->DeviceType = Device->DeviceType;
+			pwTerminal->DeviceId = Device->DeviceId;
+			pwTerminal->Attribs = __Globals->TTYDefaults;
 			_itoa(dwIndex, win_stpcpy(pwTerminal->Name, "tty"), 10);
+			Device->Index = dwIndex;
 			return(pwTerminal);
 		}
 		dwIndex++;

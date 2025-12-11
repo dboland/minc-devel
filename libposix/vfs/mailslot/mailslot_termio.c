@@ -33,24 +33,33 @@
 /****************************************************/
 
 BOOL 
-mail_PTMGET(WIN_DEVICE *Master, WIN_DEVICE *Slave)
+mail_PTMGET(WIN_DEVICE *Device, WIN_TTY *Terminal, WIN_VNODE Result[2])
 {
 	BOOL bResult = FALSE;
-	HANDLE hMaster = Master->Output;
-	HANDLE hSlave = Slave->Output;
+	HANDLE hResult = NULL;
+	CHAR szPath[MAX_PATH] = "\\\\.\\MAILSLOT\\master\\";
+	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, TRUE};
 
-	if (Slave->Flags & WIN_DVF_ACTIVE){
-		SetLastError(ERROR_NOT_READY);
+	hResult = CreateMailslot(win_strcat(szPath, Device->Name), WIN_MAX_INPUT, MAILSLOT_WAIT_FOREVER, &sa);
+	if (hResult == INVALID_HANDLE_VALUE){
+		WIN_ERR("CreateMailslot(%s): %s\n", szPath, win_strerror(GetLastError()));
 	}else{
-		Master->Output = hSlave;
-		Slave->Output = hMaster;
-		Slave->Flags |= WIN_DVF_ACTIVE;
+		Device->Input = hResult;
+		Device->Output = MailOpenFile(szPath);
+		Device->FSType = FS_TYPE_MAILSLOT;
+		Device->Event = CreateEvent(&sa, FALSE, FALSE, NULL);
+//		Result[0].FSType = FS_TYPE_MAILSLOT;
+		Result[0].Event = Device->Event;
+		Result[0].Index = Device->Index;
+		Result[1].FSType = FS_TYPE_MAILSLOT;
+		Result[1].Event = Device->Event;
+		Result[1].Index = Device->Index;
 		bResult = TRUE;
 	}
 	return(bResult);
 }
 BOOL 
-mail_TIOCSCTTY(WIN_DEVICE *Device, WIN_TTY *Terminal)
+mail_TIOCSCTTY(WIN_DEVICE *Device, WIN_TASK *Task, WIN_TTY *Terminal)
 {
 	BOOL bResult = FALSE;
 	HANDLE hResult = NULL;
@@ -61,8 +70,15 @@ mail_TIOCSCTTY(WIN_DEVICE *Device, WIN_TTY *Terminal)
 	if (hResult == INVALID_HANDLE_VALUE){
 		WIN_ERR("CreateMailslot(%s): %s\n", szPath, win_strerror(GetLastError()));
 	}else{
-		Device->Input = hResult;
+		Terminal->Input = hResult;
+		Terminal->Output = Device->Output;
+		Terminal->Event = Device->Event;
+		Terminal->FSType = FS_TYPE_MAILSLOT;
 		Device->Output = MailOpenFile(szPath);
+		Terminal->SessionId = Task->SessionId;
+		Terminal->GroupId = Task->GroupId;
+		Task->Flags |= WIN_PS_CONTROLT;
+		Task->CTTY = Terminal->Index;
 		bResult = TRUE;
 	}
 	return(bResult);

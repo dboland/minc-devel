@@ -80,7 +80,7 @@ HANDLE 		__Shared;
 WIN_SIGPROC	__SignalProc;
 HANDLE		__Interrupt;
 HANDLE		__PipeEvent;
-HANDLE		__MailEvent;
+//HANDLE		__MailEvent;
 SEQUENCE 	__ANSI_BUF;
 CHAR		__INPUT_BUF[WIN_MAX_INPUT + 2];
 UCHAR 		__Char;
@@ -162,7 +162,7 @@ vfs_PROCESS_ATTACH(HINSTANCE Instance, LPVOID Reserved)
 	__SidNone = &__Globals->SidNone;
 	__Frequency = &__Globals->Frequency;
 	__PipeEvent = event_attach(OBJECT_NAME("PipeEvent"), FALSE);
-	__MailEvent = event_attach(OBJECT_NAME("MailEvent"), FALSE);
+//	__MailEvent = event_attach(OBJECT_NAME("MailEvent"), FALSE);
 	__Interrupt = event_attach(OBJECT_NAME("Interrupt"), FALSE);
 	return(TRUE);
 }

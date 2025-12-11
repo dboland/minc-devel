@@ -112,6 +112,7 @@ typedef struct _WIN_DEVICE {
 	WIN_FS_TYPE FSType;
 	HANDLE Input;
 	HANDLE Output;
+	HANDLE Event;
 	DWORD Flags;			/* see below */
 	DWORD Index;			/* driver-specific software context */
 	WCHAR NtName[MAX_NAME];
@@ -578,7 +579,6 @@ typedef struct _WIN_POLLFD {
  */
 
 #define WIN_TTY_MAX		WIN_UNIT_MAX
-#define WIN_NCCS		20
 
 typedef struct _WIN_WINSIZE {
 	USHORT Row;
@@ -587,21 +587,11 @@ typedef struct _WIN_WINSIZE {
 	USHORT YPixel;
 } WIN_WINSIZE;
 
-typedef struct _WIN_TERMIO {
-	UINT IFlags;
-	UINT OFlags;
-	UINT CFlags;
-	UINT LFlags;
-	UCHAR Control[WIN_NCCS];
-	UINT ISpeed;
-	UINT OSpeed;
-} WIN_TERMIO;
-
 typedef struct _WIN_TTY {
 	DWORD Index;
-	HANDLE Event;
 	HANDLE Output;
 	HANDLE Input;
+	HANDLE Event;
 	WIN_FS_TYPE FSType;
 	DWORD DeviceType;
 	DWORD DeviceId;

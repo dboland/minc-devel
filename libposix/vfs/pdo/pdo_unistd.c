@@ -54,8 +54,7 @@ pdo_read(WIN_TASK *Task, WIN_DEVICE *Device, LPSTR Buffer, LONG Size, DWORD *Res
 
 	switch (Device->DeviceType){
 		case DEV_TYPE_PTY:
-		case DEV_TYPE_CONSOLE:
-			bResult = input_read(Task, Device->Input, Buffer, Size, Result);
+			bResult = ReadFile(Device->Input, Buffer, Size, Result, NULL);
 			break;
 		case DEV_TYPE_ROUTE:
 			bResult = route_read(Device, Buffer, Size, Result);
@@ -73,12 +72,11 @@ BOOL
 pdo_write(WIN_DEVICE *Device, LPCSTR Buffer, DWORD Size, DWORD *Result)
 {
 	BOOL bResult = FALSE;
-	OVERLAPPED ovl = {0, 0, 0, 0, __MailEvent};
+	OVERLAPPED ovl = {0, 0, 0, 0, Device->Event};
 
 	switch (Device->DeviceType){
 		case DEV_TYPE_PTY:
-		case DEV_TYPE_CONSOLE:
-			bResult = screen_write(Device->Output, Buffer, Size, Result);
+			bResult = WriteFile(Device->Output, Buffer, Size, Result, &ovl);
 			break;
 		case DEV_TYPE_ROUTE:
 			bResult = route_write(Device, Buffer, Size, Result);

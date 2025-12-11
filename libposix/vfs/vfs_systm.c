@@ -37,7 +37,7 @@
 /****************************************************/
 
 VOID 
-consinit(VOID)
+vfs_consinit(VOID)
 {
 	WORD wAttribs = BACKGROUND_BLUE | FOREGROUND_WHITE | FOREGROUND_INTENSITY;
 	HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);

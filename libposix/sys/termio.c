@@ -133,24 +133,17 @@ int
 term_TIOCSCTTY(WIN_TASK *Task, WIN_VNODE *Node)
 {
 	int result = 0;
-	WIN_TERMIO tAttribs = {TTYDEF_IFLAG, TTYDEF_OFLAG, TTYDEF_CFLAG, 
-		TTYDEF_LFLAG, {0}, TTYDEF_SPEED, TTYDEF_SPEED};
-	WIN_TTY *pwTerminal;
+	WIN_DEVICE *pwDevice;
 
 	if (Task->Flags & WIN_PS_CONTROLT){
 		result = -EPERM;
-	}else if (!vfs_TIOCSCTTY(Node, &pwTerminal)){
+	}else if (!vfs_TIOCSCTTY(Task, Node)){
 		result -= errno_posix(GetLastError());
 	}else{
-		win_memcpy(tAttribs.Control, ttydefchars, sizeof(ttydefchars));
-		pwTerminal->Attribs = tAttribs;
-		Node->Index = pwTerminal->Index;
-		Node->Event = pwTerminal->Event;
-		Node->FSType = pwTerminal->FSType;
-		pwTerminal->SessionId = Task->SessionId;
-		pwTerminal->GroupId = Task->GroupId;
-		Task->Flags |= WIN_PS_CONTROLT;
-		Task->CTTY = pwTerminal->Index;
+		pwDevice = DEVICE(Node->DeviceId);
+		Node->Index = pwDevice->Index;
+		Node->Event = pwDevice->Event;
+		Node->FSType = pwDevice->FSType;
 	}
 	return(result);
 }
@@ -158,18 +151,17 @@ int
 term_PTMGET(WIN_TASK *Task, WIN_VNODE *Node, struct ptmget *ptm)
 {
 	int result = 0;
-	WIN_VNODE vnMaster = {0};
-	WIN_VNODE vnSlave = {0};
+	WIN_VNODE vNode[2] = {0};
 
-	if (!vfs_PTMGET(Node, &vnMaster, &vnSlave)){
+	if (!vfs_PTMGET(Node, vNode)){
 		result -= errno_posix(GetLastError());
 	}else{
-		/* controlling terminal (master) */
-		ptm->cfd = fd_posix(Task, &vnMaster, 0);
-		win_strlcpy(ptm->cn, DEVICE(vnMaster.DeviceId)->Name, 16);
-		/* raw serial device (slave) */
-		ptm->sfd = fd_posix(Task, &vnSlave, 0);
-		win_strlcpy(ptm->sn, DEVICE(vnSlave.DeviceId)->Name, 16);
+		/* raw serial device (master) */
+		ptm->cfd = fd_posix(Task, &vNode[0], 0);
+		win_strlcpy(ptm->cn, DEVICE(Node->DeviceId)->Name, 16);
+		/* controlling terminal (slave) */
+		ptm->sfd = fd_posix(Task, &vNode[1], 0);
+		win_strlcpy(ptm->sn, TERMINAL(Node->Index)->Name, 16);
 	}
 	return(result);
 }

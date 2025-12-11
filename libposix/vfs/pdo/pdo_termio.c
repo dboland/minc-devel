@@ -33,90 +33,33 @@
 /****************************************************/
 
 BOOL 
-pdo_TIOCFLUSH(WIN_DEVICE *Device)
-{
-	BOOL bResult = FALSE;
-
-	switch (Device->DeviceType){
-//		case DEV_TYPE_PTY:
-//		case DEV_TYPE_CONSOLE:
-//			bResult = input_TIOCFLUSH(Device->Input);
-//			break;
-		case DEV_TYPE_TTY:
-			bResult = TRUE;
-			break;
-		default:
-			SetLastError(ERROR_BAD_DEVICE);
-	}
-	return(bResult);
-}
-BOOL 
-pdo_TIOCDRAIN(WIN_DEVICE *Device)
-{
-	BOOL bResult = FALSE;
-
-	switch (Device->DeviceType){
-//		case DEV_TYPE_PTY:
-//		case DEV_TYPE_CONSOLE:
-//			bResult = screen_TIOCDRAIN(Device->Output);
-//			break;
-		case DEV_TYPE_TTY:
-			bResult = TRUE;
-			break;
-		default:
-			SetLastError(ERROR_BAD_DEVICE);
-	}
-	return(bResult);
-}
-BOOL 
-pdo_TIOCSETA(WIN_DEVICE *Device, WIN_TERMIO *Attribs)
-{
-	BOOL bResult = FALSE;
-
-	switch (Device->DeviceType){
-//		case DEV_TYPE_PTY:
-//		case DEV_TYPE_CONSOLE:
-//			bResult = con_TIOCSETA(Device, Attribs);
-//			break;
-		case DEV_TYPE_TTY:
-			bResult = TRUE;
-			break;
-		default:
-			SetLastError(ERROR_BAD_DEVICE);
-	}
-	return(bResult);
-}
-BOOL 
-pdo_PTMGET(WIN_DEVICE *Master, WIN_DEVICE *Slave)
-{
-	BOOL bResult = FALSE;
-	HANDLE hMaster = Master->Output;
-	HANDLE hSlave = Slave->Output;
-
-	if (Slave->Flags & WIN_DVF_ACTIVE){
-		SetLastError(ERROR_NOT_READY);
-	}else{
-		Master->Output = hSlave;
-		Slave->Output = hMaster;
-		Slave->Flags |= WIN_DVF_ACTIVE;
-		Slave->Index = Master->Index;
-		bResult = TRUE;
-	}
-	return(bResult);
-}
-BOOL 
-pdo_TIOCSCTTY(WIN_DEVICE *Device, WIN_TTY **Result)
+pdo_TIOCSCTTY(WIN_DEVICE *Device, WIN_TASK *Task)
 {
 	BOOL bResult = FALSE;
 
 	switch (Device->DeviceType){
 		case DEV_TYPE_PTY:
 		case DEV_TYPE_CONSOLE:
-			bResult = con_TIOCSCTTY(Device, Result);
+			bResult = con_TIOCSCTTY(Device, Task, tty_attach(Device));
 			break;
-//		case DEV_TYPE_PTY:
-//			bResult = mail_TIOCSCTTY(Terminal);
+//		case DEV_TYPE_COM:
+//			bResult = com_TIOCSCTTY(Device, Task, tty_attach(Device));
 //			break;
+		default:
+			SetLastError(ERROR_BAD_DEVICE);
+	}
+	return(bResult);
+}
+BOOL 
+pdo_PTMGET(WIN_DEVICE *Device, WIN_VNODE Result[2])
+{
+	BOOL bResult = FALSE;
+
+	switch (Device->DeviceType){
+		case DEV_TYPE_PTY:
+		case DEV_TYPE_CONSOLE:
+			bResult = mail_PTMGET(Device, tty_attach(Device), Result);
+			break;
 		default:
 			SetLastError(ERROR_BAD_DEVICE);
 	}

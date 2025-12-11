@@ -56,11 +56,11 @@ PollNode(WIN_VNODE *Node, WIN_POLLFD *Info, DWORD *Result)
 		case FS_TYPE_PIPE:
 			bResult = pipe_poll(Node, Info, Result);
 			break;
-//		case FS_TYPE_PDO:
-//			bResult = pdo_poll(DEVICE(Node->DeviceId), Info, Result);
-//			break;
+		case FS_TYPE_PDO:
+			bResult = pdo_poll(DEVICE(Node->DeviceId), Info, Result);
+			break;
 		case FS_TYPE_MAILSLOT:
-			bResult = mail_poll(Node->Handle, Info, Result);
+			bResult = mail_poll(TERMINAL(Node->Index), Info, Result);
 			break;
 		case FS_TYPE_DISK:
 			bResult = disk_poll(Node->Handle, Info, Result);

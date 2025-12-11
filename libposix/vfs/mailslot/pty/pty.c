@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Daniel Boland <dboland@xs4all.nl>.
+ * Copyright (c) 2025 Daniel Boland <dboland@xs4all.nl>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,31 +28,5 @@
  *
  */
 
-#include <winbase.h>
-
-/****************************************************/
-
-BOOL 
-PdoOpenFile(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_VNODE *Result)
-{
-	BOOL bResult = FALSE;
-	WIN_DEVICE *pwDevice = DEVICE(Path->DeviceId);
-
-	if (!pwDevice->Flags){
-		CloseHandle(Path->Object);
-	}else{
-		Result->DeviceType = pwDevice->DeviceType;
-		Result->Index = pwDevice->Index;
-		Result->Event = pwDevice->Event;
-		Result->FSType = pwDevice->FSType;
-		Result->DeviceId = Path->DeviceId;
-		Result->FileType = Path->FileType;
-		Result->Attribs = Path->Attribs;
-		Result->Handle = Path->Object;
-		Result->CloseExec = Flags->CloseExec;
-		Result->Access = Flags->Access;
-		Result->Flags = HANDLE_FLAG_INHERIT;
-		bResult = TRUE;
-	}
-	return(bResult);
-}
+#include "pty_unistd.c"
+#include "pty_poll.c"

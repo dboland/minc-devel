@@ -33,27 +33,16 @@
 /****************************************************/
 
 BOOL 
-mail_poll(HANDLE Handle, WIN_POLLFD *Info, DWORD *Result)
+mail_poll(WIN_TTY *Terminal, WIN_POLLFD *Info, DWORD *Result)
 {
-	BOOL bResult = TRUE;
-	SHORT sResult = WIN_POLLERR;
-	SHORT sMask = Info->Events | WIN_POLLIGNORE;
-	DWORD dwSize = 0;
-	DWORD dwCount = 0;
+	BOOL bResult = FALSE;
 
-	if (!GetMailslotInfo(Handle, NULL, &dwSize, &dwCount, NULL)){
-		bResult = FALSE;
-	}else if (dwSize == MAILSLOT_NO_MESSAGE){
-		sResult = WIN_POLLOUT;
-	}else if (dwSize){
-		sResult = WIN_POLLOUT | WIN_POLLIN;
-	}else{
-		sResult = 0;
+	switch (Terminal->DeviceType){
+		case DEV_TYPE_PTY:
+			bResult = pty_poll(Terminal->Input, Info, Result);
+			break;
+		default:
+			SetLastError(ERROR_BAD_DEVICE);
 	}
-	if (Info->Result = sMask & sResult){
-		*Result += 1;
-	}
-//__PRINTF("mail_poll(%d): Size(%d) Count(%d) sResult(0x%x) dwResult(%d)\n", 
-//		Handle, dwSize, dwCount, sResult, dwResult)
 	return(bResult);
 }

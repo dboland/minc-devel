@@ -48,9 +48,9 @@ vfs_F_DUPFD(WIN_VNODE *Node, BOOL CloseExec, WIN_VNODE *Result)
 		case FS_TYPE_PIPE:
 			bResult = pipe_F_DUPFD(Node, hProcess, dwOptions, Result);
 			break;
-		case FS_TYPE_MAILSLOT:
-			bResult = mail_F_DUPFD(DEVICE(Node->DeviceId), hProcess, dwOptions, Result);
-			break;
+//		case FS_TYPE_MAILSLOT:
+//			bResult = mail_F_DUPFD(DEVICE(Node->DeviceId), hProcess, dwOptions, Result);
+//			break;
 		default:
 			bResult = disk_F_DUPFD(Node, hProcess, dwOptions, Result);
 	}
@@ -67,9 +67,9 @@ vfs_F_INHERIT(WIN_VNODE *Node, HANDLE Process)
 		case FS_TYPE_PIPE:
 			bResult = pipe_F_DUPFD(Node, Process, dwOptions, Node);
 			break;
-		case FS_TYPE_MAILSLOT:
-			bResult = mail_F_DUPFD(DEVICE(Node->DeviceId), Process, dwOptions, Node);
-			break;
+//		case FS_TYPE_MAILSLOT:
+//			bResult = mail_F_DUPFD(DEVICE(Node->DeviceId), Process, dwOptions, Node);
+//			break;
 		default:
 			bResult = disk_F_DUPFD(Node, Process, dwOptions, Node);
 	}
@@ -168,6 +168,9 @@ vfs_F_OSFHANDLE(WIN_VNODE Nodes[], DWORD Index)
 	switch (pwNode->FSType){
 		case FS_TYPE_CHAR:
 			hResult = char_F_OSFHANDLE(pwNode, Index);
+			break;
+		case FS_TYPE_MAILSLOT:
+			hResult = mail_F_OSFHANDLE(pwNode, Index);
 			break;
 		default:
 			hResult = win_F_SETFD(pwNode->Handle, HANDLE_FLAG_INHERIT);
