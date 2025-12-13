@@ -203,6 +203,8 @@ route_NET_RT_IFLIST(void *buf, size_t *size)
 
 	if (!buf){
 		*size = 0;
+	}else{
+		win_bzero(buf, *size);
 	}
 	if (!ws2_setifaddrs(WS_AF_UNSPEC, &ifEnum)){
 		result -= errno_posix(GetLastError());
@@ -245,6 +247,9 @@ route_NET_RT_DUMP(void *buf, size_t *size)
 	MIB_IFROW ifRow;
 	DWORD dwResult;
 
+	if (buf){
+		win_bzero(buf, *size);
+	}
 	if (!ws2_NET_RT_DUMP(&pfwTable, &pfwRow, &dwCount)){
 		result -= errno_posix(GetLastError());
 	}else if (!buf){

@@ -215,7 +215,7 @@ typedef struct _WIN_NAMEIDATA {
 } WIN_NAMEIDATA;
 
 #define WIN_PATHCOPY		0x00400000	/* copy path verbatim */
-#define WIN_NEEDHANDLE		0x01000000	/* keep handle open (if special file)
+#define WIN_NEEDHANDLE		0x01000000	/* keep handle open (if special file) */
 
 /* sys/namei.h */
 
@@ -394,7 +394,7 @@ typedef struct _WIN_VATTR {
 	DWORD FileIndexHigh;		/* object identifier high */
 	DWORD FileIndexLow;		/* object identifier low */
 	DWORD DeviceId;			/* device inode is on */
-	DWORD SpecialId;		/* device inode represents (if special file) */
+	DWORD RawDeviceId;		/* device inode represents (if special file) */
 	WIN_MODE Mode;
 	SID8 UserSid;
 	SID8 GroupSid;
@@ -431,7 +431,7 @@ typedef struct _WIN_VATTR {
 #define CTRL_USER1_EVENT		17	/* SIGUSR1 */
 #define CTRL_USER2_EVENT		18	/* SIGUSR2 */
 #define CTRL_INVALID_ARGUMENT_EVENT	19	/* SIGSYS */
-#define CTRL_EMULATOR_EVENT		20	/* SIGEMT */
+#define CTRL_EMULATOR_EVENT		20	/* SIGEMT (software inetrrupt) */
 #define CTRL_BUS_EVENT			21	/* SIGBUS */
 #define CTRL_INFO_EVENT			22	/* SIGINFO */
 #define CTRL_STOP_EVENT			23	/* SIGSTOP */
@@ -502,7 +502,7 @@ typedef struct _WIN_RUSAGE {
 } WIN_RUSAGE;
 
 /*
- * vfs_sched.c
+ * proc_task.c
  */
 
 typedef struct _WIN_TASK {
@@ -573,6 +573,17 @@ typedef struct _WIN_POLLFD {
 #define WIN_POLLRDBAND		0x0080		/* Priority data may be read without blocking */
 #define WIN_POLLWRBAND		0x0100
 #define WIN_POLLIGNORE		(WIN_POLLERR | WIN_POLLHUP | WIN_POLLNVAL)
+
+/*
+ * vfs_tty.c
+ */
+
+typedef struct _WIN_PTMGET {
+	INT Master;
+	INT Slave;
+	CHAR MName[16];
+	CHAR SName[16];
+} WIN_PTMGET;
 
 /*
  * vfs_termio.c

@@ -48,7 +48,7 @@ pipe_fstat(WIN_VNODE *Node, WIN_VATTR *Result)
 		Result->LastWriteTime = ftNow;
 		Result->NumberOfLinks = 1;
 		Result->DeviceId = __Mounts->DeviceId;
-		Result->SpecialId = Node->DeviceId;
+		Result->RawDeviceId = Node->DeviceId;
 		Result->Mode.FileType = Node->FileType;
 		bResult = TRUE;
 	}
@@ -63,7 +63,7 @@ pipe_stat(WIN_NAMEIDATA *Path, WIN_VATTR *Result)
 	if (VfsStatHandle(Path->Object, Result)){
 		Result->DeviceId = __Mounts->DeviceId;
 		Result->Mode.FileType = Path->FileType;
-		Result->SpecialId = Path->DeviceId;
+		Result->RawDeviceId = Path->DeviceId;
 		bResult = CloseHandle(Path->Object);
 	}
 	return(bResult);

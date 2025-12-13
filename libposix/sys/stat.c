@@ -238,7 +238,7 @@ stat_posix(WIN_TASK *Task, struct stat *buf, WIN_VATTR *Stat)
 	buf->st_blocks = (buf->st_size + S_BLKSIZE - 1) / S_BLKSIZE;
 	buf->st_blksize = WIN_S_BLKSIZE;
 	/* raw device: device this inode represents (if special file) */
-	buf->st_rdev = Stat->SpecialId;
+	buf->st_rdev = Stat->RawDeviceId;
 	/* stat(2) man page: access (read, execve) */
 	buf->st_atime = time_posix(&Stat->LastAccessTime);
 	/* modification (write, futimes) */

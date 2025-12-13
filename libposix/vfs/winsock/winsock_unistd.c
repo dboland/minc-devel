@@ -40,12 +40,11 @@ ws2_close(WIN_VNODE *Node)
 	/* closesocket() hangs on duplicates (login.exe). This occurs
 	 * when other threads are doing ReadFile().
 	 */
-	if (!WSACloseEvent(Node->Event)){
+	if (!WSASetEvent(Node->Event)){
+		WIN_ERR("WSASetEvent(%d): %s\n", Node->Event, win_strerror(WSAGetLastError()));
+	}else if (!WSACloseEvent(Node->Event)){
 		WIN_ERR("WSACloseEvent(%d): %s\n", Node->Event, win_strerror(WSAGetLastError()));
-	}else if (SOCKET_ERROR == closesocket(Node->Socket)){
-//		WIN_ERR("closesocket(%d): %s\n", Node->Socket, win_strerror(WSAGetLastError()));
-		return(FALSE);
-	}else{
+	}else if (SOCKET_ERROR != closesocket(Node->Socket)){
 		bResult = TRUE;
 	}
 	ZeroMemory(Node, sizeof(WIN_VNODE));
@@ -54,7 +53,14 @@ ws2_close(WIN_VNODE *Node)
 BOOL 
 ws2_write(WIN_VNODE *Node, LPCSTR Buffer, DWORD Size, DWORD *Result)
 {
-	return(fifo_write(Node, Buffer, Size, Result));
+	BOOL bResult = FALSE;
+
+	if (sock_write(Node, Buffer, Size, Result)){
+		bResult = TRUE;
+//	}else{
+//		WIN_ERR("ws2_write(%d): %s\n", Node->Socket, win_strerror(WSAGetLastError()));
+	}
+	return(bResult);
 }
 BOOL 
 ws2_read(WIN_TASK *Task, WIN_VNODE *Node, LPSTR Buffer, DWORD Size, DWORD *Result)
@@ -67,7 +73,7 @@ ws2_read(WIN_TASK *Task, WIN_VNODE *Node, LPSTR Buffer, DWORD Size, DWORD *Resul
 		if (!ws2_poll(Node, &fdInfo, &dwResult)){
 			break;
 		}else if (dwResult){
-			bResult = fifo_read(Node, Buffer, Size, Result);
+			bResult = sock_read(Task, Node, Buffer, Size, Result);
 		}else if (!sock_select(Task, Node, INFINITE)){
 			break;
 		}

@@ -31,7 +31,6 @@
 #include "pty/pty.c"
 #include "mailslot_syscall.c"
 #include "mailslot_fcntl.c"
-//#include "mailslot_stat.c"
 #include "mailslot_poll.c"
 #include "mailslot_unistd.c"
 #include "mailslot_termio.c"

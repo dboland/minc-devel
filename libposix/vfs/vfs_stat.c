@@ -38,6 +38,10 @@ vfs_fstat(WIN_VNODE *Node, WIN_VATTR *Result)
 	BOOL bResult = FALSE;
 
 	switch (Node->FSType){
+		case FS_TYPE_DISK:
+			bResult = disk_fstat(Node, Result);
+			break;
+		case FS_TYPE_MAILSLOT:
 		case FS_TYPE_CHAR:
 		case FS_TYPE_PDO:
 			bResult = pdo_fstat(Node, Result);
@@ -45,14 +49,11 @@ vfs_fstat(WIN_VNODE *Node, WIN_VATTR *Result)
 		case FS_TYPE_PIPE:
 			bResult = pipe_fstat(Node, Result);
 			break;
-//		case FS_TYPE_MAILSLOT:
-//			bResult = mail_fstat(Node, Result);
-//			break;
 		case FS_TYPE_WINSOCK:
 			bResult = ws2_fstat(Node, Result);
 			break;
 		default:
-			bResult = disk_fstat(Node, Result);
+			SetLastError(ERROR_BAD_FILE_TYPE);
 	}
 	return(bResult);
 }

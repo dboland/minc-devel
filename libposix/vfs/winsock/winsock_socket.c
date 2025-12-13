@@ -71,6 +71,7 @@ ws2_socket(UINT Family, UINT Type, INT Protocol, WIN_VNODE *Result)
 	 */
 	sResult = WSASocket(Family, Type, Protocol, NULL, 0, 0);
 	if (sResult != INVALID_SOCKET){
+		SetHandleInformation((HANDLE)sResult, 0, 0);
 		Result->Socket = sResult;
 		Result->FSType = FS_TYPE_WINSOCK;
 		Result->FileType = WIN_VSOCK;

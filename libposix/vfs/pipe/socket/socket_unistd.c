@@ -62,16 +62,10 @@ BOOL
 sock_read(WIN_TASK *Task, WIN_VNODE *Node, LPSTR Buffer, DWORD Size, DWORD *Result)
 {
 	BOOL bResult = FALSE;
-	ULONG ulResult = 0;
+	OVERLAPPED ovl = {0, 0, 0, 0, Node->Event};
 
-	while (!bResult){
-		if (!pipe_FIONREAD(Node, &ulResult)){
-			bResult = TRUE;		/* POSIX result for read() of 0 bytes */
-		}else if (ulResult){
-			bResult = fifo_read(Node, Buffer, Size, Result);
-		}else if (!sock_select(Task, Node, INFINITE)){
-			break;
-		}
+	if (ReadFile(Node->Handle, Buffer, Size, Result, &ovl)){
+		bResult = TRUE;
 	}
 	return(bResult);
 }

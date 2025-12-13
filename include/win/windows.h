@@ -27,8 +27,6 @@
 #include "windef.h"
 #include "winerror.h"
 #include "lmerr.h"
-#include "winnt.h"
-#include "basetsd.h"
 #include "wincon.h"
 #include "winbase.h"
 

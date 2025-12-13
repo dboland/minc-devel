@@ -33,6 +33,23 @@
 /****************************************************/
 
 int 
+openpt_posix(WIN_TASK *Task, const char *name, int flags, ...)
+{
+	int result = 0;
+	va_list args;
+	char path[PATH_MAX] = _PATH_DEV;
+	WIN_NAMEIDATA wPath = {0};
+
+	strcat(path, name);
+	va_start(args, flags);
+	result = __openat(Task, path_win(&wPath, path, flags | O_INODE), flags, args);
+	va_end(args);
+	return(result);
+}
+
+/****************************************************/
+
+int 
 term_TIOCGWINSZ(WIN_VNODE *Node, WIN_WINSIZE *WinSize)
 {
 	int result = 0;
@@ -148,20 +165,21 @@ term_TIOCSCTTY(WIN_TASK *Task, WIN_VNODE *Node)
 	return(result);
 }
 int 
-term_PTMGET(WIN_TASK *Task, WIN_VNODE *Node, struct ptmget *ptm)
+term_PTMGET(WIN_TASK *Task, WIN_VNODE *Node, WIN_PTMGET *Result)
 {
 	int result = 0;
-	WIN_VNODE vNode[2] = {0};
+	WIN_DEVICE *pwDevice;
 
-	if (!vfs_PTMGET(Node, vNode)){
+	if (!vfs_PTMGET(Node, Result)){
 		result -= errno_posix(GetLastError());
 	}else{
 		/* raw serial device (master) */
-		ptm->cfd = fd_posix(Task, &vNode[0], 0);
-		win_strlcpy(ptm->cn, DEVICE(Node->DeviceId)->Name, 16);
+		pwDevice = DEVICE(Node->DeviceId);
+		Node->Index = pwDevice->Index;
+		Node->Event = pwDevice->Event;
+		Result->Master = __dup(Task, Node);
 		/* controlling terminal (slave) */
-		ptm->sfd = fd_posix(Task, &vNode[1], 0);
-		win_strlcpy(ptm->sn, TERMINAL(Node->Index)->Name, 16);
+		Result->Slave = openpt_posix(Task, Result->SName, 0, 0666);
 	}
 	return(result);
 }
@@ -232,7 +250,7 @@ term_ioctl(WIN_TASK *Task, int fd, unsigned long request, va_list args)
 			result = term_TIOCDRAIN(pvNode);
 			break;
 		case PTMGET:
-			result = term_PTMGET(Task, pvNode, va_arg(args, struct ptmget *));
+			result = term_PTMGET(Task, pvNode, va_arg(args, WIN_PTMGET *));
 			break;
 		case TIOCSCTTY:
 			result = term_TIOCSCTTY(Task, pvNode);

@@ -22,8 +22,13 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef _BASETSD_H
+#define _BASETSD_H
+
 typedef unsigned int UINT_PTR, *PUINT_PTR;
 typedef long LONG_PTR, *PLONG_PTR;
 typedef unsigned long ULONG_PTR, *PULONG_PTR;
 typedef ULONG_PTR SIZE_T, *PSIZE_T;
 typedef unsigned char UINT8;
+
+#endif /* _BASETSD_H */

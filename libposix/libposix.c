@@ -31,6 +31,7 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <wchar.h>
+#include <paths.h>
 
 #include <sys/sysctl.h>
 #include <sys/sched.h>
@@ -96,13 +97,13 @@ CHAR 			*__PROGNAME;		/* ktrace.c */
 #include "netinet/in.c"
 #include "netinet6/in6.c"
 #include "sys/socket.c"
-#include "sys/termio.c"
 #include "sys/filio.c"
 #include "sys/dkio.c"
 #include "sys/mtio.c"
 #include "sys/pciio.c"
 #include "sys/resource.c"
 #include "sys/unistd.c"
+#include "sys/termio.c"
 #include "sys/wait.c"
 #include "sys/signal.c"
 #include "sys/task.c"

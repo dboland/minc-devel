@@ -164,6 +164,8 @@ typedef __uint64_t DWORDLONG;
 typedef void *PVOID, *LPVOID;
 typedef unsigned long ULONG,*PULONG;
 
+#include "basetsd.h"
+
 #ifdef STRICT
 typedef void *HANDLE;
 #define DECLARE_HANDLE(n) typedef struct n##__{int i;}*n

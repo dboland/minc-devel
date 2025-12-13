@@ -33,7 +33,7 @@
 /****************************************************/
 
 BOOL 
-mail_PTMGET(WIN_DEVICE *Device, WIN_TTY *Terminal, WIN_VNODE Result[2])
+mail_PTMGET(WIN_DEVICE *Device, WIN_TTY *Terminal, WIN_PTMGET *Result)
 {
 	BOOL bResult = FALSE;
 	HANDLE hResult = NULL;
@@ -48,12 +48,8 @@ mail_PTMGET(WIN_DEVICE *Device, WIN_TTY *Terminal, WIN_VNODE Result[2])
 		Device->Output = MailOpenFile(szPath);
 		Device->FSType = FS_TYPE_MAILSLOT;
 		Device->Event = CreateEvent(&sa, FALSE, FALSE, NULL);
-//		Result[0].FSType = FS_TYPE_MAILSLOT;
-		Result[0].Event = Device->Event;
-		Result[0].Index = Device->Index;
-		Result[1].FSType = FS_TYPE_MAILSLOT;
-		Result[1].Event = Device->Event;
-		Result[1].Index = Device->Index;
+		win_strlcpy(Result->SName, Device->Name, 16);
+		win_strlcpy(Result->MName, Terminal->Name, 16);
 		bResult = TRUE;
 	}
 	return(bResult);

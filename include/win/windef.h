@@ -44,12 +44,35 @@
 #define _ANONYMOUS_STRUCT	
 #define MAX_PATH 260
 
-typedef unsigned long DWORD,*PDWORD,*LPDWORD;
+typedef unsigned long DWORD;
+typedef int WINBOOL,*PWINBOOL,*LPWINBOOL;
+typedef WINBOOL BOOL;
 typedef unsigned char BYTE;
+typedef BOOL *PBOOL,*LPBOOL;
 typedef unsigned short WORD;
-typedef int INT, *LPINT;
-typedef int BOOL;
-typedef unsigned int UINT;
+typedef float FLOAT;
+typedef FLOAT *PFLOAT;
+typedef BYTE *PBYTE,*LPBYTE;
+typedef int *PINT,*LPINT;
+typedef WORD *PWORD,*LPWORD;
+typedef long *LPLONG;
+typedef DWORD *PDWORD,*LPDWORD;
+typedef CONST void *PCVOID,*LPCVOID;
+typedef int INT;
+typedef unsigned int UINT,*PUINT,*LPUINT;
+
+#include "winnt.h"
+
+typedef UINT_PTR WPARAM;
+typedef LONG_PTR LPARAM;
+typedef LONG_PTR LRESULT;
+
+#ifndef _HRESULT_DEFINED
+typedef LONG HRESULT;
+#define _HRESULT_DEFINED
+#endif
+
+DECLARE_HANDLE(HWND);
 
 typedef INT (WINAPI *FARPROC)();
 typedef BYTE *PBYTE,*LPBYTE;

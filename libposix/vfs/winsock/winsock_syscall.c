@@ -43,6 +43,7 @@ WSAcceptFile(WIN_VNODE *Node, LPSOCKADDR Address, LPINT Length, WIN_VNODE *Resul
 		WIN_ERR("WSAAccept(%d): %s\n", Node->Socket, win_strerror(WSAGetLastError()));
 	}else{
 		Node->Pending = 0;
+		SetHandleInformation((HANDLE)sResult, 0, 0);
 		Result->Socket = sResult;
 		Result->FSType = Node->FSType;
 		Result->DeviceType = Node->DeviceType;

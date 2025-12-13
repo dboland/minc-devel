@@ -41,8 +41,8 @@ PipeCreateFile(LPCWSTR Name, DWORD Attribs, HANDLE Event, WIN_VNODE *Result)
 	DWORD dwPipeMode = (Attribs & 0x0000FFFF) | PIPE_WAIT;
 	WCHAR szPath[MAX_PATH] = L"\\\\.\\PIPE\\";
 	DWORD dwMax = PIPE_UNLIMITED_INSTANCES;
-	HANDLE hResult;
 	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, FALSE};
+	HANDLE hResult;
 
 	hResult = CreateNamedPipeW(win_wcscat(szPath, Name), dwOpenMode, dwPipeMode, 
 		dwMax, WIN_PIPE_BUF, WIN_PIPE_BUF, NMPWAIT_USE_DEFAULT_WAIT, &sa);
@@ -67,8 +67,8 @@ PipeOpenFile(LPCWSTR Name, HANDLE Event, WIN_VNODE *Result)
 	DWORD dwShare = FILE_SHARE_WRITE + FILE_SHARE_READ;
 	WCHAR szPath[MAX_PATH] = L"\\\\.\\PIPE\\";
 	DWORD dwAttribs = FILE_ATTRIBUTE_NORMAL;
-	HANDLE hResult;
 	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, FALSE};
+	HANDLE hResult;
 
 	hResult = CreateFileW(win_wcscat(szPath, Name), aMask, dwShare, NULL, 
 		OPEN_EXISTING, dwAttribs, &sa);

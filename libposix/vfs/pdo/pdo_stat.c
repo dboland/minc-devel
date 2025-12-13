@@ -40,7 +40,7 @@ pdo_fstat(WIN_VNODE *Node, WIN_VATTR *Result)
 	if (VfsStatHandle(Node->Handle, Result)){
 		Result->DeviceId = __Mounts->DeviceId;
 		Result->Mode.FileType = Node->FileType;
-		Result->SpecialId = Node->DeviceId;
+		Result->RawDeviceId = Node->DeviceId;
 		bResult = TRUE;
 	}
 	return(bResult);
@@ -53,7 +53,7 @@ pdo_stat(WIN_NAMEIDATA *Path, WIN_VATTR *Result)
 	if (VfsStatFile(Path->Resolved, Path->Attribs, Result)){
 		Result->DeviceId = __Mounts->DeviceId;
 		Result->Mode.FileType = Path->FileType;
-		Result->SpecialId = Path->DeviceId;
+		Result->RawDeviceId = Path->DeviceId;
 		bResult = CloseHandle(Path->Object);
 	}
 	return(bResult);

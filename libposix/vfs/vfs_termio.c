@@ -150,23 +150,16 @@ vfs_TIOCSCTTY(WIN_TASK *Task, WIN_VNODE *Node)
 			bResult = mail_TIOCSCTTY(DEVICE(Node->DeviceId), Task, TERMINAL(Node->Index));
 			break;
 		default:
-			SetLastError(ERROR_BAD_FILE_TYPE);
+			SetLastError(ERROR_CTX_NOT_CONSOLE);
 	}
 	return(bResult);
 }
 BOOL 
-vfs_PTMGET(WIN_VNODE *Node, WIN_VNODE Result[2])
+vfs_PTMGET(WIN_VNODE *Node, WIN_PTMGET *Result)
 {
 	BOOL bResult = FALSE;
-//	HANDLE hEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-	WCHAR szName[MAX_NAME];
 
-	vfs_F_DUPFD(Node, Node->CloseExec, &Result[0]);
-	vfs_F_DUPFD(Node, Node->CloseExec, &Result[1]);
 	switch (Node->FSType){
-//		case FS_TYPE_CHAR:
-//			bResult = char_PTMGET(Node, TERMINAL(Node->Index), Result);
-//			break;
 		case FS_TYPE_PDO:
 			bResult = pdo_PTMGET(DEVICE(Node->DeviceId), Result);
 			break;
@@ -174,7 +167,7 @@ vfs_PTMGET(WIN_VNODE *Node, WIN_VNODE Result[2])
 			bResult = mail_PTMGET(DEVICE(Node->DeviceId), TERMINAL(Node->Index), Result);
 			break;
 		default:
-			SetLastError(ERROR_BAD_FILE_TYPE);
+			SetLastError(ERROR_CTX_NOT_CONSOLE);
 	}
 	return(bResult);
 }
@@ -184,7 +177,6 @@ vfs_TIOCGPGRP(WIN_VNODE *Node, UINT *Result)
 	BOOL bResult = FALSE;
 
 	switch (Node->FSType){
-//		case FS_TYPE_PDO:
 		case FS_TYPE_CHAR:
 		case FS_TYPE_MAILSLOT:
 			*Result = __Terminals[Node->Index].GroupId;
@@ -201,7 +193,6 @@ vfs_TIOCSPGRP(WIN_VNODE *Node, UINT GroupId)
 	BOOL bResult = FALSE;
 
 	switch (Node->FSType){
-//		case FS_TYPE_PDO:
 		case FS_TYPE_CHAR:
 		case FS_TYPE_MAILSLOT:
 			__Terminals[Node->Index].GroupId = GroupId;

@@ -442,18 +442,28 @@ sys_truncate(call_t call, const char *path, off_t length)
 /****************************************************/
 
 int 
-sys_dup(call_t call, int oldfd)
+__dup(WIN_TASK *Task, WIN_VNODE *Node)
 {
 	int result = 0;
 	WIN_VNODE vnResult = {0};
+
+	if (!vfs_dup(Node, &vnResult)){
+		result -= errno_posix(GetLastError());
+	}else{
+		result = fd_posix(Task, &vnResult, 0);
+	}
+	return(result);
+}
+int 
+sys_dup(call_t call, int oldfd)
+{
+	int result = 0;
 	WIN_TASK *pwTask = call.Task;
 
 	if (oldfd < 0 || oldfd >= OPEN_MAX){
 		result = -EBADF;
-	}else if (!vfs_dup(&pwTask->Node[oldfd], &vnResult)){
-		result -= errno_posix(GetLastError());
 	}else{
-		result = fd_posix(pwTask, &vnResult, 0);
+		result = __dup(pwTask, &pwTask->Node[oldfd]);
 	}
 	return(result);
 }
@@ -547,7 +557,7 @@ sys_read(call_t call, int fd, void *buf, size_t count)
 	WIN_TASK *pwTask = call.Task;
 
 	if (fd < 0 || fd >= OPEN_MAX){
-		return(-EBADF);
+		result = -EBADF;
 	}else if (!vfs_read(pwTask, &pwTask->Node[fd], buf, dwCount, &dwResult)){
 		result -= errno_posix(GetLastError());
 	}else if (dwResult == -1){
@@ -571,7 +581,7 @@ sys_write(call_t call, int fd, const void *buf, size_t nbytes)
 		ktrace_GENIO(pwTask, fd, UIO_WRITE, buf, nbytes);
 	}
 	if (fd < 0 || fd >= OPEN_MAX){
-		return(-EBADF);
+		result = -EBADF;
 	}else if (!vfs_write(&pwTask->Node[fd], buf, nbytes, &dwResult)){
 		result -= errno_posix(GetLastError());
 	}else if (!dwResult){

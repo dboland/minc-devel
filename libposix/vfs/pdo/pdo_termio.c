@@ -51,7 +51,7 @@ pdo_TIOCSCTTY(WIN_DEVICE *Device, WIN_TASK *Task)
 	return(bResult);
 }
 BOOL 
-pdo_PTMGET(WIN_DEVICE *Device, WIN_VNODE Result[2])
+pdo_PTMGET(WIN_DEVICE *Device, WIN_PTMGET *Result)
 {
 	BOOL bResult = FALSE;
 
