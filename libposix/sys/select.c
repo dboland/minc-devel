@@ -33,10 +33,24 @@
 /****************************************************/
 
 void 
-fdset_poll(struct pollfd pollfds[], fd_set *fds, short flags)
+fdset_init(struct pollfd pollfds[])
 {
 	int fd = 0;
 
+	while (fd < WSA_MAXIMUM_WAIT_EVENTS){
+		pollfds->fd = -1;
+		fd++;
+		pollfds++;
+	}
+}
+void 
+fdset_poll(WIN_TASK *Task, struct pollfd pollfds[], fd_set *restrict fds, short flags)
+{
+	int fd = 0;
+
+	if (Task->TracePoints & KTRFAC_STRUCT){
+		ktrace_STRUCT(Task, "fdset", 5, fds, sizeof(fd_set));
+	}
 	while (fd < WSA_MAXIMUM_WAIT_EVENTS){
 		if (FD_ISSET(fd, fds)){
 			pollfds->fd = fd;
@@ -47,7 +61,7 @@ fdset_poll(struct pollfd pollfds[], fd_set *fds, short flags)
 	}
 }
 int 
-fdset_select(fd_set *fds, struct pollfd pollfds[], short flags)
+fdset_select(WIN_TASK *Task, fd_set *restrict fds, struct pollfd pollfds[], short flags)
 {
 	int fd = 0;
 	int count = 0;
@@ -60,6 +74,9 @@ fdset_select(fd_set *fds, struct pollfd pollfds[], short flags)
 		}
 		fd++;
 		pollfds++;
+	}
+	if (Task->TracePoints & KTRFAC_STRUCT){
+		ktrace_STRUCT(Task, "fdset", 5, fds, sizeof(fd_set));
 	}
 	return(count);
 }
@@ -90,41 +107,37 @@ __select(WIN_TASK *Task, int nfds, fd_set *restrict readfds, fd_set *restrict wr
 	struct pollfd fds[WSA_MAXIMUM_WAIT_EVENTS] = {0};
 	DWORD dwResult = 0;
 	DWORD dwTimeOut = INFINITE;
+	u_int size = howmany(nfds, NFDBITS);
 
+	fdset_init(fds);
 	if (timeout){
 		dwTimeOut = timeout->tv_usec * 0.001;	/* microseconds */
 		dwTimeOut += timeout->tv_sec * 1000;	/* __int64_t (%I64d) */
 	}
 	if (readfds){
-		fdset_poll(fds, readfds, (POLLIN | POLLHUP | POLLRDBAND));
+		fdset_poll(Task, fds, readfds, (POLLIN | POLLHUP | POLLRDBAND));
 	}
 	if (writefds){
-		fdset_poll(fds, writefds, (POLLOUT | POLLWRBAND));
+		fdset_poll(Task, fds, writefds, (POLLOUT | POLLWRBAND));
 	}
 	if (errorfds){
-		fdset_poll(fds, errorfds, (POLLERR | POLLNVAL));
+		fdset_poll(Task, fds, errorfds, (POLLERR | POLLNVAL));
 	}
 	/* Silently limit to WS maximum (ab.exe)
 	 */
-	if (nfds > WSA_MAXIMUM_WAIT_EVENTS){
-		nfds = WSA_MAXIMUM_WAIT_EVENTS;
-	}
-	if (!pollfd_win(Task, vnVector, fdVector, fds, nfds)){
-		result = -EINVAL;
+	if (!pollfd_win(Task, vnVector, fdVector, fds, WSA_MAXIMUM_WAIT_EVENTS)){
+		return(-EINVAL);
 	}else if (!vfs_poll(Task, vnVector, fdVector, &dwTimeOut, &dwResult)){
-		result -= errno_posix(GetLastError());
-	}
-	if (Task->TracePoints & KTRFAC_STRUCT){
-		ktrace_STRUCT(Task, "pollfd", 6, fds, sizeof(struct pollfd) * nfds);
-	}
-	if (errorfds){
-		result += fdset_select(errorfds, fds, (POLLERR | POLLNVAL));
-	}
-	if (writefds){
-		result += fdset_select(writefds, fds, (POLLOUT | POLLWRBAND));
+		return(-errno_posix(GetLastError()));
 	}
 	if (readfds){
-		result += fdset_select(readfds, fds, (POLLIN | POLLHUP | POLLRDBAND));
+		result += fdset_select(Task, readfds, fds, (POLLIN | POLLHUP | POLLRDBAND));
+	}
+	if (writefds){
+		result += fdset_select(Task, writefds, fds, (POLLOUT | POLLWRBAND));
+	}
+	if (errorfds){
+		result += fdset_select(Task, errorfds, fds, (POLLERR | POLLNVAL));
 	}
 	if (timeout){
 		stime_posix(timeout, dwTimeOut);

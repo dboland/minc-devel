@@ -39,10 +39,10 @@ mail_poll(WIN_TTY *Terminal, WIN_POLLFD *Info, DWORD *Result)
 
 	switch (Terminal->DeviceType){
 		case DEV_TYPE_PTY:
-			bResult = pty_poll(Terminal->Input, Info, Result);
+			bResult = tty_poll(Terminal->Input, Info, Result);
 			break;
 		default:
-			SetLastError(ERROR_BAD_DEVICE);
+			SetLastError(ERROR_CTX_NOT_CONSOLE);
 	}
 	return(bResult);
 }

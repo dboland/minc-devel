@@ -51,10 +51,11 @@ BOOL
 pdo_read(WIN_TASK *Task, WIN_DEVICE *Device, LPSTR Buffer, LONG Size, DWORD *Result)
 {
 	BOOL bResult = FALSE;
+	OVERLAPPED ovl = {0, 0, 0, 0, Device->Event};
 
 	switch (Device->DeviceType){
 		case DEV_TYPE_PTY:
-			bResult = ReadFile(Device->Input, Buffer, Size, Result, NULL);
+			bResult = ReadFile(Device->Input, Buffer, Size, Result, &ovl);
 			break;
 		case DEV_TYPE_ROUTE:
 			bResult = route_read(Device, Buffer, Size, Result);

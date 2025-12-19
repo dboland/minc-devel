@@ -119,7 +119,7 @@ vfs_write(WIN_VNODE *Node, LPCVOID Buffer, DWORD Size, DWORD *Result)
 			bResult = pipe_write(Node, Buffer, Size, Result);
 			break;
 		case FS_TYPE_MAILSLOT:
-			bResult = mail_write(TERMINAL(Node->Index), Buffer, Size, Result);
+			bResult = mail_write(Node, Buffer, Size, Result);
 			break;
 		case FS_TYPE_CHAR:
 			bResult = char_write(Node, Buffer, Size, Result);

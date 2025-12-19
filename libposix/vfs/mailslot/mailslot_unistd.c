@@ -39,7 +39,7 @@ mail_read(WIN_TASK *Task, WIN_VNODE *Node, LPSTR Buffer, DWORD Size, DWORD *Resu
 
 	switch (Node->DeviceType){
 		case DEV_TYPE_PTY:
-			bResult = pty_read(Task, TERMINAL(Node->Index), Buffer, Size, Result);
+			bResult = tty_read(Task, TERMINAL(Node->Index), Buffer, Size, Result);
 			break;
 		default:
 			SetLastError(ERROR_BAD_DEVICE);
@@ -47,13 +47,16 @@ mail_read(WIN_TASK *Task, WIN_VNODE *Node, LPSTR Buffer, DWORD Size, DWORD *Resu
 	return(bResult);
 }
 BOOL 
-mail_write(WIN_TTY *Terminal, LPCSTR Buffer, DWORD Size, DWORD *Result)
+mail_write(WIN_VNODE *Node, LPCSTR Buffer, DWORD Size, DWORD *Result)
 {
 	BOOL bResult = FALSE;
-	OVERLAPPED ovl = {0, 0, 0, 0, Terminal->Event};
 
-	if (WriteFile(Terminal->Output, Buffer, Size, Result, &ovl)){
-		bResult = TRUE;
+	switch (Node->DeviceType){
+		case DEV_TYPE_PTY:
+			bResult = tty_write(TERMINAL(Node->Index), Buffer, Size, Result);
+			break;
+		default:
+			SetLastError(ERROR_BAD_DEVICE);
 	}
 	return(bResult);
 }

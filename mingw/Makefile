@@ -3,7 +3,7 @@ ROOTDIR= ..
 include ${ROOTDIR}/Makefile.inc
 
 LIBS= libadvapi32.a libkernel32.a libshell32.a libuser32.a \
-	libmoldname.a libgmon.a libmsvcrt.a
+	libmoldname.a libgmon.a libmsvcrt.a libgdi32.a libcomdlg32.a
 ULIBDIR= /usr/lib
 GCCBIN= ${BINDIR}/gcc.exe ${BINDIR}/cpp.exe ${BINDIR}/g++.exe ${BINDIR}/c++.exe
 

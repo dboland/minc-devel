@@ -8,7 +8,7 @@ OBJECTS = a64l.o atoi.o atof.o atol.o atoll.o bsearch.o \
 	lcong48.o lrand48.o mrand48.o nrand48.o seed48.o srand48.o qabs.o \
 	qdiv.o _Exit.o exit.o abort.o rand.o realpath.o \
 	div.o hcreate.o getopt_long.o
-OBJECTS+= ecvt.o gcvt.o
+OBJECTS+= ecvt.o gcvt.o abs.o
 #OBJECTS+= malloc.o
 
 # MinC replacements

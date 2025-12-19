@@ -42,3 +42,26 @@ tty_open(WIN_TTY *Terminal, WIN_FLAGS *Flags, WIN_VNODE *Result)
 	Result->FSType = Terminal->FSType;
 	return(TRUE);
 }
+WIN_TTY * 
+tty_attach(WIN_DEVICE *Device)
+{
+	DWORD dwIndex = 0;
+	WIN_TTY *pwTerminal = __Terminals;
+
+	while (dwIndex < WIN_TTY_MAX){
+		if (!pwTerminal->Flags){
+			pwTerminal->Flags = TIOCFLAG_ACTIVE;
+			pwTerminal->Index = dwIndex;
+			pwTerminal->DeviceType = Device->DeviceType;
+			pwTerminal->DeviceId = Device->DeviceId;
+			pwTerminal->Attribs = __Globals->TTYDefaults;
+			_itoa(dwIndex, win_stpcpy(pwTerminal->Name, "tty"), 10);
+			Device->Index = dwIndex;
+			return(pwTerminal);
+		}
+		dwIndex++;
+		pwTerminal++;
+	}
+	SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+	return(NULL);
+}

@@ -116,9 +116,6 @@ proc_setsid(WIN_TASK *Task)
 	}else{
 		Task->GroupId = Task->TaskId;
 		Task->SessionId = Task->TaskId;
-//		if (Task->TerminalId){
-//			FreeConsole();
-//		}
 //		Task->TerminalId = 0;
 		bResult = TRUE;
 	}

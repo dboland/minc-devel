@@ -28,8 +28,8 @@
  *
  */
 
-#include "pty/pty.c"
 #include "mailslot_syscall.c"
+#include "mailslot_tty.c"
 #include "mailslot_fcntl.c"
 #include "mailslot_poll.c"
 #include "mailslot_unistd.c"

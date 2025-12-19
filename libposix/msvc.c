@@ -30,7 +30,6 @@
 
 #include <stdio.h>
 #include <stdarg.h>
-//#include <time.h>
 
 #include "msvc_posix.h"
 

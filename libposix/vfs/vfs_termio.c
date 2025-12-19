@@ -135,7 +135,7 @@ vfs_TIOCSETA(WIN_VNODE *Node, WIN_TERMIO *Attribs, BOOL Flush, BOOL Drain)
 	return(bResult);
 }
 BOOL 
-vfs_TIOCSCTTY(WIN_TASK *Task, WIN_VNODE *Node)
+vfs_TIOCSCTTY(WIN_VNODE *Node, WIN_TASK *Task)
 {
 	BOOL bResult = FALSE;
 

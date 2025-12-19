@@ -88,6 +88,7 @@
 #define DEV_TYPE_STDOUT		(DEV_CLASS_CPU + 10)		/* standard stream pseudo device */
 #define DEV_TYPE_STDERR		(DEV_CLASS_CPU + 11)		/* standard stream pseudo device */
 #define DEV_TYPE_SWAP		(DEV_CLASS_CPU + 12)		/* disk swap pseudo device */
+#define DEV_TYPE_WINDOWS	(DEV_CLASS_CPU + 13)		/* Windows message queue */
 #define DEV_TYPE_RAMDISK	(DEV_CLASS_CPU + 24)		/* Random Access Memory disk device (rd*) */
 #define DEV_TYPE_PROCESSOR	(DEV_CLASS_CPU + 32)		/* Central Processing Unit */
 

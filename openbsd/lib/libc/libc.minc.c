@@ -104,3 +104,15 @@ __tls_copy(void *data[])
 		index++;
 	}
 }
+void 
+cygwin_conv_to_win32_path(const char *path, char *result)
+{
+	WIN_NAMEIDATA wPath = {0};
+
+	wcstombs(result, path_win(&wPath, path, 0)->Resolved, MAX_PATH);
+}
+void 
+cygwin_conv_to_full_posix_path(const char *path, char *result)
+{
+	strcpy(result, path);
+}

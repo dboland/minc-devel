@@ -36,11 +36,14 @@ DWORD
 ScreenMode(WIN_TERMIO *Attribs)
 {
 //	DWORD dwResult = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
-	DWORD dwResult = __ConMode[1] | ENABLE_PROCESSED_OUTPUT;
-	UINT uiFlags = WIN_OPOST | WIN_ONLCR;
+	DWORD dwResult = __ConMode[1];
+	UINT uiFlags = WIN_OPOST | WIN_OXTABS;
 
 	if (__ConMode[1] & ENABLE_VIRTUAL_TERMINAL_PROCESSING){
 		dwResult |= XTermScreenMode(Attribs);
+	}
+	if ((Attribs->OFlags & uiFlags) == uiFlags){
+		dwResult |= ENABLE_PROCESSED_OUTPUT;
 	}
 	return(dwResult);
 }

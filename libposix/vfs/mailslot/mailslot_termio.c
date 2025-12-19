@@ -40,6 +40,9 @@ mail_PTMGET(WIN_DEVICE *Device, WIN_TTY *Terminal, WIN_PTMGET *Result)
 	CHAR szPath[MAX_PATH] = "\\\\.\\MAILSLOT\\master\\";
 	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, TRUE};
 
+	if (!Terminal){
+		return(FALSE);
+	}
 	hResult = CreateMailslot(win_strcat(szPath, Device->Name), WIN_MAX_INPUT, MAILSLOT_WAIT_FOREVER, &sa);
 	if (hResult == INVALID_HANDLE_VALUE){
 		WIN_ERR("CreateMailslot(%s): %s\n", szPath, win_strerror(GetLastError()));
@@ -48,8 +51,8 @@ mail_PTMGET(WIN_DEVICE *Device, WIN_TTY *Terminal, WIN_PTMGET *Result)
 		Device->Output = MailOpenFile(szPath);
 		Device->FSType = FS_TYPE_MAILSLOT;
 		Device->Event = CreateEvent(&sa, FALSE, FALSE, NULL);
-		win_strlcpy(Result->SName, Device->Name, 16);
-		win_strlcpy(Result->MName, Terminal->Name, 16);
+		win_strlcpy(Result->MName, Device->Name, 16);
+		win_strlcpy(Result->SName, Terminal->Name, 16);
 		bResult = TRUE;
 	}
 	return(bResult);
@@ -62,6 +65,9 @@ mail_TIOCSCTTY(WIN_DEVICE *Device, WIN_TASK *Task, WIN_TTY *Terminal)
 	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, TRUE};
 	CHAR szPath[MAX_PATH] = "\\\\.\\MAILSLOT\\slave\\";
 
+	if (!Terminal){
+		return(FALSE);
+	}
 	hResult = CreateMailslot(win_strcat(szPath, Device->Name), WIN_MAX_INPUT, MAILSLOT_WAIT_FOREVER, &sa);
 	if (hResult == INVALID_HANDLE_VALUE){
 		WIN_ERR("CreateMailslot(%s): %s\n", szPath, win_strerror(GetLastError()));

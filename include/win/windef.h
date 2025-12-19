@@ -72,8 +72,6 @@ typedef LONG HRESULT;
 #define _HRESULT_DEFINED
 #endif
 
-DECLARE_HANDLE(HWND);
-
 typedef INT (WINAPI *FARPROC)();
 typedef BYTE *PBYTE,*LPBYTE;
 typedef CONST VOID *PCVOID,*LPCVOID;

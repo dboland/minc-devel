@@ -97,6 +97,7 @@ typedef enum _WIN_FS_TYPE {
 
 #define WIN_NAME_MAX		16
 #define WIN_PIPE_BUF		1024
+#define WIN_MAX_INPUT		255
 
 /*
  * vfs_device.c
@@ -617,6 +618,22 @@ typedef struct _WIN_TTY {
 	CHAR Name[MAX_NAME];
 } WIN_TTY;
 
+#define TERMINAL(idx)	(&__Terminals[idx])
+
+/* wincon.h */
+
+#define KeyEvent			Event.KeyEvent
+#define MouseEvent			Event.MouseEvent
+#define WindowBufferSizeEvent		Event.WindowBufferSizeEvent
+#define MenuEvent			Event.MenuEvent
+#define FocusEvent			Event.FocusEvent
+
+#define ENABLE_VIRTUAL_TERMINAL_INPUT		0x0200
+
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING	0x0004
+#define ENABLE_LVB_GRID_WORLDWIDE		0x0010
+#define DISABLE_NEWLINE_AUTO_RETURN		0x0008
+
 #define COMMON_LVB_LEADING_BYTE		0x0100
 #define COMMON_LVB_TRAILING_BYTE	0x0200
 #define COMMON_LVB_GRID_HORIZONTAL	0x0400
@@ -625,8 +642,6 @@ typedef struct _WIN_TTY {
 #define COMMON_LVB_AUTOWRAP		0x2000
 #define COMMON_LVB_REVERSE_VIDEO	0x4000
 #define COMMON_LVB_UNDERSCORE		0x8000
-
-#define TERMINAL(idx)	(&__Terminals[idx])
 
 /* sys/termios.h */
 

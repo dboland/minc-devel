@@ -72,22 +72,6 @@
 #define WIN_S_ISGID	FILE_WRITE_DATA
 #define WIN_S_ISUID	FILE_APPEND_DATA
 
-/* wincon.h */
-
-#define KeyEvent			Event.KeyEvent
-#define MouseEvent			Event.MouseEvent
-#define WindowBufferSizeEvent		Event.WindowBufferSizeEvent
-#define MenuEvent			Event.MenuEvent
-#define FocusEvent			Event.FocusEvent
-
-#define ENABLE_VIRTUAL_TERMINAL_INPUT		0x0200
-
-#define ENABLE_VIRTUAL_TERMINAL_PROCESSING	0x0004
-#define ENABLE_LVB_GRID_WORLDWIDE		0x0010
-#define DISABLE_NEWLINE_AUTO_RETURN		0x0008
-
-#define WIN_MAX_INPUT		255
-
 /* winternl.h */
 
 typedef struct _SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION {

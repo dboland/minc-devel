@@ -40,7 +40,7 @@ openpt_posix(WIN_TASK *Task, const char *name, int flags, ...)
 	char path[PATH_MAX] = _PATH_DEV;
 	WIN_NAMEIDATA wPath = {0};
 
-	strcat(path, name);
+	win_strcat(path, name);
 	va_start(args, flags);
 	result = __openat(Task, path_win(&wPath, path, flags | O_INODE), flags, args);
 	va_end(args);
@@ -147,14 +147,14 @@ term_TIOCSETAF(WIN_TASK *Task, WIN_VNODE *Node, WIN_TERMIO *Attribs)
 	return(result);
 }
 int 
-term_TIOCSCTTY(WIN_TASK *Task, WIN_VNODE *Node)
+term_TIOCSCTTY(WIN_VNODE *Node, WIN_TASK *Task)
 {
 	int result = 0;
 	WIN_DEVICE *pwDevice;
 
 	if (Task->Flags & WIN_PS_CONTROLT){
 		result = -EPERM;
-	}else if (!vfs_TIOCSCTTY(Task, Node)){
+	}else if (!vfs_TIOCSCTTY(Node, Task)){
 		result -= errno_posix(GetLastError());
 	}else{
 		pwDevice = DEVICE(Node->DeviceId);
@@ -165,7 +165,7 @@ term_TIOCSCTTY(WIN_TASK *Task, WIN_VNODE *Node)
 	return(result);
 }
 int 
-term_PTMGET(WIN_TASK *Task, WIN_VNODE *Node, WIN_PTMGET *Result)
+term_PTMGET(WIN_VNODE *Node, WIN_TASK *Task, WIN_PTMGET *Result)
 {
 	int result = 0;
 	WIN_DEVICE *pwDevice;
@@ -173,13 +173,16 @@ term_PTMGET(WIN_TASK *Task, WIN_VNODE *Node, WIN_PTMGET *Result)
 	if (!vfs_PTMGET(Node, Result)){
 		result -= errno_posix(GetLastError());
 	}else{
-		/* raw serial device (master) */
+		/* controlling terminal (slave) */
 		pwDevice = DEVICE(Node->DeviceId);
 		Node->Index = pwDevice->Index;
 		Node->Event = pwDevice->Event;
 		Result->Master = __dup(Task, Node);
-		/* controlling terminal (slave) */
-		Result->Slave = openpt_posix(Task, Result->SName, 0, 0666);
+		/* raw serial device (master) */
+		Result->Slave = openpt_posix(Task, Result->MName, 0, 0666);
+		if (Task->TracePoints & KTRFAC_STRUCT){
+			ktrace_STRUCT(Task, "ptmget", 6, Result, sizeof(struct ptmget));
+		}
 	}
 	return(result);
 }
@@ -250,10 +253,10 @@ term_ioctl(WIN_TASK *Task, int fd, unsigned long request, va_list args)
 			result = term_TIOCDRAIN(pvNode);
 			break;
 		case PTMGET:
-			result = term_PTMGET(Task, pvNode, va_arg(args, WIN_PTMGET *));
+			result = term_PTMGET(pvNode, Task, va_arg(args, WIN_PTMGET *));
 			break;
 		case TIOCSCTTY:
-			result = term_TIOCSCTTY(Task, pvNode);
+			result = term_TIOCSCTTY(pvNode, Task);
 			break;
 		case TIOCGETA:
 			result = term_TIOCGETA(pvNode, va_arg(args, WIN_TERMIO *));

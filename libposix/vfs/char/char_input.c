@@ -43,6 +43,7 @@
 #define CC_DC3	0x13	/* Ctrl+S (Device Control 3: XOFF) */
 #define CC_ESC	0x1B	/* Escape */
 #define CC_FS	0x1C	/* Ctrl+\ */
+#define CC_DEL	0x7F	/* Delete */
 
 /****************************************************/
 

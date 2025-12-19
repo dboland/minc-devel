@@ -28,13 +28,13 @@
  *
  */
 
-/* exclude msvcrt.dll headers */
+/* exclude msvcrt.dll/ws2_32.dll headers */
 #define WIN32_LEAN_AND_MEAN
 
 /* iphlpapi.h */
 #define _WIN32_WINNT	_WIN32_WINNT_WINXP
 
-/* prevent __declspec(dllimport) decoration */
+/* ddk/winddk.h: prevent __declspec(dllimport) decoration */
 #define NTOSAPI		
 
 #include <winsock2.h>
@@ -80,7 +80,6 @@ HANDLE 		__Shared;
 WIN_SIGPROC	__SignalProc;
 HANDLE		__Interrupt;
 HANDLE		__PipeEvent;
-//HANDLE		__MailEvent;
 SEQUENCE 	__ANSI_BUF;
 CHAR		__INPUT_BUF[WIN_MAX_INPUT + 2];
 UCHAR 		__Char;
@@ -112,7 +111,6 @@ BOOL vfs_F_GETFL(HANDLE Handle, ACCESS_MASK *Result);
 #include "vfs_syscall.c"
 #include "vfs_device.c"
 #include "vfs_ktrace.c"
-#include "vfs_tty.c"
 #include "registry/registry.c"
 #include "drive/drive.c"
 #include "char/char.c"
@@ -162,7 +160,6 @@ vfs_PROCESS_ATTACH(HINSTANCE Instance, LPVOID Reserved)
 	__SidNone = &__Globals->SidNone;
 	__Frequency = &__Globals->Frequency;
 	__PipeEvent = event_attach(OBJECT_NAME("PipeEvent"), FALSE);
-//	__MailEvent = event_attach(OBJECT_NAME("MailEvent"), FALSE);
 	__Interrupt = event_attach(OBJECT_NAME("Interrupt"), FALSE);
 	return(TRUE);
 }

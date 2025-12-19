@@ -97,6 +97,8 @@ pdo_open(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_VNODE *Result)
 			win_memcpy(Result, &__Process->Node[2], sizeof(WIN_VNODE));
 			bResult = TRUE;
 			break;
+		case DEV_TYPE_WINDOWS:
+			Result->Event = __Interrupt;
 		default:
 			bResult = TRUE;
 	}
