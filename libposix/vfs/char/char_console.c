@@ -43,7 +43,7 @@ ConControlHandler(DWORD CtrlType)
 	 */
 	TlsSetValue(__TlsIndex, (PVOID)__Process->TaskId);
 	if (__Process->GroupId == __CTTY->GroupId){
-		if (vfs_raise(WM_COMMAND, CtrlType, 0)){
+		if (vfs_raise(WM_USER, CtrlType, 0)){
 			SetEvent(__Interrupt);		/* ping6.exe */
 		}
 	}

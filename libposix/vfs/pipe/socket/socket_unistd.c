@@ -36,8 +36,6 @@ BOOL
 sock_close(WIN_VNODE *Node)
 {
 	BOOL bResult = FALSE;
-	DWORD dwResult;
-//	OVERLAPPED ovl = {0, 0, 0, 0, Node->Event};
 
 	/* Since this is a bi-directional pipe, CloseHandle() will block
 	 * when the thread on the other side is reading or peeking. So

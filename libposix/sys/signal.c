@@ -44,7 +44,7 @@
 #define BIT_SIGTHR		0x80000000	/* null signal (child detaching) */
 
 #define SIGMASK_STOP	(BIT_SIGSTOP | BIT_SIGTSTP | BIT_SIGTTIN | BIT_SIGTTOU | BIT_SIGCONT)
-#define SIGMASK_IGNORE	(BIT_SIGWINCH | BIT_SIGCHLD | BIT_SIGURG | BIT_SIGINFO | BIT_SIGIO)
+#define SIGMASK_IGNORE	(BIT_SIGTHR | BIT_SIGWINCH | BIT_SIGCHLD | BIT_SIGURG | BIT_SIGINFO | BIT_SIGIO)
 
 typedef void (*action_t)(int, siginfo_t *, void *);
 
@@ -221,7 +221,7 @@ kill_GRP(WIN_TASK *Task, DWORD GroupId, int sig)
 {
 	int result = 0;
 
-	if (!vfs_kill_GRP(GroupId, WM_COMMAND, __SIG_WIN[sig], Task->TaskId)){
+	if (!vfs_kill_GRP(GroupId, WM_USER, __SIG_WIN[sig], Task->TaskId)){
 		result -= errno_posix(GetLastError());
 	}
 	return(result);
@@ -231,7 +231,7 @@ kill_SYS(WIN_TASK *Task, int sig)
 {
 	int result = 0;
 
-	if (!vfs_kill_SYS(Task->TaskId, WM_COMMAND, __SIG_WIN[sig], Task->TaskId)){
+	if (!vfs_kill_SYS(Task->TaskId, WM_USER, __SIG_WIN[sig], Task->TaskId)){
 		result -= errno_posix(GetLastError());
 	}
 	return(result);
@@ -347,7 +347,7 @@ sys_kill(call_t call, pid_t pid, int sig)
 		result = kill_GRP(pwTask, pwTask->GroupId, sig);
 	}else if (pid >= CHILD_MAX){
 		result = -EINVAL;
-	}else if (!vfs_kill_PID(pid_win(pid), WM_COMMAND, __SIG_WIN[sig], pwTask->TaskId)){
+	}else if (!vfs_kill_PID(pid_win(pid), WM_USER, __SIG_WIN[sig], pwTask->TaskId)){
 		result -= errno_posix(GetLastError());
 	}
 	return(result);

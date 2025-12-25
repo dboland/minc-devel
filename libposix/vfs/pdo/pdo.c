@@ -38,6 +38,7 @@
 #include "pdo_root.c"
 #include "pdo_tty.c"
 #include "pdo_pty.c"
+#include "pdo_windows.c"
 #include "pdo_termio.c"
 #include "pdo_fcntl.c"
 #include "pdo_unistd.c"

@@ -161,6 +161,7 @@ term_TIOCSCTTY(WIN_VNODE *Node, WIN_TASK *Task)
 		Node->Index = pwDevice->Index;
 		Node->Event = pwDevice->Event;
 		Node->FSType = pwDevice->FSType;
+//		Node->DeviceType = DEV_TYPE_TTY;
 	}
 	return(result);
 }
@@ -173,12 +174,13 @@ term_PTMGET(WIN_VNODE *Node, WIN_TASK *Task, WIN_PTMGET *Result)
 	if (!vfs_PTMGET(Node, Result)){
 		result -= errno_posix(GetLastError());
 	}else{
-		/* controlling terminal (slave) */
+		/* raw serial device (master) */
 		pwDevice = DEVICE(Node->DeviceId);
 		Node->Index = pwDevice->Index;
 		Node->Event = pwDevice->Event;
+		Node->FSType = FS_TYPE_PDO;
 		Result->Master = __dup(Task, Node);
-		/* raw serial device (master) */
+		/* controlling terminal (slave) */
 		Result->Slave = openpt_posix(Task, Result->MName, 0, 0666);
 		if (Task->TracePoints & KTRFAC_STRUCT){
 			ktrace_STRUCT(Task, "ptmget", 6, Result, sizeof(struct ptmget));

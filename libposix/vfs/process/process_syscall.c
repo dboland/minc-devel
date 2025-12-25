@@ -55,6 +55,6 @@ ProcCreateTask(DWORD Offset)
 		pwTask++;
 	}
 	WIN_ERR("ProcCreateTask(%d): %s\n", Offset, win_strerror(ERROR_MAX_THRDS_REACHED));
-	vfs_raise(WM_COMMAND, CTRL_BREAK_EVENT, 0);
+	vfs_raise(WM_USER, CTRL_BREAK_EVENT, 0);
 	return(NULL);
 }

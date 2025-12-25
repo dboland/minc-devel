@@ -28,28 +28,23 @@
  *
  */
 
-#include <winbase.h>
+#include <winuser.h>
 
 /************************************************************/
 
 BOOL 
-vfs_reboot(WIN_TASK *Task, USHORT Type, USHORT DeviceId)
+win_poll(WIN_POLLFD *Info, DWORD *Result)
 {
-	BOOL bResult = FALSE;
-	DWORD dwThreadId = __Tasks[WIN_PID_INIT].ThreadId;
+	BOOL bResult = TRUE;
+	SHORT sResult = 0;
+	SHORT sMask = Info->Events | WIN_POLLIGNORE;
+	MSG msg = {0};
 
-	if (!win_group_member(&SidAdmins)){
-		SetLastError(ERROR_PRIVILEGE_NOT_HELD);
-	}else switch (Type){
-		case WIN_RB_HALT:
-//			bResult = vfs_kill_PID(dwThreadId, WM_QUIT, 0, 0);
-			bResult = TRUE;
-			break;
-		case WIN_RB_AUTOBOOT:
-			bResult = vfs_kill_PID(dwThreadId, WM_USER, CTRL_LOGOFF_EVENT, 0);
-			break;
-		default:
-			SetLastError(ERROR_NOT_SUPPORTED);
+	if (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE)){
+		sResult = WIN_POLLIN;
+	}
+	if (Info->Result = sMask & sResult){
+		*Result += 1;
 	}
 	return(bResult);
 }

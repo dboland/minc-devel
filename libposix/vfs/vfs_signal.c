@@ -168,14 +168,11 @@ vfs_raise(UINT Message, WPARAM WParam, LPARAM LParam)
 		case WM_QUIT:
 			dwCtrlType = CTRL_QUIT_EVENT;
 			break;
-		case WM_COMMAND:
+		case WM_USER:
 			dwCtrlType = WParam;
 			break;
 		case WM_TIMER:
 			dwCtrlType = CTRL_TIMER_EVENT;
-			break;
-		case WM_USER:
-			dwCtrlType = CTRL_DETACH_EVENT;
 			break;
 		default:
 			/* WM_STRING class message from WinXP, when started

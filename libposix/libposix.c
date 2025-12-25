@@ -150,10 +150,10 @@ posix_PROCESS_DETACH(WIN_TASK *Task)
 	if (Task->Flags & WIN_PS_EXITING){		/* ktrace.exe */
 		Task->Flags |= WIN_PS_ZOMBIE;
 		Task->State = WIN_SZOMB;
-		vfs_closefrom(Task->Node);
-		if (!vfs_kill_PID(pid_win(Task->ParentId), WM_COMMAND, CTRL_CHILD_EVENT, Task->TaskId)){
+		if (!vfs_kill_PID(pid_win(Task->ParentId), WM_USER, CTRL_CHILD_EVENT, Task->TaskId)){
 			proc_orphanize(Task);
 		}
+		vfs_closefrom(Task->Node);
 	}
 	return(TRUE);
 }
@@ -161,15 +161,15 @@ BOOL
 posix_THREAD_DETACH(WIN_TASK *Task)
 {
 	if (Task->Flags & WIN_PS_PPWAIT){
-		win_kill(pid_win(Task->ParentId), WM_USER, Task->TaskId, 0);
+		win_kill(pid_win(Task->ParentId), WM_USER, CTRL_DETACH_EVENT, Task->TaskId);
 	}
 	if (Task->Flags & WIN_PS_EXITING){
 		Task->Flags |= WIN_PS_ZOMBIE;
 		Task->State = WIN_SZOMB;
-		__closefrom(Task->Node, 0);
-		if (!vfs_kill_PID(pid_win(Task->ParentId), WM_COMMAND, CTRL_CHILD_EVENT, Task->TaskId)){
+		if (!vfs_kill_PID(pid_win(Task->ParentId), WM_USER, CTRL_CHILD_EVENT, Task->TaskId)){
 			proc_orphanize(Task);
 		}
+		__closefrom(Task->Node, 0);
 	}
 	return(TRUE);
 }

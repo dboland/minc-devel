@@ -33,13 +33,13 @@
 /****************************************************/
 
 BOOL 
-mail_poll(WIN_TTY *Terminal, WIN_POLLFD *Info, DWORD *Result)
+mail_poll(WIN_VNODE *Node, WIN_POLLFD *Info, DWORD *Result)
 {
 	BOOL bResult = FALSE;
 
-	switch (Terminal->DeviceType){
+	switch (Node->DeviceType){
 		case DEV_TYPE_PTY:
-			bResult = tty_poll(Terminal->Input, Info, Result);
+			bResult = tty_poll(TERMINAL(Node->Index), Info, Result);
 			break;
 		default:
 			SetLastError(ERROR_CTX_NOT_CONSOLE);

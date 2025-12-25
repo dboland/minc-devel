@@ -53,8 +53,13 @@ proc_fork(LPTHREAD_START_ROUTINE StartAddress, WIN_THREAD_STRUCT *Thread)
 	__ThreadCount++;
 	Thread->Handle = CreateThread(NULL, WIN_STACKSIZE, StartAddress, Thread, 0, &dwThreadId);
 	/* wait for child to send TaskId */
-	GetMessage(&msg, NULL, WM_USER, WM_USER);
-	return(msg.wParam);
+	while (GetMessage(&msg, NULL, WM_USER, WM_USER)){
+		if (msg.wParam == CTRL_DETACH_EVENT){
+			return(msg.lParam);
+		}else{
+			vfs_raise(msg.message, msg.wParam, msg.lParam);
+		}
+	}
 }
 VOID 
 proc_fork_leave(WIN_THREAD_STRUCT *Thread)
@@ -64,7 +69,7 @@ proc_fork_leave(WIN_THREAD_STRUCT *Thread)
 		CloseHandle(Thread->Token);
 	}
 	if (!(Thread->Flags & WIN_PS_PPWAIT)){
-		PostThreadMessage(Thread->ThreadId, WM_USER, Thread->Result, 0);
+		PostThreadMessage(Thread->ThreadId, WM_USER, CTRL_DETACH_EVENT, Thread->Result);
 	}
 	LocalFree(Thread);
 }

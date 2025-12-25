@@ -200,6 +200,6 @@ proc_orphanize(WIN_TASK *Task)
 	}else if (ERROR_INVALID_HANDLE != GetLastError()){
 		WIN_ERR("proc_orphanize(%d): %s\n", Task->Handle, win_strerror(GetLastError()));
 	}
-	bResult = vfs_kill_PID(pwTask->ThreadId, WM_COMMAND, CTRL_CHILD_EVENT, Task->TaskId);
+	bResult = vfs_kill_PID(pwTask->ThreadId, WM_USER, CTRL_CHILD_EVENT, Task->TaskId);
 	return(bResult);
 }
