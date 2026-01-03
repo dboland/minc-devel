@@ -85,7 +85,7 @@ proc_dup(WIN_TASK *Parent, WIN_THREAD_STRUCT *Thread)
 	ptResult->Depth = Parent->Depth + 1;
 	ptResult->GroupId = Parent->GroupId;
 	ptResult->SessionId = Parent->SessionId;
-	ptResult->CTTY = Parent->CTTY;
+	ptResult->TerminalId = Parent->TerminalId;
 	ptResult->MountId = Parent->MountId;
 	ptResult->UserSid = Parent->UserSid;
 	ptResult->GroupSid = Parent->GroupSid;
@@ -200,6 +200,6 @@ proc_orphanize(WIN_TASK *Task)
 	}else if (ERROR_INVALID_HANDLE != GetLastError()){
 		WIN_ERR("proc_orphanize(%d): %s\n", Task->Handle, win_strerror(GetLastError()));
 	}
-	bResult = vfs_kill_PID(pwTask->ThreadId, WM_USER, CTRL_CHILD_EVENT, Task->TaskId);
+	bResult = vfs_kill_PID(pwTask->ThreadId, WM_SIGNAL, CTRL_CHILD_EVENT, Task->TaskId);
 	return(bResult);
 }

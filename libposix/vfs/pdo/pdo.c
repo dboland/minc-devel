@@ -38,7 +38,6 @@
 #include "pdo_root.c"
 #include "pdo_tty.c"
 #include "pdo_pty.c"
-#include "pdo_windows.c"
 #include "pdo_termio.c"
 #include "pdo_fcntl.c"
 #include "pdo_unistd.c"
@@ -65,7 +64,6 @@ pdo_init(WIN_DEV_CLASS Devices[])
 	config_init("stderr", WIN_VCHR, DEV_TYPE_STDERR);
 	config_init("root", WIN_VBLK, DEV_TYPE_ROOT);
 	config_init("swap", WIN_VBLK, DEV_TYPE_SWAP);
-	config_init("windows", WIN_VCHR, DEV_TYPE_WINDOWS);
 
 	config_init("tty", WIN_VCHR, DEV_TYPE_TTY);
 	config_init("console", WIN_VCHR, DEV_TYPE_CONSOLE);

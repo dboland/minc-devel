@@ -41,9 +41,6 @@ pdo_poll(WIN_DEVICE *Device, WIN_POLLFD *Info, DWORD *Result)
 		case DEV_TYPE_PTY:
 			bResult = pty_poll(Device->Input, Info, Result);
 			break;
-		case DEV_TYPE_WINDOWS:
-			bResult = win_poll(Info, Result);
-			break;
 		default:
 			SetLastError(ERROR_BAD_DEVICE);
 	}

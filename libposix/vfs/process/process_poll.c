@@ -39,7 +39,7 @@ proc_poll(WIN_TASK *Task)
 	MSG msg;
 	LONGLONG llTime = Task->ClockTime;
 
-	if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)){
+	if (PeekMessage(&msg, NULL, WM_SIGNAL, WM_SIGNAL, PM_REMOVE)){
 		bResult = vfs_raise(msg.message, msg.wParam, msg.lParam);
 	}else if (Task->Pending){
 		SetLastError(ERROR_SIGNAL_PENDING);

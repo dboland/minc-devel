@@ -310,22 +310,6 @@ typedef struct _WIN___TFORK {
 } WIN___TFORK;
 
 /*
- * win_termio.c
- */
-
-#define WIN_NCCS		20
-
-typedef struct _WIN_TERMIO {
-	UINT IFlags;
-	UINT OFlags;
-	UINT CFlags;
-	UINT LFlags;
-	UCHAR Control[WIN_NCCS];
-	UINT ISpeed;
-	UINT OSpeed;
-} WIN_TERMIO;
-
-/*
  * win.c
  */
 
@@ -339,7 +323,6 @@ typedef struct _WIN_GLOBALS {
 	LUID AuthId;
 	ULONG PageSize;
 	DWORD ConMode[2];		/* console mode defaults */
-	WIN_TERMIO TTYDefaults;
 	WCHAR Root[MAX_PATH];
 	CHAR Path[WIN_PATH_MAX];
 	CHAR SystemRoot[MAX_PATH];

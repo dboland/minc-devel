@@ -76,10 +76,5 @@ diskconf(char *root)
 void 
 consinit(void)
 {
-	WIN_TERMIO tAttribs = {TTYDEF_IFLAG, TTYDEF_OFLAG, TTYDEF_CFLAG, 
-		TTYDEF_LFLAG, {0}, TTYDEF_SPEED, TTYDEF_SPEED};
-
-	win_memcpy(tAttribs.Control, ttydefchars, sizeof(ttydefchars));
-	__Globals->TTYDefaults = tAttribs;
 	vfs_consinit();
 }

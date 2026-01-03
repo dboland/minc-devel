@@ -68,6 +68,8 @@ diff_zip()
 			exit 1
 		elif [[ $file == *.out ]]; then
 			continue
+		elif [[ $file == *.exe ]]; then
+			echo "Binary: $file" >&2
 		elif [[ $file == */.patch ]]; then
 			echo "Patched: $file" >&2
 		elif [[ $file == */BSDmakefile ]]; then

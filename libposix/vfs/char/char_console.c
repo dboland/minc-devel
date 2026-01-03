@@ -43,7 +43,7 @@ ConControlHandler(DWORD CtrlType)
 	 */
 	TlsSetValue(__TlsIndex, (PVOID)__Process->TaskId);
 	if (__Process->GroupId == __CTTY->GroupId){
-		if (vfs_raise(WM_USER, CtrlType, 0)){
+		if (vfs_raise(WM_SIGNAL, CtrlType, 0)){
 			SetEvent(__Interrupt);		/* ping6.exe */
 		}
 	}
@@ -55,28 +55,28 @@ ConControlHandler(DWORD CtrlType)
 BOOL 
 con_TIOCSCTTY(WIN_DEVICE *Device, WIN_TASK *Task, WIN_TTY *Terminal)
 {
-	BOOL bResult = FALSE;
+//	BOOL bResult = FALSE;
 	WIN_FLAGS wFlags = {GENERIC_READ | GENERIC_WRITE, 
 		FILE_SHARE_READ | FILE_SHARE_WRITE, 
 		OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0};
 	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, TRUE};
 
-	if (Terminal){
-		Terminal->Input = CharOpenFile("CONIN$", &wFlags, &sa);
-		Terminal->Output = CharOpenFile("CONOUT$", &wFlags, &sa);
-		Terminal->FSType = FS_TYPE_CHAR;
-		Terminal->SessionId = Task->SessionId;
-		Terminal->GroupId = Task->GroupId;
-		SetConsoleTextAttribute(Terminal->Output, BACKGROUND_BLACK | FOREGROUND_WHITE);
-		GetConsoleScreenBufferInfo(Terminal->Output, &Terminal->Info);
-		SetConsoleOutputCP(CP_UTF8);
-		Device->FSType = FS_TYPE_CHAR;
-		Device->Event = Terminal->Input;
-		Task->Flags |= WIN_PS_CONTROLT;
-		Task->CTTY = Terminal->Index;
-		bResult = TRUE;
+	if (!Terminal){
+		return(FALSE);
 	}
-	return(bResult);
+	Terminal->Input = CharOpenFile("CONIN$", &wFlags, &sa);
+	Terminal->Output = CharOpenFile("CONOUT$", &wFlags, &sa);
+	Terminal->FSType = FS_TYPE_CHAR;
+	Terminal->SessionId = Task->SessionId;
+	Terminal->GroupId = Task->GroupId;
+	SetConsoleTextAttribute(Terminal->Output, BACKGROUND_BLACK | FOREGROUND_WHITE);
+	GetConsoleScreenBufferInfo(Terminal->Output, &Terminal->Info);
+	SetConsoleOutputCP(CP_UTF8);
+	Device->FSType = FS_TYPE_CHAR;
+	Device->Event = Terminal->Input;
+	Task->Flags |= WIN_PS_CONTROLT;
+	Task->TerminalId = Terminal->Index;
+	return(TRUE);
 }
 BOOL 
 con_TIOCGWINSZ(WIN_TTY *Terminal, WIN_WINSIZE *WinSize)

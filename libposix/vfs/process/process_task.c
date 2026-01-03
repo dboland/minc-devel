@@ -53,7 +53,7 @@ proc_fork(LPTHREAD_START_ROUTINE StartAddress, WIN_THREAD_STRUCT *Thread)
 	__ThreadCount++;
 	Thread->Handle = CreateThread(NULL, WIN_STACKSIZE, StartAddress, Thread, 0, &dwThreadId);
 	/* wait for child to send TaskId */
-	while (GetMessage(&msg, NULL, WM_USER, WM_USER)){
+	while (GetMessage(&msg, NULL, WM_SIGNAL, WM_SIGNAL)){
 		if (msg.wParam == CTRL_DETACH_EVENT){
 			return(msg.lParam);
 		}else{
@@ -69,7 +69,7 @@ proc_fork_leave(WIN_THREAD_STRUCT *Thread)
 		CloseHandle(Thread->Token);
 	}
 	if (!(Thread->Flags & WIN_PS_PPWAIT)){
-		PostThreadMessage(Thread->ThreadId, WM_USER, CTRL_DETACH_EVENT, Thread->Result);
+		PostThreadMessage(Thread->ThreadId, WM_SIGNAL, CTRL_DETACH_EVENT, Thread->Result);
 	}
 	LocalFree(Thread);
 }

@@ -150,7 +150,7 @@ posix_PROCESS_DETACH(WIN_TASK *Task)
 	if (Task->Flags & WIN_PS_EXITING){		/* ktrace.exe */
 		Task->Flags |= WIN_PS_ZOMBIE;
 		Task->State = WIN_SZOMB;
-		if (!vfs_kill_PID(pid_win(Task->ParentId), WM_USER, CTRL_CHILD_EVENT, Task->TaskId)){
+		if (!vfs_kill_PID(pid_win(Task->ParentId), WM_SIGNAL, CTRL_CHILD_EVENT, Task->TaskId)){
 			proc_orphanize(Task);
 		}
 		vfs_closefrom(Task->Node);
@@ -161,12 +161,12 @@ BOOL
 posix_THREAD_DETACH(WIN_TASK *Task)
 {
 	if (Task->Flags & WIN_PS_PPWAIT){
-		win_kill(pid_win(Task->ParentId), WM_USER, CTRL_DETACH_EVENT, Task->TaskId);
+		win_kill(pid_win(Task->ParentId), WM_SIGNAL, CTRL_DETACH_EVENT, Task->TaskId);
 	}
 	if (Task->Flags & WIN_PS_EXITING){
 		Task->Flags |= WIN_PS_ZOMBIE;
 		Task->State = WIN_SZOMB;
-		if (!vfs_kill_PID(pid_win(Task->ParentId), WM_USER, CTRL_CHILD_EVENT, Task->TaskId)){
+		if (!vfs_kill_PID(pid_win(Task->ParentId), WM_SIGNAL, CTRL_CHILD_EVENT, Task->TaskId)){
 			proc_orphanize(Task);
 		}
 		__closefrom(Task->Node, 0);

@@ -47,7 +47,7 @@ TTYGetString(HANDLE Handle, LPSTR Buffer)
 	return(bResult);
 }
 BOOL 
-TTYPutString(HANDLE Handle, LPCSTR Buffer, DWORD Size, OVERLAPPED *Overlap)
+TTYPutString(DWORD Owner, HANDLE Handle, LPCSTR Buffer, DWORD Size, OVERLAPPED *Ovl)
 {
 	BOOL bResult = TRUE;
 	LONG lSize = Size;
@@ -59,10 +59,11 @@ TTYPutString(HANDLE Handle, LPCSTR Buffer, DWORD Size, OVERLAPPED *Overlap)
 		}else{
 			dwCount = WIN_MAX_INPUT;
 		}
-		if (!WriteFile(Handle, Buffer, dwCount, &dwCount, Overlap)){
+		if (!WriteFile(Handle, Buffer, dwCount, &dwCount, Ovl)){
 			bResult = FALSE;
 			break;
 		}else{
+			win_kill(Owner, WM_APP, 0, 0);
 			lSize -= dwCount;
 			Buffer += dwCount;
 		}
@@ -70,31 +71,37 @@ TTYPutString(HANDLE Handle, LPCSTR Buffer, DWORD Size, OVERLAPPED *Overlap)
 	return(bResult);
 }
 BOOL 
-TTYLineFeed(HANDLE Handle, UINT Flags, OVERLAPPED *Overlap)
+TTYLineFeed(DWORD Owner, HANDLE Handle, WIN_TERMIO *Attribs, OVERLAPPED *Ovl)
 {
+	UINT oFlags = Attribs->OFlags;
+	UINT lFlags = Attribs->LFlags;
 	UINT uiFlags = WIN_OPOST | WIN_ONLCR;
 	DWORD dwCount;
 	BOOL bResult;
 
-	if ((Flags & uiFlags) == uiFlags){		/* ssh.exe */
-		bResult = WriteFile(Handle, "\r\n", 2, &dwCount, Overlap);
+	if ((oFlags & uiFlags) == uiFlags){		/* ssh.exe */
+		bResult = WriteFile(Handle, "\r\n", 2, &dwCount, Ovl);
 	}else{
-		bResult = WriteFile(Handle, "\n", 1, &dwCount, Overlap);
+		bResult = WriteFile(Handle, "\n", 1, &dwCount, Ovl);
 	}
+	win_kill(Owner, WM_APP, 0, 0);
 	return(bResult);
 }
 BOOL 
-TTYCarriageReturn(HANDLE Handle, UINT Flags, OVERLAPPED *Overlap)
+TTYCarriageReturn(DWORD Owner, HANDLE Handle, WIN_TERMIO *Attribs, OVERLAPPED *Ovl)
 {
+	UINT oFlags = Attribs->OFlags;
+	UINT lFlags = Attribs->LFlags;
 	UINT uiFlags = WIN_OPOST | WIN_OCRNL;
 	BOOL bResult;
 	DWORD dwCount;
 
-	if ((Flags & uiFlags) == uiFlags){
-		bResult = WriteFile(Handle, "\n", 1, &dwCount, Overlap);
+	if ((oFlags & uiFlags) == uiFlags){
+		bResult = WriteFile(Handle, "\n", 1, &dwCount, Ovl);
 	}else{
-		bResult = WriteFile(Handle, "\r", 1, &dwCount, Overlap);
+		bResult = WriteFile(Handle, "\r", 1, &dwCount, Ovl);
 	}
+	win_kill(Owner, WM_APP, 0, 0);
 	return(bResult);
 }
 
@@ -108,6 +115,7 @@ tty_read(WIN_TASK *Task, WIN_TTY *Terminal, LPSTR Buffer, DWORD Size, DWORD *Res
 	DWORD dwResult = 0;
 	LONG lSize = Size;
 	HANDLE hInput = Terminal->Input;
+	WIN_TERMIO *pwAttribs = &Terminal->Attribs;
 
 	while (!bResult){
 		if (lSize < 1){
@@ -138,21 +146,20 @@ tty_write(WIN_TTY *Terminal, LPCSTR Buffer, DWORD Size, DWORD *Result)
 	LONG lSize = Size;
 	DWORD dwResult = 0;
 	WIN_TERMIO *pwAttribs = &Terminal->Attribs;
-	UINT uiOutFlags = pwAttribs->OFlags;
-	UINT uiInFlags = pwAttribs->IFlags;
+	DWORD dwOwner = Terminal->ThreadId;
 	CHAR C;
 
 	while (lSize > 0){
 		C = Buffer[dwCount];
 		if (C < 16){
-			TTYPutString(hOutput, Buffer, dwCount, &ovl);
+			TTYPutString(dwOwner, hOutput, Buffer, dwCount, &ovl);
 			Buffer += dwCount;
 			dwCount = 0;
 			if (C == CC_LF){
-				TTYLineFeed(hOutput, uiOutFlags, &ovl);
+				TTYLineFeed(dwOwner, hOutput, pwAttribs, &ovl);
 				Buffer++;
 			}else if (C == CC_CR){
-				TTYCarriageReturn(hOutput, uiOutFlags, &ovl);
+				TTYCarriageReturn(dwOwner, hOutput, pwAttribs, &ovl);
 				Buffer++;
 			}else{
 				dwCount++;
@@ -163,7 +170,7 @@ tty_write(WIN_TTY *Terminal, LPCSTR Buffer, DWORD Size, DWORD *Result)
 		dwResult++;
 		lSize--;
 	}
-	if (!TTYPutString(hOutput, Buffer, dwCount, &ovl)){
+	if (!TTYPutString(dwOwner, hOutput, Buffer, dwCount, &ovl)){
 		bResult = FALSE;
 	}
 	*Result = dwResult;

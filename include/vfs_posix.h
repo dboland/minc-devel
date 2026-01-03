@@ -160,7 +160,7 @@ BOOL vfs_namei(HANDLE Handle, DWORD Index, WIN_VNODE *Result);
 
 /* vfs_uio.c */
 
-BOOL vfs_writev(WIN_VNODE *Node, const WIN_IOVEC Data[], LONG Count, ULONG *Result);
+BOOL vfs_writev(WIN_VNODE *Node, const WIN_IOVEC Data[], DWORD Count, DWORD *Result);
 BOOL vfs_readv(WIN_TASK *Task, WIN_VNODE *Node, const WIN_IOVEC Data[], LONG Count, ULONG *Result);
 
 /* vfs_resource.c */

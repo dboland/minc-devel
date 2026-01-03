@@ -75,7 +75,7 @@ kticks_posix(FILETIME *Time)
 struct kinfo_proc *
 kproc_posix(struct kinfo_proc *proc, WIN_TASK *Task)
 {
-	WIN_TTY *pTerminal = &__Terminals[Task->CTTY];
+	WIN_TTY *pTerminal = TERMINAL(Task->TerminalId);
 	wchar_t *command = win_basename(__Strings[Task->TaskId].Command);
 	DWORD dwPageSize = __Globals->PageSize;
 	WIN_KUSAGE wkUsage;

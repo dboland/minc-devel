@@ -73,7 +73,7 @@ DWORD __SIG_WIN[NSIG] = {
 	CTRL_CHILD_EVENT,		/* 20 */
 	CTRL_BACKGROUND_READ_EVENT,
 	CTRL_BACKGROUND_WRITE_EVENT,
-	CTRL_IO_EVENT,
+	CTRL_INPUT_EVENT,
 	CTRL_EXCEDED_CPUTIME_EVENT,
 	CTRL_EXCEDED_FILE_SIZE_EVENT,
 	CTRL_VTIMER_EVENT,
@@ -221,7 +221,7 @@ kill_GRP(WIN_TASK *Task, DWORD GroupId, int sig)
 {
 	int result = 0;
 
-	if (!vfs_kill_GRP(GroupId, WM_USER, __SIG_WIN[sig], Task->TaskId)){
+	if (!vfs_kill_GRP(GroupId, WM_SIGNAL, __SIG_WIN[sig], Task->TaskId)){
 		result -= errno_posix(GetLastError());
 	}
 	return(result);
@@ -231,7 +231,7 @@ kill_SYS(WIN_TASK *Task, int sig)
 {
 	int result = 0;
 
-	if (!vfs_kill_SYS(Task->TaskId, WM_USER, __SIG_WIN[sig], Task->TaskId)){
+	if (!vfs_kill_SYS(Task->TaskId, WM_SIGNAL, __SIG_WIN[sig], Task->TaskId)){
 		result -= errno_posix(GetLastError());
 	}
 	return(result);
@@ -347,7 +347,7 @@ sys_kill(call_t call, pid_t pid, int sig)
 		result = kill_GRP(pwTask, pwTask->GroupId, sig);
 	}else if (pid >= CHILD_MAX){
 		result = -EINVAL;
-	}else if (!vfs_kill_PID(pid_win(pid), WM_USER, __SIG_WIN[sig], pwTask->TaskId)){
+	}else if (!vfs_kill_PID(pid_win(pid), WM_SIGNAL, __SIG_WIN[sig], pwTask->TaskId)){
 		result -= errno_posix(GetLastError());
 	}
 	return(result);

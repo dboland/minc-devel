@@ -30,6 +30,14 @@
 
 #include <winbase.h>
 
+#define TTYDEFCHARS	CEOF, CEOL, CEOL, CERASE, CWERASE, CKILL, CREPRINT, \
+        _POSIX_VDISABLE, CINTR, CQUIT,  CSUSP,  CDSUSP, CSTART, CSTOP,  CLNEXT, \
+        CDISCARD, CMIN, CTIME,  CSTATUS, _POSIX_VDISABLE
+
+WIN_TERMIO __TTYDefaults = {TTYDEF_IFLAG, TTYDEF_OFLAG, TTYDEF_CFLAG, 
+	TTYDEF_LFLAG, {TTYDEFCHARS}, TTYDEF_SPEED, TTYDEF_SPEED
+};
+
 /****************************************************/
 
 BOOL 
@@ -54,7 +62,8 @@ tty_attach(WIN_DEVICE *Device)
 			pwTerminal->Index = dwIndex;
 			pwTerminal->DeviceType = Device->DeviceType;
 			pwTerminal->DeviceId = Device->DeviceId;
-			pwTerminal->Attribs = __Globals->TTYDefaults;
+			pwTerminal->Attribs = __TTYDefaults;
+			pwTerminal->ThreadId = GetCurrentThreadId();
 			_itoa(dwIndex, win_stpcpy(pwTerminal->Name, "tty"), 10);
 			Device->Index = dwIndex;
 			return(pwTerminal);

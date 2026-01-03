@@ -46,7 +46,7 @@ vfs_reboot(WIN_TASK *Task, USHORT Type, USHORT DeviceId)
 			bResult = TRUE;
 			break;
 		case WIN_RB_AUTOBOOT:
-			bResult = vfs_kill_PID(dwThreadId, WM_USER, CTRL_LOGOFF_EVENT, 0);
+			bResult = vfs_kill_PID(dwThreadId, WM_SIGNAL, CTRL_LOGOFF_EVENT, 0);
 			break;
 		default:
 			SetLastError(ERROR_NOT_SUPPORTED);

@@ -45,8 +45,8 @@ ws2_fstat(WIN_VNODE *Node, WIN_VATTR *Result)
 	Result->NumberOfLinks = 1;
 	Result->DeviceId = Node->DeviceId;
 	Result->Mode.User = Node->Access;
-	Result->Mode.Group = WIN_S_IREAD;
-	Result->Mode.Other = WIN_S_IREAD;
+	Result->Mode.Group = Node->Access;
+	Result->Mode.Other = Node->Access;
 	Result->Mode.FileType = Node->FileType;
 	return(TRUE);
 }

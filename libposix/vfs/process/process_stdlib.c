@@ -109,7 +109,7 @@ proc_init(WIN_SIGPROC SignalProc)
 	if (proc_setugid(__Process)){
 		__Process->IsSetUGid = 1;
 	}
-	__CTTY = &__Terminals[__Process->CTTY];
+	__CTTY = TERMINAL(__Process->TerminalId);
 	return(__Process);
 }
 DECLSPEC_NORETURN VOID 

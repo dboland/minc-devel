@@ -35,25 +35,27 @@
 BOOL 
 char_namei(HANDLE Handle, DWORD Index, WIN_VNODE *Result)
 {
-	ACCESS_MASK aMask;
+	ACCESS_MASK aMask = GENERIC_READ;
 
 	Result->Handle = Handle;
 	Result->Event = Handle;
 	Result->FSType = FS_TYPE_CHAR;
 	Result->FileType = WIN_VCHR;
-	if (vfs_F_GETFL(Handle, &aMask)){	/* NUL */
+//	if (vfs_F_GETFL(Handle, &aMask)){	/* NUL */
+	if ((DWORD)Handle > 1024){	/* NUL */
 		Result->DeviceType = DEV_TYPE_NULL;
 		Result->DeviceId = DEV_TYPE_NULL;
 	}else if (!Index){
 		Result->DeviceType = DEV_TYPE_INPUT;
 		Result->DeviceId = DEV_TYPE_INPUT;
-		aMask = GENERIC_READ;
 	}else{
 		Result->DeviceType = DEV_TYPE_SCREEN;
 		Result->DeviceId = DEV_TYPE_SCREEN;
 		aMask = GENERIC_WRITE;
 	}
-	Result->Access = aMask;
+	if (!vfs_F_GETFL(Handle, &Result->Access)){
+		Result->Access = aMask;
+	}
 	Result->Flags = win_F_GETFD(Handle);
 	return(TRUE);
 }

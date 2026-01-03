@@ -3,7 +3,7 @@ ROOTDIR= ../..
 include ${ROOTDIR}/Makefile.inc
 
 PROGS= mknod wtrace
-OBJECTS= ${PROGS} wrc mkent mount_refs
+OBJECTS= ${PROGS} wrc mkent mount_refs mount_cdfs
 TRACEDIR= ${ROOTDIR}/libtrace
 SBINSRC= ${SRCDIR}/sbin
 SBINDEST= ${DESTDIR}/sbin
@@ -18,10 +18,10 @@ ${SBINSRC}:
 	@exit 1
 
 %.o: %.c
-	${XGCC} -c ${CFLAGS} -I${ROOTDIR}/include -o $@ $<
+	${XGCC} -c ${CFLAGS} -DNOPIE -I${ROOTDIR}/include -o $@ $<
 
 %.exe: %.o
-	${XGCC} -s ${CFLAGS} -o $@ $<
+	${XGCC} -s -static ${CFLAGS} -o $@ $<
 
 ${SBINSRC}/.patch:
 	TMPDIR=${TMPDIR} /bin/patch -p 2 -d ${SBINSRC} <../sbin.patch
@@ -52,6 +52,9 @@ wtrace: libwtrace.o wtrace.o
 
 mount_refs: ${SBINSRC}/mount_ntfs/mount_ntfs.c ${SBINSRC}/mount/getmntopts.c
 	${XGCC} -s ${CFLAGS} -I${SBINSRC}/mount -o $@ $^
+
+mount_cdfs: mount_refs
+	/bin/cp $< $@
 
 install-local:
 	@/bin/mkdir -p ${BINDIR}

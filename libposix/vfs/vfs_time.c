@@ -42,7 +42,7 @@ TimeProc(PVOID Param, DWORD LowValue, DWORD HighValue)
 	 * created by CreateWaitableTimer() in one of the 
 	 * WaitFor*Ex() functions.
 	 */
-	if (!PostThreadMessage(pwTask->ThreadId, WM_TIMER, LowValue, HighValue)){
+	if (!PostThreadMessage(pwTask->ThreadId, WM_SIGNAL, CTRL_TIMER_EVENT, 0)){
 		WIN_ERR("PostThreadMessage(%d): %s\n", pwTask->ThreadId, win_strerror(GetLastError()));
 	}
 	if (win_clock_gettime_MONOTONIC(&pwTask->ClockTime)){

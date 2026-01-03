@@ -151,6 +151,7 @@ vfs_namei(HANDLE Handle, DWORD Index, WIN_VNODE *Result)
 {
 	BOOL bResult = FALSE;
 	DWORD dwType = GetFileType(Handle);
+	CHAR szBuffer[MAX_NAME];
 
 	switch (dwType){
 		case FS_TYPE_DISK:

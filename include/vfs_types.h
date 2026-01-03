@@ -409,8 +409,7 @@ typedef struct _WIN_VATTR {
 
 #define WM_STRING		0xC000			/* RegisterWindowMessage() */
 #define WM_XPCONSOLE		(WM_STRING + 154)	/* 0xC09A */
-#define WM_QUIT			18
-#define WIN_NSIG		33
+#define WM_SIGNAL		(WM_USER + 0x100)
 
 #define CTRL_C_EVENT			0	/* SIGINT (Console) */
 #define CTRL_BREAK_EVENT		1	/* SIGABRT (Console) */
@@ -439,11 +438,13 @@ typedef struct _WIN_VATTR {
 #define CTRL_CONTINUE_EVENT		24	/* SIGCONT */
 #define CTRL_BACKGROUND_READ_EVENT	25	/* SIGTTIN */
 #define CTRL_BACKGROUND_WRITE_EVENT	26	/* SIGTTOU */
-#define CTRL_IO_EVENT			27	/* SIGIO */
+#define CTRL_INPUT_EVENT		27	/* SIGIO */
 #define CTRL_TRAP_EVENT			28	/* SIGTRAP */
 #define CTRL_EXCEDED_CPUTIME_EVENT	29	/* SIGXCPU */
 #define CTRL_EXCEDED_FILE_SIZE_EVENT	30	/* SIGXFSZ */
 #define CTRL_PROFILING_EVENT		31	/* SIGPROF */
+
+#define WIN_NSIG		33
 
 typedef struct _WIN_SIGACTION {
 	PVOID Function;
@@ -515,7 +516,7 @@ typedef struct _WIN_TASK {
 	DWORD ParentId;
 	DWORD GroupId;
 	DWORD SessionId;
-	DWORD CTTY;
+	DWORD TerminalId;		/* controlling TTY */
 	DWORD MountId;			/* where CWD is mounted */
 	DWORD Processor;
 	DWORD Nice;
@@ -590,6 +591,18 @@ typedef struct _WIN_PTMGET {
  * vfs_termio.c
  */
 
+#define WIN_NCCS		20
+
+typedef struct _WIN_TERMIO {
+	UINT IFlags;
+	UINT OFlags;
+	UINT CFlags;
+	UINT LFlags;
+	UCHAR Control[WIN_NCCS];
+	UINT ISpeed;
+	UINT OSpeed;
+} WIN_TERMIO;
+
 #define WIN_TTY_MAX		WIN_UNIT_MAX
 
 typedef struct _WIN_WINSIZE {
@@ -609,10 +622,12 @@ typedef struct _WIN_TTY {
 	DWORD DeviceId;
 	DWORD GroupId;
 	DWORD SessionId;
-	WIN_WINSIZE WinSize;
-	WIN_TERMIO Attribs;
+	DWORD ThreadId;
+//	HWND Window;
 	BOOL VEdit;
 	COORD Cursor;
+	WIN_WINSIZE WinSize;
+	WIN_TERMIO Attribs;
 	CONSOLE_SCREEN_BUFFER_INFO Info;
 	DWORD Flags;
 	CHAR Name[MAX_NAME];
@@ -645,26 +660,70 @@ typedef struct _WIN_TTY {
 
 /* sys/termios.h */
 
-#define WIN_ECHO		0x00000008
-#define WIN_ISIG		0x00000080
-#define WIN_ICANON		0x00000100
+#define WIN_ECHO	0x00000008
+#define WIN_ISIG	0x00000080
+#define WIN_ICANON	0x00000100
 
 /* line In */
 
-#define WIN_IGNBRK		0x00000001      /* ignore BREAK condition */
-#define WIN_BRKINT		0x00000002      /* map BREAK to SIGINT */
-#define WIN_IXON		0x00000200	/* enable output flow control */
-#define WIN_IXOFF		0x00000400	/* enable input flow control */
-#define WIN_INLCR		0x00000040	/* Ye Olde TTY had separate key for CR */
-#define WIN_ICRNL		0x00000100	/* map CR to NL (ala CRMOD) */
-#define WIN_IEXTEN		0x00000400      /* enable DISCARD and LNEXT */
+#define WIN_IGNBRK	0x00000001      /* ignore BREAK condition */
+#define WIN_BRKINT	0x00000002      /* map BREAK to SIGINT */
+#define WIN_IXON	0x00000200	/* enable output flow control */
+#define WIN_IXOFF	0x00000400	/* enable input flow control */
+#define WIN_INLCR	0x00000040	/* Ye Olde TTY had separate key for CR */
+#define WIN_ICRNL	0x00000100	/* map CR to NL (ala CRMOD) */
+#define WIN_IEXTEN	0x00000400      /* enable DISCARD and LNEXT */
 
 /* line Out */
 
-#define WIN_OPOST		0x00000001	/* enable following output processing */
-#define WIN_ONLCR		0x00000002	/* map NL to CR-NL (ala CRMOD) */
-#define WIN_OXTABS		0x00000004	/* expand tabs to spaces */
-#define WIN_OCRNL		0x00000010	/* map CR to NL */
+#define WIN_OPOST	0x00000001	/* enable following output processing */
+#define WIN_ONLCR	0x00000002	/* map NL to CR-NL (ala CRMOD) */
+#define WIN_OXTABS	0x00000004	/* expand tabs to spaces */
+#define WIN_OCRNL	0x00000010	/* map CR to NL */
+
+/* Control */
+
+#define WIN_CS8		0x00000300      /* 8 bits */
+#define WIN_CREAD	0x00000800      /* enable receiver */
+#define WIN_HUPCL	0x00004000      /* hang up on last close */
+
+#define _POSIX_VDISABLE	(0377)
+
+/* standard speeds */
+
+#define WIN_B9600	9600
+
+/* sys/ttydefualts.h */
+
+#define TTYDEF_IFLAG	(WIN_BRKINT | WIN_ICRNL | WIN_IXON)
+#define TTYDEF_OFLAG	(WIN_OPOST | WIN_ONLCR | WIN_OXTABS)
+#define TTYDEF_LFLAG	(WIN_ECHO | WIN_ICANON | WIN_ISIG | WIN_IEXTEN)
+#define TTYDEF_CFLAG	(WIN_CREAD | WIN_CS8 | WIN_HUPCL)
+#define TTYDEF_SPEED	(WIN_B9600)
+
+#define CTRL(x) (x&037)
+#define CEOF            CTRL('d')
+#define CEOL            ((unsigned char)'\377') /* XXX avoid _POSIX_VDISABLE */
+#define CERASE          010
+#define CINTR           CTRL('c')
+#define CSTATUS         ((unsigned char)'\377') /* XXX avoid _POSIX_VDISABLE */
+#define CKILL           CTRL('u')
+#define CMIN            1
+#define CQUIT           034             /* FS, ^\ */
+#define CSUSP           CTRL('z')
+#define CTIME           0
+#define CDSUSP          CTRL('y')
+#define CSTART          CTRL('q')
+#define CSTOP           CTRL('s')
+#define CLNEXT          CTRL('v')
+#define CDISCARD        CTRL('o')
+#define CWERASE         CTRL('w')
+#define CREPRINT        CTRL('r')
+#define CEOT            CEOF
+/* compat */
+#define CBRK            CEOL
+#define CRPRNT          CREPRINT
+#define CFLUSH          CDISCARD
 
 /* sys/ttycom.h */
 

@@ -155,7 +155,7 @@ InputBufferSize(WINDOW_BUFFER_SIZE_RECORD *Event)
 {
 	BOOL bResult = TRUE;
 
-	if (vfs_raise(WM_USER, CTRL_SIZE_EVENT, 0)){
+	if (vfs_raise(WM_SIGNAL, CTRL_SIZE_EVENT, 0)){
 		bResult = FALSE;
 	}else{
 		SetEvent(__Interrupt);
