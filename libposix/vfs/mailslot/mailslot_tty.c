@@ -63,7 +63,9 @@ TTYPutString(DWORD Owner, HANDLE Handle, LPCSTR Buffer, DWORD Size, OVERLAPPED *
 			bResult = FALSE;
 			break;
 		}else{
-			win_kill(Owner, WM_APP, 0, 0);
+			if (Owner){
+				win_kill(Owner, WM_INPUT, 0, 0);
+			}
 			lSize -= dwCount;
 			Buffer += dwCount;
 		}
@@ -84,7 +86,9 @@ TTYLineFeed(DWORD Owner, HANDLE Handle, WIN_TERMIO *Attribs, OVERLAPPED *Ovl)
 	}else{
 		bResult = WriteFile(Handle, "\n", 1, &dwCount, Ovl);
 	}
-	win_kill(Owner, WM_APP, 0, 0);
+	if (Owner){
+		win_kill(Owner, WM_INPUT, 0, 0);
+	}
 	return(bResult);
 }
 BOOL 
@@ -101,7 +105,9 @@ TTYCarriageReturn(DWORD Owner, HANDLE Handle, WIN_TERMIO *Attribs, OVERLAPPED *O
 	}else{
 		bResult = WriteFile(Handle, "\r", 1, &dwCount, Ovl);
 	}
-	win_kill(Owner, WM_APP, 0, 0);
+	if (Owner){
+		win_kill(Owner, WM_INPUT, 0, 0);
+	}
 	return(bResult);
 }
 
@@ -147,6 +153,7 @@ tty_write(WIN_TTY *Terminal, LPCSTR Buffer, DWORD Size, DWORD *Result)
 	DWORD dwResult = 0;
 	WIN_TERMIO *pwAttribs = &Terminal->Attribs;
 	DWORD dwOwner = Terminal->ThreadId;
+	CHAR szBuffer[WIN_MAX_INPUT];
 	CHAR C;
 
 	while (lSize > 0){

@@ -410,6 +410,7 @@ typedef struct _WIN_VATTR {
 #define WM_STRING		0xC000			/* RegisterWindowMessage() */
 #define WM_XPCONSOLE		(WM_STRING + 154)	/* 0xC09A */
 #define WM_SIGNAL		(WM_USER + 0x100)
+#define WM_APP			32768			/* 0x8000 */
 
 #define CTRL_C_EVENT			0	/* SIGINT (Console) */
 #define CTRL_BREAK_EVENT		1	/* SIGABRT (Console) */
@@ -623,7 +624,7 @@ typedef struct _WIN_TTY {
 	DWORD GroupId;
 	DWORD SessionId;
 	DWORD ThreadId;
-//	HWND Window;
+	DWORD Mode[2];
 	BOOL VEdit;
 	COORD Cursor;
 	WIN_WINSIZE WinSize;

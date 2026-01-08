@@ -32,6 +32,16 @@
 
 /************************************************************/
 
+VOID 
+TimeInit(LARGE_INTEGER *Frequency)
+{
+	if (!QueryPerformanceFrequency(Frequency)){
+		WIN_ERR("QueryPerformanceFrequency(): %s\n", win_strerror(GetLastError()));
+	}
+}
+
+/************************************************************/
+
 BOOL 
 win_clock_gettime_MONOTONIC(DWORDLONG *Result)
 {

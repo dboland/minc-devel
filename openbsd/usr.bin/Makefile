@@ -2,7 +2,7 @@ ROOTDIR= ../..
 
 include ${ROOTDIR}/Makefile.inc
 
-PROGS= gzip id find arch uname touch find
+PROGS= gzip id arch uname touch find
 OBJECTS= ${PROGS} id du sed cap_mkdb sort xargs tsort mktemp join printf
 UBINSRC= ${SRCDIR}/usr.bin
 UBINDIR= /usr/bin

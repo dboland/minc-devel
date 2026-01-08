@@ -40,6 +40,22 @@
 
 /************************************************************/
 
+VOID 
+CapInit(LUID *AuthenticationId)
+{
+	TOKEN_STATISTICS tStats = {0};
+	HANDLE hToken;
+	DWORD dwSize = 0;
+
+	if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)){
+		WIN_ERR("OpenProcessToken(TOKEN_QUERY): %s\n", win_strerror(GetLastError()));
+	}else if (!GetTokenInformation(hToken, TokenStatistics, &tStats, sizeof(TOKEN_STATISTICS), &dwSize)){
+		WIN_ERR("GetTokenInformation(TokenStatistics): %s\n", win_strerror(GetLastError()));
+	}else{
+		*AuthenticationId = tStats.AuthenticationId;
+		CloseHandle(hToken);
+	}
+}
 BOOL 
 CapCreateToken(WIN_CAP_CONTROL *Control, HANDLE *Result)
 {

@@ -415,7 +415,9 @@ sys_getlogin(call_t call, char *name, size_t namelen)
 	int result = 0;
 	SID8 sid;
 
-	if (!vfs_getlogin(call.Task, name, namelen)){
+	if (!name){
+		result = -EFAULT;
+	}else if (!vfs_getlogin(call.Task, name, namelen)){
 		result -= errno_posix(GetLastError());
 	}
 	return(result);
@@ -609,7 +611,7 @@ __exit(WIN_TASK *Task, int status)
 	Task->Status |= (status * 0x100);
 	Task->Flags |= WIN_PS_EXITING;
 	if (Task->Flags & WIN_PS_CONTROLT){
-		term_revoke(__CTTY);
+		term_revoke(TERMINAL(Task->TerminalId));
 	}
 	proc_exit(status);
 }

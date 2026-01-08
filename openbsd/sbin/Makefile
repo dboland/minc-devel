@@ -3,12 +3,12 @@ ROOTDIR= ../..
 include ${ROOTDIR}/Makefile.inc
 
 PROGS= mknod wtrace
-OBJECTS= ${PROGS} wrc mkent mount_refs mount_cdfs
+OBJECTS= ${PROGS} wrc mkent mount_refs mount_cdfs console
 TRACEDIR= ${ROOTDIR}/libtrace
 SBINSRC= ${SRCDIR}/sbin
 SBINDEST= ${DESTDIR}/sbin
 
-all: ${SBINSRC} ${SBINSRC}/.patch ${OBJECTS} bsd.exe
+all: ${SBINSRC} ${SBINSRC}/.patch ${OBJECTS} bsd.exe boot.exe
 
 ${SBINSRC}:
 	@echo " ---------------------------------------------------"
@@ -33,18 +33,15 @@ version.o: bsd.rc
 	windres -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@
 
 wrc: wrc.exe
+console: console.exe
+boot: boot.exe
+bsd: bsd.exe
 
 mknod: ${SBINSRC}/mknod/mknod.c
 	${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $<
 
 mkent: mkent.o
 	${XGCC} -s ${CFLAGS} -o $@ $< ${MINGW}/lib/libiphlpapi.a
-
-bsd.o: bsd.c
-	${XGCC} -c ${CFLAGS} -DNOPIE -o $@ $<
-
-bsd.exe: bsd.o version.o
-	${XGCC} -s -static ${CFLAGS} -o $@ $^
 
 wtrace: libwtrace.o wtrace.o
 	${XGCC} -s ${CFLAGS} -o $@ -L${TRACEDIR} $^ -ltrace \
@@ -63,7 +60,7 @@ install-local:
 install: ${DESTDIR} ${OBJECTS}
 	@${MKDIR} -p ${SBINDEST}
 	${INSTALL} ${OBJECTS} ${SBINDEST}/
-	${INSTALL} -m 02555 -o 0 -g 0 bsd.exe ${SBINDEST}/
+	${INSTALL} -m 02555 -o 0 -g 0 bsd.exe boot.exe ${SBINDEST}/
 	${INSTALL} -m 00754 -o 0 -g 0 setup.sh ${SBINDEST}/
 
 release-clean:

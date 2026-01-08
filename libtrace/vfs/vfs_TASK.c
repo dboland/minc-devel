@@ -35,9 +35,11 @@ vfs_TASK(WIN_TASK *Task, LPSTR Buffer)
 {
 	LPSTR psz = Buffer;
 
-	psz += sprintf(psz, "(%d): Parent(%d) Depth(%d) Process(%d) Thread(%d) Handle(%d) Session(%d) Group(%d) CTTY(%d)\n", 
-		Task->TaskId, Task->ParentId, Task->Depth, Task->ProcessId, Task->ThreadId, Task->Handle, Task->SessionId, Task->GroupId, Task->CTTY);
+	psz += sprintf(psz, "(%d): Parent(%d) Depth(%d) Process(%d) Thread(%d) Handle(%d) Session(%d) Group(%d) TerminalId(%d)\n", 
+		Task->TaskId, Task->ParentId, Task->Depth, Task->ProcessId, Task->ThreadId, Task->Handle, Task->SessionId, Task->GroupId, Task->TerminalId);
 	psz = VfsTaskFlags(psz, "+ Flags", Task->Flags);
 	psz += sprintf(psz, "+ Command: %ls\n", __Strings[Task->TaskId].Command);
+	psz += sprintf(psz, "+ UserSid: %s\n", win_strsid(&Task->UserSid));
+	psz += sprintf(psz, "+ GroupSid: %s\n", win_strsid(&Task->GroupSid));
 	return(psz - Buffer);
 }

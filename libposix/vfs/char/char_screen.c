@@ -30,19 +30,19 @@
 
 #include <wincon.h>
 
+#define CON_MODE_SCREEN	ENABLE_PROCESSED_OUTPUT
+
 /****************************************************/
 
 DWORD 
-ScreenMode(WIN_TERMIO *Attribs)
+ScreenMode(DWORD Mode, WIN_TERMIO *Attribs)
 {
-//	DWORD dwResult = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
-	DWORD dwResult = __ConMode[1];
-	UINT uiFlags = WIN_OPOST | WIN_OXTABS;
+	DWORD dwResult = Mode & ~(CON_MODE_SCREEN);
 
-	if (__ConMode[1] & ENABLE_VIRTUAL_TERMINAL_PROCESSING){
+	if (Mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING){
 		dwResult |= XTermScreenMode(Attribs);
 	}
-	if ((Attribs->OFlags & uiFlags) == uiFlags){
+	if (Attribs->OFlags & WIN_OXTABS){
 		dwResult |= ENABLE_PROCESSED_OUTPUT;
 	}
 	return(dwResult);
@@ -262,7 +262,7 @@ screen_write(WIN_TTY *Terminal, LPCSTR Buffer, DWORD Size, DWORD *Result)
 {
 	BOOL bResult = FALSE;
 
-	if (__ConMode[1] & ENABLE_VIRTUAL_TERMINAL_PROCESSING){
+	if (Terminal->Mode[1] & ENABLE_VIRTUAL_TERMINAL_PROCESSING){
 		bResult = WriteConsole(Terminal->Output, Buffer, Size, Result, NULL);
 	}else{
 		bResult = ScreenWriteFile(Terminal, Buffer, Size, Result);

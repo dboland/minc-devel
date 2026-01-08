@@ -39,6 +39,7 @@ vfs_TTY(WIN_TTY *Terminal, LPSTR Buffer)
 		Terminal->Index, Terminal->Name, Terminal->DeviceId, Terminal->Flags, Terminal->GroupId, Terminal->SessionId, Terminal->WinSize.Row, Terminal->WinSize.Column);
 	/* sys/termio.c
 	 */
-//	psz = VfsTermFlags(psz, &Terminal->Mode, "+ mode");
+	psz = VfsInputMode(psz, "+ input", Terminal->Mode[0]);
+	psz = VfsScreenMode(psz, "+ screen", Terminal->Mode[1]);
 	return(psz - Buffer);
 }

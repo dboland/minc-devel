@@ -45,18 +45,19 @@
 #define CC_FS	0x1C	/* Ctrl+\ */
 #define CC_DEL	0x7F	/* Delete */
 
+#define CON_MODE_INPUT	ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_WINDOW_INPUT | \
+	ENABLE_PROCESSED_INPUT
+
 /****************************************************/
 
 DWORD 
-InputMode(WIN_TERMIO *Attribs)
+InputMode(DWORD Mode, WIN_TERMIO *Attribs)
 {
-//	DWORD dwResult = ENABLE_WINDOW_INPUT | ENABLE_INSERT_MODE | 
-//		ENABLE_QUICK_EDIT_MODE | ENABLE_EXTENDED_FLAGS | ENABLE_MOUSE_INPUT;
-	DWORD dwResult = __ConMode[0] | ENABLE_INSERT_MODE | \
-		ENABLE_WINDOW_INPUT;
+	DWORD dwResult = Mode & ~(CON_MODE_INPUT);
 
+	dwResult |= ENABLE_WINDOW_INPUT;
 	if (Attribs->LFlags & WIN_ECHO){
-		dwResult |= ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT;
+		dwResult |= ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT;	/* ftp.exe */
 	}else if (Attribs->LFlags & WIN_ICANON){
 		dwResult |= ENABLE_LINE_INPUT;
 	}
@@ -406,7 +407,7 @@ input_read(WIN_TASK *Task, WIN_TTY *Terminal, LPSTR Buffer, DWORD Size, DWORD *R
 {
 	BOOL bResult = FALSE;
 
-	if (__ConMode[0] & ENABLE_VIRTUAL_TERMINAL_INPUT){
+	if (Terminal->Mode[0] & ENABLE_VIRTUAL_TERMINAL_INPUT){
 		bResult = ReadConsole(Terminal->Input, Buffer, Size, Result, NULL);
 	}else{
 		bResult = InputReadFile(Task, Terminal, Buffer, Size, Result);
@@ -428,8 +429,8 @@ input_poll(HANDLE Handle, WIN_POLLFD *Info, DWORD *Result)
 		bResult = FALSE;
 	}else if (!dwCount){
 		sResult = 0;
-	}else if (__ConMode[0] & ENABLE_VIRTUAL_TERMINAL_INPUT){
-		bResult = XTermPollEvent(Handle, &iRecord, &sResult);
+//	}else if (__ConMode[0] & ENABLE_VIRTUAL_TERMINAL_INPUT){
+//		bResult = XTermPollEvent(Handle, &iRecord, &sResult);
 	}else{
 		bResult = InputPollEvent(Handle, &iRecord, &sResult);
 	}

@@ -60,6 +60,7 @@ con_TIOCSCTTY(WIN_DEVICE *Device, WIN_TASK *Task, WIN_TTY *Terminal)
 		FILE_SHARE_READ | FILE_SHARE_WRITE, 
 		OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0};
 	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, TRUE};
+	DWORD *dwMode = Terminal->Mode;
 
 	if (!Terminal){
 		return(FALSE);
@@ -76,6 +77,9 @@ con_TIOCSCTTY(WIN_DEVICE *Device, WIN_TASK *Task, WIN_TTY *Terminal)
 	Device->Event = Terminal->Input;
 	Task->Flags |= WIN_PS_CONTROLT;
 	Task->TerminalId = Terminal->Index;
+	GetConsoleMode(Terminal->Input, &dwMode[0]);
+	GetConsoleMode(Terminal->Output, &dwMode[1]);
+//	vfs_ktrace(L"con_TIOCSCTTY", STRUCT_TTY, Terminal);
 	return(TRUE);
 }
 BOOL 
@@ -93,9 +97,9 @@ con_TIOCSETA(WIN_TTY *Terminal, WIN_TERMIO *Attribs)
 {
 	BOOL bResult = FALSE;
 
-	if (!SetConsoleMode(Terminal->Input, InputMode(Attribs))){
+	if (!SetConsoleMode(Terminal->Input, InputMode(Terminal->Mode[0], Attribs))){
 		WIN_ERR("SetConsoleMode(%d): %s\n", Terminal->Input, win_strerror(GetLastError()));
-	}else if (!SetConsoleMode(Terminal->Output, ScreenMode(Attribs))){
+	}else if (!SetConsoleMode(Terminal->Output, ScreenMode(Terminal->Mode[1], Attribs))){
 		WIN_ERR("SetConsoleMode(%d): %s\n", Terminal->Output, win_strerror(GetLastError()));
 	}else{
 		bResult = TRUE;

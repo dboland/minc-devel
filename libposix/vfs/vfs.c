@@ -99,7 +99,6 @@ CHAR 		*__Escape;
 CHAR		*__Input = __INPUT_BUF;
 CONST WCHAR	*__Clipboard;		/* Clipboard buffer */
 WIN_TASK	*__Process;
-DWORD		*__ConMode;
 
 BOOL proc_poll(WIN_TASK *Task);
 BOOL vfs_F_GETFL(HANDLE Handle, ACCESS_MASK *Result);
@@ -108,9 +107,9 @@ BOOL vfs_F_GETFL(HANDLE Handle, ACCESS_MASK *Result);
 #include "vfs_signal.c"
 #include "vfs_statvfs.c"
 #include "vfs_libgen.c"
-#include "vfs_syscall.c"
 #include "vfs_device.c"
 #include "vfs_ktrace.c"
+#include "vfs_syscall.c"
 #include "registry/registry.c"
 #include "drive/drive.c"
 #include "char/char.c"
@@ -139,7 +138,6 @@ BOOL vfs_F_GETFL(HANDLE Handle, ACCESS_MASK *Result);
 #include "vfs_resource.c"
 #include "vfs_wait.c"
 #include "vfs_event.c"
-#include "vfs_systm.c"
 #include "vfs_reboot.c"
 
 /****************************************************/
@@ -155,7 +153,6 @@ vfs_PROCESS_ATTACH(HINSTANCE Instance, LPVOID Reserved)
 	__Mounts = __Session->Mounts;
 	__Strings = __Session->Strings;
 	__Globals = __Session->Globals;
-	__ConMode = __Globals->ConMode;
 	__SidMachine = &__Globals->SidMachine;
 	__SidNone = &__Globals->SidNone;
 	__Frequency = &__Globals->Frequency;

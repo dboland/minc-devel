@@ -79,10 +79,10 @@ char_TIOCSETA(WIN_VNODE *Node, WIN_TERMIO *Attribs)
 			bResult = con_TIOCSETA(TERMINAL(Node->Index), Attribs);
 			break;
 		case DEV_TYPE_INPUT:
-			bResult = SetConsoleMode(Node->Handle, InputMode(Attribs));
+			bResult = SetConsoleMode(Node->Handle, InputMode(0, Attribs));
 			break;
 		case DEV_TYPE_SCREEN:
-			bResult = SetConsoleMode(Node->Handle, ScreenMode(Attribs));
+			bResult = SetConsoleMode(Node->Handle, ScreenMode(0, Attribs));
 			break;
 		default:
 			SetLastError(ERROR_CTX_NOT_CONSOLE);

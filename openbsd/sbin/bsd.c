@@ -228,7 +228,6 @@ boot(void)
 {
 	char *args[] = {"/sbin/init", NULL};
 
-	consinit();
 	ifinit();
 	cpu_configure();
 	fs_unmount();		// fsck.exe operation?
@@ -243,7 +242,6 @@ single(void)
 	int level = 1;
 	char *args[] = {"/bin/ksh", "-l", NULL};
 
-	consinit();
 	ifinit();
 	cpu_configure();
 	fs_unmount();

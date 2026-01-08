@@ -170,8 +170,8 @@ vfs_getlogin(WIN_TASK *Task, LPSTR Name, DWORD Size)
 
 	/* In WinXP, this returns logged on user, not impersonated one.
 	 */
-	if (!LookupAccountSid(NULL, &Task->UserSid, Name, &Size, szBuf, &dwSize, &snType)){
-		WIN_ERR("LookupAccountSid(%s): %s\n", win_strsid(&Task->UserSid), win_strerror(GetLastError()));
+	if (!LookupAccountSid(NULL, &__Process->UserSid, Name, &Size, szBuf, &dwSize, &snType)){
+		WIN_ERR("LookupAccountSid(%s): %s\n", win_strsid(&__Process->UserSid), win_strerror(GetLastError()));
 	}else{
 		bResult = TRUE;
 	}

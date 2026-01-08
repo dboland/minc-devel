@@ -188,10 +188,6 @@ BOOL vfs_poll(WIN_TASK *Task, WIN_VNODE *Nodes[], WIN_POLLFD *Info[], DWORD *Tim
 
 BOOL vfs_wait4(WIN_TASK *Task, WIN_TASK *Children[], BOOL NoHang, DWORD Status, WIN_RUSAGE *Result);
 
-/* vfs_systm.c */
-
-VOID vfs_consinit(VOID);
-
 /****************************************************/
 
 /* process.c */

@@ -63,7 +63,9 @@ tty_attach(WIN_DEVICE *Device)
 			pwTerminal->DeviceType = Device->DeviceType;
 			pwTerminal->DeviceId = Device->DeviceId;
 			pwTerminal->Attribs = __TTYDefaults;
-			pwTerminal->ThreadId = GetCurrentThreadId();
+			if (GetActiveWindow()){
+				pwTerminal->ThreadId = GetCurrentThreadId();
+			}
 			_itoa(dwIndex, win_stpcpy(pwTerminal->Name, "tty"), 10);
 			Device->Index = dwIndex;
 			return(pwTerminal);

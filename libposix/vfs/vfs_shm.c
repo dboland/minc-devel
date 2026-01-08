@@ -37,8 +37,11 @@ SHMCreate(LPCSTR Name, DWORD SizeLow)
 {
 	LPVOID lpvResult = NULL;
 	WIN_OBJECT_CONTROL wControl;
-	SECURITY_ATTRIBUTES sa = {sizeof(sa), &wControl.Security, FALSE};
+	SECURITY_ATTRIBUTES sa = {sizeof(sa), &wControl.Security, TRUE};
 
+	/* The initial Session handle needs to be inherited so the boot 
+	 * program can replace itself with a terminal program.
+	 */
 	if (!AclCreateControl(WIN_S_IRW, WIN_S_IREAD, &wControl)){
 		return(NULL);
 	}else if (!(__Shared = CreateFileMapping(INVALID_HANDLE_VALUE, &sa, PAGE_READWRITE, 0, SizeLow, Name))){

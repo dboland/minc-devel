@@ -62,7 +62,6 @@ extern WIN_TTY 		*__Terminals;
 extern WIN_PSTRING 	*__Strings;
 extern WIN_MOUNT	*__Mounts;
 extern WIN_GLOBALS	*__Globals;
-extern WIN_TTY	 	*__CTTY;
 extern SID8 		*__SidNone;
 extern SID8 		*__SidMachine;
 
@@ -161,7 +160,7 @@ BOOL
 posix_THREAD_DETACH(WIN_TASK *Task)
 {
 	if (Task->Flags & WIN_PS_PPWAIT){
-		win_kill(pid_win(Task->ParentId), WM_SIGNAL, CTRL_DETACH_EVENT, Task->TaskId);
+		win_kill(pid_win(Task->ParentId), WM_APP, Task->TaskId, 0);
 	}
 	if (Task->Flags & WIN_PS_EXITING){
 		Task->Flags |= WIN_PS_ZOMBIE;

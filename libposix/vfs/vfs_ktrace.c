@@ -83,9 +83,6 @@ vfs_ktrace(LPCWSTR Label, STRUCT_TYPE Type, PVOID Data)
 		case STRUCT_NAMEI:
 			vfs_NAMEI((WIN_NAMEIDATA *)Data, pszBuffer);
 			break;
-		case STRUCT_CONSOLE:
-			vfs_CONSOLE((DWORD *)Data, pszBuffer);
-			break;
 		case STRUCT_DEVICE:
 			vfs_DEVICE((WIN_DEVICE *)Data, pszBuffer);
 			break;
@@ -95,8 +92,11 @@ vfs_ktrace(LPCWSTR Label, STRUCT_TYPE Type, PVOID Data)
 		case STRUCT_TTY:
 			vfs_TTY((WIN_TTY *)Data, pszBuffer);
 			break;
+		case STRUCT_TASK:
+			vfs_TASK((WIN_TASK *)Data, pszBuffer);
+			break;
 		default:
-			strcpy(pszBuffer, "(%d): Not implemented.");
+			strcpy(pszBuffer, ": Not implemented.\n");
 	}
 	WIN_ERR("%ls%s", Label, pszBuffer);
 	LocalFree(pszBuffer);
