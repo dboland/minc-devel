@@ -95,8 +95,6 @@ char_revoke(WIN_VNODE *Node)
 
 	switch (Node->DeviceType){
 		case DEV_TYPE_CONSOLE:
-			bResult = TRUE;
-			break;
 		case DEV_TYPE_PTY:
 			bResult = con_revoke(TERMINAL(Node->Index), DEVICE(Node->DeviceId));
 			break;

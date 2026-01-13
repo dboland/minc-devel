@@ -132,12 +132,6 @@ char_TIOCSCTTY(WIN_DEVICE *Device, WIN_TASK *Task, WIN_TTY *Terminal)
 
 	switch (Device->DeviceType){
 		case DEV_TYPE_CONSOLE:
-			Terminal->SessionId = Task->SessionId;
-			Terminal->GroupId = Task->GroupId;
-			Task->Flags |= WIN_PS_CONTROLT;
-			Task->TerminalId = Terminal->Index;
-			bResult = TRUE;
-			break;
 		case DEV_TYPE_PTY:
 			bResult = con_TIOCSCTTY(Device, Task, Terminal);
 			break;

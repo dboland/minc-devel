@@ -26,4 +26,4 @@ FILETYPE 0x1
 		VALUE "Translation", 0x0413, 0x04E4
 	}
 }
-MAINICON ICON "minc-icon.ico"
+MAINICON ICON "minc.ico"

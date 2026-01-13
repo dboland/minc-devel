@@ -30,47 +30,24 @@
 
 #include <winbase.h>
 
-#define TTYDEFCHARS	CEOF, CEOL, CEOL, CERASE, CWERASE, CKILL, CREPRINT, \
-        _POSIX_VDISABLE, CINTR, CQUIT,  CSUSP,  CDSUSP, CSTART, CSTOP,  CLNEXT, \
-        CDISCARD, CMIN, CTIME,  CSTATUS, _POSIX_VDISABLE
-
-WIN_TERMIO __TTYDefaults = {TTYDEF_IFLAG, TTYDEF_OFLAG, TTYDEF_CFLAG, 
-	TTYDEF_LFLAG, {TTYDEFCHARS}, TTYDEF_SPEED, TTYDEF_SPEED
-};
-
 /****************************************************/
 
 BOOL 
-tty_open(WIN_TTY *Terminal, WIN_FLAGS *Flags, WIN_VNODE *Result)
+char_fstat(WIN_VNODE *Node, WIN_VATTR *Result)
 {
-	Result->DeviceType = Terminal->DeviceType;
-	Result->DeviceId = Terminal->DeviceId;
-	Result->Index = Terminal->Index;
-	Result->Event = Terminal->Event;
-	Result->FSType = Terminal->FSType;
-	return(TRUE);
-}
-WIN_TTY * 
-tty_attach(WIN_DEVICE *Device)
-{
-	DWORD dwIndex = 0;
-	WIN_TTY *pwTerminal = __Terminals;
+	FILETIME ftNow;
 
-	while (dwIndex < WIN_TTY_MAX){
-		if (!pwTerminal->Flags){
-			pwTerminal->Flags = TIOCFLAG_ACTIVE;
-			pwTerminal->Index = dwIndex;
-			pwTerminal->DeviceType = Device->DeviceType;
-			pwTerminal->DeviceId = Device->DeviceId;
-			pwTerminal->Attribs = __TTYDefaults;
-			pwTerminal->Window = GetActiveWindow();
-			_itoa(dwIndex, win_stpcpy(pwTerminal->Name, "tty"), 10);
-			Device->Index = dwIndex;
-			return(pwTerminal);
-		}
-		dwIndex++;
-		pwTerminal++;
-	}
-	SetLastError(ERROR_NOT_ENOUGH_MEMORY);
-	return(NULL);
+	Result->Attributes = Node->Attribs;
+	GetSystemTimeAsFileTime(&ftNow);
+	Result->CreationTime = ftNow;
+	Result->LastAccessTime = ftNow;
+	Result->LastWriteTime = ftNow;
+	Result->NumberOfLinks = 1;
+	Result->DeviceId = __Mounts->DeviceId;
+	Result->RawDeviceId = Node->DeviceId;
+	Result->Mode.User = Node->Access;
+	Result->Mode.Group = Node->Access;
+	Result->Mode.Other = Node->Access;
+	Result->Mode.FileType = Node->FileType;
+	return(TRUE);
 }

@@ -70,7 +70,7 @@ sock_poll(WIN_VNODE *Node, WIN_POLLFD *Info, DWORD *Result)
 	if (!PeekNamedPipe(Node->Handle, NULL, 0, NULL, &dwAvail, &dwRemain)){
 		sResult = SockPollError(Node, GetLastError());
 	}else if (dwAvail || dwRemain){
-		sResult = WIN_POLLIN;
+		sResult |= WIN_POLLIN;
 	}
 	if (Info->Result = sResult & sMask){
 		*Result += 1;

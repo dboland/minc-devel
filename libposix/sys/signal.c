@@ -43,7 +43,7 @@
 #define BIT_SIGINFO		0x10000000
 #define BIT_SIGTHR		0x80000000	/* null signal (child detaching) */
 
-#define SIGMASK_STOP	(BIT_SIGSTOP | BIT_SIGTSTP | BIT_SIGTTIN | BIT_SIGTTOU | BIT_SIGCONT)
+#define SIGMASK_STOP	(BIT_SIGSTOP | BIT_SIGTSTP | BIT_SIGCONT | BIT_SIGTTIN | BIT_SIGTTOU)
 #define SIGMASK_IGNORE	(BIT_SIGTHR | BIT_SIGWINCH | BIT_SIGCHLD | BIT_SIGURG | BIT_SIGINFO | BIT_SIGIO)
 
 typedef void (*action_t)(int, siginfo_t *, void *);
@@ -144,6 +144,18 @@ context_posix(ucontext_t *ucontext, CONTEXT *Context)
 	return(ucontext);
 }
 int 
+__sigsuspend(WIN_TASK *Task, const sigset_t *mask)
+{
+	int result = 0;
+
+	if (!mask){
+		result = -EFAULT;
+	}else if (!vfs_sigsuspend(Task, mask)){
+		result -= errno_posix(GetLastError());
+	}
+	return(result);
+}
+int 
 sigproc_default(WIN_TASK *Task, int signum)
 {
 	sigset_t sigbit = sigmask(signum);
@@ -154,8 +166,7 @@ sigproc_default(WIN_TASK *Task, int signum)
 	 */
 	if (sigbit & SIGMASK_STOP){
 		Task->Status = _WSTOPPED;
-//		SuspendThread(Task->Handle);
-		SetEvent(__Interrupt);
+		__sigsuspend(Task, &mask);
 	}else if (sigbit & ~SIGMASK_IGNORE){
 		Task->Status = signum;
 		__exit(Task, 127);
@@ -304,14 +315,7 @@ sys_sigprocmask(call_t call, int how, const sigset_t *restrict set, sigset_t *re
 int 
 sys_sigsuspend(call_t call, const sigset_t *mask)
 {
-	int result = 0;
-
-	if (!mask){
-		result = -EFAULT;
-	}else if (!vfs_sigsuspend(call.Task, mask)){
-		result -= errno_posix(GetLastError());
-	}
-	return(result);
+	return(__sigsuspend(call.Task, mask));
 }
 int 
 sys_sigpending(call_t call, sigset_t *set)

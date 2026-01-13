@@ -47,7 +47,7 @@ TTYGetString(HANDLE Handle, LPSTR Buffer)
 	return(bResult);
 }
 BOOL 
-TTYPutString(DWORD Owner, HANDLE Handle, LPCSTR Buffer, DWORD Size, OVERLAPPED *Ovl)
+TTYPutString(HWND Window, HANDLE Handle, LPCSTR Buffer, DWORD Size, OVERLAPPED *Ovl)
 {
 	BOOL bResult = TRUE;
 	LONG lSize = Size;
@@ -63,8 +63,8 @@ TTYPutString(DWORD Owner, HANDLE Handle, LPCSTR Buffer, DWORD Size, OVERLAPPED *
 			bResult = FALSE;
 			break;
 		}else{
-			if (Owner){
-				win_kill(Owner, WM_INPUT, 0, 0);
+			if (Window){
+				SendMessage(Window, WM_INPUT, 0, 0);
 			}
 			lSize -= dwCount;
 			Buffer += dwCount;
@@ -73,7 +73,7 @@ TTYPutString(DWORD Owner, HANDLE Handle, LPCSTR Buffer, DWORD Size, OVERLAPPED *
 	return(bResult);
 }
 BOOL 
-TTYLineFeed(DWORD Owner, HANDLE Handle, WIN_TERMIO *Attribs, OVERLAPPED *Ovl)
+TTYLineFeed(HWND Window, HANDLE Handle, WIN_TERMIO *Attribs, OVERLAPPED *Ovl)
 {
 	UINT oFlags = Attribs->OFlags;
 	UINT lFlags = Attribs->LFlags;
@@ -86,13 +86,13 @@ TTYLineFeed(DWORD Owner, HANDLE Handle, WIN_TERMIO *Attribs, OVERLAPPED *Ovl)
 	}else{
 		bResult = WriteFile(Handle, "\n", 1, &dwCount, Ovl);
 	}
-	if (Owner){
-		win_kill(Owner, WM_INPUT, 0, 0);
+	if (Window){
+		SendMessage(Window, WM_INPUT, 0, 0);
 	}
 	return(bResult);
 }
 BOOL 
-TTYCarriageReturn(DWORD Owner, HANDLE Handle, WIN_TERMIO *Attribs, OVERLAPPED *Ovl)
+TTYCarriageReturn(HWND Window, HANDLE Handle, WIN_TERMIO *Attribs, OVERLAPPED *Ovl)
 {
 	UINT oFlags = Attribs->OFlags;
 	UINT lFlags = Attribs->LFlags;
@@ -105,8 +105,8 @@ TTYCarriageReturn(DWORD Owner, HANDLE Handle, WIN_TERMIO *Attribs, OVERLAPPED *O
 	}else{
 		bResult = WriteFile(Handle, "\r", 1, &dwCount, Ovl);
 	}
-	if (Owner){
-		win_kill(Owner, WM_INPUT, 0, 0);
+	if (Window){
+		SendMessage(Window, WM_INPUT, 0, 0);
 	}
 	return(bResult);
 }
@@ -152,21 +152,21 @@ tty_write(WIN_TTY *Terminal, LPCSTR Buffer, DWORD Size, DWORD *Result)
 	LONG lSize = Size;
 	DWORD dwResult = 0;
 	WIN_TERMIO *pwAttribs = &Terminal->Attribs;
-	DWORD dwOwner = Terminal->ThreadId;
+	HWND hWindow = Terminal->Window;
 	CHAR szBuffer[WIN_MAX_INPUT];
 	CHAR C;
 
 	while (lSize > 0){
 		C = Buffer[dwCount];
 		if (C < 16){
-			TTYPutString(dwOwner, hOutput, Buffer, dwCount, &ovl);
+			TTYPutString(hWindow, hOutput, Buffer, dwCount, &ovl);
 			Buffer += dwCount;
 			dwCount = 0;
 			if (C == CC_LF){
-				TTYLineFeed(dwOwner, hOutput, pwAttribs, &ovl);
+				TTYLineFeed(hWindow, hOutput, pwAttribs, &ovl);
 				Buffer++;
 			}else if (C == CC_CR){
-				TTYCarriageReturn(dwOwner, hOutput, pwAttribs, &ovl);
+				TTYCarriageReturn(hWindow, hOutput, pwAttribs, &ovl);
 				Buffer++;
 			}else{
 				dwCount++;
@@ -177,7 +177,7 @@ tty_write(WIN_TTY *Terminal, LPCSTR Buffer, DWORD Size, DWORD *Result)
 		dwResult++;
 		lSize--;
 	}
-	if (!TTYPutString(dwOwner, hOutput, Buffer, dwCount, &ovl)){
+	if (!TTYPutString(hWindow, hOutput, Buffer, dwCount, &ovl)){
 		bResult = FALSE;
 	}
 	*Result = dwResult;

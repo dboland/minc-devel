@@ -623,7 +623,7 @@ typedef struct _WIN_TTY {
 	DWORD DeviceId;
 	DWORD GroupId;
 	DWORD SessionId;
-	DWORD ThreadId;
+	HWND Window;
 	DWORD Mode[2];
 	BOOL VEdit;
 	COORD Cursor;

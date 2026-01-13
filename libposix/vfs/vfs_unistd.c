@@ -428,7 +428,9 @@ vfs_revoke(WIN_VNODE *Node)
 {
 	BOOL bResult = FALSE;
 
-	switch (Node->FSType){
+	if (!win_group_member(&SidAdmins)){
+		SetLastError(ERROR_PRIVILEGE_NOT_HELD);
+	}else switch (Node->FSType){
 		case FS_TYPE_CHAR:
 			bResult = char_revoke(Node);
 			break;

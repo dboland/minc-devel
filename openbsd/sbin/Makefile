@@ -8,7 +8,7 @@ TRACEDIR= ${ROOTDIR}/libtrace
 SBINSRC= ${SRCDIR}/sbin
 SBINDEST= ${DESTDIR}/sbin
 
-all: ${SBINSRC} ${SBINSRC}/.patch ${OBJECTS} bsd.exe boot.exe
+all: ${SBINSRC} ${SBINSRC}/.patch ${OBJECTS} bsd.exe
 
 ${SBINSRC}:
 	@echo " ---------------------------------------------------"
@@ -34,7 +34,6 @@ version.o: bsd.rc
 
 wrc: wrc.exe
 console: console.exe
-boot: boot.exe
 bsd: bsd.exe
 
 mknod: ${SBINSRC}/mknod/mknod.c
@@ -60,7 +59,7 @@ install-local:
 install: ${DESTDIR} ${OBJECTS}
 	@${MKDIR} -p ${SBINDEST}
 	${INSTALL} ${OBJECTS} ${SBINDEST}/
-	${INSTALL} -m 02555 -o 0 -g 0 bsd.exe boot.exe ${SBINDEST}/
+	${INSTALL} -m 02555 -o 0 -g 0 bsd.exe ${SBINDEST}/
 	${INSTALL} -m 00754 -o 0 -g 0 setup.sh ${SBINDEST}/
 
 release-clean:

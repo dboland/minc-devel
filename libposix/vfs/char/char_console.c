@@ -155,7 +155,6 @@ con_revoke(WIN_TTY *Terminal, WIN_DEVICE *Device)
 		Terminal->Input = NULL;
 		Terminal->Output = NULL;
 		Terminal->Flags = 0;
-		Device->Flags = 0;
 		Device->FSType = FS_TYPE_PDO;
 		bResult = TRUE;
 	}
