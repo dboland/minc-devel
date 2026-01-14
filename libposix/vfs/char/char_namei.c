@@ -41,7 +41,6 @@ char_namei(HANDLE Handle, DWORD Index, WIN_VNODE *Result)
 	Result->Event = Handle;
 	Result->FSType = FS_TYPE_CHAR;
 	Result->FileType = WIN_VCHR;
-//	if (vfs_F_GETFL(Handle, &aMask)){	/* NUL */
 	if ((DWORD)Handle > 1024){	/* NUL */
 		Result->DeviceType = DEV_TYPE_NULL;
 		Result->DeviceId = DEV_TYPE_NULL;
@@ -53,9 +52,11 @@ char_namei(HANDLE Handle, DWORD Index, WIN_VNODE *Result)
 		Result->DeviceId = DEV_TYPE_SCREEN;
 		aMask = GENERIC_WRITE;
 	}
-	if (!vfs_F_GETFL(Handle, &Result->Access)){
-		Result->Access = aMask;
-	}
 	Result->Flags = win_F_GETFD(Handle);
+	if (!vfs_F_GETFL(Handle, &Result->Access)){	/* NUL/CON */
+		Result->Access = aMask;
+//	}else{
+//		vfs_ktrace(L"char_namei", STRUCT_VNODE, Result);
+	}
 	return(TRUE);
 }

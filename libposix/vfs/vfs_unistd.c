@@ -432,7 +432,7 @@ vfs_revoke(WIN_VNODE *Node)
 		SetLastError(ERROR_PRIVILEGE_NOT_HELD);
 	}else switch (Node->FSType){
 		case FS_TYPE_CHAR:
-			bResult = char_revoke(Node);
+			bResult = char_revoke(TERMINAL(Node->Index));
 			break;
 		case FS_TYPE_PDO:
 			bResult = pdo_revoke(DEVICE(Node->DeviceId));

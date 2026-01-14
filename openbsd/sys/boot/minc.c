@@ -83,10 +83,8 @@ sig(int signum)
 {
 	if (signum == SIGQUIT){
 		fprintf(stderr, "System halt.\n");
-		kill(1, SIGKILL);
 	}else if (signum == SIGHUP){
 		fprintf(stderr, "System reboot.\n");
-		kill(1, SIGHUP);
 	}else{
 		fprintf(stderr, "%s: %s\n", __progname, strsignal(signum));
 	}

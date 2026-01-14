@@ -229,11 +229,12 @@ DWORD pdo_statvfs(WIN_CFDATA *Config, DWORD Flags, WIN_CFDRIVER *Result);
 BOOL pdo_match(LPCWSTR NtName, DWORD DeviceType, WIN_CFDRIVER *Driver);
 BOOL pdo_DIOCGDINFO(WIN_DEVICE *Device);
 BOOL pdo_WSKBDIO_GTYPE(UINT *Type, UINT *SubType, UINT *FKeys);
+BOOL pdo_revoke(WIN_DEVICE *Device);
 BOOL rand_read(LPSTR Buffer, DWORD Size, DWORD *Result);
 
 /* char.c */
 
-BOOL con_revoke(WIN_TTY *Terminal, WIN_DEVICE *Device);
+BOOL char_revoke(WIN_TTY *Terminal);
 
 /* volume.c */
 

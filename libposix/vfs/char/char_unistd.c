@@ -89,14 +89,16 @@ char_fsync(WIN_VNODE *Node)
 	return(bResult);
 }
 BOOL 
-char_revoke(WIN_VNODE *Node)
+char_revoke(WIN_TTY *Terminal)
 {
 	BOOL bResult = FALSE;
 
-	switch (Node->DeviceType){
+	switch (Terminal->DeviceType){
 		case DEV_TYPE_CONSOLE:
+			bResult = TRUE;
+			break;
 		case DEV_TYPE_PTY:
-			bResult = con_revoke(TERMINAL(Node->Index), DEVICE(Node->DeviceId));
+			bResult = con_revoke(Terminal, DEVICE(Terminal->DeviceId));
 			break;
 		default:
 			SetLastError(ERROR_BAD_DEVICE);

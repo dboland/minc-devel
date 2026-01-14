@@ -56,11 +56,12 @@ term_USER_NAMEI_TTY(dev_t id, char *buf, size_t buflen)
 VOID 
 term_revoke(WIN_TTY *Terminal)
 {
-	switch (Terminal->DeviceType){
-		case DEV_TYPE_CONSOLE:
+	switch (Terminal->FSType){
+		case FS_TYPE_CHAR:
+			char_revoke(Terminal);
 			break;
-		case DEV_TYPE_PTY:
-			con_revoke(Terminal, DEVICE(Terminal->DeviceId));
+		case FS_TYPE_PDO:
+			pdo_revoke(DEVICE(Terminal->DeviceId));
 			break;
 		default:
 			SetLastError(ERROR_CTX_NOT_CONSOLE);

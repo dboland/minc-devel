@@ -60,13 +60,15 @@ con_TIOCSCTTY(WIN_DEVICE *Device, WIN_TASK *Task, WIN_TTY *Terminal)
 		FILE_SHARE_READ | FILE_SHARE_WRITE, 
 		OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0};
 	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, TRUE};
-	DWORD *dwMode = Terminal->Mode;
+	DWORD *dwMode;
 
 	if (!Terminal){
 		return(FALSE);
+	}else{
+		dwMode = Terminal->Mode;
 	}
-	Terminal->Input = CharOpenFile("CONIN$", &wFlags, &sa);
-	Terminal->Output = CharOpenFile("CONOUT$", &wFlags, &sa);
+	Terminal->Input = GetStdHandle(STD_INPUT_HANDLE);
+	Terminal->Output = GetStdHandle(STD_OUTPUT_HANDLE);
 	Terminal->FSType = FS_TYPE_CHAR;
 	Terminal->SessionId = Task->SessionId;
 	Terminal->GroupId = Task->GroupId;
@@ -156,6 +158,7 @@ con_revoke(WIN_TTY *Terminal, WIN_DEVICE *Device)
 		Terminal->Output = NULL;
 		Terminal->Flags = 0;
 		Device->FSType = FS_TYPE_PDO;
+		Device->Flags = 0;
 		bResult = TRUE;
 	}
 	return(bResult);
