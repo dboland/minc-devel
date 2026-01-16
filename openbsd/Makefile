@@ -52,4 +52,4 @@ bin-clean:
 clean: bin-clean
 	@${MAKE} -C lib clean
 	@${MAKE} -C libexec clean
-	@${MAKE} -C sys clean
+	@${MAKE} -C sys/stand clean
