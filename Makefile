@@ -5,12 +5,12 @@ usage:
 	@echo "usage: ${MAKE} TARGET"
 	@echo
 	@echo "Targets:"
-	@echo " opt			set up a simple cross-compiler"
-	@echo " all			build all targets"
-	@echo " kernel			build libtrace and libposix"
-	@echo " system			build OpenBSD system binaries"
-	@echo " release		update version info in shared libraries"
-	@echo " help			show build instructions"
+	@printf " opt\t\t\tset up a simple cross-compiler\n"
+	@printf " all\t\t\tbuild all targets\n"
+	@printf " kernel\t\t\tbuild libtrace and libposix\n"
+	@printf " system\t\t\tbuild OpenBSD system binaries\n"
+	@printf " release\t\tupdate version info in shared libraries\n"
+	@printf " help\t\t\tshow build instructions\n"
 
 all: kernel system
 

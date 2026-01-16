@@ -11,6 +11,7 @@ all: ${SRCDIR} ${TMPDIR}
 	@${MAKE} -C usr.sbin
 	@${MAKE} -C share
 	@${MAKE} -C etc
+	@${MAKE} -C sys/stand
 
 include ${ROOTDIR}/Errorfile.inc
 
