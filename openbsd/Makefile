@@ -36,7 +36,7 @@ install: ${DESTDIR}
 	@${MAKE} -C libexec install
 	@${MAKE} -C etc install
 	@${MAKE} -C include install
-	@${MAKE} -C sys install
+	@${MAKE} -C sys/stand install
 
 release:
 	@${MAKE} -C lib release
