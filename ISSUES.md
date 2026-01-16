@@ -20,28 +20,36 @@ issues with ksh are:
 * Command Substitution works up to 64 times, then you get: */bin/ksh: 
 too many files open in shell*
 
-Also, some of the Korn Shell features are dependent on the type of 
+## Windows Console
+
+Some of the Korn Shell features are dependent on the type of 
 terminal used. MinC uses the Windows Console by default. Its 
-*ncurses* name in the environment is **interix**. This makes MinC 
-compatible as a terminal with **VS Code** and **Windows Terminal**. 
+*ncurses* name in the environment is *interix*. This makes MinC 
+compatible as a terminal with *VS Code* and *Windows Terminal*. 
 But it also means that Ctrl+Z (**suspend**) does not work, but 
 Ctrl+S (XOFF) does. Use this instead to suspend the current 
-task. Or just use the **Pause** key.
+task. Or just use the *Pause* key.
 
 This also means that Ctrl-V (**paste**) does not work. Use the 
 Shift+Insert key combination instead to paste text from the Windows 
 Clipboard in any editing program.
 
-Another thing is that one can't interrupt (Ctrl+C) certain running 
+Another thing is that one can't **interrupt** (Ctrl+C) certain running 
 scripts. For example, the following line will run forever and 
 cannot be interrupted:
 
 	while :; do echo [H]; done
 
 I tested this on Debain Linux and my OpenBSD server. To my surprise 
-they both have the same issue when using the MinC Console. With PuTTY 
-Ctrl+C works fine. Appearently, this is a feature, not a bug. I'm 
-working on it.
+they both have the same issue when using the Windows Console. With PuTTY 
+Ctrl+C works fine.
+
+Finally, **scrolling** in the Windows Console has two modes, due to 
+its scrollback buffer feature. The first mode is scrolling the entire 
+scrollback buffer. This is the default behaviour. If you want scrolling 
+enabled in viewing and editing programs, like less or nano, you have to 
+disable *QuickEdit* mode. This is done by right-clicking the title bar, 
+choosing *Properties* and clicking the *Options* tab.
 
 ## Mounting
 
@@ -65,5 +73,6 @@ I intend to implement the missing parts but these have a low
 priority at the moment. Create an issue if you need to have one 
 of them implemented.
 
-November, 2025
+
+Januari, 2026
 Daniel Boland

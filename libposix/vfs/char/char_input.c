@@ -403,6 +403,21 @@ InputReadFile(WIN_TASK *Task, WIN_TTY *Terminal, LPSTR Buffer, DWORD Size, DWORD
 /****************************************************/
 
 BOOL 
+input_TIOCFLUSH(WIN_TTY *Terminal)
+{
+	BOOL bResult = FALSE;
+
+	/* "Handle is invalid" if CONIN$ buffer empty
+	 */
+	if (FlushConsoleInputBuffer(Terminal->Input)){
+		bResult = TRUE;
+	}
+	return(bResult);
+}
+
+/****************************************************/
+
+BOOL 
 input_read(WIN_TASK *Task, WIN_TTY *Terminal, LPSTR Buffer, DWORD Size, DWORD *Result)
 {
 	BOOL bResult = FALSE;
@@ -436,21 +451,6 @@ input_poll(HANDLE Handle, WIN_POLLFD *Info, DWORD *Result)
 	}
 	if (Info->Result |= sResult & sMask){
 		*Result += 1;
-	}
-	return(bResult);
-}
-
-/****************************************************/
-
-BOOL 
-input_TIOCFLUSH(WIN_TTY *Terminal)
-{
-	BOOL bResult = FALSE;
-
-	/* "Handle is invalid" if CONIN$ buffer empty
-	 */
-	if (FlushConsoleInputBuffer(Terminal->Input)){
-		bResult = TRUE;
 	}
 	return(bResult);
 }

@@ -7,8 +7,9 @@ OBJECTS= ${PROGS} wrc mkent mount_refs mount_cdfs console
 TRACEDIR= ${ROOTDIR}/libtrace
 SBINSRC= ${SRCDIR}/sbin
 SBINDEST= ${DESTDIR}/sbin
+CFLAGS+= -I${ROOTDIR}/include
 
-all: ${SBINSRC} ${SBINSRC}/.patch ${OBJECTS} bsd.exe
+all: ${SBINSRC} ${SBINSRC}/.patch ${OBJECTS}
 
 ${SBINSRC}:
 	@echo " ---------------------------------------------------"
@@ -18,7 +19,7 @@ ${SBINSRC}:
 	@exit 1
 
 %.o: %.c
-	${XGCC} -c ${CFLAGS} -DNOPIE -I${ROOTDIR}/include -o $@ $<
+	${XGCC} -c ${CFLAGS} -DNOPIE -o $@ $<
 
 %.exe: %.o
 	${XGCC} -s -static ${CFLAGS} -o $@ $<
@@ -34,15 +35,14 @@ version.o: bsd.rc
 
 wrc: wrc.exe
 console: console.exe
-bsd: bsd.exe
 
 mknod: ${SBINSRC}/mknod/mknod.c
 	${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $<
 
-mkent: mkent.o
+mkent: mkent.c
 	${XGCC} -s ${CFLAGS} -o $@ $< ${MINGW}/lib/libiphlpapi.a
 
-wtrace: libwtrace.o wtrace.o
+wtrace: libwtrace.o wtrace.c
 	${XGCC} -s ${CFLAGS} -o $@ -L${TRACEDIR} $^ -ltrace \
 	${MINGW}/lib/libkernel32.a ${MINGW}/lib/libuser32.a ${MINGW}/lib/libadvapi32.a
 
@@ -59,7 +59,6 @@ install-local:
 install: ${DESTDIR} ${OBJECTS}
 	@${MKDIR} -p ${SBINDEST}
 	${INSTALL} ${OBJECTS} ${SBINDEST}/
-	${INSTALL} -m 02555 -o 0 -g 0 bsd.exe ${SBINDEST}/
 	${INSTALL} -m 00754 -o 0 -g 0 setup.sh ${SBINDEST}/
 
 release-clean:

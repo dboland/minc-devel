@@ -47,7 +47,7 @@ __atexit_register_cleanup(void (*func)(void))
 void 
 __cxa_finalize(void *param)
 {
-	vfs__cxa_finalize(param);
+	proc__cxa_finalize(param);
 }
 
 /****************************************************/
@@ -57,7 +57,7 @@ atexit(void (*function)(void))
 {
 	int result = -1;
 
-	if (!vfs_atexit(function)){
+	if (!proc_atexit(function)){
 		errno = errno_posix(errno_win());
 	}else{
 		result = 0;

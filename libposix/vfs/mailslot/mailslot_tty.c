@@ -64,7 +64,7 @@ TTYPutString(HWND Window, HANDLE Handle, LPCSTR Buffer, DWORD Size, OVERLAPPED *
 			break;
 		}else{
 			if (Window){
-				SendMessage(Window, WM_INPUT, 0, 0);
+				PostMessage(Window, WM_INPUT, 0, 0);
 			}
 			lSize -= dwCount;
 			Buffer += dwCount;
@@ -87,7 +87,7 @@ TTYLineFeed(HWND Window, HANDLE Handle, WIN_TERMIO *Attribs, OVERLAPPED *Ovl)
 		bResult = WriteFile(Handle, "\n", 1, &dwCount, Ovl);
 	}
 	if (Window){
-		SendMessage(Window, WM_INPUT, 0, 0);
+		PostMessage(Window, WM_INPUT, 0, 0);
 	}
 	return(bResult);
 }
@@ -106,7 +106,7 @@ TTYCarriageReturn(HWND Window, HANDLE Handle, WIN_TERMIO *Attribs, OVERLAPPED *O
 		bResult = WriteFile(Handle, "\r", 1, &dwCount, Ovl);
 	}
 	if (Window){
-		SendMessage(Window, WM_INPUT, 0, 0);
+		PostMessage(Window, WM_INPUT, 0, 0);
 	}
 	return(bResult);
 }

@@ -53,9 +53,9 @@ char_namei(HANDLE Handle, DWORD Index, WIN_VNODE *Result)
 		aMask = GENERIC_WRITE;
 	}
 	Result->Flags = win_F_GETFD(Handle);
-	if (!vfs_F_GETFL(Handle, &Result->Access)){	/* NUL/CON */
+	if (!vfs_F_GETFL(Handle, &Result->Access)){
 		Result->Access = aMask;
-//	}else{
+//	}else{		/* NUL/CON */
 //		vfs_ktrace(L"char_namei", STRUCT_VNODE, Result);
 	}
 	return(TRUE);

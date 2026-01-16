@@ -138,11 +138,6 @@ BOOL vfs_setitimer(WIN_TASK *Task, LONG *Interval, DWORDLONG *TimeOut);
 BOOL vfs_nanosleep(WIN_TASK *Task, DWORDLONG TimeOut, DWORDLONG *Remain);
 BOOL vfs_utimes(WIN_NAMEIDATA *Path, FILETIME FileTime[2]);
 
-/* vfs_stdlib.c */
-
-BOOL vfs_atexit(WIN_ATEXITPROC Function);
-BOOL vfs__cxa_finalize(PVOID Param);
-
 /* vfs_ktrace.c */
 
 BOOL vfs_ktrace_SET(WIN_TASK *Task, WIN_NAMEIDATA *Path, PVOID Buffer, LONG Size);
@@ -203,6 +198,8 @@ PVOID proc_malloc(WIN_TASK *Task, ULONG Size);
 BOOL proc_realloc(WIN_TASK *Task, ULONG Size, PVOID Buffer, PVOID *Result);
 VOID proc_free(WIN_TASK *Task, PVOID Buffer);
 BOOL proc_setsid(WIN_TASK *Task);
+BOOL proc_atexit(WIN_ATEXITPROC Function);
+BOOL proc__cxa_finalize(PVOID Param);
 
 /* drive.c */
 
@@ -235,6 +232,7 @@ BOOL rand_read(LPSTR Buffer, DWORD Size, DWORD *Result);
 /* char.c */
 
 BOOL char_revoke(WIN_TTY *Terminal);
+VOID char_init(VOID);
 
 /* volume.c */
 

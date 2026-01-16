@@ -40,6 +40,9 @@ Var USERNAME
 
 ;--------------------------------
 
+Function .onInit
+	ReadEnvStr $USERNAME USERNAME
+FunctionEnd
 Section
 
 	# Set output path to the installation directory.
@@ -78,7 +81,8 @@ Section "Uninstall"
 
 	# Remove files and uninstaller
 	RMDir /r "$INSTDIR"
-	Delete ".\bsd.exe"
+	Delete ".\minc.exe"
+	Delete ".\bsd.dll"
 
 	# Remove registry keys
 	DeleteRegKey HKLM ${REGFILE}
@@ -100,6 +104,8 @@ Section "Base system" SecBase
 	Delete .\dev\*.*
 	# Legacy
 	Delete .\sbin\minc.exe
+	Delete .\sbin\bsd.exe
+	Delete .\sbin\libposix-6.1.0.dll
 
 	DetailPrint "Installing base system..."
 
@@ -205,7 +211,8 @@ Section
 	RMDir /r "$INSTDIR\miniroot"
 	Delete "$INSTDIR\*.cmd"
 
-	CreateShortcut "$DESKTOP\Console.lnk" "$OUTDIR\sbin\terminal.cmd" "" "$OUTDIR\sbin\bsd.exe" 0
+	# 'Start In' will be set to $OUTDIR
+	CreateShortcut "$DESKTOP\Console.lnk" "$OUTDIR\sbin\terminal.cmd" "" "$OUTDIR\minc.exe" 0
 
 SectionEnd
 
@@ -228,10 +235,3 @@ SectionEnd
 !insertmacro MUI_DESCRIPTION_TEXT ${SecSasl} "SASL - SASL authentication library"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
-Function .onInit
-	ReadEnvStr $USERNAME USERNAME
-	StrCpy $0 0
-	IfFileExists $INSTDIR\usr\lib\libc.so +2 0
-	StrCpy $0 ${SF_SELECTED}
-	SectionSetFlags ${SecComp} $0
-FunctionEnd

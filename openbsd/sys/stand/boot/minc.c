@@ -60,7 +60,7 @@
 extern char *__progname;
 extern char **environ;
 
-#include "../../libposix/kern/systm.h"
+#include "../../../../libposix/kern/systm.h"
 
 #define _KERNEL
 #include <net/if.h>
@@ -68,34 +68,19 @@ extern char **environ;
 #define KTR_DEFAULT (KTRFAC_SYSCALL | KTRFAC_SYSRET | KTRFAC_NAMEI | \
 	KTRFAC_PSIG | KTRFAC_EMUL | KTRFAC_STRUCT | KTRFAC_INHERIT)
 
-unsigned char		_verbose;
-unsigned char		_boot;
-unsigned char		_home;
-
-char _term[NAME_MAX] = "interix";
+char *_argv[] = {"/sbin/console", NULL, NULL, NULL};
+char **_args = _argv;
 char *_lctype = "en_US.UTF-8";
 
 /************************************************************/
 
 void 
-die(const char *msg, ...)
-{
-	va_list args;
-
-	va_start(args, msg);
-	vfprintf(stderr, msg, args);
-	va_end(args);
-	_exit(-1);
-}
-void 
 sig(int signum)
 {
 	if (signum == SIGQUIT){
 		fprintf(stderr, "System halt.\n");
-		kill(1, SIGKILL);
 	}else if (signum == SIGHUP){
 		fprintf(stderr, "System reboot.\n");
-		kill(1, SIGHUP);
 	}else{
 		fprintf(stderr, "%s: %s\n", __progname, strsignal(signum));
 	}
@@ -131,60 +116,6 @@ fs_unmount(void)
 	}
 	endfsent();
 }
-int
-getty(const char *name)
-{
-	int result = -1;
-	int fd;
-	struct ttyent *term;
-	char path[PATH_MAX] = _PATH_DEV;
-
-	/* copy of ./lib/libutil/login_tty.c
-	 */
-	strcat(path, name);
-	fd = open(path, O_RDWR);
-	if (fd < 0){
-		fprintf(stderr, "open(%s): %s\n", path, strerror(errno));
-	}else if (ioctl(fd, TIOCSCTTY, NULL) < 0){
-		fprintf(stderr, "ioctl(TIOCSCTTY): %s\n", strerror(errno));
-	}else{
-		dup2(fd, STDIN_FILENO);
-		dup2(fd, STDOUT_FILENO);
-		dup2(fd, STDERR_FILENO);
-		if (fd > STDERR_FILENO)
-			close(fd);
-		result = 0;
-	}
-	while (term = getttyent()){
-		if (!strcmp(term->ty_name, name)){
-			strcpy(_term, term->ty_type);
-		}
-	}
-	endttyent();
-	setenv("TERM", _term, 1);
-	return(result);
-}
-int 
-shell(char *args[])
-{
-	const struct passwd *pwd = NULL;
-	char *login = getlogin();
-	char *home = "/";
-
-	if (pwd = getpwnam(login)){
-		setenv("USER", pwd->pw_name, 1);
-		setenv("HOME", pwd->pw_dir, 1);
-		home = pwd->pw_dir;
-	}else{
-		fprintf(stderr, "getpwnam(%s): %s\n", login, strerror(errno));
-	}
-	if (_home && chdir(home) < 0){
-		fprintf(stderr, "chdir(%s): %s\n", home, strerror(errno));
-	}
-	execve(*args, args, environ);
-	fprintf(stderr, "execve(%s): %s\n", *args, strerror(errno));
-	return(0);
-}
 int 
 trpoints(const char *opts)
 {
@@ -201,79 +132,20 @@ trpoints(const char *opts)
 void 
 args(int argc, char *argv[])
 {
-	int ch;
+	char *token;
+	char *prog = *argv++;
 
-	while ((ch = getopt(argc, argv, "kvbh")) > 0){
-		switch (ch){
-		case 'v':
-			_verbose++;
+	while (token = *argv){
+		if (token[0] != '-'){
+			_args = argv;
 			break;
-		case 'b':
-			_boot++;
-			break;
-		case 'k':
-			ktrace("boot.out", KTROP_SET, trpoints(optarg), 0);
-			break;
-		case 'h':
-			_home++;
-			break;
-		case 't':
-			strcpy(_term, optarg);
-			break;
+		}else if (token[1] == 'h'){
+			_args[1] = "-h";
+		}else if (token[1] == 't'){
+			ktrace("minc.out", KTROP_SET, KTR_DEFAULT, 0);
 		}
+		argv++;
 	}
-}
-void 
-boot(void)
-{
-	char *args[] = {"/sbin/init", NULL};
-
-	ifinit();
-	cpu_configure();
-	fs_unmount();		// fsck.exe operation?
-	fprintf(stderr, "\r\n");
-	execve(*args, args, environ);
-	fprintf(stderr, "execve(%s): %s\n", *args, strerror(errno));
-}
-void 
-single(void)
-{
-	int mib[2] = {CTL_KERN, KERN_SECURELVL};
-	int level = 1;
-	char *args[] = {"/bin/ksh", "-l", NULL};
-
-	ifinit();
-	cpu_configure();
-	fs_unmount();
-	fs_mount();
-	sysctl(mib, 2, NULL, NULL, &level, sizeof(int));
-//	close(0);
-//	close(1);
-//	close(2);
-	(void) revoke(_PATH_CONSOLE);
-	setsid();
-	getty("console");
-	shell(args);
-}
-void 
-multi(void)
-{
-	char *args[] = {"/bin/ksh", "-l", NULL};
-
-	setsid();
-	getty("ptm");
-	shell(args);
-}
-void 
-state(int level)
-{
-	setenv("LC_CTYPE", _lctype, 0);
-	if (_boot)
-		boot();
-	else if (!level)
-		single();
-	else
-		multi();
 }
 
 /************************************************************/
@@ -281,27 +153,37 @@ state(int level)
 int 
 main(int argc, char *argv[], char *env[])
 {
-	int mib[2] = {CTL_KERN, KERN_SECURELVL};
-	size_t size = sizeof(int);
-	int level = 0;
-	pid_t pid;
+	int result = -1;
+	pid_t pid = getpid();
 	int status;
 	char root[260];
 
+	args(argc, argv);
 	diskconf(root);
 	setenv("MINCROOT", root, 1);
 	setenv("PATH", _PATH_DEFPATH, 1);
 	setenv("TMP", "/tmp", 1);	/* GNU CC */
-	args(argc, argv);
-	sysctl(mib, 2, &level, &size, NULL, 0);
+	setenv("LC_CTYPE", _lctype, 0);
+	if (!pid){
+		signal(SIGQUIT, sig);
+		signal(SIGHUP, sig);
+		consinit();
+		cpu_configure();
+		ifinit();
+		fs_unmount();
+		fprintf(stderr, "\r\n");
+	}
 	switch (pid = fork()){
 		case -1:
-			die("fork(): %s\n", strerror(errno));
+			fprintf(stderr, "fork(): %s\n", *args, strerror(errno));
+			break;
 		case 0:
-			state(level);
+			execvp(*_args, _args);
+			fprintf(stderr, "execvp(%s): %s\n", *_args, strerror(errno));
 			break;
 		default:
 			waitpid(pid, &status, 0);
+			result = 0;
 	}
-	return(0);
+	return(result);
 }

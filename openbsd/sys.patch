@@ -23,8 +23,8 @@
  #if defined(PROF) || defined(GPROF)
  # define _PROF_PROLOGUE	\
 --- openbsd-master/sys/arch/i386/include/cdefs.h
-+++ openbsd-master/sys/arch/i386/include/cdefs.h	Sun Oct 19 18:35:30 2025
-@@ -4,18 +4,67 @@
++++ openbsd-master/sys/arch/i386/include/cdefs.h	Wed Jan 14 17:21:24 2026
+@@ -4,18 +4,54 @@
   * Written by J.T. Conklin <jtc@wimsey.com> 01/17/95.
   * Public domain.
   */
@@ -43,6 +43,16 @@
 -#define __warn_references(sym,msg)			\
 -	__asm__(".section .gnu.warning." __STRING(sym)	\
 -	    " ; .ascii \"" msg "\" ; .text")
++/* weak aliases are kind of broken in MinGW32 ld.exe:
++ * http://mingw.5.n7.nabble.com/weak-functions-td6379.html
++ * https://sourceware.org/bugzilla/show_bug.cgi?id=9687
++ * https://sourceware.org/bugzilla/show_bug.cgi?id=2729
++ */
++#define __strong_alias(name,symbol)                    \
++       extern __typeof(symbol) name __attribute__((alias(__STRING(symbol))))
++#define __warn_references(symbol,msg)                  \
++       extern __typeof(symbol) symbol __attribute__((deprecated(msg)))
++
 +#ifndef __bounded__
 +#define __bounded__(...)	
 +#endif
@@ -50,15 +60,7 @@
 +#define visibility(a)	
 +#endif
 +
-+#undef __MINGW32__
-+#undef __WIN32__	// <GL/gl.h>
-+#undef __MSVCRT__
-+#undef __WINNT__
-+#undef __WINNT
-+#undef _WIN32		// cc.exe
-+#undef WIN32		// cc.exe
-+#undef WINNT
-+
++#define __weak_alias	__strong_alias
 +#define __thread	__thread __attribute__((section(".tls")))
 +
 +#define __MinC__
@@ -84,21 +86,6 @@
 +#ifndef LIBSSL_IMPORT
 +#define LIBSSL_IMPORT	__import
 +#endif
-+
-+/* weak aliases are kind of broken in MinGW32 ld.exe:
-+ * http://mingw.5.n7.nabble.com/weak-functions-td6379.html
-+ * https://sourceware.org/bugzilla/show_bug.cgi?id=9687
-+ * https://sourceware.org/bugzilla/show_bug.cgi?id=2729
-+ */
-+
-+#define __strong_alias(name,symbol)			\
-+	extern __typeof(symbol) name __attribute__((alias(__STRING(symbol))))
-+//#define __weak_alias(name,symbol)			\
-+//	extern __typeof(symbol) name __attribute__((weak,alias(__STRING(symbol))))
-+#define __weak_alias(name,symbol)			\
-+	__strong_alias(name,symbol)
-+#define __warn_references(symbol,msg)			\
-+	extern __typeof(symbol) symbol __attribute__((deprecated(msg)))
  
  #endif /* !_MACHINE_CDEFS_H_ */
 --- openbsd-master/sys/arch/i386/include/exec.h

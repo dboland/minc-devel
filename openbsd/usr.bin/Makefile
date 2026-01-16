@@ -118,3 +118,4 @@ install: ${DESTDIR} ${OBJECTS} xinstall
 clean:
 	/bin/rm -f *.exe *.o
 	${MAKE} -C make clean
+	${MAKE} -C kdump clean

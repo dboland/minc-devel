@@ -2,7 +2,7 @@ if ! cd "$PKGROOT/minc-comp"; then
         exit 1
 fi
 
-# Location of curses databses
+# Location of curses databases
 mkdir -p ./usr/share/misc
 mkdir -p ./usr/share/man/man1
 mkdir -p ./usr/share/man/man3

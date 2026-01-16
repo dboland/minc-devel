@@ -128,7 +128,7 @@ win_init(WIN_GLOBALS *Globals, HINSTANCE Instance)
 	if (!GetModuleFileNameW(Instance, Globals->Root, MAX_PATH)){
 		WIN_ERR("GetModuleFileName(0x%x): %s\n", Instance, win_strerror(GetLastError()));
 	}else{
-		win_dirname(win_dirname(Globals->Root));
+		win_dirname(Globals->Root);
 	}
 
 	AclInit(&Globals->SidMachine, &Globals->SidNone);
@@ -137,7 +137,7 @@ win_init(WIN_GLOBALS *Globals, HINSTANCE Instance)
 
 	win_wcstombs(szRoot, Globals->Root, MAX_PATH);
 	psz = win_stpcpy(Globals->Path, "Path=");
-	psz = win_stpcpy(win_stpcpy(psz, szRoot), "\\sbin;");
+	psz = win_stpcpy(win_stpcpy(psz, szRoot), ";");
 	psz = win_stpcpy(win_stpcpy(psz, szRoot), "\\usr\\lib;");
 	psz = win_stpcpy(win_stpcpy(psz, szRoot), "\\usr\\libexec;");
 	dwSize = WIN_PATH_MAX - (psz - Globals->Path);

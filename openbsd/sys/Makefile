@@ -10,7 +10,7 @@ SYSDIRS= ${INCDIR}/machine ${INCDIR}/sys ${INCDIR}/dev ${INCDIR}/net \
 SYSSRC= ${SRCDIR}/sys
 
 all: ${SYSSRC} ${TMPDIR} ${SYSSRC}/.patch
-	${MAKE} -C boot
+	${MAKE} -C stand/boot
 
 ${SYSSRC}:
 	@echo " ---------------------------------------------------"
@@ -33,4 +33,7 @@ ${INCDIR}/machine: ${SRCDIR}/sys/arch/${ARCH}/include
 install-local: ${INCDIR} ${SYSDIRS}
 
 install:
-	${MAKE} -C boot install
+	${MAKE} -C stand/boot install
+
+clean:
+	${MAKE} -C stand/boot clean

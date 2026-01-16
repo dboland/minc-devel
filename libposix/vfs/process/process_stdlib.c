@@ -59,6 +59,35 @@ ProcInitChannels(WIN_VNODE Result[])
 /************************************************************/
 
 BOOL 
+proc__cxa_finalize(PVOID Param)
+{
+	DWORD dwIndex = WIN_ATEXIT_MAX;
+	WIN_TASK *pwTask = &__Tasks[CURRENT];
+	WIN_ATEXITPROC Function;
+
+	while (dwIndex--){
+		if (Function = pwTask->AtExit[dwIndex]){
+			Function();
+		}
+	}
+}
+BOOL 
+proc_atexit(WIN_ATEXITPROC Function)
+{
+	DWORD dwIndex = 0;
+	WIN_TASK *pwTask = &__Tasks[CURRENT];
+
+	while (dwIndex < WIN_ATEXIT_MAX){
+		if (!pwTask->AtExit[dwIndex]){
+			pwTask->AtExit[dwIndex] = Function;
+			return(TRUE);
+		}
+		dwIndex++;
+	}
+	SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+	return(FALSE);
+}
+BOOL 
 proc_setugid(WIN_TASK *Task)
 {
 	BOOL bResult = FALSE;

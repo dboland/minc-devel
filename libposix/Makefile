@@ -4,14 +4,13 @@ include ${ROOTDIR}/Makefile.inc
 
 OBJECTS= crt1.o version.o msvc.o win_posix.o vfs_posix.o libposix.o \
 	arch/fork.o arch/syscall.o
-LIBPOSIX= libposix-${RELEASE}.dll
-IMPLIB= libposix.dll.a
+LIBPOSIX= bsd.dll
+IMPLIB= bsd.dll.a
 CFLAGS+= -I${ROOTDIR}/include -g
 CFLAGS+= -DRELEASE=\"${RELEASE}\" -DVERSION=\"${VERSION}\" -DBUILD=${BUILD}
 GCCDIR= ${ROOTDIR}/mingw/libgcc
 TRACEDIR= ${ROOTDIR}/libtrace
-SBINDIR= /sbin
-ULIBDIR= /usr/lib
+ULIBDEST= ${DESTDIR}/usr/lib
 
 all: ${LIBPOSIX}
 
@@ -62,8 +61,8 @@ install-local:
 	@/bin/cp -vu ${IMPLIB} ${LIBDIR}/libmingw32.a
 
 install: ${DESTDIR}
-	${INSTALL} -m 06555 ${LIBPOSIX} ${DESTDIR}${SBINDIR}/
-	${INSTALL} -m ${BINMODE} ${IMPLIB} ${DESTDIR}${ULIBDIR}/libposix.a
+	${INSTALL} -m 06555 ${LIBPOSIX} ${DESTDIR}/
+	${INSTALL} -m ${BINMODE} ${IMPLIB} ${ULIBDEST}/libposix.a
 
 release-clean:
 	/bin/rm -f version.o libposix.o

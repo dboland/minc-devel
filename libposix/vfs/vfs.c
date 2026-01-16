@@ -122,7 +122,6 @@ BOOL vfs_F_GETFL(HANDLE Handle, ACCESS_MASK *Result);
 #include "shell/shell.c"
 #include "vfs_namei.c"
 #include "vfs_fcntl.c"
-#include "vfs_stdlib.c"
 #include "vfs_unistd.c"
 #include "vfs_time.c"
 #include "process/process.c"

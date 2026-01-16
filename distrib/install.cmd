@@ -1,4 +1,4 @@
-@echo off
+@ECHO OFF
 
 SET ROOT=%cd%
 SET Path=%ROOT%\miniroot

@@ -20,17 +20,14 @@ GitHub (196Mb):
 **Note**: create a folder in the root of a diskdrive, named 
 'source'. Move the .ZIP file there and extract it.
 
-
 ## Step 1: set up a simple cross-compiler
 
 To build the new kernel and compile the operating system code, 
 you would have to build an OpenBSD cross compiler first. This 
-can be very laborious and frustrating. 
-
-Instead we will create an isolated, slightly modified instance 
-of the MinGW compiler. Let's call it a *poor man's cross-compiler*. 
-Your current MinGW installation will be left completely 
-untouched.
+can be very laborious and frustrating. Instead we will create 
+an isolated, slightly modified instance of the MinGW compiler. 
+Let's call it a *poor man's cross-compiler*. Your current MinGW 
+installation will be left completely untouched.
 
 Open the MSYS terminal, **cd** to your *minc-devel* directory 
 and make the *opt* target. All files will be installed in a 
@@ -42,7 +39,6 @@ newly created directory, called */opt/minc*:
 will guide you to properly set up the 'config.inc' file. Use 
 vim to edit it and define the indicated variables.
 
-
 ## Step 2: build a minimal OpenBSD system
 
 The kernel will be built using a combination of vanilla MinGW 
@@ -51,10 +47,10 @@ To test if this all works, make the kernel first:
 
 	make kernel
 
-A minimal OpenBSD system consists of the kernel, the BSD C 
-library, the boot program, the Korn shell and some utilities. 
-These will be built by the new system itself. To finish 
-the build:
+A minimal OpenBSD system consists of the kernel (/bsd.dll), the 
+BSD C library, the boot program (/minc.exe), the Korn shell 
+(/bin/ksh) and some utilities. These will be built by the new 
+system itself. To finish the build:
 
 	make system
 
@@ -75,10 +71,9 @@ permissions in this kind of location are unsuitable for OpenBSD
 to run properly.
 
 You now have a working system. Go to the new folder in Windows 
-Exporer and open the *sbin* folder. There should be a program 
-named *bsd.exe*. You can open a terminal by double-clicking it. 
-To test if the new system works, you can run the **uname** 
-command:
+Exporer. There should be a program named *minc.exe*. You can open 
+a terminal by double-clicking it. To test if the new system works, 
+you can run the **uname** command:
 
 	uname -a
 
@@ -86,15 +81,15 @@ The result should be similar to the following output:
 
 	OpenBSD dimension.sassenheim.dmz 6.1.0 MINC#20250720 i386
 
-Double-clicking the *bsd.exe* program is not the right way to 
+Double-clicking the *minc.exe* program is not the right way to 
 start the MinC terminal. To make it start properly and in your 
 home directory, put following lines in a file named 
 *minc-release.cmd* on your Desktop:
 
 	@ECHO OFF
 	
-	CD C:\minc-release\sbin
-	START "MinC" bsd.exe -h
+	CD C:\minc-release
+	START "MinC" minc.exe -h
 
 The *START* command tells the console to read console settings from
 the Windows Registry. The *-h* switch tells MinC to change to 
@@ -125,4 +120,5 @@ Tutorial: Building the Simplest Possible Linux System - Rob Landley
 https://youtu.be/Sk9TatW9ino
 
 
-Daniel Boland, September, 2025
+Januari, 2026
+Daniel Boland

@@ -35,6 +35,7 @@ install: ${DESTDIR}
 	@${MAKE} -C libexec install
 	@${MAKE} -C etc install
 	@${MAKE} -C include install
+	@${MAKE} -C sys install
 
 release:
 	@${MAKE} -C lib release
@@ -44,9 +45,10 @@ release:
 bin-clean:
 	@${MAKE} -C bin clean
 	@${MAKE} -C usr.bin clean
+	@${MAKE} -C sbin clean
+	@${MAKE} -C usr.sbin clean
 
 clean: bin-clean
 	@${MAKE} -C lib clean
-	@${MAKE} -C sbin clean
-	@${MAKE} -C usr.sbin clean
 	@${MAKE} -C libexec clean
+	@${MAKE} -C sys clean

@@ -9,6 +9,8 @@ copy_src()
         done
 }
 
+cp -p /bsd.dll /minc.exe .
+
 copy_src etc "$ETC"
 
 copy_file /sbin "$SBIN"

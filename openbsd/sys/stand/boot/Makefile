@@ -1,4 +1,4 @@
-ROOTDIR= ../../..
+ROOTDIR= ../../../..
 
 include ${ROOTDIR}/Makefile.inc
 
@@ -14,4 +14,7 @@ ${PROG}: version.o minc.c
 	${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $^
 
 install:
-	${INSTALL} -m 02555 -o 0 -g 0 ${PROG} ${SBINDEST}/
+	${INSTALL} -m 02555 -o 0 -g 0 ${PROG} ${DESTDIR}/
+
+clean:
+	/bin/rm -f *.o

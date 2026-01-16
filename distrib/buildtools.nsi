@@ -50,6 +50,11 @@ Section
         WriteRegStr HKLM ${REGFILE} "BuildTools" $INSTDIR
 
 SectionEnd
+Section "Base libraries" SecBase
+	File 'comp61.tgz'
+	DetailPrint "Installing base libraries..."
+	ExecDos::exec /DETAILED '.\install.cmd comp61.tgz'
+SectionEnd
 Section "Curl file transfer" SecCurl
         File 'curl772.tgz'
         DetailPrint "Installing curl 7.72..."
@@ -80,11 +85,6 @@ Section "Vim editor" SecVim
 	DetailPrint "Installing vim 8.1..."
 	ExecDos::exec /DETAILED '.\install.cmd vim81.tgz'
 SectionEnd
-Section "Base libraries" SecBase
-	File 'comp61.tgz'
-	DetailPrint "Installing base libraries..."
-	ExecDos::exec /DETAILED '.\install.cmd comp61.tgz'
-SectionEnd
 Section
 	DetailPrint "Cleaning up..."
 	RMDir /r "$INSTDIR\miniroot"
@@ -101,9 +101,3 @@ SectionEnd
 !insertmacro MUI_DESCRIPTION_TEXT ${SecVim} "Vi IMproved, a programmer's text editor"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
-Function .onInit
-        StrCpy $0 0
-        IfFileExists $INSTDIR\usr\lib\libc.so +2 0
-        StrCpy $0 ${SF_SELECTED}
-        SectionSetFlags ${SecBase} $0
-FunctionEnd

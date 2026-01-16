@@ -73,3 +73,10 @@ diskconf(char *root)
 	win_chroot(__Globals->Root);
 	win_wcstombs(root, __Globals->Root, MAX_PATH);
 }
+void 
+consinit(void)
+{
+	/* sys/arch/i386/i386/machdep.c
+	*/
+	char_init();
+}

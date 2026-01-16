@@ -109,8 +109,9 @@ VfsStatNode(WIN_NAMEIDATA *Path, DWORD Flags, HANDLE *Result)
 		Path->Size = iNode.NameSize;
 		*Result = hResult;
 		bResult = TRUE;
-	}else if (CloseHandle(hResult)){
-		WIN_ERR("VfsStatNode(%ls): %s\n", Path->Resolved, win_strerror(ERROR_BAD_ARGUMENTS));
+	}else{
+//		WIN_ERR("VfsStatNode(%ls): %s\n", Path->Resolved, win_strerror(ERROR_BAD_ARGUMENTS));
+		bResult = CloseHandle(hResult);
 	}
 	return(bResult);
 }

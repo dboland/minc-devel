@@ -86,7 +86,6 @@ extern struct sysent {		/* system call table */
 #define sys_setrtable		sys_nosys
 
 void	consinit(void);		/* sys/arch/i386/i386/machdep.c:3392 */
-
 void    cpu_startup(void);	/* sys/arch/i386/i386/machdep.c:382 */
 void    cpu_configure(void);	/* sys/arch/i386/i386/autoconf.c:105 (configure devices) */
 void 	diskconf(char *);	/* sys/arch/i386/i386/autoconf.c:175 (configure root/swap) */
