@@ -76,4 +76,6 @@ typedef INT (WINAPI *FARPROC)();
 typedef BYTE *PBYTE,*LPBYTE;
 typedef CONST VOID *PCVOID,*LPCVOID;
 
+DECLARE_HANDLE(HWND);
+
 #endif

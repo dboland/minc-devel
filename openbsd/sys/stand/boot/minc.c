@@ -28,6 +28,14 @@
  *
  */
 
+#include <sys/wait.h>
+#include <sys/ioctl.h>
+#include <sys/param.h>
+#include <sys/mount.h>
+#include <sys/uio.h>
+#include <sys/ktrace.h>
+#include <sys/socket.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pwd.h>
@@ -38,24 +46,6 @@
 #include <paths.h>
 #include <fstab.h>
 #include <regex.h>
-#include <locale.h>
-#include <dirent.h>
-#include <ttyent.h>
-
-#include <sys/stdarg.h>
-#include <sys/fcntl.h>
-#include <sys/wait.h>
-#include <sys/ioctl.h>
-#include <sys/param.h>
-#include <sys/mount.h>
-#include <sys/stat.h>
-#include <sys/sysctl.h>
-#include <sys/uio.h>
-#include <sys/ktrace.h>
-#include <sys/reboot.h>
-#include <sys/socket.h>
-#include <sys/tty.h>
-#include <sys/termios.h>
 
 extern char *__progname;
 extern char **environ;

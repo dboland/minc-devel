@@ -688,43 +688,43 @@ typedef struct _WIN_TTY {
 #define WIN_CREAD	0x00000800      /* enable receiver */
 #define WIN_HUPCL	0x00004000      /* hang up on last close */
 
-#define _POSIX_VDISABLE	(0377)
+#define WIN_POSIX_VDISABLE	(0377)
 
 /* standard speeds */
 
 #define WIN_B9600	9600
 
-/* sys/ttydefualts.h */
+/* sys/ttydefaults.h */
 
-#define TTYDEF_IFLAG	(WIN_BRKINT | WIN_ICRNL | WIN_IXON)
-#define TTYDEF_OFLAG	(WIN_OPOST | WIN_ONLCR | WIN_OXTABS)
-#define TTYDEF_LFLAG	(WIN_ECHO | WIN_ICANON | WIN_ISIG | WIN_IEXTEN)
-#define TTYDEF_CFLAG	(WIN_CREAD | WIN_CS8 | WIN_HUPCL)
-#define TTYDEF_SPEED	(WIN_B9600)
+#define WIN_TTYDEF_IFLAG	(WIN_BRKINT | WIN_ICRNL | WIN_IXON)
+#define WIN_TTYDEF_OFLAG	(WIN_OPOST | WIN_ONLCR | WIN_OXTABS)
+#define WIN_TTYDEF_LFLAG	(WIN_ECHO | WIN_ICANON | WIN_ISIG | WIN_IEXTEN)
+#define WIN_TTYDEF_CFLAG	(WIN_CREAD | WIN_CS8 | WIN_HUPCL)
+#define WIN_TTYDEF_SPEED	(WIN_B9600)
 
 #define CTRL(x) (x&037)
-#define CEOF            CTRL('d')
-#define CEOL            ((unsigned char)'\377') /* XXX avoid _POSIX_VDISABLE */
-#define CERASE          010
-#define CINTR           CTRL('c')
-#define CSTATUS         ((unsigned char)'\377') /* XXX avoid _POSIX_VDISABLE */
-#define CKILL           CTRL('u')
-#define CMIN            1
-#define CQUIT           034             /* FS, ^\ */
-#define CSUSP           CTRL('z')
-#define CTIME           0
-#define CDSUSP          CTRL('y')
-#define CSTART          CTRL('q')
-#define CSTOP           CTRL('s')
-#define CLNEXT          CTRL('v')
-#define CDISCARD        CTRL('o')
-#define CWERASE         CTRL('w')
-#define CREPRINT        CTRL('r')
-#define CEOT            CEOF
+#define WIN_CEOF            CTRL('d')
+#define WIN_CEOL            ((unsigned char)'\377') /* XXX avoid _POSIX_VDISABLE */
+#define WIN_CERASE          010
+#define WIN_CINTR           CTRL('c')
+#define WIN_CSTATUS         ((unsigned char)'\377') /* XXX avoid _POSIX_VDISABLE */
+#define WIN_CKILL           CTRL('u')
+#define WIN_CMIN            1
+#define WIN_CQUIT           034             /* FS, ^\ */
+#define WIN_CSUSP           CTRL('z')
+#define WIN_CTIME           0
+#define WIN_CDSUSP          CTRL('y')
+#define WIN_CSTART          CTRL('q')
+#define WIN_CSTOP           CTRL('s')
+#define WIN_CLNEXT          CTRL('v')
+#define WIN_CDISCARD        CTRL('o')
+#define WIN_CWERASE         CTRL('w')
+#define WIN_CREPRINT        CTRL('r')
+#define WIN_CEOT            CEOF
 /* compat */
-#define CBRK            CEOL
-#define CRPRNT          CREPRINT
-#define CFLUSH          CDISCARD
+#define WIN_CBRK            WIN_CEOL
+#define WIN_CRPRNT          WIN_CREPRINT
+#define WIN_CFLUSH          WIN_CDISCARD
 
 /* sys/ttycom.h */
 

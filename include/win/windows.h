@@ -25,12 +25,10 @@
 #include <sys/types.h>
 
 #include "windef.h"
-#include "winerror.h"
-#include "lmerr.h"
-#include "wincon.h"
 #include "winbase.h"
-
-typedef HANDLE HWND;
+#include "winerror.h"
+#include "wincon.h"
+#include "lmerr.h"
 
 typedef UINT_PTR WPARAM;
 typedef LONG_PTR LPARAM;

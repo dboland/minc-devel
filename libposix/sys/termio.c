@@ -161,7 +161,7 @@ term_TIOCSCTTY(WIN_VNODE *Node, WIN_TASK *Task)
 		Node->Index = pwDevice->Index;
 		Node->Event = pwDevice->Event;
 		Node->FSType = pwDevice->FSType;
-//		Node->DeviceType = DEV_TYPE_TTY;
+		Node->DeviceType = DEV_TYPE_TTY;
 	}
 	return(result);
 }
@@ -178,7 +178,7 @@ term_PTMGET(WIN_VNODE *Node, WIN_TASK *Task, WIN_PTMGET *Result)
 		pwDevice = DEVICE(Node->DeviceId);
 		Node->Index = pwDevice->Index;
 		Node->Event = pwDevice->Event;
-		Node->FSType = FS_TYPE_PDO;
+		Node->FSType = pwDevice->FSType;
 		Result->Master = __dup(Task, Node);
 		/* controlling terminal (slave) */
 		Result->Slave = openpt_posix(Task, Result->MName, 0, 0666);

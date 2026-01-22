@@ -38,8 +38,7 @@ char_poll(WIN_VNODE *Node, WIN_POLLFD *Info, DWORD *Result)
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
-		case DEV_TYPE_PTY:
-		case DEV_TYPE_CONSOLE:
+		case DEV_TYPE_TTY:
 			bResult = con_poll(TERMINAL(Node->Index), Info, Result);
 			break;
 		case DEV_TYPE_INPUT:

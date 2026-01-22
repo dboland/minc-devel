@@ -111,7 +111,7 @@ VfsStatNode(WIN_NAMEIDATA *Path, DWORD Flags, HANDLE *Result)
 		bResult = TRUE;
 	}else{
 //		WIN_ERR("VfsStatNode(%ls): %s\n", Path->Resolved, win_strerror(ERROR_BAD_ARGUMENTS));
-		bResult = CloseHandle(hResult);
+		CloseHandle(hResult);
 	}
 	return(bResult);
 }

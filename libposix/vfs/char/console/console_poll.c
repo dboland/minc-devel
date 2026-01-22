@@ -30,24 +30,69 @@
 
 #include <wincon.h>
 
-/* The Vista Console can go into full XTerm mode. This gets you:
- * Overall faster screen drawing;
- * Underlined terms in man pages;
- * Beautiful mouse scrolling in vim;
- * Colour coded file listings on remote Linux systems;
- * The alternate screen feature (MS calls it 'application mode');
- */
-
 /****************************************************/
 
 SHORT 
-InputPollKey(HANDLE Handle, INPUT_RECORD *Record)
+ConPollKey(HANDLE Handle, INPUT_RECORD *Record)
 {
 	SHORT sResult = 0;
-	KEY_EVENT_RECORD *pkEvent = &Record->KeyEvent;
+	KEY_EVENT_RECORD *Event = &Record->KeyEvent;
+	WORD VK = Event->wVirtualKeyCode;
+	CHAR CH = Event->uChar.AsciiChar;
+	BOOL bIsAnsi = FALSE;
 	DWORD dwCount;
 
-	if (pkEvent->bKeyDown){
+	if (!Event->bKeyDown){
+		bIsAnsi = FALSE;
+	}else if (CH){
+		bIsAnsi = TRUE;
+	}else if (VK <= VK_MODIFY){
+		bIsAnsi = FALSE;
+	}else if (VK <= VK_CURSOR){
+		bIsAnsi = *ANSI_CURSOR(VK);
+	}else if (VK <= VK_WINDOWS){
+		bIsAnsi = FALSE;
+	}else if (VK <= VK_NUMPAD){
+		bIsAnsi = FALSE;
+	}else if (VK <= VK_FUNCTION){
+		bIsAnsi = *ANSI_FUNCTION(VK);
+	}
+	if (bIsAnsi){
+		sResult = WIN_POLLIN;
+	}else{
+		ReadConsoleInput(Handle, Record, 1, &dwCount);
+	}
+	return(sResult);
+}
+SHORT 
+ConPollBufferSize(HANDLE Handle, INPUT_RECORD *Record, CONSOLE_SCREEN_BUFFER_INFO *Info)
+{
+	SHORT sResult = 0;
+	WINDOW_BUFFER_SIZE_RECORD *pbsEvent = &Record->WindowBufferSizeEvent;
+	DWORD dwSize1 = *(DWORD *)&pbsEvent->dwSize;
+	DWORD dwSize2 = *(DWORD *)&Info->dwSize;
+	DWORD dwCount;
+
+	/* When the Vista Console is in VIRTUAL_TERMINAL_PROCESSING (xterm)
+	 * mode, multiple WINDOW_BUFFER_SIZE_EVENT are sent because of
+	 * screen alternation.
+	 */
+	if (dwSize1 != dwSize2){
+		Info->dwSize = pbsEvent->dwSize;
+		sResult = WIN_POLLIN;
+	}else{
+		ReadConsoleInput(Handle, Record, 1, &dwCount);
+	}
+	return(sResult);
+}
+SHORT 
+ConPollMouse(HANDLE Handle, INPUT_RECORD *Record)
+{
+	SHORT sResult = 0;
+	MOUSE_EVENT_RECORD *pmEvent = &Record->MouseEvent;
+	DWORD dwCount;
+
+	if (pmEvent->dwEventFlags == MOUSE_WHEELED){
 		sResult = WIN_POLLIN;
 	}else{
 		ReadConsoleInput(Handle, Record, 1, &dwCount);
@@ -55,26 +100,28 @@ InputPollKey(HANDLE Handle, INPUT_RECORD *Record)
 	return(sResult);
 }
 BOOL 
-InputPollEvent(HANDLE Handle, INPUT_RECORD *Record, SHORT *Result)
+ConPollEvent(HANDLE Handle, INPUT_RECORD *Record, SHORT *Result)
 {
 	BOOL bResult = TRUE;
 	DWORD dwCount;
-	SHORT sResult = WIN_POLLERR;
+	SHORT sResult = 0;
 
 	switch (Record->EventType){
 		case KEY_EVENT:
-			sResult = InputPollKey(Handle, Record);
-			break;
-		case MOUSE_EVENT:
-			sResult = WIN_POLLIN;
+			sResult = ConPollKey(Handle, Record);
 			break;
 		case WINDOW_BUFFER_SIZE_EVENT:
+			sResult = ConPollBufferSize(Handle, Record, &__CTTY->Info);
+			break;
+		case MOUSE_EVENT:
+			sResult = ConPollMouse(Handle, Record);
+			break;
 		case FOCUS_EVENT:
 		case MENU_EVENT:
-			sResult = 0;
 			bResult = ReadConsoleInput(Handle, Record, 1, &dwCount);
 			break;
 		default:
+			sResult = WIN_POLLERR;
 			SetLastError(ERROR_IO_DEVICE);
 	}
 	*Result = sResult;
@@ -84,7 +131,7 @@ InputPollEvent(HANDLE Handle, INPUT_RECORD *Record, SHORT *Result)
 /****************************************************/
 
 BOOL 
-input_poll(HANDLE Handle, WIN_POLLFD *Info, DWORD *Result)
+con_poll(WIN_TTY *Terminal, WIN_POLLFD *Info, DWORD *Result)
 {
 	BOOL bResult = TRUE;
 	DWORD dwCount = 0;
@@ -92,10 +139,12 @@ input_poll(HANDLE Handle, WIN_POLLFD *Info, DWORD *Result)
 	SHORT sResult = WIN_POLLOUT;
 	SHORT sMask = Info->Events | WIN_POLLIGNORE;
 
-	if (!PeekConsoleInput(Handle, &iRecord, 1, &dwCount)){
+	if (*__Input || __Clipboard){		/* vim.exe */
+		sResult = WIN_POLLIN;
+	}else if (!PeekConsoleInput(Terminal->Input, &iRecord, 1, &dwCount)){
 		bResult = FALSE;
 	}else if (dwCount){
-		bResult = InputPollEvent(Handle, &iRecord, &sResult);
+		bResult = ConPollEvent(Terminal->Input, &iRecord, &sResult);
 	}
 	if (Info->Result |= sResult & sMask){
 		*Result += 1;

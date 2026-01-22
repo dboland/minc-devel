@@ -32,26 +32,6 @@
 
 /****************************************************/
 
-BOOL CALLBACK 
-ConControlHandler(DWORD CtrlType)
-{
-	BOOL bResult = TRUE;
-
-	/* To deliver signals, Windows (CSRSS.EXE) actually forks!
-	 * Copying the call stack to a new thread and executing
-	 * our code. Let's make sure it uses our Task struct too:
-	 */
-	TlsSetValue(__TlsIndex, (PVOID)__Process->TaskId);
-	if (__Process->GroupId == __CTTY->GroupId){
-		if (vfs_raise(WM_SIGNAL, CtrlType, 0)){
-			SetEvent(__Interrupt);		/* ping6.exe */
-		}
-	}
-	return(bResult);
-}
-
-/****************************************************/
-
 BOOL 
 con_TIOCSCTTY(WIN_DEVICE *Device, WIN_TASK *Task, WIN_TTY *Terminal)
 {
@@ -68,6 +48,8 @@ con_TIOCSCTTY(WIN_DEVICE *Device, WIN_TASK *Task, WIN_TTY *Terminal)
 	}
 	Terminal->Input = GetStdHandle(STD_INPUT_HANDLE);
 	Terminal->Output = GetStdHandle(STD_OUTPUT_HANDLE);
+//	Terminal->Input = CharOpenFile("CONIN$", &wFlags, &sa);
+//	Terminal->Output = CharOpenFile("CONOUT$", &wFlags, &sa);
 	Terminal->FSType = FS_TYPE_CHAR;
 	Terminal->SessionId = Task->SessionId;
 	Terminal->GroupId = Task->GroupId;
@@ -107,57 +89,19 @@ con_TIOCSETA(WIN_TTY *Terminal, WIN_TERMIO *Attribs)
 	}
 	return(bResult);
 }
-
-/****************************************************/
-
-HANDLE 
-con_F_OSFHANDLE(WIN_TTY *Terminal, DWORD Index)
-{
-	if (!Index){
-		return(Terminal->Input);
-	}else{
-		return(Terminal->Output);
-	}
-}
-
-/****************************************************/
-
 BOOL 
-con_fsync(WIN_TTY *Terminal)
+con_TIOCDRAIN(WIN_TTY *Terminal)
 {
-	return(FlushConsoleInputBuffer(Terminal->Input));
+	return(TRUE);		/* CONOUT$ not buffered */
 }
 BOOL 
-con_poll(WIN_TTY *Terminal, WIN_POLLFD *Info, DWORD *Result)
-{
-	DWORD dwResult = 0;
-
-	if (!input_poll(Terminal->Input, Info, &dwResult)){
-		return(FALSE);
-	}
-	if (!screen_poll(Terminal->Output, Info, &dwResult)){
-		return(FALSE);
-	}
-	if (dwResult){
-		*Result += 1;
-	}
-	return(TRUE);
-}
-BOOL 
-con_revoke(WIN_TTY *Terminal, WIN_DEVICE *Device)
+con_TIOCFLUSH(WIN_TTY *Terminal)
 {
 	BOOL bResult = FALSE;
 
-	if (!CloseHandle(Terminal->Output)){
-		WIN_ERR("CloseHandle(%d): %s\n", Terminal->Output, win_strerror(GetLastError()));
-	}else if (!CloseHandle(Terminal->Input)){
-		WIN_ERR("CloseHandle(%d): %s\n", Terminal->Input, win_strerror(GetLastError()));
-	}else{
-		Terminal->Input = NULL;
-		Terminal->Output = NULL;
-		Terminal->Flags = 0;
-		Device->FSType = FS_TYPE_PDO;
-		Device->Flags = 0;
+	/* "Handle is invalid" if CONIN$ buffer empty
+	 */
+	if (FlushConsoleInputBuffer(Terminal->Input)){
 		bResult = TRUE;
 	}
 	return(bResult);

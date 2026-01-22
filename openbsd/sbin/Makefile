@@ -46,6 +46,10 @@ wtrace: libwtrace.o wtrace.c
 	${XGCC} -s ${CFLAGS} -o $@ -L${TRACEDIR} $^ -ltrace \
 	${MINGW}/lib/libkernel32.a ${MINGW}/lib/libuser32.a ${MINGW}/lib/libadvapi32.a
 
+xconsole: xconsole.c
+	${XGCC} -s ${CFLAGS} -Wl,--enable-stdcall-fixup -o $@ \
+	-L/C/WINDOWS/system32 $^ -lkernel32 -lutil
+
 mount_refs: ${SBINSRC}/mount_ntfs/mount_ntfs.c ${SBINSRC}/mount/getmntopts.c
 	${XGCC} -s ${CFLAGS} -I${SBINSRC}/mount -o $@ $^
 

@@ -437,6 +437,9 @@ vfs_revoke(WIN_VNODE *Node)
 		case FS_TYPE_PDO:
 			bResult = pdo_revoke(DEVICE(Node->DeviceId));
 			break;
+		case FS_TYPE_MAILSLOT:
+			bResult = mail_revoke(TERMINAL(Node->Index));
+			break;
 		default:
 			SetLastError(ERROR_BAD_FILE_TYPE);
 	}

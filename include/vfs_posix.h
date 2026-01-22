@@ -234,6 +234,10 @@ BOOL rand_read(LPSTR Buffer, DWORD Size, DWORD *Result);
 BOOL char_revoke(WIN_TTY *Terminal);
 VOID char_init(VOID);
 
+/* mailslot.c */
+
+BOOL mail_revoke(WIN_TTY *Terminal);
+
 /* volume.c */
 
 BOOL vol_fstat(HANDLE Handle, LPSTR Result);

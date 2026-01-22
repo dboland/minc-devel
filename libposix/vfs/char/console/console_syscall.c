@@ -28,57 +28,24 @@
  *
  */
 
-#include <winbase.h>
+#include <wincon.h>
 
 /****************************************************/
 
-BOOL 
-disk_lookup(WIN_NAMEIDATA *Path, DWORD Flags)
+BOOL CALLBACK 
+ConControlHandler(DWORD CtrlType)
 {
-	BOOL bResult = FALSE;
-	HANDLE hResult = NULL;
+	BOOL bResult = TRUE;
 
-	if (!VfsStatNode(Path, Flags, &hResult)){	/* Windows IFS node (.cat files) */
-		Path->FSType = FS_TYPE_DISK;
-		Path->FileType = WIN_VREG;
-		bResult = TRUE;
-	}else switch (Path->FSType){
-		case FS_TYPE_DISK:
-			bResult = disk_F_LOOKUP(hResult, Flags, Path);
-			break;
-		case FS_TYPE_PIPE:
-			bResult = pipe_F_LOOKUP(hResult, Flags, Path);
-			break;
-		case FS_TYPE_PDO:
-			bResult = pdo_F_LOOKUP(hResult, Flags, Path);
-			break;
-		default:
-			SetLastError(ERROR_BAD_FILE_TYPE);
-	}
-	return(bResult);
-}
-BOOL 
-disk_namei(HANDLE Handle, WIN_VNODE *Result)
-{
-	BOOL bResult = FALSE;
-	BY_HANDLE_FILE_INFORMATION fInfo;
-
-	Result->Handle = Handle;
-	Result->FSType = FS_TYPE_DISK;
-	Result->DeviceType = DEV_TYPE_ROOT;
-	Result->DeviceId = DEV_TYPE_ROOT;
-	if (GetFileInformationByHandle(Handle, &fInfo)){
-		if (fInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY){
-			Result->FileType = WIN_VDIR;
-		}else{
-			Result->FileType = WIN_VREG;
+	/* To deliver signals, Windows (CSRSS.EXE) actually forks!
+	 * Copying the call stack to a new thread and executing
+	 * our code. Let's make sure it uses our Task struct too:
+	 */
+	TlsSetValue(__TlsIndex, (PVOID)__Process->TaskId);
+	if (__Process->GroupId == __CTTY->GroupId){
+		if (vfs_raise(WM_SIGNAL, CtrlType, 0)){
+			SetEvent(__Interrupt);		/* ping6.exe */
 		}
-		Result->Attribs = fInfo.dwFileAttributes;
-		Result->Flags = win_F_GETFD(Handle);
-		Result->Access = win_F_GETFL(Handle);
-		bResult = TRUE;
-	}else{
-		WIN_ERR("GetFileInformationByHandle(%d): %s\n", Handle, win_strerror(GetLastError()));
 	}
 	return(bResult);
 }

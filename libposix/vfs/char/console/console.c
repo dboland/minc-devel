@@ -28,57 +28,10 @@
  *
  */
 
-#include <winbase.h>
-
-/****************************************************/
-
-BOOL 
-disk_lookup(WIN_NAMEIDATA *Path, DWORD Flags)
-{
-	BOOL bResult = FALSE;
-	HANDLE hResult = NULL;
-
-	if (!VfsStatNode(Path, Flags, &hResult)){	/* Windows IFS node (.cat files) */
-		Path->FSType = FS_TYPE_DISK;
-		Path->FileType = WIN_VREG;
-		bResult = TRUE;
-	}else switch (Path->FSType){
-		case FS_TYPE_DISK:
-			bResult = disk_F_LOOKUP(hResult, Flags, Path);
-			break;
-		case FS_TYPE_PIPE:
-			bResult = pipe_F_LOOKUP(hResult, Flags, Path);
-			break;
-		case FS_TYPE_PDO:
-			bResult = pdo_F_LOOKUP(hResult, Flags, Path);
-			break;
-		default:
-			SetLastError(ERROR_BAD_FILE_TYPE);
-	}
-	return(bResult);
-}
-BOOL 
-disk_namei(HANDLE Handle, WIN_VNODE *Result)
-{
-	BOOL bResult = FALSE;
-	BY_HANDLE_FILE_INFORMATION fInfo;
-
-	Result->Handle = Handle;
-	Result->FSType = FS_TYPE_DISK;
-	Result->DeviceType = DEV_TYPE_ROOT;
-	Result->DeviceId = DEV_TYPE_ROOT;
-	if (GetFileInformationByHandle(Handle, &fInfo)){
-		if (fInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY){
-			Result->FileType = WIN_VDIR;
-		}else{
-			Result->FileType = WIN_VREG;
-		}
-		Result->Attribs = fInfo.dwFileAttributes;
-		Result->Flags = win_F_GETFD(Handle);
-		Result->Access = win_F_GETFL(Handle);
-		bResult = TRUE;
-	}else{
-		WIN_ERR("GetFileInformationByHandle(%d): %s\n", Handle, win_strerror(GetLastError()));
-	}
-	return(bResult);
-}
+#include "console_syscall.c"
+#include "console_input.c"
+#include "console_screen.c"
+#include "console_fcntl.c"
+#include "console_termio.c"
+#include "console_poll.c"
+#include "console_unistd.c"

@@ -63,6 +63,9 @@ term_revoke(WIN_TTY *Terminal)
 		case FS_TYPE_PDO:
 			pdo_revoke(DEVICE(Terminal->DeviceId));
 			break;
+		case FS_TYPE_MAILSLOT:
+			mail_revoke(Terminal);
+			break;
 		default:
 			SetLastError(ERROR_CTX_NOT_CONSOLE);
 	}

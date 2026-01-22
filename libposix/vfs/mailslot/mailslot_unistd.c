@@ -38,8 +38,11 @@ mail_read(WIN_TASK *Task, WIN_VNODE *Node, LPSTR Buffer, DWORD Size, DWORD *Resu
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
-		case DEV_TYPE_PTY:
+		case DEV_TYPE_TTY:
 			bResult = tty_read(Task, TERMINAL(Node->Index), Buffer, Size, Result);
+			break;
+		case DEV_TYPE_PTY:
+			bResult = pty_read(DEVICE(Node->DeviceId), Buffer, Size, Result);
 			break;
 		default:
 			SetLastError(ERROR_BAD_DEVICE);
@@ -52,8 +55,28 @@ mail_write(WIN_VNODE *Node, LPCSTR Buffer, DWORD Size, DWORD *Result)
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
-		case DEV_TYPE_PTY:
+		case DEV_TYPE_TTY:
 			bResult = tty_write(TERMINAL(Node->Index), Buffer, Size, Result);
+			break;
+		case DEV_TYPE_PTY:
+			bResult = pty_write(DEVICE(Node->DeviceId), Buffer, Size, Result);
+			break;
+		default:
+			SetLastError(ERROR_BAD_DEVICE);
+	}
+	return(bResult);
+}
+BOOL 
+mail_revoke(WIN_TTY *Terminal)
+{
+	BOOL bResult = FALSE;
+
+	switch (Terminal->DeviceType){
+		case DEV_TYPE_CONSOLE:
+			bResult = TRUE;
+			break;
+		case DEV_TYPE_PTY:
+			bResult = pty_revoke(Terminal, DEVICE(Terminal->DeviceId));
 			break;
 		default:
 			SetLastError(ERROR_BAD_DEVICE);

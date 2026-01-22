@@ -190,16 +190,12 @@ BOOL
 proc_orphanize(WIN_TASK *Task)
 {
 	BOOL bResult = TRUE;
-	WIN_TASK *pwTask = &__Tasks[WIN_PID_INIT];
 
-	Task->ParentId = WIN_PID_INIT;
 	if (!Task->Handle){		/* remote thread exited (ffmpeg.exe) */
 		bResult = FALSE;
 	}else if (CloseHandle(Task->Handle)){
 		Task->Handle = NULL;
-	}else if (ERROR_INVALID_HANDLE != GetLastError()){
-		WIN_ERR("proc_orphanize(%d): %s\n", Task->Handle, win_strerror(GetLastError()));
 	}
-	bResult = vfs_kill_PID(pwTask->ThreadId, WM_SIGNAL, CTRL_CHILD_EVENT, Task->TaskId);
+	Task->ParentId = WIN_PID_INIT;
 	return(bResult);
 }

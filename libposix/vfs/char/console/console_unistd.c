@@ -28,81 +28,29 @@
  *
  */
 
-#include <winbase.h>
+#include <wincon.h>
 
 /****************************************************/
 
 BOOL 
-char_read(WIN_TASK *Task, WIN_VNODE *Node, LPSTR Buffer, LONG Size, DWORD *Result)
+con_revoke(WIN_TTY *Terminal, WIN_DEVICE *Device)
 {
 	BOOL bResult = FALSE;
 
-	switch (Node->DeviceType){
-		case DEV_TYPE_TTY:
-			bResult = con_read(Task, TERMINAL(Node->Index), Buffer, Size, Result);
-			break;
-		case DEV_TYPE_INPUT:
-			bResult = ReadConsole(Node->Handle, Buffer, Size, Result, NULL);
-			break;
-		case DEV_TYPE_NULL:
-			bResult = ReadFile(Node->Handle, Buffer, Size, Result, NULL);
-			break;
-		default:
-			SetLastError(ERROR_BAD_DEVICE);
+	if (!CloseHandle(Terminal->Output)){
+		WIN_ERR("CloseHandle(%d): %s\n", Terminal->Output, win_strerror(GetLastError()));
+	}else if (!CloseHandle(Terminal->Input)){
+		WIN_ERR("CloseHandle(%d): %s\n", Terminal->Input, win_strerror(GetLastError()));
+	}else{
+		ZeroMemory(Terminal, sizeof(WIN_TTY));
+		Device->FSType = FS_TYPE_PDO;
+		Device->Flags = 0;
+		bResult = TRUE;
 	}
 	return(bResult);
 }
 BOOL 
-char_write(WIN_VNODE *Node, LPCSTR Buffer, DWORD Size, DWORD *Result)
+con_fsync(WIN_TTY *Terminal)
 {
-	BOOL bResult = FALSE;
-
-	switch (Node->DeviceType){
-		case DEV_TYPE_TTY:
-			bResult = con_write(TERMINAL(Node->Index), Buffer, Size, Result);
-			break;
-		case DEV_TYPE_SCREEN:
-			bResult = WriteConsole(Node->Handle, Buffer, Size, Result, NULL);
-			break;
-		case DEV_TYPE_NULL:
-			bResult = WriteFile(Node->Handle, Buffer, Size, Result, NULL);
-			break;
-		default:
-			SetLastError(ERROR_BAD_DEVICE);
-	}
-	return(bResult);
-}
-BOOL 
-char_fsync(WIN_VNODE *Node)
-{
-	BOOL bResult = FALSE;
-
-	switch (Node->DeviceType){
-		case DEV_TYPE_TTY:		/* less.exe */
-			bResult = con_fsync(TERMINAL(Node->Index));
-			break;
-		case DEV_TYPE_INPUT:
-			bResult = FlushConsoleInputBuffer(Node->Handle);
-			break;
-		default:
-			SetLastError(ERROR_BAD_DEVICE);
-	}
-	return(bResult);
-}
-BOOL 
-char_revoke(WIN_TTY *Terminal)
-{
-	BOOL bResult = FALSE;
-
-	switch (Terminal->DeviceType){
-		case DEV_TYPE_CONSOLE:
-			bResult = TRUE;
-			break;
-		case DEV_TYPE_PTY:
-			bResult = con_revoke(Terminal, DEVICE(Terminal->DeviceId));
-			break;
-		default:
-			SetLastError(ERROR_BAD_DEVICE);
-	}
-	return(bResult);
+	return(FlushConsoleInputBuffer(Terminal->Input));
 }

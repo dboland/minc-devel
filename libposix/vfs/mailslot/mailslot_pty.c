@@ -28,69 +28,69 @@
  *
  */
 
-#include <wincon.h>
-
-/* By setting the 'VirtualTerminalLevel' registry key to a DWORD value greater
- * than 1, the Vista Console goes into full XTerm mode. This gets you:
- * Overall faster screen drawing;
- * Underlined terms in man pages;
- * Beautiful mouse scrolling in vim;
- * Colour coded file listings on remote Linux systems;
- * The alternate screen feature (MS calls it 'application mode');
- */
+#include <winbase.h>
 
 /****************************************************/
 
-DWORD 
-XTermScreenMode(WIN_TERMIO *Attribs)
-{
-	DWORD dwResult = 0;
-	UINT uiFlags = WIN_OPOST | WIN_ONLCR;
-
-	if ((Attribs->OFlags & uiFlags) != uiFlags){
-		dwResult |= DISABLE_NEWLINE_AUTO_RETURN;
-	}
-	return(dwResult);
-}
-SHORT 
-XTermPollKey(HANDLE Handle, INPUT_RECORD *Record)
-{
-	SHORT sResult = 0;
-	KEY_EVENT_RECORD *pkEvent = &Record->KeyEvent;
-	DWORD dwCount;
-
-	if (pkEvent->bKeyDown){
-		sResult = WIN_POLLIN;
-	}else{
-		ReadConsoleInput(Handle, Record, 1, &dwCount);
-	}
-	return(sResult);
-}
 BOOL 
-XTermPollEvent(HANDLE Handle, INPUT_RECORD *Record, SHORT *Result)
+pty_poll(WIN_DEVICE *Device, WIN_POLLFD *Info, DWORD *Result)
 {
 	BOOL bResult = TRUE;
-	DWORD dwCount;
-	SHORT sResult = 0;
+	SHORT sResult = WIN_POLLERR;
+	SHORT sMask = Info->Events | WIN_POLLIGNORE;
+	DWORD dwSize = 0;
+	DWORD dwCount = 0;
 
-	switch (Record->EventType){
-		case KEY_EVENT:
-			sResult = XTermPollKey(Handle, Record);
-			break;
-		case MOUSE_EVENT:
-			sResult = WIN_POLLIN;
-			break;
-		case WINDOW_BUFFER_SIZE_EVENT:
-//			bResult = InputBufferSize(&Record->WindowBufferSizeEvent);
-//			break;
-		case FOCUS_EVENT:
-		case MENU_EVENT:
-			bResult = ReadConsoleInput(Handle, Record, 1, &dwCount);
-			break;
-		default:
-			sResult = WIN_POLLERR;
-			SetLastError(ERROR_IO_DEVICE);
+	if (!GetMailslotInfo(Device->Input, NULL, &dwSize, &dwCount, NULL)){
+		bResult = FALSE;
+	}else if (dwSize == MAILSLOT_NO_MESSAGE){
+		sResult = WIN_POLLOUT;
+	}else if (dwSize){
+		sResult = WIN_POLLOUT | WIN_POLLIN;
+	}else{
+		sResult = 0;
 	}
-	*Result = sResult;
+	if (Info->Result = sMask & sResult){
+		*Result += 1;
+	}
+	return(bResult);
+}
+BOOL 
+pty_read(WIN_DEVICE *Device, LPSTR Buffer, DWORD Size, DWORD *Result)
+{
+	BOOL bResult = FALSE;
+	OVERLAPPED ovl = {0, 0, 0, 0, Device->Event};
+
+	if (ReadFile(Device->Input, Buffer, Size, Result, &ovl)){
+		bResult = TRUE;
+	}
+	return(bResult);
+}
+BOOL 
+pty_write(WIN_DEVICE *Device, LPCSTR Buffer, DWORD Size, DWORD *Result)
+{
+	BOOL bResult = FALSE;
+	OVERLAPPED ovl = {0, 0, 0, 0, Device->Event};
+
+	if (WriteFile(Device->Output, Buffer, Size, Result, &ovl)){
+		bResult = TRUE;
+	}
+	return(bResult);
+}
+BOOL 
+pty_revoke(WIN_TTY *Terminal, WIN_DEVICE *Device)
+{
+	BOOL bResult = FALSE;
+
+	if (!CloseHandle(Terminal->Output)){
+		WIN_ERR("CloseHandle(%d): %s\n", Terminal->Output, win_strerror(GetLastError()));
+	}else if (!CloseHandle(Terminal->Input)){
+		WIN_ERR("CloseHandle(%d): %s\n", Terminal->Input, win_strerror(GetLastError()));
+	}else{
+		ZeroMemory(Terminal, sizeof(WIN_TTY));
+		Device->FSType = FS_TYPE_PDO;
+		Device->Flags = 0;
+		bResult = TRUE;
+	}
 	return(bResult);
 }

@@ -158,6 +158,7 @@ errno_posix(DWORD Error)
 			break;
 		case ERROR_DEVICE_NOT_PARTITIONED:
 		case ERROR_DEVICE_NOT_AVAILABLE:
+		case WSANOTINITIALISED:
 			result = ENXIO;
 			break;
 		case ERROR_TOO_MANY_LINKS:

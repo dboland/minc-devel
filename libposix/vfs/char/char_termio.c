@@ -38,8 +38,7 @@ char_TIOCGWINSZ(WIN_VNODE *Node, WIN_WINSIZE *WinSize)
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
-		case DEV_TYPE_PTY:
-		case DEV_TYPE_CONSOLE:
+		case DEV_TYPE_TTY:
 			bResult = con_TIOCGWINSZ(TERMINAL(Node->Index), WinSize);
 			break;
 		case DEV_TYPE_SCREEN:
@@ -56,8 +55,7 @@ char_TIOCSWINSZ(WIN_VNODE *Node, WIN_WINSIZE *WinSize)
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
-		case DEV_TYPE_PTY:
-		case DEV_TYPE_CONSOLE:
+		case DEV_TYPE_TTY:
 			bResult = con_TIOCSWINSZ(TERMINAL(Node->Index), WinSize);
 			break;
 		case DEV_TYPE_SCREEN:
@@ -74,8 +72,7 @@ char_TIOCSETA(WIN_VNODE *Node, WIN_TERMIO *Attribs)
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
-		case DEV_TYPE_PTY:
-		case DEV_TYPE_CONSOLE:
+		case DEV_TYPE_TTY:
 			bResult = con_TIOCSETA(TERMINAL(Node->Index), Attribs);
 			break;
 		case DEV_TYPE_INPUT:
@@ -95,9 +92,8 @@ char_TIOCFLUSH(WIN_VNODE *Node)
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
-		case DEV_TYPE_PTY:
-		case DEV_TYPE_CONSOLE:
-			bResult = input_TIOCFLUSH(TERMINAL(Node->Index));
+		case DEV_TYPE_TTY:
+			bResult = con_TIOCFLUSH(TERMINAL(Node->Index));
 			break;
 		case DEV_TYPE_INPUT:
 			bResult = FlushConsoleInputBuffer(Node->Handle);
@@ -113,9 +109,8 @@ char_TIOCDRAIN(WIN_VNODE *Node)
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
-		case DEV_TYPE_PTY:
-		case DEV_TYPE_CONSOLE:
-			bResult = screen_TIOCDRAIN(TERMINAL(Node->Index));
+		case DEV_TYPE_TTY:
+			bResult = con_TIOCDRAIN(TERMINAL(Node->Index));
 			break;
 		case DEV_TYPE_SCREEN:
 			bResult = TRUE;		/* CONOUT$ not buffered */

@@ -38,8 +38,11 @@ mail_poll(WIN_VNODE *Node, WIN_POLLFD *Info, DWORD *Result)
 	BOOL bResult = FALSE;
 
 	switch (Node->DeviceType){
-		case DEV_TYPE_PTY:
+		case DEV_TYPE_TTY:
 			bResult = tty_poll(TERMINAL(Node->Index), Info, Result);
+			break;
+		case DEV_TYPE_PTY:
+			bResult = pty_poll(DEVICE(Node->DeviceId), Info, Result);
 			break;
 		default:
 			SetLastError(ERROR_CTX_NOT_CONSOLE);

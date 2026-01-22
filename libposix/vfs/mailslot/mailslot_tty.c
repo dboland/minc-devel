@@ -154,7 +154,7 @@ tty_write(WIN_TTY *Terminal, LPCSTR Buffer, DWORD Size, DWORD *Result)
 	WIN_TERMIO *pwAttribs = &Terminal->Attribs;
 	HWND hWindow = Terminal->Window;
 	CHAR szBuffer[WIN_MAX_INPUT];
-	CHAR C;
+	UCHAR C;	/* 8-bit multibyte! */
 
 	while (lSize > 0){
 		C = Buffer[dwCount];
