@@ -197,6 +197,11 @@ Section "SASL authentication library" SecSasl
 	DetailPrint "Installing Sasl 2.1.28..."
 	ExecDos::exec /DETAILED '.\install.cmd sasl2128.tgz'
 SectionEnd
+Section "sl program" SecSL
+	File 'sl.tgz'
+	DetailPrint "Installing sl..."
+	ExecDos::exec /DETAILED '.\install.cmd sl.tgz'
+SectionEnd
 Section
 
 ;	File 'vista.tgz'
@@ -220,18 +225,19 @@ SectionEnd
 !insertmacro MUI_DESCRIPTION_TEXT ${SecBase} "The OpenBSD/i386 6.1 base binary distribution"
 !insertmacro MUI_DESCRIPTION_TEXT ${SecComp} "The OpenBSD/i386 6.1 base libraries distribution"
 !insertmacro MUI_DESCRIPTION_TEXT ${SecNano} "GNU nano -- an enhanced clone of the Pico text editor"
-!insertmacro MUI_DESCRIPTION_TEXT ${SecLynx} "lynx - a general purpose distributed information browser for the World Wide Web"
-!insertmacro MUI_DESCRIPTION_TEXT ${SecWGet} "Wget - The non-interactive network downloader"
-!insertmacro MUI_DESCRIPTION_TEXT ${SecUnzip} "unzip - list, test and extract compressed files in a ZIP archive"
-!insertmacro MUI_DESCRIPTION_TEXT ${SecBZip2} "bzip2, bunzip2 - a block-sorting file compressor, v1.0.6"
-!insertmacro MUI_DESCRIPTION_TEXT ${SecEMail} "email - Encrypted SMTP email via Command line"
-!insertmacro MUI_DESCRIPTION_TEXT ${SecHexEdit} "hexedit - view and edit files in hexadecimal or in ASCII"
-!insertmacro MUI_DESCRIPTION_TEXT ${SecXZ} "xz - Compress or decompress .xz and .lzma files"
-!insertmacro MUI_DESCRIPTION_TEXT ${SecMutt} "mutt - The Mutt Mail User Agent"
-!insertmacro MUI_DESCRIPTION_TEXT ${SecBitchX} "BitchX - The Ultimate IRC Client"
-!insertmacro MUI_DESCRIPTION_TEXT ${SecMagick} "magick - convert between image formats as well as resize an image and more"
+!insertmacro MUI_DESCRIPTION_TEXT ${SecLynx} "a general purpose distributed information browser for the World Wide Web"
+!insertmacro MUI_DESCRIPTION_TEXT ${SecWGet} "The non-interactive network downloader"
+!insertmacro MUI_DESCRIPTION_TEXT ${SecUnzip} "list, test and extract compressed files in a ZIP archive"
+!insertmacro MUI_DESCRIPTION_TEXT ${SecBZip2} "a block-sorting file compressor, v1.0.6"
+!insertmacro MUI_DESCRIPTION_TEXT ${SecEMail} "Encrypted SMTP email via Command line"
+!insertmacro MUI_DESCRIPTION_TEXT ${SecHexEdit} "view and edit files in hexadecimal or in ASCII"
+!insertmacro MUI_DESCRIPTION_TEXT ${SecXZ} "Compress or decompress .xz and .lzma files"
+!insertmacro MUI_DESCRIPTION_TEXT ${SecMutt} "The Mutt Mail User Agent"
+!insertmacro MUI_DESCRIPTION_TEXT ${SecBitchX} "The Ultimate IRC Client"
+!insertmacro MUI_DESCRIPTION_TEXT ${SecMagick} "convert between image formats as well as resize an image and more"
 ;!insertmacro MUI_DESCRIPTION_TEXT ${SecPerl} "perl - The Perl 5 language interpreter"
 !insertmacro MUI_DESCRIPTION_TEXT ${SecBind} "Bind DNS tools"
-!insertmacro MUI_DESCRIPTION_TEXT ${SecSasl} "SASL - SASL authentication library"
+!insertmacro MUI_DESCRIPTION_TEXT ${SecSasl} "SASL authentication library"
+!insertmacro MUI_DESCRIPTION_TEXT ${SecSL} "cure your bad habit of mistyping"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 

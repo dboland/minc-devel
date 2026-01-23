@@ -3,7 +3,7 @@ ROOTDIR= ../..
 include ${ROOTDIR}/Makefile.inc
 
 PROGS= mknod wtrace
-OBJECTS= ${PROGS} wrc mkent mount_refs mount_cdfs console
+OBJECTS= ${PROGS} wrc mkent mount_refs mount_cdfs console xterm
 TRACEDIR= ${ROOTDIR}/libtrace
 SBINSRC= ${SRCDIR}/sbin
 SBINDEST= ${DESTDIR}/sbin
@@ -46,7 +46,7 @@ wtrace: libwtrace.o wtrace.c
 	${XGCC} -s ${CFLAGS} -o $@ -L${TRACEDIR} $^ -ltrace \
 	${MINGW}/lib/libkernel32.a ${MINGW}/lib/libuser32.a ${MINGW}/lib/libadvapi32.a
 
-xconsole: xconsole.c
+xterm: xterm.c
 	${XGCC} -s ${CFLAGS} -Wl,--enable-stdcall-fixup -o $@ \
 	-L/C/WINDOWS/system32 $^ -lkernel32 -lutil
 

@@ -1,0 +1,3 @@
+LIBRARY comdlg32.dll
+EXPORTS
+___comdlg32_dummy DATA

@@ -38,7 +38,7 @@ mail_F_OSFHANDLE(WIN_VNODE *Node, DWORD Index)
 	HANDLE hResult = NULL;
 
 	switch(Node->DeviceType){
-		case DEV_TYPE_PTY:
+		case DEV_TYPE_TTY:
 			hResult = con_F_OSFHANDLE(__Terminals, Index);
 			break;
 		default:

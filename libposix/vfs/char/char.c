@@ -50,14 +50,9 @@ void
 char_init(void)
 {
 	WORD wAttribs = BACKGROUND_BLUE | FOREGROUND_WHITE | FOREGROUND_INTENSITY;
-	HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);
 	HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-	DWORD dwMode;
 
 	/* sys/arch/i386/i386/machdep.c
 	*/
-	GetConsoleMode(hInput, &dwMode);
-	dwMode &= ~(ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT);
-	SetConsoleMode(hInput, dwMode);
 	SetConsoleTextAttribute(hOutput, wAttribs);
 }

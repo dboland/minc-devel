@@ -58,8 +58,8 @@ extern char **environ;
 #define KTR_DEFAULT (KTRFAC_SYSCALL | KTRFAC_SYSRET | KTRFAC_NAMEI | \
 	KTRFAC_PSIG | KTRFAC_EMUL | KTRFAC_STRUCT | KTRFAC_INHERIT)
 
-char *_argv[] = {"/sbin/console", NULL, NULL, NULL};
-char **_args = _argv;
+char *_console[] = {"/sbin/console", NULL, NULL, NULL};
+char **_args = _console;
 char *_lctype = "en_US.UTF-8";
 
 /************************************************************/

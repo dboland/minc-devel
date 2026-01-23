@@ -94,13 +94,11 @@ TTYLineFeed(HWND Window, HANDLE Handle, WIN_TERMIO *Attribs, OVERLAPPED *Ovl)
 BOOL 
 TTYCarriageReturn(HWND Window, HANDLE Handle, WIN_TERMIO *Attribs, OVERLAPPED *Ovl)
 {
-	UINT oFlags = Attribs->OFlags;
-	UINT lFlags = Attribs->LFlags;
-	UINT uiFlags = WIN_OPOST | WIN_OCRNL;
 	BOOL bResult;
+	UINT uiFlags = WIN_OPOST | WIN_OCRNL;
 	DWORD dwCount;
 
-	if ((oFlags & uiFlags) == uiFlags){
+	if ((Attribs->OFlags & uiFlags) == uiFlags){
 		bResult = WriteFile(Handle, "\n", 1, &dwCount, Ovl);
 	}else{
 		bResult = WriteFile(Handle, "\r", 1, &dwCount, Ovl);
