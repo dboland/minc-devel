@@ -39,6 +39,7 @@ char_TIOCGWINSZ(WIN_VNODE *Node, WIN_WINSIZE *WinSize)
 
 	switch (Node->DeviceType){
 		case DEV_TYPE_TTY:
+		case DEV_TYPE_CONSOLE:
 			bResult = con_TIOCGWINSZ(TERMINAL(Node->Index), WinSize);
 			break;
 		case DEV_TYPE_SCREEN:
@@ -56,6 +57,7 @@ char_TIOCSWINSZ(WIN_VNODE *Node, WIN_WINSIZE *WinSize)
 
 	switch (Node->DeviceType){
 		case DEV_TYPE_TTY:
+		case DEV_TYPE_CONSOLE:
 			bResult = con_TIOCSWINSZ(TERMINAL(Node->Index), WinSize);
 			break;
 		case DEV_TYPE_SCREEN:
@@ -73,6 +75,7 @@ char_TIOCSETA(WIN_VNODE *Node, WIN_TERMIO *Attribs)
 
 	switch (Node->DeviceType){
 		case DEV_TYPE_TTY:
+		case DEV_TYPE_CONSOLE:
 			bResult = con_TIOCSETA(TERMINAL(Node->Index), Attribs);
 			break;
 		case DEV_TYPE_INPUT:
@@ -93,6 +96,7 @@ char_TIOCFLUSH(WIN_VNODE *Node)
 
 	switch (Node->DeviceType){
 		case DEV_TYPE_TTY:
+		case DEV_TYPE_CONSOLE:
 			bResult = con_TIOCFLUSH(TERMINAL(Node->Index));
 			break;
 		case DEV_TYPE_INPUT:
@@ -110,6 +114,7 @@ char_TIOCDRAIN(WIN_VNODE *Node)
 
 	switch (Node->DeviceType){
 		case DEV_TYPE_TTY:
+		case DEV_TYPE_CONSOLE:
 			bResult = con_TIOCDRAIN(TERMINAL(Node->Index));
 			break;
 		case DEV_TYPE_SCREEN:

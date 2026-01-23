@@ -39,6 +39,7 @@ char_read(WIN_TASK *Task, WIN_VNODE *Node, LPSTR Buffer, LONG Size, DWORD *Resul
 
 	switch (Node->DeviceType){
 		case DEV_TYPE_TTY:
+		case DEV_TYPE_CONSOLE:
 			bResult = con_read(Task, TERMINAL(Node->Index), Buffer, Size, Result);
 			break;
 		case DEV_TYPE_INPUT:
@@ -59,6 +60,7 @@ char_write(WIN_VNODE *Node, LPCSTR Buffer, DWORD Size, DWORD *Result)
 
 	switch (Node->DeviceType){
 		case DEV_TYPE_TTY:
+		case DEV_TYPE_CONSOLE:
 			bResult = con_write(TERMINAL(Node->Index), Buffer, Size, Result);
 			break;
 		case DEV_TYPE_SCREEN:
@@ -79,6 +81,7 @@ char_fsync(WIN_VNODE *Node)
 
 	switch (Node->DeviceType){
 		case DEV_TYPE_TTY:		/* less.exe */
+		case DEV_TYPE_CONSOLE:
 			bResult = con_fsync(TERMINAL(Node->Index));
 			break;
 		case DEV_TYPE_INPUT:
