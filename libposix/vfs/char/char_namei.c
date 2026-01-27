@@ -33,30 +33,32 @@
 /****************************************************/
 
 BOOL 
-char_namei(HANDLE Handle, DWORD Index, WIN_VNODE *Result)
+char_namei(HANDLE Handle, WIN_VNODE *Result)
 {
 	ACCESS_MASK aMask = GENERIC_READ;
+	DWORD dwMode;
+	CONSOLE_SCREEN_BUFFER_INFO sbInfo;
 
 	Result->Handle = Handle;
 	Result->Event = Handle;
 	Result->FSType = FS_TYPE_CHAR;
 	Result->FileType = WIN_VCHR;
-	if ((DWORD)Handle > 1024){	/* NUL */
+	if (!GetConsoleMode(Handle, &dwMode)){
 		Result->DeviceType = DEV_TYPE_NULL;
 		Result->DeviceId = DEV_TYPE_NULL;
-	}else if (!Index){
-		Result->DeviceType = DEV_TYPE_INPUT;
-		Result->DeviceId = DEV_TYPE_INPUT;
-	}else{
+		aMask |= GENERIC_WRITE;
+	}else if (GetConsoleScreenBufferInfo(Handle, &sbInfo)){
 		Result->DeviceType = DEV_TYPE_SCREEN;
 		Result->DeviceId = DEV_TYPE_SCREEN;
 		aMask = GENERIC_WRITE;
+	}else{
+		Result->DeviceType = DEV_TYPE_INPUT;
+		Result->DeviceId = DEV_TYPE_INPUT;
+		aMask = GENERIC_READ;
 	}
 	Result->Flags = win_F_GETFD(Handle);
-	if (!vfs_F_GETFL(Handle, &Result->Access)){
+	if (!vfs_F_GETFL(Handle, &Result->Access)){	/* Vista */
 		Result->Access = aMask;
-//	}else{		/* NUL/CON */
-//		vfs_ktrace(L"char_namei", STRUCT_VNODE, Result);
 	}
 	return(TRUE);
 }

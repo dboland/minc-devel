@@ -62,7 +62,7 @@ con_TIOCSCTTY(WIN_DEVICE *Device, WIN_TASK *Task, WIN_TTY *Terminal)
 	Task->TerminalId = Terminal->Index;
 	GetConsoleMode(Terminal->Input, &dwMode[0]);
 	GetConsoleMode(Terminal->Output, &dwMode[1]);
-//	vfs_ktrace(L"con_TIOCSCTTY", STRUCT_TTY, Terminal);
+//vfs_ktrace(L"con_TIOCSCTTY", STRUCT_TTY, Terminal);
 	return(TRUE);
 }
 BOOL 

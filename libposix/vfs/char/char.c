@@ -44,6 +44,8 @@
 #include "char_filio.c"
 #include "char_stat.c"
 
+#define ENABLE_ALL_INPUT	0xFF
+
 /****************************************************/
 
 void 

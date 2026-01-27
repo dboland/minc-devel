@@ -151,7 +151,7 @@ BOOL vfs_FIONBIO(WIN_VNODE *Node, ULONG NoWait);
 /* vfs_namei.c */
 
 WIN_NAMEIDATA *vfs_lookup(WIN_NAMEIDATA *Path, LPWSTR Source, DWORD Flags);
-BOOL vfs_namei(HANDLE Handle, DWORD Index, WIN_VNODE *Result);
+BOOL vfs_namei(HANDLE Handle, WIN_VNODE *Result);
 
 /* vfs_uio.c */
 

@@ -45,16 +45,6 @@ ProcInitLimits(DWORDLONG Limits[])
 	Limits[WIN_RLIMIT_NPROC] = WIN_CHILD_MAX;
 	Limits[WIN_RLIMIT_NOFILE] = WIN_OPEN_MAX;
 }
-VOID 
-ProcInitChannels(WIN_VNODE Result[])
-{
-	DWORD dwIndex = 0;
-
-	while (dwIndex < WIN_OPEN_MAX){
-		Result->FileId = dwIndex++;
-		Result++;
-	}
-}
 
 /************************************************************/
 
@@ -125,13 +115,12 @@ proc_init(WIN_SIGPROC SignalProc)
 		__Process = ProcCreateTask(0);
 		__Process->Flags |= WIN_PS_SYSTEM;
 		__Process->FileMask = 0022;
-		vfs_namei(GetStdHandle(STD_INPUT_HANDLE), 0, &__Process->Node[0]);
-		vfs_namei(GetStdHandle(STD_OUTPUT_HANDLE), 1, &__Process->Node[1]);
-		vfs_namei(GetStdHandle(STD_ERROR_HANDLE), 2, &__Process->Node[2]);
+		vfs_namei(GetStdHandle(STD_INPUT_HANDLE), &__Process->Node[0]);
+		vfs_namei(GetStdHandle(STD_OUTPUT_HANDLE), &__Process->Node[1]);
+		vfs_namei(GetStdHandle(STD_ERROR_HANDLE), &__Process->Node[2]);
 		win_getcwd(__Strings[__Process->TaskId].Path);
 		win_geteuid(&__Process->UserSid);
 		win_getegid(&__Process->GroupSid);
-		ProcInitChannels(__Process->Node);
 		ProcInitLimits(__Process->Limit);
 //		SetErrorMode(SEM_FAILCRITICALERRORS);
 	}

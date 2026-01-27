@@ -120,5 +120,5 @@ Tutorial: Building the Simplest Possible Linux System - Rob Landley
 https://youtu.be/Sk9TatW9ino
 
 
-Januari, 2026
+Januari 2026,
 Daniel Boland

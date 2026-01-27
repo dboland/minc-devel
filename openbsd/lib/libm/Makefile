@@ -5,6 +5,8 @@ include ${ROOTDIR}/Makefile.inc
 LIB= libm.a
 ARCH=i387
 ULIBDIR= /usr/lib
+LIBSRC= ${SRCDIR}/lib/libm
+IMPLIB= ${LIBSRC}/libm.dll.a
 
 OBJECTS=b_exp__D.o b_log__D.o b_tgamma.o \
 	e_acos.o e_acosf.o e_acosh.o e_acoshf.o e_asin.o e_asinf.o \
@@ -86,6 +88,9 @@ install: ${DESTDIR}
 
 install-local:
 	/bin/cp -uv ${LIB} ${LIBDIR}/
+
+install-cross: ${IMPLIB}
+	/bin/cp -uv ${IMPLIB} ${XLIBDIR}/libm.a
 
 lib-clean:
 	/bin/rm -f ${LIB}

@@ -38,11 +38,9 @@ vfs_F_DUPFD(WIN_VNODE *Node, BOOL CloseExec, WIN_VNODE *Result)
 	BOOL bResult = FALSE;
 	HANDLE hProcess = GetCurrentProcess();
 	DWORD dwOptions = DUPLICATE_SAME_ACCESS;
-	DWORD dwFileId = Result->FileId;
 
 	win_memcpy(Result, Node, sizeof(WIN_VNODE));
 	Result->CloseExec = CloseExec;
-	Result->FileId = dwFileId;
 	switch (Node->FSType){
 		case FS_TYPE_WINSOCK:
 		case FS_TYPE_PIPE:

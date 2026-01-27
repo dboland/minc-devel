@@ -65,27 +65,6 @@ ConPollKey(HANDLE Handle, INPUT_RECORD *Record)
 	return(sResult);
 }
 SHORT 
-ConPollBufferSize(HANDLE Handle, INPUT_RECORD *Record, CONSOLE_SCREEN_BUFFER_INFO *Info)
-{
-	SHORT sResult = 0;
-	WINDOW_BUFFER_SIZE_RECORD *pbsEvent = &Record->WindowBufferSizeEvent;
-	DWORD dwSize1 = *(DWORD *)&pbsEvent->dwSize;
-	DWORD dwSize2 = *(DWORD *)&Info->dwSize;
-	DWORD dwCount;
-
-	/* When the Vista Console is in VIRTUAL_TERMINAL_PROCESSING (xterm)
-	 * mode, multiple WINDOW_BUFFER_SIZE_EVENT are sent because of
-	 * screen alternation.
-	 */
-	if (dwSize1 != dwSize2){
-		Info->dwSize = pbsEvent->dwSize;
-		sResult = WIN_POLLIN;
-	}else{
-		ReadConsoleInput(Handle, Record, 1, &dwCount);
-	}
-	return(sResult);
-}
-SHORT 
 ConPollMouse(HANDLE Handle, INPUT_RECORD *Record)
 {
 	SHORT sResult = 0;
@@ -110,15 +89,15 @@ ConPollEvent(HANDLE Handle, INPUT_RECORD *Record, SHORT *Result)
 		case KEY_EVENT:
 			sResult = ConPollKey(Handle, Record);
 			break;
-		case WINDOW_BUFFER_SIZE_EVENT:
-			sResult = ConPollBufferSize(Handle, Record, &__CTTY->Info);
-			break;
 		case MOUSE_EVENT:
 			sResult = ConPollMouse(Handle, Record);
 			break;
+		case WINDOW_BUFFER_SIZE_EVENT:
+			sResult = WIN_POLLIN;
+			break;
 		case FOCUS_EVENT:
 		case MENU_EVENT:
-			bResult = ReadConsoleInput(Handle, Record, 1, &dwCount);
+			ReadConsoleInput(Handle, Record, 1, &dwCount);
 			break;
 		default:
 			sResult = WIN_POLLERR;

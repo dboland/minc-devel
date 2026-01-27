@@ -112,7 +112,7 @@ so_sockopt_posix(WIN_TASK *Task, struct cmsghdr *cmsg)
 	switch (cmsg->cmsg_type){
 		case SCM_RIGHTS:			/* syslogd.exe */
 			hChannel = *(HANDLE *)data;
-			vfs_namei(hChannel, 1, &vNode);
+			vfs_namei(hChannel, &vNode);
 			*(int *)data = fd_posix(Task, &vNode, 0);
 			break;
 		case SCM_TIMESTAMP:

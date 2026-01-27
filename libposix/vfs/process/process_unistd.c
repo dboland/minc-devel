@@ -38,7 +38,6 @@ ProcDupChannels(WIN_VNODE Nodes[], WIN_VNODE Result[])
 	DWORD dwIndex = 0;
 
 	while (dwIndex < WIN_OPEN_MAX){
-		Result->FileId = dwIndex;
 		if (Nodes->Access){
 			/* don't clear FD_CLOEXEC */
 			vfs_F_DUPFD(Nodes, Nodes->CloseExec, Result);

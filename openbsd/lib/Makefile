@@ -24,6 +24,7 @@ install-cross:
 	@${MAKE} -C libutil install-cross
 	@${MAKE} -C libcurses install-cross
 	@${MAKE} -C libz install-cross
+	@${MAKE} -C libm install-cross
 	@${MAKE} -C libcrypto install-cross
 	@${MAKE} -C libssl install-cross
 

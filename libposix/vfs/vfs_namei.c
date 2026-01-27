@@ -147,7 +147,7 @@ vfs_lookup(WIN_NAMEIDATA *Path, LPWSTR Source, DWORD Flags)
 	return(Path);
 }
 BOOL 
-vfs_namei(HANDLE Handle, DWORD Index, WIN_VNODE *Result)
+vfs_namei(HANDLE Handle, WIN_VNODE *Result)
 {
 	BOOL bResult = FALSE;
 	DWORD dwType = GetFileType(Handle);
@@ -158,7 +158,7 @@ vfs_namei(HANDLE Handle, DWORD Index, WIN_VNODE *Result)
 			bResult = disk_namei(Handle, Result);
 			break;
 		case FS_TYPE_CHAR:
-			bResult = char_namei(Handle, Index, Result);
+			bResult = char_namei(Handle, Result);
 			break;
 		case FS_TYPE_PIPE:
 			bResult = pipe_namei(Handle, Result);

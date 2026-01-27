@@ -36,7 +36,6 @@ BOOL
 vfs_close(WIN_VNODE *Node)
 {
 	BOOL bResult = FALSE;
-	DWORD dwFileId = Node->FileId;
 
 	if (!Node->Handle){		/* vfs_dup2() */
 		bResult = TRUE;
@@ -53,7 +52,6 @@ vfs_close(WIN_VNODE *Node)
 		default:
 			bResult = disk_close(Node);
 	}
-	Node->FileId = dwFileId;
 	return(bResult);
 }
 VOID 
@@ -179,7 +177,7 @@ vfs_dup(WIN_VNODE *Node, WIN_VNODE *Result)
 {
 	BOOL bResult = FALSE;
 
-	Result->FileId = Node->FileId;		/* pdo_F_DUPFD() */
+//	Result->FileId = Node->FileId;		/* pdo_F_DUPFD() */
 	if (vfs_F_DUPFD(Node, FALSE, Result)){
 		bResult = TRUE;
 	}

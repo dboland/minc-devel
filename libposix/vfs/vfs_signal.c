@@ -96,7 +96,7 @@ vfs_kill_GRP(DWORD GroupId, UINT Message, WPARAM WParam, LPARAM LParam)
 	DWORD dwIndex = WIN_CHILD_MAX - 1;
 	WIN_TASK *pwTask = &__Tasks[dwIndex];
 
-	while (dwIndex > WIN_PID_INIT){
+	while (dwIndex > 0){
 		if (pwTask->GroupId == GroupId){
 			vfs_kill_PID(pwTask->ThreadId, Message, WParam, LParam);
 		}
@@ -112,7 +112,7 @@ vfs_kill_ANY(DWORD ParentId, UINT Message, WPARAM WParam, LPARAM LParam)
 	DWORD dwIndex = WIN_CHILD_MAX - 1;
 	WIN_TASK *pwTask = &__Tasks[dwIndex];
 
-	while (dwIndex > WIN_PID_INIT){
+	while (dwIndex > 0){
 		if (pwTask->ParentId == ParentId){
 			vfs_kill_PID(pwTask->ThreadId, Message, WParam, LParam);
 		}

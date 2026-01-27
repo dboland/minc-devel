@@ -25,12 +25,12 @@ too many files open in shell*
 Some of the Korn Shell features are dependent on the type of 
 terminal used. MinC uses the Windows Console by default. Its 
 *ncurses* name in the environment is *interix*. This makes MinC 
-compatible as a terminal with *VS Code* and *Windows Terminal*. 
-But it also means that Ctrl+Z (**suspend**) does not work, but 
-Ctrl+S (XOFF) does. Use this instead to suspend the current 
-task. Or just use the *Pause* key.
+compatible as a terminal with *VS Code*, *Windows Terminal* and 
+remote Linux distributions. But it also means that **suspend**
+(Ctrl+Z) does not work, but Ctrl+S (XOFF) does. Use this instead 
+to suspend the current task. Or just use the *Pause* key.
 
-This also means that Ctrl-V (**paste**) does not work. Use the 
+This also means that **paste** (Ctrl+V) does not work. Use the 
 Shift+Insert key combination instead to paste text from the Windows 
 Clipboard in any editing program.
 
@@ -74,5 +74,5 @@ priority at the moment. Create an issue if you need to have one
 of them implemented.
 
 
-Januari, 2026
+Januari 2026,
 Daniel Boland
