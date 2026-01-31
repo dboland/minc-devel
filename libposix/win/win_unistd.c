@@ -211,7 +211,7 @@ win_readlink(LPCWSTR Path, SHELL_LINK_HEADER *Header, LPWSTR Target)
 	}else if (Header->LinkFlags & HasLinkInfo){
 		bResult = LinkReadInfo(hFile, Target);
 	}
-	CloseHandle(hFile);
+	NtClose(hFile);
 	return(bResult);
 }
 BOOL 
@@ -257,6 +257,9 @@ win_execve(LPSTR Command, LPCSTR Path, STARTUPINFO *Info)
 	Info->lpDesktop = "";			/* Vista */
 	Info->dwFlags = STARTF_USESTDHANDLES;
 	if (CreateProcess(NULL, Command, NULL, NULL, TRUE, NORMAL_PRIORITY_CLASS, NULL, Path, Info, &pi)){
+		CloseHandle(Info->hStdInput);
+		CloseHandle(Info->hStdOutput);
+		CloseHandle(Info->hStdError);
 		CloseHandle(pi.hThread);
 		WaitForSingleObject(pi.hProcess, INFINITE);
 		bResult = CloseHandle(pi.hProcess);

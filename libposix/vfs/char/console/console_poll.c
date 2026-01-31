@@ -79,6 +79,20 @@ ConPollMouse(HANDLE Handle, INPUT_RECORD *Record)
 	return(sResult);
 }
 BOOL 
+ConPollBufferSize(HANDLE Handle, INPUT_RECORD *Record, SHORT *Result)
+{
+	BOOL bResult = TRUE;
+	DWORD dwCount;
+
+	if (!vfs_raise(WM_SIGNAL, CTRL_SIZE_EVENT, 0)){
+		*Result = WIN_POLLIN;
+	}else{
+		ReadConsoleInput(Handle, Record, 1, &dwCount);
+		bResult = FALSE;
+	}
+	return(bResult);
+}
+BOOL 
 ConPollEvent(HANDLE Handle, INPUT_RECORD *Record, SHORT *Result)
 {
 	BOOL bResult = TRUE;
@@ -93,7 +107,7 @@ ConPollEvent(HANDLE Handle, INPUT_RECORD *Record, SHORT *Result)
 			sResult = ConPollMouse(Handle, Record);
 			break;
 		case WINDOW_BUFFER_SIZE_EVENT:
-			sResult = WIN_POLLIN;
+			bResult = ConPollBufferSize(Handle, Record, &sResult);
 			break;
 		case FOCUS_EVENT:
 		case MENU_EVENT:
