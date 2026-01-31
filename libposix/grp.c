@@ -114,14 +114,16 @@ grp_GRP_GETGRNAM(const char *name, char *buf, size_t buflen)
 
 	if (!strncmp(name, "_", 1)){
 		result = grp_GRP_GETGRGID(DAEMON_GID, buf, buflen);
+	}else if (!strcmp(name, "auth")){
+		result = grp_GRP_GETGRGID(AUTH_GID, buf, buflen);
 	}else if (!strcmp(name, "bin")){
 		result = grp_GRP_GETGRGID(BIN_GID, buf, buflen);
 	}else if (!strcmp(name, "wheel")){
-		result = grp_GRP_GETGRGID(ROOT_GID, buf, buflen);
+		result = grp_GRP_GETGRGID(WHEEL_GID, buf, buflen);
 	}else if (!strcmp(name, "crontab")){
-		result = grp_GRP_GETGRGID(ROOT_GID, buf, buflen);
+		result = grp_GRP_GETGRGID(CRONTAB_GID, buf, buflen);
 	}else if (!strcmp(name, "kmem")){
-		result = grp_GRP_GETGRGID(ROOT_GID, buf, buflen);
+		result = grp_GRP_GETGRGID(KMEM_GID, buf, buflen);
 	}else if (!strcmp(name, "operator")){
 		result = grp_GRP_GETGRGID(OPERATOR_GID, buf, buflen);
 	}else if (!win_mbstowcs(szAccount, name, MAX_NAME)){
