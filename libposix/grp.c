@@ -94,7 +94,7 @@ grp_GRP_GETGRGID(gid_t gid, char *buf, size_t buflen)
 	SID8 sid;
 
 	if (!gid){
-		gid = ROOT_GID;
+		gid = WHEEL_GID;
 	}
 	if (gid < 0){
 		result = -EINVAL;
@@ -116,6 +116,8 @@ grp_GRP_GETGRNAM(const char *name, char *buf, size_t buflen)
 		result = grp_GRP_GETGRGID(DAEMON_GID, buf, buflen);
 	}else if (!strcmp(name, "auth")){
 		result = grp_GRP_GETGRGID(AUTH_GID, buf, buflen);
+	}else if (!strcmp(name, "tty")){
+		result = grp_GRP_GETGRGID(TERM_GID, buf, buflen);
 	}else if (!strcmp(name, "bin")){
 		result = grp_GRP_GETGRGID(BIN_GID, buf, buflen);
 	}else if (!strcmp(name, "wheel")){
@@ -148,7 +150,7 @@ grp_GRP_GETGROUPLIST(const char *user, gid_t group, gid_t *groups, int *ngroups)
 	gid_t next;
 
 	if (!group){
-		group = ROOT_GID;
+		group = WHEEL_GID;
 	}
 	if (!win_mbstowcs(szAccount, user, MAX_NAME)){
 		result = -EINVAL;
@@ -160,7 +162,7 @@ grp_GRP_GETGROUPLIST(const char *user, gid_t group, gid_t *groups, int *ngroups)
 		result = -EINVAL;
 	}else while (index < dwCount){
 		next = rid_posix(psGroups);
-		if (next == ROOT_GID){
+		if (next == WHEEL_GID){
 			groups[index] = 0;
 		}else{
 			groups[index] = next;

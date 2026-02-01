@@ -217,7 +217,7 @@ __getgid(WIN_TASK *Task)
 	if (!gid){
 		gid = rid_posix(&Task->GroupSid);
 	}
-	if (gid == ROOT_GID){
+	if (gid == WHEEL_GID){
 		gid = 0;
 	}
 	return(gid);
@@ -232,7 +232,7 @@ __getegid(WIN_TASK *Task)
 {
 	gid_t gid = rid_posix(&Task->GroupSid);
 
-	if (gid == ROOT_GID){
+	if (gid == WHEEL_GID){
 		gid = 0;
 	}
 	return(gid);
@@ -341,7 +341,7 @@ __setegid(WIN_TASK *Task, gid_t gid)
 	SID8 sidGroup;
 
 	if (!gid){
-		gid = ROOT_GID;
+		gid = WHEEL_GID;
 	}
 	if (gid == rid_posix(&Task->GroupSid)){		/* PRIV_START check (ssh.exe) */
 		return(0);
@@ -397,7 +397,7 @@ sys_setresgid(call_t call, gid_t rgid, gid_t egid, gid_t sgid)
 	WIN_TASK *pwTask = call.Task;
 
 	if (!sgid){
-		sgid = ROOT_GID;
+		sgid = WHEEL_GID;
 	}
 	if (!__setregid(pwTask, rgid, egid)){
 		pwTask->SavedGid = sgid;
@@ -489,7 +489,7 @@ sys_chown(call_t call, const char *path, uid_t owner, gid_t group)
 		owner = ROOT_UID;
 	}
 	if (!group){
-		group = ROOT_GID;
+		group = WHEEL_GID;
 	}
 	if (!vfs_chown(path_win(&wpePath, path, 0), rid_win(&sidUser, owner), rid_win(&sidGroup, group))){
 		result -= errno_posix(GetLastError());
@@ -508,7 +508,7 @@ sys_fchown(call_t call, int fd, uid_t owner, gid_t group)
 		owner = ROOT_UID;
 	}
 	if (!group){
-		group = ROOT_GID;
+		group = WHEEL_GID;
 	}
 	if (fd < 0 || fd >= OPEN_MAX){
 		result = -EBADF;
@@ -529,7 +529,7 @@ sys_lchown(call_t call, const char *path, uid_t owner, gid_t group)
 		owner = ROOT_UID;
 	}
 	if (!group){
-		group = ROOT_GID;
+		group = WHEEL_GID;
 	}
 	if (!vfs_chown(path_win(&wpePath, path, O_NOFOLLOW), rid_win(&sidUser, owner), rid_win(&sidGroup, group))){
 		result -= errno_posix(GetLastError());
@@ -550,7 +550,7 @@ sys_fchownat(call_t call, int dirfd, const char *path, uid_t owner, gid_t group,
 		owner = ROOT_UID;
 	}
 	if (!group){
-		group = ROOT_GID;
+		group = WHEEL_GID;
 	}
 	if (!path || !path[0]){
 		result = -EINVAL;

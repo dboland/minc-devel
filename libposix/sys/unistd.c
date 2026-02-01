@@ -100,7 +100,7 @@ sys_getgroups(call_t call, int size, gid_t list[])
 	}else if (size >= dwCount){
 		while (index < dwCount){
 			list[index] = rid_posix(&grList[index]);
-			if (list[index] == ROOT_GID){
+			if (list[index] == WHEEL_GID){
 				list[index] = 0;
 			}
 			index++;
@@ -126,7 +126,7 @@ sys_setgroups(call_t call, int size, const gid_t *list)
 		grList = win_malloc(sizeof(SID8) * dwCount);
 		while (size--){
 			if (!list[size]){
-				grList[dwIndex] = *rid_win(&sid, ROOT_GID);
+				grList[dwIndex] = *rid_win(&sid, WHEEL_GID);
 			}else{
 				grList[dwIndex] = *rid_win(&sid, list[size]);
 			}
