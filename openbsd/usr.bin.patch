@@ -3,7 +3,7 @@
 @@ -0,0 +1 @@
 +This directory has been patched.
 --- openbsd-master/usr.bin/ftp/Makefile
-+++ openbsd-master/usr.bin/ftp/Makefile	Sun Feb 16 19:02:22 2025
++++ openbsd-master/usr.bin/ftp/Makefile	Tue Jan 20 05:51:05 2026
 @@ -15,11 +15,12 @@
  SRCS=	cmds.c cmdtab.c complete.c cookie.c domacro.c fetch.c ftp.c \
  	list.c main.c ruserpass.c small.c stringlist.c util.c
@@ -19,7 +19,7 @@
  #COPTS+= -Wall -Wconversion -Wstrict-prototypes -Wmissing-prototypes
  
 --- openbsd-master/usr.bin/kdump/kdump.c
-+++ openbsd-master/usr.bin/kdump/kdump.c	Tue Oct  7 15:48:22 2025
++++ openbsd-master/usr.bin/kdump/kdump.c	Sat Oct 18 06:13:22 2025
 @@ -492,6 +492,7 @@
  static void
  plln(void)
@@ -28,8 +28,38 @@
  	long long val = ((long long)*ap) & 0xffffffff;
  	ap++;
  	val |= ((long long)*ap) << 32;
+--- openbsd-master/usr.bin/mail/Makefile
++++ openbsd-master/usr.bin/mail/Makefile	Fri Oct 24 04:56:04 2025
+@@ -1,13 +1,13 @@
+ #	$OpenBSD: src/usr.bin/mail/Makefile,v 1.9 2010/01/04 17:50:39 deraadt Exp $
+ 
+ PROG=	mail
+-SRCS=	version.c aux.c cmd1.c cmd2.c cmd3.c cmdtab.c collect.c \
++SRCS=	version.c _aux.c cmd1.c cmd2.c cmd3.c cmdtab.c collect.c \
+ 	edit.c fio.c getname.c head.c v7.local.c lex.c list.c main.c names.c \
+ 	popen.c quit.c send.c strings.c temp.c tty.c vars.c
+ SFILES=	mail.help mail.tildehelp
+ EFILES=	mail.rc
+-LINKS=	${BINDIR}/mail ${BINDIR}/Mail ${BINDIR}/mail ${BINDIR}/mailx
+-MLINKS=	mail.1 Mail.1 mail.1 mailx.1
++LINKS=	${BINDIR}/mail ${BINDIR}/mailx
++MLINKS=	mail.1 mailx.1
+ 
+ beforeinstall:
+ 	cd ${.CURDIR}/misc; ${INSTALL} ${INSTALL_COPY} -o ${BINOWN} -g ${BINGRP} \
+--- openbsd-master/usr.bin/mandoc/Makefile
++++ openbsd-master/usr.bin/mandoc/Makefile	Sat Oct 18 06:17:56 2025
+@@ -3,7 +3,7 @@
+ .include <bsd.own.mk>
+ 
+ CFLAGS  += -DVERSION=\"1.13.0\"
+-CFLAGS  += -W -Wall -Wstrict-prototypes -Wno-unused-parameter
++CFLAGS  += -W -Wall -Wstrict-prototypes -Wno-unused-parameter -Dfork=vfork
+ DPADD += ${LIBUTIL}
+ LDADD	+= -lsqlite3 -lutil
+ 
 --- openbsd-master/usr.bin/netstat/main.c
-+++ openbsd-master/usr.bin/netstat/main.c	Tue Oct  7 15:56:35 2025
++++ openbsd-master/usr.bin/netstat/main.c	Sat Oct 18 06:13:22 2025
 @@ -335,6 +335,7 @@
  	need_nlist = !mflag && (pflag || nlistf != NULL || memf != NULL ||
  	    (!iflag && !sflag && (rflag ? Aflag :
@@ -39,7 +69,7 @@
  	/*
  	 * Discard setgid privileges if not the running kernel so that bad
 --- openbsd-master/usr.bin/sqlite3/Makefile
-+++ openbsd-master/usr.bin/sqlite3/Makefile	Sun May  1 08:20:56 2022
++++ openbsd-master/usr.bin/sqlite3/Makefile	Sat Oct 18 06:13:22 2025
 @@ -11,8 +11,8 @@
  
  CPPFLAGS +=	-I${.CURDIR}/../../lib/libedit -DHAVE_READLINE=1
@@ -52,7 +82,7 @@
  
  .include <bsd.prog.mk>
 --- openbsd-master/usr.bin/ssh/scp/Makefile
-+++ openbsd-master/usr.bin/ssh/scp/Makefile	Sat Sep  6 07:38:24 2025
++++ openbsd-master/usr.bin/ssh/scp/Makefile	Sat Oct 18 06:13:22 2025
 @@ -12,4 +12,6 @@
  
  SRCS=	scp.c
@@ -61,7 +91,7 @@
 +
  .include <bsd.prog.mk>
 --- openbsd-master/usr.bin/ssh/sftp/Makefile
-+++ openbsd-master/usr.bin/ssh/sftp/Makefile	Sat Sep  6 07:41:46 2025
++++ openbsd-master/usr.bin/ssh/sftp/Makefile	Sat Oct 18 06:13:22 2025
 @@ -14,5 +14,5 @@
  
  .include <bsd.prog.mk>
@@ -70,7 +100,7 @@
 +LDADD+=	-ledit -ltermcap -lutil -lssp
  DPADD+= ${LIBEDIT} ${LIBTERMCAP} ${LIBUTIL}
 --- openbsd-master/usr.bin/ssh/sftp-server/Makefile
-+++ openbsd-master/usr.bin/ssh/sftp-server/Makefile	Sat Sep  6 07:39:16 2025
++++ openbsd-master/usr.bin/ssh/sftp-server/Makefile	Sat Oct 18 06:13:22 2025
 @@ -12,7 +12,7 @@
  
  SRCS=	sftp-server.c sftp-common.c sftp-server-main.c
@@ -81,7 +111,7 @@
  
  .include <bsd.prog.mk>
 --- openbsd-master/usr.bin/ssh/ssh/Makefile
-+++ openbsd-master/usr.bin/ssh/ssh/Makefile	Sat Sep  6 07:14:43 2025
++++ openbsd-master/usr.bin/ssh/ssh/Makefile	Sat Oct 18 06:13:22 2025
 @@ -42,5 +42,5 @@
  DPADD+=	${LIBCRYPTO} ${LIBUTIL}
  .endif
@@ -90,7 +120,7 @@
 +LDADD+=	-lz -lssp
  DPADD+=	${LIBZ}
 --- openbsd-master/usr.bin/ssh/ssh-add/Makefile
-+++ openbsd-master/usr.bin/ssh/ssh-add/Makefile	Sat Sep  6 07:32:25 2025
++++ openbsd-master/usr.bin/ssh/ssh-add/Makefile	Sat Oct 18 06:13:22 2025
 @@ -14,5 +14,5 @@
  
  .include <bsd.prog.mk>
@@ -99,7 +129,7 @@
 +LDADD+=	-lcrypto -lssp
  DPADD+= ${LIBCRYPTO}
 --- openbsd-master/usr.bin/ssh/ssh-agent/Makefile
-+++ openbsd-master/usr.bin/ssh/ssh-agent/Makefile	Sat Sep  6 07:36:51 2025
++++ openbsd-master/usr.bin/ssh/ssh-agent/Makefile	Sat Oct 18 06:13:22 2025
 @@ -15,5 +15,5 @@
  
  .include <bsd.prog.mk>
@@ -108,7 +138,7 @@
 +LDADD+=	-lcrypto -lssp
  DPADD+=	${LIBCRYPTO}
 --- openbsd-master/usr.bin/ssh/ssh-keygen/Makefile
-+++ openbsd-master/usr.bin/ssh/ssh-keygen/Makefile	Sat Sep  6 07:33:46 2025
++++ openbsd-master/usr.bin/ssh/ssh-keygen/Makefile	Sat Oct 18 06:13:22 2025
 @@ -14,5 +14,5 @@
  
  .include <bsd.prog.mk>
@@ -117,7 +147,7 @@
 +LDADD+=	-lcrypto -lssp
  DPADD+=	${LIBCRYPTO}
 --- openbsd-master/usr.bin/ssh/ssh-keyscan/Makefile
-+++ openbsd-master/usr.bin/ssh/ssh-keyscan/Makefile	Sat Sep  6 07:41:00 2025
++++ openbsd-master/usr.bin/ssh/ssh-keyscan/Makefile	Sat Oct 18 06:13:22 2025
 @@ -14,5 +14,5 @@
  
  .include <bsd.prog.mk>
@@ -126,7 +156,7 @@
 +LDADD+= -lcrypto -lz -lssp
  DPADD+= ${LIBCRYPTO} ${LIBZ}
 --- openbsd-master/usr.bin/ssh/ssh-keysign/Makefile
-+++ openbsd-master/usr.bin/ssh/ssh-keysign/Makefile	Sat Sep  6 07:40:15 2025
++++ openbsd-master/usr.bin/ssh/ssh-keysign/Makefile	Sat Oct 18 06:13:22 2025
 @@ -14,5 +14,5 @@
  
  .include <bsd.prog.mk>
@@ -135,7 +165,7 @@
 +LDADD+=	-lcrypto -lutil -lz -lssp
  DPADD+=	${LIBCRYPTO} ${LIBUTIL} ${LIBZ}
 --- openbsd-master/usr.bin/ssh/ssh-pkcs11-helper/Makefile
-+++ openbsd-master/usr.bin/ssh/ssh-pkcs11-helper/Makefile	Sat Sep  6 07:42:27 2025
++++ openbsd-master/usr.bin/ssh/ssh-pkcs11-helper/Makefile	Sat Oct 18 06:13:22 2025
 @@ -14,5 +14,5 @@
  
  .include <bsd.prog.mk>
@@ -144,7 +174,7 @@
 +LDADD+=	-lcrypto -lssp
  DPADD+=	${LIBCRYPTO}
 --- openbsd-master/usr.bin/ssh/sshd/Makefile
-+++ openbsd-master/usr.bin/ssh/sshd/Makefile	Tue Sep 23 19:46:23 2025
++++ openbsd-master/usr.bin/ssh/sshd/Makefile	Sat Oct 18 06:13:22 2025
 @@ -47,5 +47,5 @@
  DPADD+=	${LIBCRYPTO} ${LIBUTIL}
  .endif
@@ -152,8 +182,30 @@
 -LDADD+=	-lz
 +LDADD+=	-lz -lssp
  DPADD+=	${LIBZ}
+--- openbsd-master/usr.bin/sudo/compat.h
++++ openbsd-master/usr.bin/sudo/compat.h	Sun Jan 18 08:01:54 2026
+@@ -248,7 +248,7 @@
+  */
+ #ifndef HAVE_GETPROGNAME
+ # ifdef HAVE___PROGNAME
+-extern const char *__progname;
++extern char *__progname;
+ #  define getprogname()          (__progname)
+ # else
+ const char *getprogname __P((void));
+--- openbsd-master/usr.bin/sudo/sudo/Makefile
++++ openbsd-master/usr.bin/sudo/sudo/Makefile	Sun Jan 18 08:06:24 2026
+@@ -6,7 +6,7 @@
+ BINOWN=	root
+ BINMODE=4555
+ LINKS=  ${BINDIR}/sudo ${BINDIR}/sudoedit
+-CFLAGS+=-DSUDO_DEVEL
++#CFLAGS+=-DSUDO_DEVEL
+ 
+ SRCS=	audit.c check.c env.c getspwuid.c interfaces.c lbuf.c logging.c \
+ 	parse.c pwutil.c set_perms.c sudo.c sudo_edit.c sudo_nss.c term.c \
 --- openbsd-master/usr.bin/tic/progs.priv.h
-+++ openbsd-master/usr.bin/tic/progs.priv.h	Mon Oct 13 09:58:11 2025
++++ openbsd-master/usr.bin/tic/progs.priv.h	Sat Jan 31 17:16:20 2026
 @@ -109,7 +109,7 @@
  extern int optind;
  #endif /* HAVE_GETOPT_H */
@@ -164,7 +216,7 @@
  #include <tic.h>
  #include <nc_tparm.h>
 --- openbsd-master/usr.bin/top/Makefile
-+++ openbsd-master/usr.bin/top/Makefile	Wed Sep 17 05:02:47 2025
++++ openbsd-master/usr.bin/top/Makefile	Sat Oct 18 06:13:22 2025
 @@ -4,7 +4,7 @@
  
  PROG=	top
@@ -175,7 +227,7 @@
  DPADD=	${LIBCURSES}
  LDADD=	-lcurses
 --- openbsd-master/usr.bin/vi/build/config.h
-+++ openbsd-master/usr.bin/vi/build/config.h	Wed Oct  8 08:58:02 2025
++++ openbsd-master/usr.bin/vi/build/config.h	Sat Oct 18 06:13:22 2025
 @@ -102,7 +102,7 @@
  /* #undef HAVE_LOCK_FCNTL */
  
@@ -186,7 +238,7 @@
  /* Define if you want to compile in the Perl interpreter. */
  /* #undef HAVE_PERL_INTERP */
 --- openbsd-master/usr.bin/xinstall/Makefile
-+++ openbsd-master/usr.bin/xinstall/Makefile	Thu Jun 26 10:58:26 2025
++++ openbsd-master/usr.bin/xinstall/Makefile	Sat Oct 18 06:13:22 2025
 @@ -5,7 +5,7 @@
  MAN=	install.1
  
@@ -197,7 +249,7 @@
  	    -m ${BINMODE} ${PROG} ${DESTDIR}${BINDIR}/install
  
 --- openbsd-master/usr.bin/xinstall/xinstall.c
-+++ openbsd-master/usr.bin/xinstall/xinstall.c	Sat Oct 11 19:17:05 2025
++++ openbsd-master/usr.bin/xinstall/xinstall.c	Sat Oct 18 06:13:22 2025
 @@ -272,13 +272,13 @@
  	}
  
