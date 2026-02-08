@@ -141,6 +141,8 @@ pwd_PWD_GETPWNAM(const char *name, char *buf, size_t buflen)
 		result = pwd_PWD_GETPWUID(DAEMON_UID, buf, buflen);
 	}else if (!strcmp(name, "root")){
 		result = pwd_PWD_GETPWUID(ROOT_UID, buf, buflen);
+	}else if (!strcmp(name, "nobody")){
+		result = pwd_PWD_GETPWUID(NOBODY_UID, buf, buflen);
 	}else if (!win_mbstowcs(szAccount, name, MAX_NAME)){
 		result = -EINVAL;
 	}else if (!win_getpwnam(szAccount, &pwResult)){

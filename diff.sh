@@ -53,8 +53,8 @@ diff_dir()
 			echo "MinC: $file" >&2
 			;;
 		*)
-#			diff -au "$SOURCE/$file" "$file" | sed "s:$SOURCE/::"
-			diff_file "$file"
+			diff -au "$file" "$SOURCE/$file" | sed "s:$SOURCE/::"
+#			diff_file "$file"
 			;;
 	esac
 	done

@@ -2,23 +2,29 @@ if ! cd "$PKGROOT/perl"; then
         exit 1
 fi
 
-MODS='B Compress Encode POSIX PerlIO Storable Unicode re'
+DOCROOT="$PKGROOT/perl-doc"
 
-function rm_modules {
-	for mod in $1; do
-		echo -n "${mod} "
-		rm -rf ./usr/lib/perl5/5.30.0/OpenBSD.i386-openbsd-multi/auto/${mod}
-	done
-}
+LIBDIR='usr/lib/perl5/5.30.0'
+MODDIR="${LIBDIR}/OpenBSD.i386-openbsd-multi"
+PODDIR="${LIBDIR}/Pod"
+SHDIR='usr/share'
 
-mv ./usr/lib/perl5/5.30.0/OpenBSD.i386-openbsd-multi/CORE/libperl.so ./usr/lib/
+mv -f usr/lib/perl5/5.30.0/OpenBSD.i386-openbsd-multi/CORE/libperl.so usr/lib/
 
-echo -n "Removing modules... "
-rm_modules "${MODS}"
-rm -rf ./usr/lib/perl5/5.30.0/Pod	# 9Mb
+mkdir -p "${DOCROOT}/${PODDIR}"
+mv ${PODDIR}/*.pod ${DOCROOT}/${PODDIR}/ 2>/dev/null
+
+mkdir -p "${DOCROOT}/${SHDIR}"
+mv "${SHDIR}/man" "${DOCROOT}/${SHDIR}/" 2>/dev/null
+
+echo -n "Compressing perl53-base.tgz... "
+tar -zcf $DISTROOT/perl53-base.tgz *
 echo done.
 
-echo -n "Compressing perl53.tgz... "
-tar -zcf $DISTROOT/perl53.tgz *
+if ! cd "${DOCROOT}"; then
+	exit 1
+fi
+echo -n "Compressing perl53-doc.tgz... "
+tar -zcf $DISTROOT/perl53-doc.tgz *
 echo done.
 

@@ -38,16 +38,16 @@ DWORD
 ScreenMode(DWORD Mode, WIN_TERMIO *Attribs)
 {
 	DWORD dwResult = Mode & ~(CON_MODE_SCREEN);
-	UINT uiFlags = WIN_OPOST | WIN_ONLCR;
+//	UINT uiFlags = WIN_OPOST | WIN_ONLCR;
 
 	if (Attribs->OFlags & WIN_OXTABS){
 		dwResult |= ENABLE_PROCESSED_OUTPUT;
 	}
-	if (Mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING){
-		if ((Attribs->OFlags & uiFlags) != uiFlags){
-			dwResult |= DISABLE_NEWLINE_AUTO_RETURN;
-		}
-	}
+//	if (Mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING){
+//		if ((Attribs->OFlags & uiFlags) != uiFlags){
+//			dwResult |= DISABLE_NEWLINE_AUTO_RETURN;
+//		}
+//	}
 	return(dwResult);
 }
 BOOL 

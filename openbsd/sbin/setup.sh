@@ -9,7 +9,7 @@ USER="$USERNAME"
 HOME="/home/$USERNAME"
 WINHOME="$USERPROFILE"
 
-function admins_only
+admins_only()
 {
 	for file in $1; do
 		chown "$USER:0" $file

@@ -75,6 +75,7 @@ x_init(VOID)
 	GetConsoleMode(hInput, &dwMode[0]);
 	GetConsoleMode(hScreen, &dwMode[1]);
 	dwMode[0] &= ~(ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT);
+	dwMode[1] |= DISABLE_NEWLINE_AUTO_RETURN;
 	if (!SetConsoleTextAttribute(hScreen, BACKGROUND_BLACK | FOREGROUND_WHITE)){
 		result = 1;
 	}else if (!SetConsoleOutputCP(CP_UTF8)){
