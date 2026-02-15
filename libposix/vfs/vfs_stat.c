@@ -42,6 +42,8 @@ vfs_fstat(WIN_VNODE *Node, WIN_VATTR *Result)
 			bResult = disk_fstat(Node, Result);
 			break;
 		case FS_TYPE_CHAR:
+			bResult = char_fstat(Node, Result);
+			break;
 		case FS_TYPE_MAILSLOT:
 		case FS_TYPE_PDO:
 			bResult = pdo_fstat(Node, Result);

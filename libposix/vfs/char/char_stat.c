@@ -33,30 +33,22 @@
 /****************************************************/
 
 BOOL 
-char_namei(HANDLE Handle, WIN_VNODE *Result)
+char_fstat(WIN_VNODE *Node, WIN_VATTR *Result)
 {
-	ACCESS_MASK aMask = GENERIC_READ;
-	DWORD dwMode;
-	CONSOLE_SCREEN_BUFFER_INFO sbInfo;
+	BOOL bResult = FALSE;
 
-	Result->Handle = Handle;
-	Result->Event = Handle;
-	Result->FSType = FS_TYPE_CHAR;
-	Result->FileType = WIN_VCHR;
-	if (!GetConsoleMode(Handle, &dwMode)){
-		Result->DeviceType = DEV_TYPE_NULL;
-		Result->DeviceId = DEV_TYPE_NULL;
-		aMask = win_F_GETFL(Handle);
-	}else if (GetConsoleScreenBufferInfo(Handle, &sbInfo)){
-		Result->DeviceType = DEV_TYPE_SCREEN;
-		Result->DeviceId = DEV_TYPE_SCREEN;
-		aMask = GENERIC_WRITE;
-	}else{
-		Result->DeviceType = DEV_TYPE_INPUT;
-		Result->DeviceId = DEV_TYPE_INPUT;
-		aMask = GENERIC_READ;
+	switch (Node->DeviceType){
+		case DEV_TYPE_NULL:
+		case DEV_TYPE_INPUT:
+		case DEV_TYPE_SCREEN:
+			bResult = pipe_fstat(Node, Result);
+			break;
+		case DEV_TYPE_TTY:
+		case DEV_TYPE_CONSOLE:
+			bResult = pdo_fstat(Node, Result);
+			break;
+		default:
+			SetLastError(ERROR_BAD_FILE_TYPE);
 	}
-	Result->Flags = win_F_GETFD(Handle);
-	Result->Access = aMask;
-	return(TRUE);
+	return(bResult);
 }

@@ -53,6 +53,21 @@
 #define WIN_ERR			msvc_printf
 #define OBJECT_NAME(name)	"Local\\MinC_" VERSION "_" name
 
+#define CC_NUL	0x00	/* Padding (Ignore) */
+#define CC_SOH	0x01	/* Ctrl+A (Start of Header) */
+#define CC_ETX	0x03	/* Ctrl+C (End of Text) */
+#define CC_EOT	0x04	/* Ctrl+D (End of Transmission) */
+#define CC_BS	0x08	/* Ctrl+H (Back Space) */
+#define CC_LF	0x0A	/* Ctrl+J (Line Feed) */
+#define CC_CR	0x0D	/* Ctrl+M (Carriage Return) */
+#define CC_SO	0x0E	/* Ctrl+N (Shift In) */
+#define CC_SI	0x0F	/* Ctrl+O (Shift Out) */
+#define CC_DC1	0x11	/* Ctrl+Q (Device Control 1: XON) */
+#define CC_DC3	0x13	/* Ctrl+S (Device Control 3: XOFF) */
+#define CC_ESC	0x1B	/* Escape */
+#define CC_FS	0x1C	/* Ctrl+\ */
+#define CC_DEL	0x7F	/* Delete */
+
 extern WIN_GLOBALS 	*__Globals;
 extern SID8 		*__SidMachine;
 extern SID8		*__SidNone;
@@ -101,7 +116,7 @@ CONST WCHAR	*__Clipboard;		/* Clipboard buffer */
 WIN_TASK	*__Process;
 
 BOOL proc_poll(WIN_TASK *Task);
-BOOL vfs_F_GETFL(HANDLE Handle, ACCESS_MASK *Result);
+BOOL pdo_fstat(WIN_VNODE *Node, WIN_VATTR *Result);
 
 #include "vfs_acl.c"
 #include "vfs_signal.c"
@@ -112,11 +127,11 @@ BOOL vfs_F_GETFL(HANDLE Handle, ACCESS_MASK *Result);
 #include "vfs_syscall.c"
 #include "registry/registry.c"
 #include "drive/drive.c"
-#include "char/char.c"
 #include "volume/volume.c"
+#include "pipe/pipe.c"
+#include "char/char.c"
 #include "mailslot/mailslot.c"
 #include "pdo/pdo.c"
-#include "pipe/pipe.c"
 #include "disk/disk.c"
 #include "winsock/winsock.c"
 #include "shell/shell.c"

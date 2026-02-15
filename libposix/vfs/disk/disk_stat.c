@@ -41,8 +41,12 @@ disk_fstat(WIN_VNODE *Node, WIN_VATTR *Result)
 		case WIN_VDIR:
 			bResult = dir_fstat(Node, Result);
 			break;
-		default:
+		case WIN_VREG:
+		case WIN_VLNK:
 			bResult = file_fstat(Node, Result);
+			break;
+		default:
+			SetLastError(ERROR_BAD_FILE_TYPE);
 	}
 	return(bResult);
 }
