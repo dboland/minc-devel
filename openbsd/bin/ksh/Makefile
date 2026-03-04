@@ -41,7 +41,7 @@ OBJECTS+= debug.o
 # after compiling with below flags, execute once, then:
 # gprof -q ksh.exe (gprof.exe comes with the GNU binutils suite)
 
-CFLAGS+= -DSMALL
+CFLAGS+= -DSMALL -DJOBS
 #CFLAGS+=-pg
 #OBJECTS+=/usr/lib/gcrt0.o
 

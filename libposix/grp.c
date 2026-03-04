@@ -128,6 +128,8 @@ grp_GRP_GETGRNAM(const char *name, char *buf, size_t buflen)
 		result = grp_GRP_GETGRGID(KMEM_GID, buf, buflen);
 	}else if (!strcmp(name, "operator")){
 		result = grp_GRP_GETGRGID(OPERATOR_GID, buf, buflen);
+	}else if (!strcmp(name, "nobody")){
+		result = pwd_PWD_GETPWUID(NOBODY_GID, buf, buflen);
 	}else if (!win_mbstowcs(szAccount, name, MAX_NAME)){
 		result = -EINVAL;
 	}else if (!win_getgrnam(szAccount, &wgResult)){

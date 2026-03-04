@@ -115,7 +115,7 @@ BOOL
 tty_read(WIN_TASK *Task, WIN_TTY *Terminal, LPSTR Buffer, DWORD Size, DWORD *Result)
 {
 	BOOL bResult = FALSE;
-	CHAR C;
+	UCHAR C;
 	DWORD dwResult = 0;
 	LONG lSize = Size;
 	HANDLE hInput = Terminal->Input;

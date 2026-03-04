@@ -47,7 +47,9 @@ InputPollKey(HANDLE Handle, INPUT_RECORD *Record)
 	KEY_EVENT_RECORD *pkEvent = &Record->KeyEvent;
 	DWORD dwCount;
 
-	if (pkEvent->bKeyDown){
+	if (!pkEvent->bKeyDown){
+		ReadConsoleInput(Handle, Record, 1, &dwCount);
+	}else if (pkEvent->uChar.AsciiChar){
 		sResult = WIN_POLLIN;
 	}else{
 		ReadConsoleInput(Handle, Record, 1, &dwCount);

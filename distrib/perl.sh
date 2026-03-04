@@ -1,15 +1,15 @@
-if ! cd "$PKGROOT/perl"; then
+if ! cd "$PKGROOT/perl-base"; then
         exit 1
 fi
 
 DOCROOT="$PKGROOT/perl-doc"
 
+SHDIR='usr/share'
 LIBDIR='usr/lib/perl5/5.30.0'
 MODDIR="${LIBDIR}/OpenBSD.i386-openbsd-multi"
 PODDIR="${LIBDIR}/Pod"
-SHDIR='usr/share'
 
-mv -f usr/lib/perl5/5.30.0/OpenBSD.i386-openbsd-multi/CORE/libperl.so usr/lib/
+mv -f ${MODDIR}/CORE/libperl.so usr/lib/ 2>/dev/null
 
 mkdir -p "${DOCROOT}/${PODDIR}"
 mv ${PODDIR}/*.pod ${DOCROOT}/${PODDIR}/ 2>/dev/null

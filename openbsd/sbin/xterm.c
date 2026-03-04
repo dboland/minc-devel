@@ -68,21 +68,22 @@ x_init(VOID)
 {
 	int result = 0;
 	DWORD dwMode[2];
-	HANDLE hInput, hScreen;
+	HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);
+	HANDLE hScreen = GetStdHandle(STD_ERROR_HANDLE);
 
-	hInput = GetStdHandle(STD_INPUT_HANDLE);
-	hScreen = GetStdHandle(STD_OUTPUT_HANDLE);
 	GetConsoleMode(hInput, &dwMode[0]);
 	GetConsoleMode(hScreen, &dwMode[1]);
-	dwMode[0] &= ~(ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT);
-	dwMode[1] |= DISABLE_NEWLINE_AUTO_RETURN;
+//	dwMode[0] &= ~(ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT);
+	dwMode[0] &= ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT);
+	dwMode[0] |= ENABLE_VIRTUAL_TERMINAL_INPUT;
+	dwMode[1] |= ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN;
 	if (!SetConsoleTextAttribute(hScreen, BACKGROUND_BLACK | FOREGROUND_WHITE)){
 		result = 1;
 	}else if (!SetConsoleOutputCP(CP_UTF8)){
 		result = 2;
-	}else if (!SetConsoleMode(hInput, dwMode[0] | ENABLE_VIRTUAL_TERMINAL_INPUT)){
+	}else if (!SetConsoleMode(hInput, dwMode[0])){
 		result = 3;
-	}else if (!SetConsoleMode(hScreen, dwMode[1] | ENABLE_VIRTUAL_TERMINAL_PROCESSING)){
+	}else if (!SetConsoleMode(hScreen, dwMode[1])){
 		result = 4;
 	}
 	return(result);

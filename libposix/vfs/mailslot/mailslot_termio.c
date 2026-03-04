@@ -48,7 +48,7 @@ mail_PTMGET(WIN_DEVICE *Device, WIN_TTY *Terminal, WIN_PTMGET *Result)
 		WIN_ERR("CreateMailslot(%s): %s\n", szPath, win_strerror(GetLastError()));
 	}else{
 		Device->Input = hResult;
-		Device->Output = MailOpenFile(szPath);
+		Device->Output = MailOpenFile(szPath, &sa);
 		Device->FSType = FS_TYPE_MAILSLOT;
 		Device->Event = CreateEvent(&sa, FALSE, FALSE, NULL);
 		win_strlcpy(Result->MName, Device->Name, 16);
@@ -76,7 +76,7 @@ mail_TIOCSCTTY(WIN_DEVICE *Device, WIN_TASK *Task, WIN_TTY *Terminal)
 		Terminal->Output = Device->Output;
 		Terminal->Event = Device->Event;
 		Terminal->FSType = FS_TYPE_MAILSLOT;
-		Device->Output = MailOpenFile(szPath);
+		Device->Output = MailOpenFile(szPath, &sa);
 		Terminal->SessionId = Task->SessionId;
 		Terminal->GroupId = Task->GroupId;
 		Task->Flags |= WIN_PS_CONTROLT;

@@ -115,7 +115,6 @@ proc_setsid(WIN_TASK *Task)
 	}else{
 		Task->GroupId = Task->TaskId;
 		Task->SessionId = Task->TaskId;
-//		Task->TerminalId = 0;
 		bResult = TRUE;
 	}
 	return(bResult);

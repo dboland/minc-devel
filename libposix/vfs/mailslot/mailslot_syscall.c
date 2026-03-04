@@ -33,13 +33,12 @@
 /****************************************************/
 
 HANDLE 
-MailOpenFile(LPCSTR FileName)
+MailOpenFile(LPCSTR FileName, SECURITY_ATTRIBUTES *Attribs)
 {
 	HANDLE hResult = NULL;
-	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, TRUE};
 
 	hResult = CreateFile(FileName, GENERIC_WRITE | READ_CONTROL, FILE_SHARE_READ, 
-		&sa, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		Attribs, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hResult == INVALID_HANDLE_VALUE){
 		WIN_ERR("CreateFile(%s): %s\n", FileName, win_strerror(GetLastError()));
 	}

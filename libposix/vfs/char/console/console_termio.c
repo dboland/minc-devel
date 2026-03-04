@@ -47,7 +47,7 @@ con_TIOCSCTTY(WIN_DEVICE *Device, WIN_TASK *Task, WIN_TTY *Terminal)
 		dwMode = Terminal->Mode;
 	}
 	Terminal->Input = GetStdHandle(STD_INPUT_HANDLE);
-	Terminal->Output = GetStdHandle(STD_OUTPUT_HANDLE);
+	Terminal->Output = GetStdHandle(STD_ERROR_HANDLE);
 //	Terminal->Input = CharOpenFile("CONIN$", &wFlags, &sa);
 //	Terminal->Output = CharOpenFile("CONOUT$", &wFlags, &sa);
 	Terminal->FSType = FS_TYPE_CHAR;

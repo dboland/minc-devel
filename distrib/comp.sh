@@ -12,6 +12,7 @@ mkdir -p ./usr/share/man/man8
 
 ln -sf libc.so.75.0 ./usr/lib/libc.so
 ln -sf libz.so.5.0 ./usr/lib/libz.so
+ln -sf libm.so.9.0 ./usr/lib/libm.so
 ln -sf libedit.so.5.1 ./usr/lib/libedit.so
 ln -sf libutil.so.12.1 ./usr/lib/libutil.so
 ln -sf libkvm.so.16.0 ./usr/lib/libkvm.so
