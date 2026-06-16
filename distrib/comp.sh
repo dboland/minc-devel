@@ -2,13 +2,13 @@ if ! cd "$PKGROOT/minc-comp"; then
         exit 1
 fi
 
-# Location of curses databases
-mkdir -p ./usr/share/misc
 mkdir -p ./usr/share/man/man1
 mkdir -p ./usr/share/man/man3
 mkdir -p ./usr/share/man/man5
 mkdir -p ./usr/share/man/man7
 mkdir -p ./usr/share/man/man8
+# Location of curses databases
+mkdir -p ./usr/share/misc
 
 ln -sf libc.so.75.0 ./usr/lib/libc.so
 ln -sf libz.so.5.0 ./usr/lib/libz.so
@@ -25,6 +25,9 @@ ln -sf libncurses.so.14.0 ./usr/lib/libncurses.so
 ln -sf libncursesw.so.14.0 ./usr/lib/libncursesw.so
 ln -sf libtermcap.so.14.0 ./usr/lib/libtermcap.so
 ln -sf libtermlib.so.14.0 ./usr/lib/libtermlib.so
+
+mkdir -p ./etc
+copy_dir etc "ssl color"
 
 echo -n "Compressing comp61.tgz... "
 tar -zcf $DISTROOT/comp61.tgz *

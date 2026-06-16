@@ -138,7 +138,7 @@ ScreenAnsi(HANDLE Handle, CHAR C, SEQUENCE *Seq, CONSOLE_SCREEN_BUFFER_INFO *Inf
 	}
 	if (!bResult){
 		Seq->Buf[dwSize] = 0;
-		WIN_ERR("\e%s", Seq->Buf);
+		WIN_ERR("^[%s", Seq->Buf);
 	}
 	__Escape = NULL;
 	return(bResult);

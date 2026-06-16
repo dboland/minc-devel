@@ -51,6 +51,7 @@ ln -sn "$WINHOME\Documents" "$HOME/Documents" 2>/dev/null
 ln -sn "$WINHOME\Downloads" "$HOME/Downloads" 2>/dev/null
 ln -sn "$WINHOME\Desktop" "$HOME/Desktop" 2>/dev/null
 ln -sn "$WINHOME\Videos" "$HOME/Videos" 2>/dev/null
+ln -sn "$WINHOME\Pictures" "$HOME/Pictures" 2>/dev/null
 if ! [ -f "$HOME/.profile" ]; then
 	echo "mkent resolv 2>/dev/null >/etc/resolv.conf" >"$HOME/.profile"
 fi

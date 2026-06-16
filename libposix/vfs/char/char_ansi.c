@@ -423,6 +423,12 @@ AnsiCursorPosition(HANDLE Handle, CONSOLE_SCREEN_BUFFER_INFO *Info, WORD Y, WORD
 	COORD cPos = {X - 1, Y - 1};
 
 	cPos.Y += Info->srWindow.Top;
+	if (cPos.X > Info->srWindow.Right){
+		cPos.X = Info->srWindow.Right;
+	}
+	if (cPos.Y > Info->srWindow.Bottom){
+		cPos.Y = Info->srWindow.Bottom;
+	}
 	Info->dwCursorPosition = cPos;
 	return(SetConsoleCursorPosition(Handle, cPos));
 }

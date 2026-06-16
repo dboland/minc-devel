@@ -104,6 +104,27 @@ __TF_FLAGS(int flags)
 	return(__X_BUF);
 }
 char *
+__SS_FLAGS(int flags)
+{
+	char *buf = __X_BUF;
+
+	if (flags & SS_RESTORE_CURR)
+		buf += sprintf(buf, "[SS_RESTORE_CURR]");
+	if (flags & SS_RESTORE_ORIG)
+		buf += sprintf(buf, "[SS_RESTORE_ORIG]");
+	if (flags & SS_RESTORE_DFL)
+		buf += sprintf(buf, "[SS_RESTORE_DFL]");
+	if (flags & SS_RESTORE_IGN)
+		buf += sprintf(buf, "[SS_RESTORE_IGN]");
+	if (flags & SS_FORCE)
+		buf += sprintf(buf, "[SS_FORCE]");
+	if (flags & SS_USER)
+		buf += sprintf(buf, "[SS_USER]");
+	if (flags & SS_SHTRAP)
+		buf += sprintf(buf, "[SS_SHTRAP]");
+	return(__X_BUF);
+}
+char *
 __X_FLAGS(int flags)
 {
 	char *buf = __X_BUF;
