@@ -47,8 +47,10 @@ cpu_configure(void)
 	}else while (vfs_getvfs(&cfData, dwFlags)){
 		if (cfData.FSType == FS_TYPE_DRIVE){
 			drive_statvfs(&cfData, dwFlags, &cfDriver);
-			drive_match(cfData.NtName, cfData.DeviceType, &cfDriver);
-			if (!(cfDriver.Flags & WIN_DVF_CONFIG_READY)){
+			if (drive_match(cfData.NtName, cfData.DeviceType, &cfDriver)){
+				msgbuf_DRIVE(&cfData, &cfDriver, szMessage);
+//				WIN_ERR(szMessage);
+			}else if (!(cfDriver.Flags & WIN_DVF_CONFIG_READY)){
 				msgbuf_DRIVE(&cfData, &cfDriver, szMessage);
 				WIN_ERR(szMessage);
 			}

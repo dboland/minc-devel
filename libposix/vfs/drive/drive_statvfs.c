@@ -46,6 +46,9 @@ DriveLookupDevice(LPCWSTR BusName)
 	}else if (!wcscmp(BusName, L"LOG")){
 		dwResult = DEV_TYPE_LOG;
 
+	}else if (!wcscmp(BusName, L"GLOBALROOT")){
+		dwResult = DEV_TYPE_ROOT;
+
 	}
 	return(dwResult);
 }

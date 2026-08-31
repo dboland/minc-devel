@@ -48,7 +48,7 @@ To test if this all works, make the kernel first:
 	make kernel
 
 A minimal OpenBSD system consists of the kernel (/bsd.dll), the 
-BSD C library, the boot program (/minc.exe), the Korn shell 
+BSD C library (/usr/lib/libc.so), the boot program (/minc.exe), the Korn shell 
 (/bin/ksh) and some utilities. These will be built by the new 
 system itself. To finish the build:
 

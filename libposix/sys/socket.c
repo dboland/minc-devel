@@ -125,10 +125,10 @@ sockopt_win(int level, int name)
 {
 	switch (level){
 		case IPPROTO_IP:
-			name = IN_SOCKOPT_WIN[name];
+			name = IN_SOCKOPT_WIN[name]; 	/* netinet/in.c */
 			break;
 		case IPPROTO_IPV6:
-			name = IN6_SOCKOPT_WIN[name];
+			name = IN6_SOCKOPT_WIN[name]; 	/* netinet6/in6.c */
 			break;
 	}
 	return(name);

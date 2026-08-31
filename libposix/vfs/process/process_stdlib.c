@@ -122,7 +122,7 @@ proc_init(WIN_SIGPROC SignalProc)
 		win_geteuid(&__Process->UserSid);
 		win_getegid(&__Process->GroupSid);
 		ProcInitLimits(__Process->Limit);
-//		SetErrorMode(SEM_FAILCRITICALERRORS);
+		SetErrorMode(SEM_FAILCRITICALERRORS);
 	}
 	if (proc_setugid(__Process)){
 		__Process->IsSetUGid = 1;

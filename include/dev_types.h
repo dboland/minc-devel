@@ -98,13 +98,13 @@
 #define DEV_TYPE_WDC		(DEV_CLASS_DISK + DEV_BUS_WDC)	/* WD100x compatible hard disk controller */
 #define DEV_TYPE_SCSI		(DEV_CLASS_DISK + DEV_BUS_SCSI)	/* Small Computer System Interface controller */
 
-#define DEV_TYPE_NDIS		(DEV_CLASS_IFNET)
-#define DEV_TYPE_TUNNEL		(DEV_CLASS_IFNET + 16)		/* Tunnel type encapsulation */
-#define DEV_TYPE_LOOPBACK	(DEV_CLASS_IFNET + 20)		/* loop-back network pseudo device */
-#define DEV_TYPE_PPP		(DEV_CLASS_IFNET + 24)		/* Point-To-Point network device */
-#define DEV_TYPE_ETH		(DEV_CLASS_IFNET + 28)		/* Ethernet network device */
-#define DEV_TYPE_WLAN		(DEV_CLASS_IFNET + 36)		/* IEEE80211 wireless network device */
-#define DEV_TYPE_NIC		(DEV_CLASS_IFNET + DEV_BUS_PCI)	/* Network Interface Card */
+#define DEV_TYPE_NDIS		(DEV_CLASS_IFNET)			/* Generic network device */
+#define DEV_TYPE_TUNNEL		(DEV_CLASS_IFNET + 16)			/* Tunnel type encapsulation */
+#define DEV_TYPE_LOOPBACK	(DEV_CLASS_IFNET + 20)			/* loop-back network pseudo device */
+#define DEV_TYPE_PPP		(DEV_CLASS_IFNET + 24)			/* Point-To-Point network device */
+#define DEV_TYPE_ETH		(DEV_CLASS_IFNET + 28)			/* Ethernet network device */
+#define DEV_TYPE_WLAN		(DEV_CLASS_IFNET + 36)			/* IEEE80211 wireless network device */
+#define DEV_TYPE_NIC		(DEV_CLASS_IFNET + DEV_BUS_PCI)		/* Network Interface Card */
 #define DEV_TYPE_REMOTE		(DEV_CLASS_IFNET + DEV_BUS_MAIN)	/* Server Message Block storage */
 
 #define DEV_TYPE_MEDIA		(DEV_CLASS_MEDIA)

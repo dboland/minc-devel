@@ -60,10 +60,10 @@
 DWORD 
 VfsLinkType(LPWSTR BusName)
 {
-	DWORD dwType = FS_TYPE_PROCESS;
+	DWORD dwType = FS_TYPE_LINK;
 
 	if (!*BusName){
-		dwType = FS_TYPE_LINK;
+//		dwType = FS_TYPE_LINK;
 		wcscpy(BusName, L"LINK");
 	}else if (!wcscmp(BusName, L"Volume")){
 		dwType = FS_TYPE_VOLUME;

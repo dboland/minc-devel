@@ -42,7 +42,7 @@
 
 #include <time.h>
 
-#include "ntdll_posix.h"
+#include "win/ntdll.h"
 #include "msvc_posix.h"
 #include "win_types.h"
 

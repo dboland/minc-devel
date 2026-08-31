@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Daniel Boland <dboland@xs4all.nl>.
+ * Copyright (c) 2026 Daniel Boland <dboland@xs4all.nl>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,16 @@
  *
  */
 
-#include "shell_unistd.c"
-#include "shell_namei.c"
-#include "shell_stat.c"
-#include "shell_wchar.c"
+#include <winbase.h>
+
+/************************************************************/
+
+INT 
+shell_wcstombs(LPSTR Destination, LPCWSTR Source, INT Size)
+{
+	INT iResult;
+
+	if (!Destination) Size = 0;
+	iResult = WideCharToMultiByte(GetACP(), 0, Source, -1, Destination, Size, NULL, NULL);
+	return(iResult - 1);
+}

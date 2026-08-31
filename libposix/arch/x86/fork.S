@@ -34,7 +34,7 @@
 .global _sys_fork, _sys_vfork
 .text
 
-# aliasen
+# aliasen (constants)
 
 return = 0
 origin = 4

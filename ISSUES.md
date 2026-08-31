@@ -44,6 +44,16 @@ I tested this on Debain Linux and my OpenBSD server. To my surprise
 they both have the same issue when using the Windows Console. With PuTTY 
 Ctrl+C works fine.
 
+I finally figured out why this is. The Windows Console sucks at 
+XON/XOFF flow control, meaning that it does not do any. If you have 
+large output from the other side, like a **ls -l** in a huge direcory, 
+the modern hyper-optimized Internet network stream sends you the 
+entire list in one go, unless your local user program requests 
+flow control (by sending the XON/XOFF bytes). This will have the 
+effect of slowing down the network traffic to the speed the terminal 
+can handle, which is traditinally only 9600 baud. Modern terminals, 
+like PuTTY have it fully implemented.
+
 Finally, **scrolling** in the Windows Console has two modes, due to 
 its scrollback buffer feature. The first mode is scrolling the entire 
 scrollback buffer. This is the default behaviour. If you want scrolling 
@@ -61,6 +71,21 @@ in their days. I am working on a solution which will maintain the
 mount table in semi real-time, like I have done with the /etc/passwd 
 and /etc/group tables.
 
+## Hard Links
+
+Windows NT Hardlinks are POSIX compatible. However, if you use 
+programs like the Windows Explorer, when it encounters NT's hardlinks, 
+it just doubles the space on disk and could thereby rob you of knowing 
+how much disk space is actually free. OpenBSD itself uses them sparsely, 
+but programs like Git use them a lot.
+
+In the end it does not matter, because the Windows API itself properly 
+reports the disk space, occupied by Hardlinks (zero). Since MinC is using 
+this API, you can use it to show the real numbers with the **df** 
+(disk free) command:
+
+	df -h
+
 ## Networking
 
 Only the "read" part of networking has been implemented, so you 
@@ -74,5 +99,5 @@ priority at the moment. Create an issue if you need to have one
 of them implemented.
 
 
-Januari 2026,
+August 2026,
 Daniel Boland

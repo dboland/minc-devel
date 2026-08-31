@@ -31,6 +31,7 @@
 #include <shlobj.h>
 
 /****************************************************/
+
 BOOL 
 shell_rename(WIN_NAMEIDATA *Path, WIN_NAMEIDATA *Result)
 {

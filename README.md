@@ -12,10 +12,8 @@ you run OpenBSD on your Windows machine at native speed.
 ![MinC](MinC.png)
 
 If you want to build the MinC system yourself, read the
-BUILD.md document.
-
-For downloading the installer and more information go 
-to:
+BUILD.md document. For downloading the installer and more 
+information go to:
 
 https://minc.commandlinerevolution.nl/english/home.html
 
@@ -42,8 +40,13 @@ but only if there is an actual bug to fix. And even then: don't
 start with a pull request. State the issue or proposal first 
 in the *Issues* section.
 
-3. **Eat you own dogfood**. I got that one from Dave Cuttler,
+3. **Eat your own dogfood**. I got that one from Dave Cuttler,
 architect of Windows NT. Please use MinC before, while and after 
 you contribute code. It is really satisfying seeing you own 
 code run.
 
+4. **Don't break userspace**. This one has been made famous by Linus 
+Torvalds, creator of Linux. It means that the kernel has to keep 
+supporting software that was created in the past. It is also known 
+as 'backward compatibility' and is the reason why Microsoft Windows 
+is still the most used operating system in the world.

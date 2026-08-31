@@ -32,3 +32,11 @@
 #include "drive_device.c"
 #include "drive_mount.c"
 #include "drive_statvfs.c"
+
+/****************************************************/
+
+VOID 
+drive_init(WIN_MOUNT Mounts[])
+{
+	__Mounts = Mounts;
+}

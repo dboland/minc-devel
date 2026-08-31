@@ -106,3 +106,4 @@ typedef struct _COMMON_NETWORK_RELATIVE_LINK {
 /* CommonNetworkRelativeLinkFlags */
 
 #define ValidDevice	0x1#define ValidNetType	0x2
+INT shell_wcstombs(LPSTR Destination, LPCWSTR Source, INT Size);

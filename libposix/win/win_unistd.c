@@ -263,6 +263,8 @@ win_execve(LPSTR Command, LPCSTR Path, STARTUPINFO *Info)
 		CloseHandle(pi.hThread);
 		WaitForSingleObject(pi.hProcess, INFINITE);
 		bResult = CloseHandle(pi.hProcess);
+//	}else{
+//		WIN_ERR("CreateProcess(%s): %s\n", Path, win_strerror(GetLastError()));
 	}
 	win_free(Command);
 	return(bResult);
