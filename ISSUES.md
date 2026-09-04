@@ -48,10 +48,10 @@ I finally figured out why this is. The Windows Console sucks at
 XON/XOFF flow control, meaning that it does not do any. If you have 
 large output from the other side, like a **ls -l** in a huge direcory, 
 the modern hyper-optimized Internet network stream sends you the 
-entire list in one go, unless your local user program requests 
+entire list in one go, unless your local terminal program requests 
 flow control (by sending the XON/XOFF bytes). This will have the 
 effect of slowing down the network traffic to the speed the terminal 
-can handle, which is traditinally only 9600 baud. Modern terminals, 
+can handle, which is traditionally 9600 baud. Modern terminal programs, 
 like PuTTY have it fully implemented.
 
 Finally, **scrolling** in the Windows Console has two modes, due to 

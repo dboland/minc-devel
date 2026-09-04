@@ -61,7 +61,7 @@ install-local:
 	@/bin/cp -vu ${IMPLIB} ${LIBDIR}/libmingw32.a
 
 install: ${DESTDIR}
-	${INSTALL} -m 06555 ${LIBPOSIX} ${DESTDIR}/
+	${INSTALL} -m 01555 ${LIBPOSIX} ${DESTDIR}/
 	${INSTALL} -m ${BINMODE} ${IMPLIB} ${ULIBDEST}/libposix.a
 
 release-clean:

@@ -69,7 +69,7 @@ x_init(VOID)
 	int result = 0;
 	DWORD dwMode[2];
 	HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);
-	HANDLE hScreen = GetStdHandle(STD_ERROR_HANDLE);
+	HANDLE hScreen = GetStdHandle(STD_OUTPUT_HANDLE);
 
 	GetConsoleMode(hInput, &dwMode[0]);
 	GetConsoleMode(hScreen, &dwMode[1]);

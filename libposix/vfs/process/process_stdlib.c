@@ -108,6 +108,7 @@ proc_init(WIN_SIGPROC SignalProc)
 	SetConsoleCtrlHandler(ConControlHandler, TRUE);
 	SetLastError(ERROR_SUCCESS);
 	GetStartupInfo(&si);
+//	SetErrorMode(SEM_FAILCRITICALERRORS);
 	if (si.dwFlags & STARTF_PS_EXEC){
 		__Process = &__Tasks[si.dwX];
 		__Process->Flags |= WIN_PS_INEXEC;
@@ -122,11 +123,10 @@ proc_init(WIN_SIGPROC SignalProc)
 		win_geteuid(&__Process->UserSid);
 		win_getegid(&__Process->GroupSid);
 		ProcInitLimits(__Process->Limit);
-		SetErrorMode(SEM_FAILCRITICALERRORS);
 	}
-	if (proc_setugid(__Process)){
-		__Process->IsSetUGid = 1;
-	}
+//	if (proc_setugid(__Process)){
+//		__Process->IsSetUGid = 1;
+//	}
 	__CTTY = TERMINAL(__Process->TerminalId);
 	return(__Process);
 }
