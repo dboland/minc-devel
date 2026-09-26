@@ -71,6 +71,41 @@ typedef enum _WIN_DTYPE {
 	WIN_DTYPE_MAX
 } WIN_DTYPE;
 
+/* sys/syslimits.h */
+
+#define WIN_NAME_MAX		16
+#define WIN_PIPE_BUF		1024
+#define WIN_MAX_INPUT		255
+
+/* 
+ * vfs_namei.c
+ */
+
+#define TypeNameLink		0x6B6E6C2E	/* ".lnk" */
+#define TypeNameExe		0x6578652E	/* ".exe" */
+#define TypeNameVirtual		0x7366762E	/* ".vfs" */
+
+#define FILE_ATTRIBUTE_LABEL	0x00000008	/* Win16 legacy */
+
+#define FILE_CLASS_INODE	(FILE_ATTRIBUTE_SYSTEM)
+#define FILE_CLASS_MOUNT	(FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_SYSTEM)
+#define FILE_CLASS_ROOT		(FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_SYSTEM)
+
+#define FILE_CLASS(attr)	(attr & (FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_HIDDEN \
+				| FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_SYSTEM))
+
+#define WIN_SYMLOOP_MAX		8
+
+typedef struct _WIN_INODE {
+	DWORD Magic;		/* file signature */
+	DWORD DeviceId;		/* in kernelland, everything is a device */
+	WIN_VTYPE FileType;	/* in userland, everything is a file */
+	DWORD FSType;		/* See below */
+	DWORD NameSize;
+	DWORD Reserved1;
+	DWORD Reserved2;
+} WIN_INODE;
+
 /* These are hard-coded on disk. Used for identifying symlinks,
  * devices and sockets. Don't change them.
  */
@@ -93,11 +128,52 @@ typedef enum _WIN_FS_TYPE {
 	FS_TYPE_MAX
 } WIN_FS_TYPE;
 
-/* sys/syslimits.h */
+#define INAMESIZE(wcs)		((wcslen(wcs) + 1) * sizeof(WCHAR))
 
-#define WIN_NAME_MAX		16
-#define WIN_PIPE_BUF		1024
-#define WIN_MAX_INPUT		255
+typedef struct _WIN_NAMEIDATA {
+	DWORD MountId;
+	DWORD DeviceId;
+	WIN_VTYPE FileType;
+	WIN_FS_TYPE FSType;
+	DWORD Size;
+	DWORD Index;
+	HANDLE Object;
+	DWORD Attribs;
+	DWORD Flags;			/* see below */
+	SID8 *Owner;			/* owner at file creation */
+	SID8 *Group;			/* group at file creation */
+	WCHAR *Base;
+	WCHAR *Last;
+	WCHAR *R;			/* current WCHAR in resolved path buffer */
+	WCHAR *S;			/* current WCHAR in source path buffer */
+	WCHAR Resolved[WIN_PATH_MAX];
+} WIN_NAMEIDATA;
+
+#define WIN_PATHCOPY		0x00400000	/* copy path verbatim */
+#define WIN_NEEDHANDLE		0x01000000	/* keep handle open (if special file) */
+
+/* sys/namei.h */
+
+#define WIN_LOCKLEAF		0x00000004	/* lock inode on return */
+#define WIN_LOCKPARENT		0x00000008	/* want parent vnode returned locked */
+#define WIN_WANTPARENT		0x00000010	/* want parent vnode returned unlocked */
+#define WIN_NOCACHE		0x00000020	/* name must not be left in cache */
+#define WIN_FOLLOW		0x00000040	/* follow symbolic links */
+#define WIN_NOFOLLOW		0x00000000	/* do not follow symbolic links (pseudo) */
+#define WIN_MODMASK		0x000000fc	/* mask of operational modifiers */
+
+#define WIN_NOCROSSMOUNT	0x00000100	/* do not cross mount points */
+#define WIN_RDONLY		0x00000200	/* lookup with read-only semantics */
+#define WIN_HASBUF		0x00000400	/* has allocated pathname buffer */
+#define WIN_SAVENAME		0x00000800	/* save pathname buffer */
+#define WIN_SAVESTART		0x00001000	/* save starting directory */
+#define WIN_ISDOTDOT		0x00002000	/* current component name is .. */
+#define WIN_MAKEENTRY		0x00004000	/* entry is to be added to name cache */
+#define WIN_ISLASTCN		0x00008000	/* this is last component of pathname */
+#define WIN_ISSYMLINK		0x00010000	/* symlink needs interpretation */
+#define WIN_REQUIREDIR		0x00080000	/* must be a directory */
+#define WIN_STRIPSLASHES	0x00100000	/* strip trailing slashes */
+#define WIN_PDIRUNLOCK		0x00200000	/* vfs_lookup() unlocked parent dir */
 
 /*
  * vfs_device.c
@@ -164,82 +240,6 @@ typedef struct _WIN_CFDATA {
 typedef WIN_DEVICE WIN_DEV_CLASS[WIN_UNIT_MAX];
 
 #define DEVICE(rid)		(&__Devices[rid >> 8][rid & 0xFF])
-
-/* 
- * vfs_namei.c
- */
-
-#define TypeNameLink		0x6B6E6C2E	/* ".lnk" */
-#define TypeNameExe		0x6578652E	/* ".exe" */
-#define TypeNameVirtual		0x7366762E	/* ".vfs" */
-
-#define FILE_ATTRIBUTE_LABEL	0x00000008
-
-#define FILE_CLASS_INODE	(FILE_ATTRIBUTE_SYSTEM)
-#define FILE_CLASS_MOUNT	(FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_SYSTEM)
-#define FILE_CLASS_ROOT		(FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_SYSTEM)
-
-#define FILE_CLASS(attr)	(attr & (FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_HIDDEN \
-				| FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_SYSTEM))
-
-#define WIN_SYMLOOP_MAX		8
-
-typedef struct _WIN_INODE {
-	DWORD Magic;		/* file signature */
-	DWORD DeviceId;		/* in kernelland, everything is a device */
-	WIN_VTYPE FileType;	/* in userland, everything is a file */
-	WIN_FS_TYPE FSType;
-	DWORD NameSize;
-	DWORD Reserved1;
-	DWORD Reserved2;
-} WIN_INODE;
-
-#define INAMESIZE(wcs)		((wcslen(wcs) + 1) * sizeof(WCHAR))
-
-typedef struct _WIN_NAMEIDATA {
-	DWORD MountId;
-	DWORD DeviceId;
-	WIN_VTYPE FileType;
-	WIN_FS_TYPE FSType;
-	DWORD Size;
-	DWORD Index;
-	HANDLE Object;
-	DWORD Attribs;
-	DWORD Flags;			/* see below */
-	SID8 *Owner;			/* owner at file creation */
-	SID8 *Group;			/* group at file creation */
-	WCHAR *Base;
-	WCHAR *Last;
-	WCHAR *R;			/* current WCHAR in resolved path buffer */
-	WCHAR *S;			/* current WCHAR in source path buffer */
-	WCHAR Resolved[WIN_PATH_MAX];
-} WIN_NAMEIDATA;
-
-#define WIN_PATHCOPY		0x00400000	/* copy path verbatim */
-#define WIN_NEEDHANDLE		0x01000000	/* keep handle open (if special file) */
-
-/* sys/namei.h */
-
-#define WIN_LOCKLEAF		0x00000004	/* lock inode on return */
-#define WIN_LOCKPARENT		0x00000008	/* want parent vnode returned locked */
-#define WIN_WANTPARENT		0x00000010	/* want parent vnode returned unlocked */
-#define WIN_NOCACHE		0x00000020	/* name must not be left in cache */
-#define WIN_FOLLOW		0x00000040	/* follow symbolic links */
-#define WIN_NOFOLLOW		0x00000000	/* do not follow symbolic links (pseudo) */
-#define WIN_MODMASK		0x000000fc	/* mask of operational modifiers */
-
-#define WIN_NOCROSSMOUNT	0x00000100	/* do not cross mount points */
-#define WIN_RDONLY		0x00000200	/* lookup with read-only semantics */
-#define WIN_HASBUF		0x00000400	/* has allocated pathname buffer */
-#define WIN_SAVENAME		0x00000800	/* save pathname buffer */
-#define WIN_SAVESTART		0x00001000	/* save starting directory */
-#define WIN_ISDOTDOT		0x00002000	/* current component name is .. */
-#define WIN_MAKEENTRY		0x00004000	/* entry is to be added to name cache */
-#define WIN_ISLASTCN		0x00008000	/* this is last component of pathname */
-#define WIN_ISSYMLINK		0x00010000	/* symlink needs interpretation */
-#define WIN_REQUIREDIR		0x00080000	/* must be a directory */
-#define WIN_STRIPSLASHES	0x00100000	/* strip trailing slashes */
-#define WIN_PDIRUNLOCK		0x00200000	/* vfs_lookup() unlocked parent dir */
 
 /*
  * vfs_dirent.c
@@ -355,7 +355,7 @@ typedef struct _WIN_MOUNT {
 	WCHAR Path[MAX_PATH];
 } WIN_MOUNT;
 
-typedef struct _WIN_STATFS {
+typedef struct _WIN_STATVFS {
 	DWORD MaxPath;
 	LARGE_INTEGER Flags;
 	DWORD DeviceId;
@@ -366,7 +366,7 @@ typedef struct _WIN_STATFS {
 	FILETIME MountTime;
 	WCHAR TypeName[MAX_LABEL];
 	WCHAR Path[MAX_PATH];
-} WIN_STATFS;
+} WIN_STATVFS;
 
 #define WIN_MNT_DOOMED 0x08000000	/* device behind filesystem is gone */
 #define WIN_MNT_ROOTFS 0x00004000	/* identifies the root filesystem */

@@ -28,7 +28,7 @@
  *
  */
 
-#include <ddk/ntifs.h>		/* Installable File System */
+#include <ddk/ntifs.h>
 
 #define DEVINTERFACE_VOLUME		L"{53f5630d-b6bf-11d0-94f2-00a0c91efb8b}"
 #define DEVINTERFACE_PARTITION		L"{53f5630a-b6bf-11d0-94f2-00a0c91efb8b}"
@@ -75,14 +75,12 @@ drive_statvfs(WIN_CFDATA *Config, DWORD Flags, WIN_CFDRIVER *Result)
 	ZeroMemory(Result, sizeof(WIN_CFDRIVER));
 	switch (uiType){
 		case DRIVE_REMOVABLE:
-//			win_wcscpy(Result->ClassId, DEVINTERFACE_PARTITION);
 			Config->DeviceType = DriveLookupStorage(Config->ClassName);
 			break;
 		case DRIVE_NO_ROOT_DIR:		/* Not mounted */
 			Config->DeviceType = DriveLookupDevice(Config->BusName);
 			break;
 		case DRIVE_FIXED:
-//			win_wcscpy(Result->ClassId, DEVINTERFACE_PARTITION);
 			Config->DeviceType = DEV_TYPE_FIXED;
 			break;
 		case DRIVE_CDROM:
@@ -99,7 +97,6 @@ drive_statvfs(WIN_CFDATA *Config, DWORD Flags, WIN_CFDRIVER *Result)
 			bResult = FALSE;
 	}
 	win_wcscpy(Result->NtClass, L"drive");
-//	win_wcscpy(win_wcpcpy(Result->NtPath, L"\\\\.\\GLOBALROOT"), Config->NtPath);
 	win_volname(Result->NtPath, Config->DosPath);
 	return(bResult);
 }

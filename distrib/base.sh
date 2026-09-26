@@ -14,7 +14,7 @@ cp -p /bsd.dll /minc.exe .
 copy_src etc "$ETC"
 
 copy_file sbin "$SBIN"
-copy_file usr/bin "$UBIN"
+copy_posix usr/bin "$UBIN"
 
 echo -n "Compressing base61.tgz... "
 tar -zcf $DISTROOT/base61.tgz *

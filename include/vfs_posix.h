@@ -123,8 +123,8 @@ HANDLE vfs_F_OSFHANDLE(WIN_VNODE Nodes[], DWORD Index);
 
 BOOL vfs_statfs(WIN_NAMEIDATA *Path, WIN_STATFS *Result);
 BOOL vfs_mount(WIN_VNODE *Node, WIN_NAMEIDATA *Path, DWORD Flags, WIN_MODE *Mode);
-BOOL vfs_getfsstat(WIN_CFDATA *Config, WIN_CFDRIVER *Driver, WIN_STATFS *Result);
 BOOL vfs_unmount(WIN_NAMEIDATA *Path);
+BOOL vfs_getfsstat(WIN_CFDATA *Config, WIN_CFDRIVER *Driver, WIN_STATFS *Result);
 
 /* vfs_statvfs.c */
 
@@ -206,6 +206,7 @@ BOOL proc__cxa_finalize(PVOID Param);
 BOOL drive_statvfs(WIN_CFDATA *Config, DWORD Flags, WIN_CFDRIVER *Result);
 BOOL drive_match(LPCWSTR NtName, DWORD DeviceType, WIN_CFDRIVER *Driver);
 BOOL drive_statfs(WIN_MOUNT *Mount, WIN_STATFS *Result);
+BOOL drive_getfsstat(WIN_CFDATA *Config, WIN_CFDRIVER *Driver, WIN_STATFS *Result);
 
 /* disk.c */
 

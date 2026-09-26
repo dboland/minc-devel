@@ -49,7 +49,7 @@ DriveStatVolume(LPCWSTR Drive, WIN_MOUNT *Result)
 /************************************************************/
 
 BOOL 
-drive_statfs(WIN_MOUNT *Mount, WIN_STATFS *Result)
+drive_statfs(WIN_MOUNT *Mount, WIN_STATVFS *Result)
 {
 	BOOL bResult = FALSE;
 

@@ -28,7 +28,7 @@
  *
  */
 
-#include <ddk/ntifs.h>
+#include <ddk/ntifs.h>		/* Installable File System */
 
 /* Devices are loaded using OpenBSD's autoconf framework. After executing the 
  * biosboot program, devices are known, but need to be matched with their drivers.

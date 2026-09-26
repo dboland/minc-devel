@@ -166,7 +166,7 @@ mk_passwd(FILE *stream)
 	if (!sysctl(mib, 4, buf, &size, NULL, 0)){
 		fprintf(stream, "%s\n", buf);
 	}
-	mib[3] = ROOT_GID;
+	mib[3] = WHEEL_GID;
 	if (!sysctl(mib, 4, buf, &size, NULL, 0)){
 		fprintf(stream, "%s\n", buf);
 	}

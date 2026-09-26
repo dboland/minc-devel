@@ -101,7 +101,7 @@ fsflags_win(u_int32_t flags)
 	return(dwResult);
 }
 struct statfs *
-statfs_posix(struct statfs *buf, WIN_STATFS *Stat)
+statfs_posix(struct statfs *buf, WIN_STATVFS *Stat)
 {
 	WIN_DEVICE *pwDevice = DEVICE(Stat->DeviceId);
 
@@ -274,7 +274,7 @@ sys_fstatfs(call_t call, int fd, struct statfs *buf)
 	return(result);
 }
 int 
-sys_getfsstat(call_t call, struct statfs *buf, size_t bufsize, int flags)
+sys_getfsstat_OLD(call_t call, struct statfs *buf, size_t bufsize, int flags)
 {
 	int result = 0;
 	WIN_STATFS fsInfo;
@@ -293,5 +293,39 @@ sys_getfsstat(call_t call, struct statfs *buf, size_t bufsize, int flags)
 		dwIndex++;
 		pwMount++;
 	}
+	return(result);
+}
+int 
+sys_getfsstat(call_t call, struct statfs *buf, size_t bufsize, int flags)
+{
+	int result = 1;
+	WIN_CFDATA cfData;
+	DWORD dwFlags = WIN_MNT_NOWAIT;
+	WIN_CFDRIVER cfDriver;
+	WIN_STATFS fsInfo = {0};
+
+	drive_statfs(__Mounts, &fsInfo);
+	if (buf){
+		buf = statfs_posix(buf, &fsInfo);
+	}
+//	result++;
+	if (!vfs_setvfs(&cfData, dwFlags)){
+		result = -errno_posix(GetLastError());
+	}else while (vfs_getvfs(&cfData, dwFlags)){
+		if (cfData.FSType == FS_TYPE_DRIVE){
+			drive_statvfs(&cfData, dwFlags, &cfDriver);
+			drive_match(cfData.NtName, cfData.DeviceType, &cfDriver);
+			if (!drive_getfsstat(&cfData, &cfDriver, &fsInfo)){
+				continue;
+			}else if (fsInfo.Flags.HighPart & WIN_MNT_DOOMED){
+vfs_ktrace(L"sys_getfsstat", STRUCT_CFDATA, &cfData);
+				continue;
+			}else if (buf){
+				buf = statfs_posix(buf, &fsInfo);
+			}
+			result++;
+		}
+	}
+	vfs_endvfs(&cfData);
 	return(result);
 }

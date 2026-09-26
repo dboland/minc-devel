@@ -197,11 +197,6 @@ Section "SASL authentication library" SecSasl
 	DetailPrint "Installing Sasl 2.1.28..."
 	ExecDos::exec /DETAILED '.\install.cmd sasl2128.tgz'
 SectionEnd
-Section "sl program" SecSL
-	File 'sl.tgz'
-	DetailPrint "Installing sl..."
-	ExecDos::exec /DETAILED '.\install.cmd sl.tgz'
-SectionEnd
 Section
 
 ;	File 'vista.tgz'

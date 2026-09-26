@@ -107,8 +107,8 @@ proc_init(WIN_SIGPROC SignalProc)
 	SetUnhandledExceptionFilter(SigExceptionProc);
 	SetConsoleCtrlHandler(ConControlHandler, TRUE);
 	SetLastError(ERROR_SUCCESS);
-	GetStartupInfo(&si);
 //	SetErrorMode(SEM_FAILCRITICALERRORS);
+	GetStartupInfo(&si);
 	if (si.dwFlags & STARTF_PS_EXEC){
 		__Process = &__Tasks[si.dwX];
 		__Process->Flags |= WIN_PS_INEXEC;
