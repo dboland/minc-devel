@@ -121,16 +121,16 @@ HANDLE vfs_F_OSFHANDLE(WIN_VNODE Nodes[], DWORD Index);
 
 /* vfs_mount.c */
 
-BOOL vfs_statfs(WIN_NAMEIDATA *Path, WIN_STATFS *Result);
+BOOL vfs_statfs(WIN_NAMEIDATA *Path, WIN_STATVFS *Result);
 BOOL vfs_mount(WIN_VNODE *Node, WIN_NAMEIDATA *Path, DWORD Flags, WIN_MODE *Mode);
 BOOL vfs_unmount(WIN_NAMEIDATA *Path);
-BOOL vfs_getfsstat(WIN_CFDATA *Config, WIN_CFDRIVER *Driver, WIN_STATFS *Result);
+BOOL vfs_getfsstat(WIN_CFDATA *Config, DWORD DeviceId, WIN_STATVFS *Result);
 
-/* vfs_statvfs.c */
+/* vfs_device.c */
 
-BOOL vfs_setvfs(WIN_CFDATA *Config, DWORD Flags);
-VOID vfs_endvfs(WIN_CFDATA *Config);
-BOOL vfs_getvfs(WIN_CFDATA *Config, DWORD Flags);
+BOOL vfs_setconf(WIN_CFDATA *Config, DWORD Flags);
+VOID vfs_endconf(WIN_CFDATA *Config);
+BOOL vfs_getconf(WIN_CFDATA *Config, DWORD Flags);
 
 /* vfs_time.c */
 
@@ -150,8 +150,8 @@ BOOL vfs_FIONBIO(WIN_VNODE *Node, ULONG NoWait);
 
 /* vfs_namei.c */
 
-WIN_NAMEIDATA *vfs_lookup(WIN_NAMEIDATA *Path, LPWSTR Source, DWORD Flags);
-BOOL vfs_namei(HANDLE Handle, WIN_VNODE *Result);
+WIN_NAMEIDATA *vfs_namei(WIN_NAMEIDATA *Path, LPWSTR Source, DWORD Flags);
+BOOL vfs_lookup(HANDLE Handle, WIN_VNODE *Result);
 
 /* vfs_uio.c */
 
@@ -203,10 +203,9 @@ BOOL proc__cxa_finalize(PVOID Param);
 
 /* drive.c */
 
-BOOL drive_statvfs(WIN_CFDATA *Config, DWORD Flags, WIN_CFDRIVER *Result);
-BOOL drive_match(LPCWSTR NtName, DWORD DeviceType, WIN_CFDRIVER *Driver);
-BOOL drive_statfs(WIN_MOUNT *Mount, WIN_STATFS *Result);
-BOOL drive_getfsstat(WIN_CFDATA *Config, WIN_CFDRIVER *Driver, WIN_STATFS *Result);
+BOOL drive_lookup(WIN_CFDATA *Config, DWORD Flags, WIN_STATVFS *Result);
+BOOL drive_match(LPCWSTR NtName, DWORD DeviceType, WIN_STATVFS *Result);
+BOOL drive_statvfs(WIN_MOUNT *Mount, WIN_STATVFS *Result);
 
 /* disk.c */
 
@@ -216,14 +215,14 @@ BOOL disk_HW_DISKNAMES(WIN_DEVICE *Device, LPSTR Result);
 
 /* registry.c */
 
-WIN_NAMEIDATA *reg_lookup(WIN_NAMEIDATA *Path, LPCWSTR Source, DWORD Flags);
+WIN_NAMEIDATA *reg_namei(WIN_NAMEIDATA *Path, LPCWSTR Source, DWORD Flags);
 BOOL reg_open(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_VNODE *Result);
 BOOL reg_read(WIN_VNODE *Node, LPCWSTR Name, LPVOID Buffer, DWORD Size, DWORD *Result);
 BOOL reg_close(WIN_VNODE *Node);
 
 /* pdo.c */
 
-DWORD pdo_statvfs(WIN_CFDATA *Config, DWORD Flags, WIN_CFDRIVER *Result);
+DWORD pdo_lookup(WIN_CFDATA *Config, DWORD Flags, WIN_CFDRIVER *Result);
 BOOL pdo_match(LPCWSTR NtName, DWORD DeviceType, WIN_CFDRIVER *Driver);
 BOOL pdo_DIOCGDINFO(WIN_DEVICE *Device);
 BOOL pdo_WSKBDIO_GTYPE(UINT *Type, UINT *SubType, UINT *FKeys);

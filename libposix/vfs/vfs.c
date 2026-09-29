@@ -118,10 +118,11 @@ WIN_TASK	*__Process;
 
 BOOL proc_poll(WIN_TASK *Task);
 BOOL pdo_fstat(WIN_VNODE *Node, WIN_VATTR *Result);
+BOOL disk_F_NAMEI(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result);
 
 #include "vfs_acl.c"
 #include "vfs_signal.c"
-#include "vfs_statvfs.c"
+//#include "vfs_statvfs.c"
 #include "vfs_libgen.c"
 #include "vfs_device.c"
 #include "vfs_ktrace.c"

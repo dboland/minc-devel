@@ -48,15 +48,16 @@ BOOL vfs_listen(WIN_VNODE *Node, INT Backlog);
 BOOL vfs_getpeername(WIN_VNODE *Node, LPSOCKADDR Name, INT *Length);
 BOOL vfs_getsockname(WIN_VNODE *Node, LPSOCKADDR Name, INT *Length);
 
-/* winsock_statvfs.c */
+/* winsock_namei.c */
 
-BOOL ws2_setvfs(WIN_IFDATA *Config);
-VOID ws2_endvfs(WIN_IFDATA *Config);
-BOOL ws2_getvfs(WIN_IFDATA *Config, WIN_CFDRIVER *Result);
+BOOL ws2_lookup(WIN_IFDATA *Config, WIN_CFDRIVER *Result);
 
 /* winsock_device.c */
 
-BOOL ws2_match(LPCWSTR NtName, DWORD DeviceType, DWORD Index, WIN_CFDRIVER *Driver);
+BOOL ws2_setconf(WIN_IFDATA *Config);
+VOID ws2_endconf(WIN_IFDATA *Config);
+BOOL ws2_getconf(WIN_IFDATA *Config, WIN_CFDRIVER *Result);
+BOOL ws2_match(WIN_IFDATA *Config, WIN_CFDRIVER *Driver);
 
 /* winsock_ifaddrs.c */
 

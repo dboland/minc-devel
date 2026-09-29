@@ -37,7 +37,7 @@ wrc: wrc.exe
 console: console.exe
 
 mknod: ${SBINSRC}/mknod/mknod.c
-	${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $<
+	${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $< 
 
 mkent: mkent.c
 	${XGCC} -s ${CFLAGS} -o $@ $< ${MINGW}/lib/libiphlpapi.a

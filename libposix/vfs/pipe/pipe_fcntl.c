@@ -89,7 +89,7 @@ pipe_F_SETFL(WIN_VNODE *Node, WIN_FLAGS *Flags)
 	return(bResult);
 }
 BOOL 
-pipe_F_LOOKUP(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
+pipe_F_NAMEI(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
 {
 	BOOL bResult = FALSE;
 	DWORD dwResult;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Daniel Boland <dboland@xs4all.nl>.
+ * Copyright (c) 2026 Daniel Boland <dboland@xs4all.nl>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,16 +28,37 @@
  *
  */
 
-#include "../config.h"
+#include <ipifcons.h>
 
-DWORD 
-vfs_STATFS(WIN_STATFS *Info, LPSTR Buffer)
+#define NDIS_LAN_CLASS		L"{ad498944-762f-11d0-8dcb-00c04fc3358c}"
+
+/************************************************************/
+
+BOOL 
+ws2_lookup(WIN_IFDATA *Config, WIN_CFDRIVER *Result)
 {
-	LPSTR psz = Buffer;
+	BOOL bResult = TRUE;
 
-	psz += sprintf(psz, "(%ls): DevId(0x%x) MaxPath(%d) ClustersTotal(%d) FreeClusters(%d)\n", 
-		Info->TypeName, Info->DeviceId, Info->MaxPath, Info->ClustersTotal, Info->FreeClusters);
-	psz = VfsVolumeFlagsLow(psz, "+ Flags", Info->Flags.LowPart);
-	psz += sprintf(psz, "+ Path: %ls\n", Info->Path);
-	return(psz - Buffer);
+	switch (Config->IfType){
+		case IF_TYPE_ETHERNET_CSMACD:
+			Config->DeviceType = DEV_TYPE_ETH;
+			break;
+		case IF_TYPE_PPP:
+			Config->DeviceType = DEV_TYPE_PPP;
+			break;
+		case IF_TYPE_SOFTWARE_LOOPBACK:
+			Config->DeviceType = DEV_TYPE_LOOPBACK;
+			break;
+		case IF_TYPE_IEEE80211:
+			Config->DeviceType = DEV_TYPE_WLAN;
+			break;
+		case IF_TYPE_TUNNEL:
+			Config->DeviceType = DEV_TYPE_TUNNEL;
+			break;
+		default:
+			Config->DeviceType = DEV_CLASS_IFNET;
+			bResult = FALSE;
+	}
+	win_wcscpy(Result->ClassId, NDIS_LAN_CLASS);
+	return(bResult);
 }

@@ -41,7 +41,7 @@
 #include "pdo_fcntl.c"
 #include "pdo_unistd.c"
 #include "pdo_stat.c"
-#include "pdo_statvfs.c"
+#include "pdo_namei.c"
 #include "pdo_mount.c"
 
 /****************************************************/

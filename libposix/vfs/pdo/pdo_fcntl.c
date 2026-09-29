@@ -33,7 +33,7 @@
 /****************************************************/
 
 BOOL 
-pdo_F_LOOKUP(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
+pdo_F_NAMEI(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
 {
 	BOOL bResult = TRUE;
 

@@ -116,9 +116,9 @@ proc_init(WIN_SIGPROC SignalProc)
 		__Process = ProcCreateTask(0);
 		__Process->Flags |= WIN_PS_SYSTEM;
 		__Process->FileMask = 0022;
-		vfs_namei(GetStdHandle(STD_INPUT_HANDLE), &__Process->Node[0]);
-		vfs_namei(GetStdHandle(STD_OUTPUT_HANDLE), &__Process->Node[1]);
-		vfs_namei(GetStdHandle(STD_ERROR_HANDLE), &__Process->Node[2]);
+		vfs_lookup(GetStdHandle(STD_INPUT_HANDLE), &__Process->Node[0]);
+		vfs_lookup(GetStdHandle(STD_OUTPUT_HANDLE), &__Process->Node[1]);
+		vfs_lookup(GetStdHandle(STD_ERROR_HANDLE), &__Process->Node[2]);
 		win_getcwd(__Strings[__Process->TaskId].Path);
 		win_geteuid(&__Process->UserSid);
 		win_getegid(&__Process->GroupSid);

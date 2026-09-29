@@ -62,7 +62,9 @@ extern __import SID8 SidPackageRestrict;
 char 	_PWDBUF[MAX_PWDBUF];
 
 int _verbose;
-int _paths;
+int _paths = 1;
+
+/* systm.h */
 
 /****************************************************/
 
@@ -204,12 +206,12 @@ mk_resolv(FILE *stream)
 	}
 }
 int 
-mk_fsent(WIN_CFDATA *Config, WIN_CFDRIVER *Driver, struct statfs *info)
+mk_fsent(WIN_CFDATA *Config, DWORD DeviceId, struct statfs *info)
 {
 	int result = 0;
-	WIN_STATFS fsInfo = {0};
+	WIN_STATVFS fsInfo = {0};
 
-	if (vfs_getfsstat(Config, Driver, &fsInfo)){
+	if (vfs_getfsstat(Config, DeviceId, &fsInfo)){
 		statfs_posix(info, &fsInfo);
 	}else{
 		result = -1;
@@ -222,25 +224,22 @@ mk_fstab(FILE *stream)
 	int result = 0;
 	WIN_CFDATA cfData;
 	DWORD dwFlags = WIN_MNT_NOWAIT;
-	WIN_CFDRIVER cfDriver;
+	WIN_STATVFS fsInfo;
 	struct statfs info;
 
 	printf("/dev/root\t/\tffs\trw\t0\t0\n");
-	if (!vfs_setvfs(&cfData, dwFlags)){
+	if (!vfs_setconf(&cfData, dwFlags)){
 		fprintf(stderr, "vfs_setvfs(): %s\n", win_strerror(errno_win()));
-	}else while (vfs_getvfs(&cfData, dwFlags)){
+	}else while (vfs_getconf(&cfData, dwFlags)){
 		if (cfData.FSType == FS_TYPE_DRIVE){
-			drive_statvfs(&cfData, dwFlags, &cfDriver);
-			drive_match(cfData.NtName, cfData.DeviceType, &cfDriver);
-			if (!mk_fsent(&cfData, &cfDriver, &info)){
+			drive_lookup(&cfData, dwFlags, &fsInfo);
+			drive_match(cfData.NtName, cfData.DeviceType, &fsInfo);
+			if (!mk_fsent(&cfData, fsInfo.DeviceId, &info)){
 				print_fsent(&cfData, &info);
 			}
-		}else if (cfData.FSType == FS_TYPE_PDO){
-			pdo_statvfs(&cfData, dwFlags, &cfDriver);
-			pdo_match(cfData.NtName, cfData.DeviceType, &cfDriver);
 		}
 	}
-	vfs_endvfs(&cfData);
+	vfs_endconf(&cfData);
 	return(result);
 }
 void 
@@ -249,9 +248,9 @@ mk_vfsent(WIN_FS_TYPE Type)
 	WIN_CFDATA fsEnum;
 	char buf[PATH_MAX] = "";
 
-	if (!vfs_setvfs(&fsEnum, 0)){
+	if (!vfs_setconf(&fsEnum, 0)){
 		fprintf(stderr, "vfs_setfsstat(): %s\n", strerror(errno));
-	}else while (vfs_getvfs(&fsEnum, 0)){
+	}else while (vfs_getconf(&fsEnum, 0)){
 		if (fsEnum.FSType == Type){
 			if (_verbose){
 				printf("%ls: %ls\n", fsEnum.DosPath, fsEnum.NtPath);
@@ -260,7 +259,7 @@ mk_vfsent(WIN_FS_TYPE Type)
 			}
 		}
 	}
-	vfs_endvfs(&fsEnum);
+	vfs_endconf(&fsEnum);
 }
 void 
 mk_vol(FILE *stream)
@@ -269,9 +268,9 @@ mk_vol(FILE *stream)
 	CHAR szMessage[MAX_MESSAGE];
 	char buf[PATH_MAX];
 
-	if (!vfs_setvfs(&cfData, 0)){
+	if (!vfs_setconf(&cfData, 0)){
 		fprintf(stderr, "vfs_setfsstat(): %s\n", strerror(errno));
-	}else while (vfs_getvfs(&cfData, 0)){
+	}else while (vfs_getconf(&cfData, 0)){
 		if (cfData.FSType == FS_TYPE_VOLUME){
 			printf("%ls: %ls\n", cfData.DosPath, cfData.NtPath);
 			if (!vol_stat(cfData.DosPath, szMessage)){
@@ -281,7 +280,7 @@ mk_vol(FILE *stream)
 			}
 		}
 	}
-	vfs_endvfs(&cfData);
+	vfs_endconf(&cfData);
 }
 void 
 mk_ifent(WIN_FS_TYPE Type)
@@ -289,14 +288,15 @@ mk_ifent(WIN_FS_TYPE Type)
 	WIN_IFDATA ifData;
 	WIN_CFDRIVER ifDriver;
 
-	if (!ws2_setvfs(&ifData)){
+	if (!ws2_setconf(&ifData)){
 		fprintf(stderr, "ws2_setvfs(): %s\n", strerror(errno));
-	}else while (ws2_getvfs(&ifData, &ifDriver)){
+	}else while (ws2_getconf(&ifData, &ifDriver)){
 		if (ifData.FSType == Type){
-			printf("%ls: Index(%d) Type(%d): %ls\n", ifData.NtName, ifData.Index, ifData.Type, ifDriver.Comment);
+			printf("%ls: Index(%d) Type(%d): %ls\n", 
+				ifData.NtName, ifData.Index, ifData.Type, ifDriver.Comment);
 		}
 	}
-	ws2_endvfs(&ifData);
+	ws2_endconf(&ifData);
 }
 
 /****************************************************/

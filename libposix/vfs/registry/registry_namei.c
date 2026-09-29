@@ -65,7 +65,7 @@ RegReadPath(LPCWSTR Source, LPWSTR Destination)
 /****************************************************/
 
 WIN_NAMEIDATA *
-reg_lookup(WIN_NAMEIDATA *Result, DWORD FileType, LPCWSTR Source)
+reg_namei(WIN_NAMEIDATA *Result, DWORD FileType, LPCWSTR Source)
 {
 	Result->FSType = FS_TYPE_REGISTRY;
 	switch (FileType){

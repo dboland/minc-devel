@@ -36,7 +36,7 @@
 #include "winsock_socket.c"
 #include "winsock_sockio.c"
 #include "winsock_unistd.c"
-#include "winsock_statvfs.c"
+#include "winsock_namei.c"
 #include "winsock_stat.c"
 #include "winsock_if.c"
 #include "winsock_ifaddrs.c"

@@ -43,6 +43,127 @@
 
 /****************************************************/
 
+DWORD 
+VfsLinkType(LPWSTR BusName)
+{
+	DWORD dwType = FS_TYPE_LINK;
+
+	if (!*BusName){
+		wcscpy(BusName, L"LINK");
+	}else if (!wcscmp(BusName, L"Volume")){
+		dwType = FS_TYPE_VOLUME;
+	}else if (!wcsncmp(BusName, L"NP", 2)){
+		dwType = FS_TYPE_NPF;
+	}
+	return(dwType);
+}
+DWORD 
+VfsBusName(LPCWSTR DosPath, LPWSTR Result)
+{
+	DWORD dwType = FS_TYPE_PROCESS;
+	LPCWSTR P = DosPath;
+	WCHAR *B = Result;
+	WCHAR C;
+
+	ZeroMemory(Result, sizeof(WCHAR) * MAX_NAME);
+	while (C = *P++){
+		if (C == '#'){
+			dwType = FS_TYPE_PDO;
+			break;
+		}else if (C == ':'){
+			dwType = FS_TYPE_DRIVE;
+			break;
+		}else if (C == '{'){
+			dwType = VfsLinkType(Result);
+			break;
+		}
+		*B++ = C;
+	}
+	return(dwType);
+}
+DWORD 
+VfsClassName(LPCWSTR NtPath, LPWSTR Result)
+{
+	LPCWSTR P = NtPath;
+	DWORD dwDepth = 0;
+	WCHAR C;
+
+	while (C = *P++){
+		if (C == '\\'){
+			dwDepth++;
+		}else if (dwDepth == 2){
+			*Result++ = C;
+		}
+	}
+	*Result = 0;
+	return(dwDepth);
+}
+BOOL 
+VfsQueryDosDevice(LPCWSTR DosPath, LPWSTR Result)
+{
+	/* Kaspersky Total Security creates a random FDO device,
+	 * named XXXXCtrl.
+	 */
+	if (QueryDosDeviceW(DosPath, Result, MAX_TEXT)){
+		return(TRUE);
+	}else if (ERROR_ACCESS_DENIED == GetLastError()){
+		win_wcscpy(win_wcpcpy(Result, L"\\Device\\"), DosPath);
+	}else{
+		WIN_ERR("QueryDosDevice(%ls): %s\n", DosPath, win_strerror(GetLastError()));
+	}
+	return(TRUE);
+}
+
+/************************************************************/
+
+BOOL 
+vfs_setconf(WIN_CFDATA *Config, DWORD Flags)
+{
+	DWORD dwSize = __Globals->PageSize;
+	LPWSTR pszBuffer = win_malloc(dwSize * sizeof(WCHAR));
+
+	ZeroMemory(Config, sizeof(WIN_CFDATA));
+	while (!QueryDosDeviceW(NULL, pszBuffer, dwSize)){
+		if (ERROR_INSUFFICIENT_BUFFER == GetLastError()){
+			dwSize += __Globals->PageSize;
+			win_realloc(dwSize * sizeof(WCHAR), pszBuffer, (PVOID *)&pszBuffer);
+		}else{
+			WIN_ERR("QueryDosDevice(%d): %s\n", dwSize, win_strerror(GetLastError()));
+			win_free(pszBuffer);
+			return(FALSE);
+		}
+	}
+	Config->Strings = pszBuffer;
+	Config->Next = pszBuffer;
+	return(TRUE);
+}
+VOID 
+vfs_endconf(WIN_CFDATA *Config)
+{
+	win_free(Config->Strings);
+}
+BOOL 
+vfs_getconf(WIN_CFDATA *Config, DWORD Flags)
+{
+	BOOL bResult = FALSE;
+	LPCWSTR pszNext = Config->Next;
+
+	if (!*pszNext){
+		SetLastError(ERROR_NO_MORE_ITEMS);
+	}else if (VfsQueryDosDevice(pszNext, Config->NtPath)){
+		Config->FSType = VfsBusName(pszNext, Config->BusName);
+		Config->Depth = VfsClassName(Config->NtPath, Config->ClassName);
+		win_wcsucase(Config->BusName);
+		Config->NtName = win_basename(Config->NtPath);
+		Config->DosPath = pszNext;
+		Config->Next += wcslen(pszNext) + 1;
+		bResult = TRUE;
+	}
+	return(bResult);
+}
+
+/************************************************************/
+
 BOOL 
 config_init(LPCSTR Name, DWORD FileType, DWORD DeviceType)
 {
@@ -52,7 +173,7 @@ config_init(LPCSTR Name, DWORD FileType, DWORD DeviceType)
 	pwDevice->FSType = FS_TYPE_PDO;
 	pwDevice->DeviceType = DeviceType;
 	pwDevice->DeviceId = DeviceType;
-	pwDevice->Flags |= WIN_DVF_CONFIG_READY;
+	pwDevice->Flags |= WIN_DVF_ACTIVE;
 	win_strlcpy(pwDevice->Name, Name, MAX_NAME);
 	return(TRUE);
 }
@@ -63,7 +184,7 @@ config_found(LPCSTR Name, DWORD FileType, WIN_DEVICE *Device)
 
 	Device->FileType = FileType;
 	Device->FSType = FS_TYPE_PDO;
-	Device->Flags |= WIN_DVF_CONFIG_READY;
+	Device->Flags |= WIN_DVF_ACTIVE;
 	_itoa(uiUnit, win_stpcpy(Device->Name, Name), 10);
 	return(TRUE);
 }
@@ -250,7 +371,7 @@ printer_attach(WIN_DEVICE *Device)
 			bResult = config_found("ulpt", WIN_VCHR, Device);
 			break;
 		case DEV_TYPE_LPT:
-			bResult = config_found("parallel", WIN_VCHR, Device);
+			bResult = config_found("pclpt", WIN_VCHR, Device);
 			break;
 		default:
 			bResult = FALSE;
@@ -314,6 +435,9 @@ storage_attach(WIN_DEVICE *Device)
 		case DEV_TYPE_FIXED:
 			bResult = config_found("vol", WIN_VBLK, Device);
 			break;
+		case DEV_TYPE_REMOVABLE:
+			bResult = config_found("sd", WIN_VBLK, Device);
+			break;
 		case DEV_TYPE_CDROM:
 			bResult = config_found("cd", WIN_VBLK, Device);
 			break;
@@ -321,7 +445,7 @@ storage_attach(WIN_DEVICE *Device)
 			bResult = config_found("fd", WIN_VBLK, Device);
 			break;
 		case DEV_TYPE_SD:
-			bResult = config_found("sd", WIN_VBLK, Device);
+			bResult = config_found("hd", WIN_VBLK, Device);
 			break;
 		default:
 			bResult = FALSE;

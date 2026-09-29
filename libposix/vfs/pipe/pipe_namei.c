@@ -33,7 +33,7 @@
 /****************************************************/
 
 BOOL 
-pipe_namei(HANDLE Handle, WIN_VNODE *Result)
+pipe_lookup(HANDLE Handle, WIN_VNODE *Result)
 {
 	BOOL bResult = FALSE;
 	DWORD dwFlags = 0;

@@ -51,9 +51,10 @@ int
 msgbuf_PDO(WIN_CFDATA *Config, WIN_CFDRIVER *Driver, LPSTR Result)
 {
 	LPSTR psz = Result;
+	WIN_DEVICE *pwDevice = DEVICE(Driver->DeviceId);
 
-	if (Driver->Flags & WIN_DVF_CONFIG_READY){
-		psz += sprintf(psz, "%s on ", Driver->Name);
+	if (pwDevice->Flags & WIN_DVF_ACTIVE){
+		psz += sprintf(psz, "%s on ", pwDevice->Name);
 	}else{
 		psz += sprintf(psz, "+ not configured: ");
 	}
@@ -61,26 +62,22 @@ msgbuf_PDO(WIN_CFDATA *Config, WIN_CFDRIVER *Driver, LPSTR Result)
 	psz += sprintf(psz, " %ls", cfexpand(Driver->Location));
 	psz += sprintf(psz, ", class %ls", Driver->NtClass);
 	psz += sprintf(psz, ", type 0x%x", Config->DeviceType);
-	psz += sprintf(psz, ", flags 0x%x", Driver->Flags);
+	psz += sprintf(psz, ", flags 0x%x", pwDevice->Flags);
 	psz += sprintf(psz, ", \"%ls\"", cfexpand(Driver->Comment));
 	*psz++ = '\n';
 	*psz = 0;
 	return(psz - Result);
 }
 int 
-msgbuf_DRIVE(WIN_CFDATA *Config, WIN_CFDRIVER *Driver, LPSTR Result)
+msgbuf_DRIVE(WIN_CFDATA *Config, WIN_STATVFS *Stat, LPSTR Result)
 {
 	LPSTR psz = Result;
+	WIN_DEVICE *pwDevice = DEVICE(Stat->DeviceId);
 
-	if (Driver->Flags & WIN_DVF_CONFIG_READY){
-		psz += sprintf(psz, "%s on ", Driver->Name);
-	}else{
-		psz += sprintf(psz, "+ not configured: ");
-	}
-	psz += sprintf(psz, "%ls at %ls", Config->NtName, Config->BusName);
-	psz += sprintf(psz, " %ls", Driver->NtClass);
+	psz += sprintf(psz, "%s on ", pwDevice->Name);
+	psz += sprintf(psz, "%ls at %ls drive", Config->NtName, Config->BusName);
 	psz += sprintf(psz, ", type 0x%x", Config->DeviceType);
-	psz += sprintf(psz, ", flags 0x%x", Driver->Flags);
+	psz += sprintf(psz, ", flags 0x%x", pwDevice->Flags);
 	*psz++ = '\n';
 	*psz = 0;
 	return(psz - Result);
@@ -89,16 +86,17 @@ int
 msgbuf_WINSOCK(WIN_IFDATA *Config, WIN_CFDRIVER *Driver, LPSTR Result)
 {
 	LPSTR psz = Result;
+	WIN_DEVICE *pwDevice = DEVICE(Driver->DeviceId);
 
-	if (Driver->Flags & WIN_DVF_CONFIG_READY){
-		psz += sprintf(psz, "%s on ", Driver->Name);
+	if (pwDevice->Flags & WIN_DVF_ACTIVE){
+		psz += sprintf(psz, "%s on ", pwDevice->Name);
 	}else{
 		psz += sprintf(psz, "+ not configured: ");
 	}
-	psz += sprintf(psz, "%ls", Config->NtName);
-	psz += sprintf(psz, ", index %d", Config->Index);
+	psz += sprintf(psz, "%ls", Config->AdapterName);
+	psz += sprintf(psz, ", index %d", Config->IfIndex);
 	psz += sprintf(psz, ", type 0x%x", Config->DeviceType);
-	psz += sprintf(psz, ", flags 0x%x", Driver->Flags);
+	psz += sprintf(psz, ", flags 0x%x", pwDevice->Flags);
 	psz += sprintf(psz, ", \"%ls\"", Driver->Comment);
 	*psz++ = '\n';
 	*psz = 0;
@@ -112,33 +110,34 @@ msgbuf_KERN_MSGBUFSIZE(int *data, size_t *len)
 {
 	WIN_CFDATA cfData;
 	WIN_CFDRIVER cfDriver;
+	WIN_STATVFS fsInfo;
 	DWORD dwFlags = WIN_MNT_NOWAIT;
 	char *msgbuf = win_malloc(MSGBUFSIZE);
 	size_t bufsize = 0;
 	char *buf = msgbuf;
 
-	if (!vfs_setvfs(&cfData, dwFlags)){
+	if (!vfs_setconf(&cfData, dwFlags)){
 		return(-ECANCELED);
-	}else while (vfs_getvfs(&cfData, dwFlags)){
-		if (cfData.FSType == FS_TYPE_DRIVE){
-			drive_statvfs(&cfData, dwFlags, &cfDriver);
-			if (drive_match(cfData.NtName, cfData.DeviceType, &cfDriver)){
-				bufsize += msgbuf_DRIVE(&cfData, &cfDriver, buf);
-				if (win_realloc(bufsize + MSGBUFSIZE, msgbuf, (PVOID *)&msgbuf)){
-					buf = msgbuf + bufsize;
-				}
-			}
-		}else if (cfData.FSType == FS_TYPE_PDO){
-			pdo_statvfs(&cfData, dwFlags, &cfDriver);
+	}else while (vfs_getconf(&cfData, dwFlags)){
+		if (cfData.FSType == FS_TYPE_PDO){
+			pdo_lookup(&cfData, dwFlags, &cfDriver);
 			if (pdo_match(cfData.NtName, cfData.DeviceType, &cfDriver)){
 				bufsize += msgbuf_PDO(&cfData, &cfDriver, buf);
 				if (win_realloc(bufsize + MSGBUFSIZE, msgbuf, (PVOID *)&msgbuf)){
 					buf = msgbuf + bufsize;
 				}
 			}
+		}else if (cfData.FSType == FS_TYPE_DRIVE){
+			drive_lookup(&cfData, dwFlags, &fsInfo);
+			if (drive_match(cfData.NtName, cfData.DeviceType, &fsInfo)){
+				bufsize += msgbuf_DRIVE(&cfData, &fsInfo, buf);
+				if (win_realloc(bufsize + MSGBUFSIZE, msgbuf, (PVOID *)&msgbuf)){
+					buf = msgbuf + bufsize;
+				}
+			}
 		}
 	}
-	vfs_endvfs(&cfData);
+	vfs_endconf(&cfData);
 	__Globals->MsgBufSize = bufsize;
 	__Globals->MsgBuffer = msgbuf;
 	*data = bufsize;

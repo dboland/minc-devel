@@ -174,7 +174,7 @@ pathat_win(WIN_NAMEIDATA *Result, int dirfd, const char *path, int atflags)
 	size = WIN_PATH_MAX - (Result->R - Result->Resolved);
 	win_mbstowcs(szSource, path, size);
 
-	return(vfs_lookup(Result, szSource, dwFlags));
+	return(vfs_namei(Result, szSource, dwFlags));
 
 }
 WIN_NAMEIDATA *

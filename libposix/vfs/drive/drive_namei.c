@@ -32,8 +32,77 @@
 
 /****************************************************/
 
+DWORD 
+DriveLookupDevice(LPCWSTR BusName)
+{
+	DWORD dwResult = DEV_CLASS_CPU;
+
+	if (!wcsncmp(BusName, L"SCSI", 4)){
+		dwResult = DEV_TYPE_SD;
+
+	}else if (!wcscmp(BusName, L"LOG")){
+		dwResult = DEV_TYPE_LOG;
+
+//	}else if (!wcscmp(BusName, L"GLOBALROOT")){
+//		dwResult = DEV_TYPE_ROOT;
+
+	}
+	return(dwResult);
+}
+DWORD 
+DriveLookupStorage(LPCWSTR ClassName)
+{
+	DWORD dwResult = DEV_CLASS_STORAGE;
+
+	if (!wcsncmp(ClassName, L"Floppy", 6)){
+		dwResult |= DEV_BUS_FDC;
+
+//	}else{
+//		dwResult |= DEV_BUS_USB;
+
+	}
+	return(dwResult);
+}
+
+/****************************************************/
+
 BOOL 
-drive_lookup(WIN_NAMEIDATA *Path, DWORD Flags)
+drive_lookup(WIN_CFDATA *Config, DWORD Flags, WIN_STATVFS *Result)
+{
+	BOOL bResult = TRUE;
+	UINT uiType = GetDriveTypeW(Config->DosPath);
+
+	ZeroMemory(Result, sizeof(WIN_STATVFS));
+	switch (uiType){
+		case DRIVE_REMOVABLE:
+			Result->Flags.HighPart = WIN_MNT_DOOMED;
+			Config->DeviceType = DriveLookupStorage(Config->ClassName);
+			break;
+		case DRIVE_NO_ROOT_DIR:		/* Not mounted */
+			Config->DeviceType = DriveLookupDevice(Config->BusName);
+			break;
+		case DRIVE_FIXED:
+			Config->DeviceType = DEV_TYPE_FIXED;
+			break;
+		case DRIVE_CDROM:
+			Config->DeviceType = DEV_TYPE_CDROM;
+			break;
+		case DRIVE_REMOTE:
+			Config->DeviceType = DEV_TYPE_REMOTE;
+			Result->Flags.HighPart = WIN_MNT_DOOMED;
+			break;
+		case DRIVE_RAMDISK:
+			Config->DeviceType = DEV_TYPE_RAMDISK;
+			break;
+		default:
+			bResult = FALSE;
+	}
+	win_wcscpy(Result->Path, Config->DosPath);
+	Result->MountId = MOUNTID(Config->DosPath[0]);
+	return(bResult);
+}
+BOOL 
+drive_namei(WIN_NAMEIDATA *Path, DWORD Flags)
 {
 	BOOL bResult = TRUE;
 	WCHAR szDrive[MAX_NAME];
@@ -44,6 +113,5 @@ drive_lookup(WIN_NAMEIDATA *Path, DWORD Flags)
 		Path->R = win_wcpcpy(Path->Resolved, pszDrive);
 		Path->Base = Path->R;
 	}
-//vfs_ktrace("drive_lookup", STRUCT_NAMEI, Path);
 	return(bResult);
 }

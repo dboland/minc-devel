@@ -90,10 +90,10 @@ PathGlob(WIN_NAMEIDATA *Path, DWORD Flags)
 		bResult = FALSE;
 	}else switch (FILE_CLASS(dwAttribs)){
 		case FILE_CLASS_INODE:
-			bResult = disk_lookup(Path, Flags);
+			bResult = disk_namei(Path, Flags);
 			break;
 		case FILE_CLASS_MOUNT:
-			bResult = drive_lookup(Path, Flags);
+			bResult = drive_namei(Path, Flags);
 			break;
 		case FILE_CLASS_ROOT:
 			break;
@@ -130,7 +130,7 @@ PathClose(WIN_NAMEIDATA *Path, DWORD Flags)
 /****************************************************/
 
 WIN_NAMEIDATA *
-vfs_lookup(WIN_NAMEIDATA *Path, LPWSTR Source, DWORD Flags)
+vfs_namei(WIN_NAMEIDATA *Path, LPWSTR Source, DWORD Flags)
 {
 	PathOpen(Path, Source, Flags);
 	if (Flags & WIN_PATHCOPY){	/* vfs_symlink() */
@@ -147,7 +147,7 @@ vfs_lookup(WIN_NAMEIDATA *Path, LPWSTR Source, DWORD Flags)
 	return(Path);
 }
 BOOL 
-vfs_namei(HANDLE Handle, WIN_VNODE *Result)
+vfs_lookup(HANDLE Handle, WIN_VNODE *Result)
 {
 	BOOL bResult = FALSE;
 	DWORD dwType = GetFileType(Handle);
@@ -155,13 +155,13 @@ vfs_namei(HANDLE Handle, WIN_VNODE *Result)
 
 	switch (dwType){
 		case FS_TYPE_DISK:
-			bResult = disk_namei(Handle, Result);
+			bResult = disk_lookup(Handle, Result);
 			break;
 		case FS_TYPE_CHAR:
-			bResult = char_namei(Handle, Result);
+			bResult = char_lookup(Handle, Result);
 			break;
 		case FS_TYPE_PIPE:
-			bResult = pipe_namei(Handle, Result);
+			bResult = pipe_lookup(Handle, Result);
 			break;
 		default:
 			SetLastError(ERROR_BAD_FILE_TYPE);

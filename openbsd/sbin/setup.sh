@@ -31,7 +31,7 @@ echo done.
 
 echo -n "Creating /dev file system... "
 sh /etc/MAKEDEV
-mkent -p fstab >/etc/fstab
+printf "/dev/root\t/\tffs\trw\t0\t0\n" >/etc/fstab
 admins_only "/etc/fstab"
 echo done.
 

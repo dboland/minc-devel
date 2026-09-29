@@ -98,6 +98,9 @@ vfs_ktrace(LPCWSTR Label, STRUCT_TYPE Type, PVOID Data)
 		case STRUCT_CFDATA:
 			vfs_CFDATA((WIN_CFDATA *)Data, pszBuffer);
 			break;
+		case STRUCT_STATVFS:
+			vfs_STATVFS((WIN_STATVFS *)Data, pszBuffer);
+			break;
 		default:
 			strcpy(pszBuffer, ": Not implemented.\n");
 	}

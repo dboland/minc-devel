@@ -11,10 +11,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "win/ntdll.h"
 #include "win_types.h"
 #include "dev_types.h"
 #include "vfs_types.h"
-#include "ntdll_posix.h"
 
 #include "../libtrace/libtrace.h"
 

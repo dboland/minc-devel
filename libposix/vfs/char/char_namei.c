@@ -33,7 +33,7 @@
 /****************************************************/
 
 BOOL 
-char_namei(HANDLE Handle, WIN_VNODE *Result)
+char_lookup(HANDLE Handle, WIN_VNODE *Result)
 {
 	ACCESS_MASK aMask = GENERIC_READ;
 	DWORD dwMode;

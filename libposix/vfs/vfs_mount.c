@@ -33,14 +33,14 @@
 /****************************************************/
 
 BOOL 
-vfs_getfsstat(WIN_CFDATA *Config, WIN_CFDRIVER *Driver, WIN_STATVFS *Result)
+vfs_getfsstat(WIN_CFDATA *Config, DWORD DeviceId, WIN_STATVFS *Result)
 {
 	WIN_MOUNT wMount = {0};
 
 	/* This function simulates the mount() process and is used 
 	 * by the mkent program only.
 	 */
-	win_bzero(Result, sizeof(WIN_STATFS));
+	win_bzero(Result, sizeof(WIN_STATVFS));
 	switch (Config->DeviceType){
 		case DEV_TYPE_CDROM:
 			win_wcscpy(wMount.TypeName, L"ISO9660");
@@ -64,25 +64,8 @@ vfs_getfsstat(WIN_CFDATA *Config, WIN_CFDRIVER *Driver, WIN_STATVFS *Result)
 	win_wcscpy(Result->Path, Config->DosPath);
 	win_wcscpy(Result->TypeName, wMount.TypeName);
 	Result->Flags = wMount.Flags;
-	Result->DeviceId = Driver->DeviceId;
+	Result->DeviceId = DeviceId;
 	return(TRUE);
-}
-BOOL 
-drive_getfsstat(WIN_CFDATA *Config, WIN_CFDRIVER *Driver, WIN_STATVFS *Result)
-{
-	BOOL bResult = FALSE;
-	LONG lMountId = MOUNTID(Config->DosPath[0]);
-	WIN_MOUNT *pwMount = &__Mounts[lMountId];
-
-	win_bzero(Result, sizeof(WIN_STATFS));
-	if (pwMount->Flags.QuadPart){
-		win_wcscpy(Result->Path, Config->DosPath);
-		win_wcscpy(Result->TypeName, pwMount->TypeName);
-		Result->Flags = pwMount->Flags;
-		Result->DeviceId = Driver->DeviceId;
-		bResult = TRUE;
-	}
-	return(bResult);
 }
 
 /****************************************************/
@@ -90,7 +73,7 @@ drive_getfsstat(WIN_CFDATA *Config, WIN_CFDRIVER *Driver, WIN_STATVFS *Result)
 BOOL 
 vfs_statfs(WIN_NAMEIDATA *Path, WIN_STATVFS *Result)
 {
-	return(drive_statfs(&__Mounts[Path->MountId], Result));
+	return(drive_statvfs(&__Mounts[Path->MountId], Result));
 }
 BOOL 
 vfs_mount(WIN_VNODE *Node, WIN_NAMEIDATA *Path, DWORD Flags, WIN_MODE *Mode)

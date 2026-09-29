@@ -37,35 +37,30 @@ cpu_configure(void)
 {
 	WIN_CFDATA cfData;
 	WIN_CFDRIVER cfDriver;
+	WIN_STATVFS fsInfo;
 	DWORD dwFlags = WIN_MNT_NOWAIT;
 	CHAR szMessage[MAX_MESSAGE];
+	LONG lResult;
 
 	/* Determine i/o configuration for a machine.
 	 */
-	if (!vfs_setvfs(&cfData, dwFlags)){
+	if (!vfs_setconf(&cfData, dwFlags)){
 		return;
-	}else while (vfs_getvfs(&cfData, dwFlags)){
-		if (cfData.FSType == FS_TYPE_DRIVE){
-			drive_statvfs(&cfData, dwFlags, &cfDriver);
-			if (drive_match(cfData.NtName, cfData.DeviceType, &cfDriver)){
-				msgbuf_DRIVE(&cfData, &cfDriver, szMessage);
-//				WIN_ERR(szMessage);
-			}else if (!(cfDriver.Flags & WIN_DVF_CONFIG_READY)){
-				msgbuf_DRIVE(&cfData, &cfDriver, szMessage);
-				WIN_ERR(szMessage);
+	}else while (vfs_getconf(&cfData, dwFlags)){
+		if (cfData.FSType == FS_TYPE_PDO){
+			pdo_lookup(&cfData, dwFlags, &cfDriver);
+			if (!pdo_match(cfData.NtName, cfData.DeviceType, &cfDriver)){
+				if (!(cfDriver.Flags & WIN_DVF_ACTIVE)){
+					msgbuf_PDO(&cfData, &cfDriver, szMessage);
+					WIN_ERR(szMessage);
+				}
 			}
-		}else if (cfData.FSType == FS_TYPE_PDO){
-			pdo_statvfs(&cfData, dwFlags, &cfDriver);
-			if (pdo_match(cfData.NtName, cfData.DeviceType, &cfDriver)){
-				msgbuf_PDO(&cfData, &cfDriver, szMessage);
-//				WIN_ERR(szMessage);
-			}else if (!(cfDriver.Flags & WIN_DVF_CONFIG_READY)){
-				msgbuf_PDO(&cfData, &cfDriver, szMessage);
-				WIN_ERR(szMessage);
-			}
+		}else if (cfData.FSType == FS_TYPE_DRIVE){
+			drive_lookup(&cfData, dwFlags, &fsInfo);
+			drive_match(cfData.NtName, cfData.DeviceType, &fsInfo);
 		}
 	}
-	vfs_endvfs(&cfData);
+	vfs_endconf(&cfData);
 }
 void 
 diskconf(char *root)

@@ -199,7 +199,7 @@ typedef struct _WIN_DEVICE {
 
 #define WIN_DVF_PDO_READY		0x0100
 #define WIN_DVF_DRIVE_READY		0x0200
-#define WIN_DVF_CONFIG_READY		0x0400
+#define WIN_DVF_IF_READY		0x0400
 
 /* Flags from NetBSD */
 
@@ -215,7 +215,6 @@ typedef struct _WIN_DEVICE {
 typedef struct _WIN_CFDRIVER {
 	DWORD Flags;
 	DWORD DeviceId;
-	CHAR Name[MAX_NAME];
 	WCHAR ClassId[MAX_GUID];
 	WCHAR NtClass[MAX_NAME];
 	WCHAR Service[MAX_NAME];
@@ -359,6 +358,7 @@ typedef struct _WIN_STATVFS {
 	DWORD MaxPath;
 	LARGE_INTEGER Flags;
 	DWORD DeviceId;
+	DWORD MountId;
 	DWORD SectorsPerCluster;
 	DWORD BytesPerSector;
 	DWORD FreeClusters;

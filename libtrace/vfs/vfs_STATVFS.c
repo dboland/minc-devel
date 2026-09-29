@@ -28,58 +28,16 @@
  *
  */
 
-#include <winbase.h>
+#include "../config.h"
 
-/************************************************************/
-
-BOOL 
-pdo_match(LPCWSTR NtName, DWORD DeviceType, WIN_CFDRIVER *Driver)
+DWORD 
+vfs_STATVFS(WIN_STATVFS *Info, LPSTR Buffer)
 {
-	BOOL bResult = FALSE;
-	WIN_DEVICE *pwDevice = DEVICE(DeviceType);
-	USHORT sClass = DeviceType & 0xFF00;
-	USHORT sUnit = DeviceType & 0x00FF;
+	LPSTR psz = Buffer;
 
-	while (sUnit < WIN_UNIT_MAX){
-		if (!wcscmp(pwDevice->NtName, NtName)){
-			if (!wcscmp(pwDevice->ClassId, Driver->ClassId)){
-				bResult = TRUE;
-			}
-			break;
-		}else if (!pwDevice->Flags){
-			pwDevice->Flags = WIN_DVF_PDO_READY;
-			pwDevice->DeviceType = DeviceType;
-			pwDevice->DeviceId = sClass + sUnit;
-			win_wcscpy(pwDevice->NtName, NtName);
-			win_wcscpy(pwDevice->ClassId, Driver->ClassId);
-			bResult = config_attach(pwDevice, sClass);
-			break;
-		}
-		pwDevice++;
-		sUnit++;
-	}
-	Driver->DeviceId = pwDevice->DeviceId;
-	Driver->Flags = pwDevice->Flags;
-	return(bResult);
-}
-WIN_DEVICE *
-pdo_attach(DWORD DeviceType)
-{
-	WIN_DEVICE *pwDevice = DEVICE(DeviceType);
-	USHORT sClass = DeviceType & 0xFF00;
-	USHORT sUnit = DeviceType & 0x00FF;
-
-	while (sUnit < WIN_UNIT_MAX){
-		if (!pwDevice->Flags){
-			pwDevice->DeviceType = DeviceType;
-			pwDevice->DeviceId = sClass + sUnit;
-			if (!config_attach(pwDevice, sClass)){
-				WIN_ERR("Warning: device 0x%x not configured\n", DeviceType);
-			}
-			break;
-		}
-		pwDevice++;
-		sUnit++;
-	}
-	return(pwDevice);
+	psz += sprintf(psz, "(%ls): DevId(0x%x) MaxPath(%d) ClustersTotal(%d) FreeClusters(%d)\n", 
+		Info->TypeName, Info->DeviceId, Info->MaxPath, Info->ClustersTotal, Info->FreeClusters);
+	psz = VfsVolumeFlagsLow(psz, "+ Flags", Info->Flags.LowPart);
+	psz += sprintf(psz, "+ Path: %ls\n", Info->Path);
+	return(psz - Buffer);
 }

@@ -247,7 +247,7 @@ int
 sys_statfs(call_t call, const char *path, struct statfs *buf)
 {
 	int result = 0;
-	WIN_STATFS fsInfo = {0};
+	WIN_STATVFS fsInfo = {0};
 	WIN_NAMEIDATA wPath = {0};
 	WIN_TASK *pwTask = call.Task;
 
@@ -262,7 +262,7 @@ int
 sys_fstatfs(call_t call, int fd, struct statfs *buf)
 {
 	int result = 0;
-	WIN_STATFS fsInfo = {0};
+	WIN_STATVFS fsInfo = {0};
 	WIN_NAMEIDATA wPath = {0};
 	WIN_TASK *pwTask = call.Task;
 
@@ -274,10 +274,10 @@ sys_fstatfs(call_t call, int fd, struct statfs *buf)
 	return(result);
 }
 int 
-sys_getfsstat_OLD(call_t call, struct statfs *buf, size_t bufsize, int flags)
+sys_getfsstat(call_t call, struct statfs *buf, size_t bufsize, int flags)
 {
 	int result = 0;
-	WIN_STATFS fsInfo;
+	WIN_STATVFS fsInfo;
 	DWORD dwFlags = flags;
 	DWORD dwIndex = 0;
 	WIN_MOUNT *pwMount = __Mounts;
@@ -285,7 +285,7 @@ sys_getfsstat_OLD(call_t call, struct statfs *buf, size_t bufsize, int flags)
 	while (dwIndex < WIN_MOUNT_MAX){
 		if (pwMount->Flags.QuadPart){
 			if (buf){
-				drive_statfs(pwMount, &fsInfo);
+				drive_statvfs(pwMount, &fsInfo);
 				buf = statfs_posix(buf, &fsInfo);
 			}
 			result++;
@@ -293,39 +293,5 @@ sys_getfsstat_OLD(call_t call, struct statfs *buf, size_t bufsize, int flags)
 		dwIndex++;
 		pwMount++;
 	}
-	return(result);
-}
-int 
-sys_getfsstat(call_t call, struct statfs *buf, size_t bufsize, int flags)
-{
-	int result = 1;
-	WIN_CFDATA cfData;
-	DWORD dwFlags = WIN_MNT_NOWAIT;
-	WIN_CFDRIVER cfDriver;
-	WIN_STATFS fsInfo = {0};
-
-	drive_statfs(__Mounts, &fsInfo);
-	if (buf){
-		buf = statfs_posix(buf, &fsInfo);
-	}
-//	result++;
-	if (!vfs_setvfs(&cfData, dwFlags)){
-		result = -errno_posix(GetLastError());
-	}else while (vfs_getvfs(&cfData, dwFlags)){
-		if (cfData.FSType == FS_TYPE_DRIVE){
-			drive_statvfs(&cfData, dwFlags, &cfDriver);
-			drive_match(cfData.NtName, cfData.DeviceType, &cfDriver);
-			if (!drive_getfsstat(&cfData, &cfDriver, &fsInfo)){
-				continue;
-			}else if (fsInfo.Flags.HighPart & WIN_MNT_DOOMED){
-vfs_ktrace(L"sys_getfsstat", STRUCT_CFDATA, &cfData);
-				continue;
-			}else if (buf){
-				buf = statfs_posix(buf, &fsInfo);
-			}
-			result++;
-		}
-	}
-	vfs_endvfs(&cfData);
 	return(result);
 }

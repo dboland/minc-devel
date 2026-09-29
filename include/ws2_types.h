@@ -60,17 +60,17 @@
 #define WS_AF_ROUTE	24
 
 /*
- * winsock_statvfs.c
+ * winsock_device.c
  */
 
 typedef struct _WIN_IFDATA {
 	PVOID Table;
 	PIP_ADAPTER_ADDRESSES Next;
-	DWORD Index;
-	DWORD Type;
+	DWORD IfIndex;
+	DWORD IfType;
 	DWORD FSType;
 	DWORD DeviceType;
-	WCHAR NtName[MAX_NAME];
+	WCHAR AdapterName[MAX_NAME];
 } WIN_IFDATA;
 
 #define WS_SOCKET_SIZE		0x2000

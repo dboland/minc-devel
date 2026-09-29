@@ -39,18 +39,19 @@ ifinit(void)
 	WIN_CFDRIVER cfDriver;
 	CHAR szMessage[MAX_MESSAGE];
 
-	if (!ws2_setvfs(&ifData)){
+	if (!ws2_setconf(&ifData)){
 		return;
-	}else while (ws2_getvfs(&ifData, &cfDriver)){
+	}else while (ws2_getconf(&ifData, &cfDriver)){
 		if (ifData.FSType == FS_TYPE_WINSOCK){
-			if (ws2_match(ifData.NtName, ifData.DeviceType, ifData.Index, &cfDriver)){
+			ws2_lookup(&ifData, &cfDriver);
+			if (ws2_match(&ifData, &cfDriver)){
 				msgbuf_WINSOCK(&ifData, &cfDriver, szMessage);
 //				WIN_ERR(szMessage);
-			}else if (!(cfDriver.Flags & WIN_DVF_CONFIG_READY)){
+			}else if (!(cfDriver.Flags & WIN_DVF_ACTIVE)){
 				msgbuf_WINSOCK(&ifData, &cfDriver, szMessage);
 				WIN_ERR(szMessage);
 			}
 		}
 	}
-	ws2_endvfs(&ifData);
+	ws2_endconf(&ifData);
 }

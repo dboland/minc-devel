@@ -49,27 +49,6 @@ DriveStatVolume(LPCWSTR Drive, WIN_MOUNT *Result)
 /************************************************************/
 
 BOOL 
-drive_statfs(WIN_MOUNT *Mount, WIN_STATVFS *Result)
-{
-	BOOL bResult = FALSE;
-
-	/* mount.exe -a
-	 */
-	if (GetDiskFreeSpaceW(Mount->Volume, &Result->SectorsPerCluster, 
-		&Result->BytesPerSector, &Result->FreeClusters, &Result->ClustersTotal)){
-		win_wcscpy(Result->Path, Mount->Path);
-		win_wcscpy(Result->TypeName, Mount->TypeName);
-		Result->DeviceId = Mount->DeviceId;
-		Result->MountTime = Mount->Time;
-		Result->Flags = Mount->Flags;
-		Result->MaxPath = Mount->MaxPath;
-		bResult = TRUE;
-	}else{
-		Result->Flags.HighPart |= WIN_MNT_DOOMED;
-	}
-	return(bResult);
-}
-BOOL 
 drive_mount(WIN_DEVICE *Device, WIN_NAMEIDATA *Path, DWORD Flags, WIN_MODE *Mode)
 {
 	BOOL bResult = FALSE;

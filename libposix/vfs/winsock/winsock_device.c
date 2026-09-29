@@ -28,27 +28,80 @@
  *
  */
 
-#include <ddk/ndisguid.h>
+#include <iphlpapi.h>
 
 /************************************************************/
 
 BOOL 
-ws2_match(LPCWSTR NtName, DWORD DeviceType, DWORD Index, WIN_CFDRIVER *Driver)
+ws2_setconf(WIN_IFDATA *Config)
 {
 	BOOL bResult = FALSE;
-	WIN_DEVICE *pwDevice = DEVICE(DeviceType);
-	USHORT sClass = DeviceType & 0xFF00;
-	USHORT sUnit = DeviceType & 0x00FF;
+	ULONG ulStatus;
+	PIP_ADAPTER_ADDRESSES pTable;
+	LONG lSize = 0;
+	ULONG ulFlags = GAA_FLAG_SKIP_DNS_SERVER | GAA_FLAG_SKIP_MULTICAST;
+	DWORD dwCount = 0;
+
+	ulStatus = GetAdaptersAddresses(AF_UNSPEC, ulFlags, NULL, NULL, &lSize);
+	if (lSize > 0){
+		pTable = win_malloc(lSize);
+		GetAdaptersAddresses(AF_UNSPEC, ulFlags, NULL, pTable, &lSize);
+		Config->Table = pTable;
+		Config->Next = pTable;
+		Config->IfIndex = 0;
+		bResult = TRUE;
+	}else{
+		WIN_ERR("GetAdaptersAddresses(AF_UNSPEC): %s\n", win_strerror(ulStatus));
+	}
+	return(bResult);
+}
+VOID 
+ws2_endconf(WIN_IFDATA *Config)
+{
+	win_free(Config->Table);
+}
+BOOL 
+ws2_getconf(WIN_IFDATA *Config, WIN_CFDRIVER *Result)
+{
+	BOOL bResult = FALSE;
+	PIP_ADAPTER_ADDRESSES pRow = Config->Next;
+
+	if (!pRow){
+		SetLastError(ERROR_NO_MORE_ITEMS);
+	}else{
+		ZeroMemory(Result, sizeof(WIN_CFDRIVER));
+		Config->FSType = FS_TYPE_WINSOCK;
+		Config->IfIndex = pRow->IfIndex;
+		Config->IfType = pRow->IfType;
+		win_mbstowcs(Config->AdapterName, pRow->AdapterName, MAX_NAME);
+		win_wcscpy(Result->Comment, pRow->FriendlyName);
+		Config->Next = pRow->Next;
+		bResult = TRUE;
+	}
+	return(bResult);
+}
+
+/****************************************************/
+
+BOOL 
+ws2_match(WIN_IFDATA *Config, WIN_CFDRIVER *Driver)
+{
+	BOOL bResult = FALSE;
+	DWORD dwType = Config->DeviceType;
+	WIN_DEVICE *pwDevice = DEVICE(dwType);
+	USHORT sClass = dwType & 0xFF00;
+	USHORT sUnit = dwType & 0x00FF;
 
 	while (sUnit < WIN_UNIT_MAX){
-		if (!wcscmp(pwDevice->NtName, NtName)){
+		if (!wcscmp(pwDevice->NtName, Config->AdapterName)){
 			bResult = TRUE;
 			break;
 		}else if (!pwDevice->Flags){
-			pwDevice->DeviceType = DeviceType;
+			pwDevice->Flags = WIN_DVF_IF_READY;
+			pwDevice->DeviceType = dwType;
 			pwDevice->DeviceId = sClass + sUnit;
-			pwDevice->Index = Index;
-			win_wcscpy(pwDevice->NtName, NtName);
+			pwDevice->Index = Config->IfIndex;
+			win_wcscpy(pwDevice->NtName, Config->AdapterName);
 			win_wcscpy(pwDevice->ClassId, Driver->ClassId);
 			bResult = config_attach(pwDevice, sClass);
 			break;
@@ -56,7 +109,6 @@ ws2_match(LPCWSTR NtName, DWORD DeviceType, DWORD Index, WIN_CFDRIVER *Driver)
 		pwDevice++;
 		sUnit++;
 	}
-	win_strcpy(Driver->Name, pwDevice->Name);
 	Driver->DeviceId = pwDevice->DeviceId;
 	Driver->Flags = pwDevice->Flags;
 	return(bResult);

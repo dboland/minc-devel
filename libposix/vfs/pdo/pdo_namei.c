@@ -159,7 +159,7 @@ PDOLookupClass(LPCWSTR ClassID, LPWSTR Result)
 	WIN_FLAGS wFlags = {GENERIC_READ, 0, 0, REG_SZ, FALSE};
 	WIN_NAMEIDATA wPath;
 
-	if (reg_open(reg_lookup(&wPath, REG_CLASS, ClassID), &wFlags, &vNode)){
+	if (reg_open(reg_namei(&wPath, REG_CLASS, ClassID), &wFlags, &vNode)){
 		if (!reg_read(&vNode, L"Class", Result, MAX_NAME, &dwResult)){
 			win_wcscpy(Result, L"UNKNOWN");
 		}
@@ -171,7 +171,7 @@ PDOLookupClass(LPCWSTR ClassID, LPWSTR Result)
 /************************************************************/
 
 BOOL 
-pdo_statvfs(WIN_CFDATA *Config, DWORD Flags, WIN_CFDRIVER *Driver)
+pdo_lookup(WIN_CFDATA *Config, DWORD Flags, WIN_CFDRIVER *Driver)
 {
 	BOOL bResult = FALSE;
 	WIN_VNODE vNode = {0};
@@ -182,7 +182,7 @@ pdo_statvfs(WIN_CFDATA *Config, DWORD Flags, WIN_CFDRIVER *Driver)
 	WCHAR szText[MAX_TEXT];
 
 	ZeroMemory(Driver, sizeof(WIN_CFDRIVER));
-	if (reg_open(reg_lookup(&wPath, REG_DRIVER, Config->DosPath), &wFlags, &vNode)){
+	if (reg_open(reg_namei(&wPath, REG_DRIVER, Config->DosPath), &wFlags, &vNode)){
 
 		/* GUID of attached software device
 		 */

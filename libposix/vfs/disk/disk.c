@@ -28,16 +28,14 @@
  *
  */
 
-BOOL disk_lookup(WIN_NAMEIDATA *Path, DWORD Flags);
-
 #include "disk_syscall.c"
 #include "disk_sysctl.c"
-#include "disk_dirent.c"
 #include "link/link.c"
 #include "file/file.c"
+#include "disk_namei.c"
+#include "disk_dirent.c"
 #include "directory/directory.c"
 #include "disk_fcntl.c"
-#include "disk_namei.c"
 #include "disk_unistd.c"
 #include "disk_stat.c"
 #include "disk_time.c"

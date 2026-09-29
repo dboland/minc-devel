@@ -32,7 +32,7 @@
 
 /* mount.c */
 
-struct statfs *statfs_posix(struct statfs *buf, WIN_STATFS *Stat);
+struct statfs *statfs_posix(struct statfs *buf, WIN_STATVFS *Stat);
 
 /* unistd.c */
 
