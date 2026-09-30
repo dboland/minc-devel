@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Daniel Boland <dboland@xs4all.nl>.
+ * Copyright (c) 2026 Daniel Boland <dboland@xs4all.nl>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,67 +28,40 @@
  *
  */
 
-#include <winreg.h>
-
-#define DRIVER_ROOT	L"SYSTEM\\CurrentControlSet\\Enum\\"
-#define CLASS_ROOT	L"SYSTEM\\CurrentControlSet\\Control\\Class\\"
-#define INTERFACE_ROOT	L"SYSTEM\\CurrentControlSet\\Control\\DeviceClasses\\"
-#define MOUNT_ROOT	L"SYSTEM\\MountedDevices\\"
-#define CONSOLE_ROOT	L"Console\\"
-#define BIOS_ROOT	L"HARDWARE\DESCRIPTION\System\\"
+#include <winbase.h>
 
 /****************************************************/
 
-LPWSTR 
-RegReadPath(LPCWSTR Src, LPWSTR Dest)
+BOOL 
+shell_statfs(WIN_CFDATA *Config, WIN_STATVFS *Result)
 {
-	WCHAR C;
-	LONG lDepth = 0;
-	WCHAR *pszBase = NULL;
+	WIN_MOUNT wMount = {0};
 
-	while (C = *Src++){
-		if (C == '#'){
-			if (lDepth < 2){
-				C = '\\';
-			}
-			lDepth++;
-			pszBase = Dest;
-		}
-		*Dest++ = C;
-	}
-	if (pszBase){
-		*pszBase++ = 0;
-	}
-	*Dest = 0;
-	return(pszBase);
-}
-
-/****************************************************/
-
-WIN_NAMEIDATA *
-reg_namei(WIN_NAMEIDATA *Result, DWORD FileType, LPCWSTR Source)
-{
-	Result->FSType = FS_TYPE_REGISTRY;
-	switch (FileType){
-		case REG_DRIVER:
-			Result->R = win_wcpcpy(Result->Resolved, DRIVER_ROOT);
-			break;
-		case REG_CLASS:
-			Result->R = win_wcpcpy(Result->Resolved, CLASS_ROOT);
-			break;
-		case REG_IFACE:
-			Result->R = win_wcpcpy(Result->Resolved, INTERFACE_ROOT);
-			break;
-		case REG_MOUNT:
-			Result->R = win_wcpcpy(Result->Resolved, MOUNT_ROOT);
-			break;
-		case REG_TTY:
-			Result->R = win_wcpcpy(Result->Resolved, CONSOLE_ROOT);
+	/* This function simulates the mount() process and is used 
+	 * by the mkent program only.
+	 */
+	switch (Config->DeviceType){
+		case DEV_TYPE_CDROM:
+			win_wcscpy(wMount.TypeName, L"ISO9660");
+			wMount.Flags.LowPart = FILE_READ_ONLY_VOLUME;
+			wMount.Flags.HighPart = WIN_MNT_DOOMED;
 			break;
 		default:
-			Result->R = Result->Resolved;
+			win_wcscpy(wMount.TypeName, L"FAT");
 	}
-	Result->FileType = FileType;
-	Result->R = RegReadPath(Source, Result->R);
-	return(Result);
+	if (Config->DeviceType == DEV_TYPE_FLOPPY){
+		wMount.Flags.HighPart |= WIN_MNT_DOOMED;
+	}else if (DriveStatVolume(Config->DosPath, &wMount)){
+		Result->MaxPath = wMount.MaxPath;
+	}else if (ERROR_NOT_READY != GetLastError()){
+//		WIN_ERR("GetVolumeInformation(%ls): %s\n", wMount.Volume, win_strerror(GetLastError()));
+		return(FALSE);
+	}
+	if (Config->DeviceType == DEV_TYPE_REMOTE){
+		wMount.Flags.HighPart |= WIN_MNT_DOOMED;
+	}
+	win_wcscpy(Result->Path, Config->DosPath);
+	win_wcscpy(Result->TypeName, wMount.TypeName);
+	Result->Flags = wMount.Flags;
+	return(TRUE);
 }

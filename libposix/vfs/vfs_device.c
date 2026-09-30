@@ -151,11 +151,11 @@ vfs_getconf(WIN_CFDATA *Config, DWORD Flags)
 	if (!*pszNext){
 		SetLastError(ERROR_NO_MORE_ITEMS);
 	}else if (VfsQueryDosDevice(pszNext, Config->NtPath)){
+		Config->DosPath = pszNext;
 		Config->FSType = VfsBusName(pszNext, Config->BusName);
 		Config->Depth = VfsClassName(Config->NtPath, Config->ClassName);
 		win_wcsucase(Config->BusName);
 		Config->NtName = win_basename(Config->NtPath);
-		Config->DosPath = pszNext;
 		Config->Next += wcslen(pszNext) + 1;
 		bResult = TRUE;
 	}

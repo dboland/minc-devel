@@ -28,4 +28,4 @@
  *
  */
 
-#include "volume_stat.c"
+#include "volume_namei.c"

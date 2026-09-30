@@ -33,44 +33,6 @@
 /****************************************************/
 
 BOOL 
-vfs_getfsstat(WIN_CFDATA *Config, DWORD DeviceId, WIN_STATVFS *Result)
-{
-	WIN_MOUNT wMount = {0};
-
-	/* This function simulates the mount() process and is used 
-	 * by the mkent program only.
-	 */
-	win_bzero(Result, sizeof(WIN_STATVFS));
-	switch (Config->DeviceType){
-		case DEV_TYPE_CDROM:
-			win_wcscpy(wMount.TypeName, L"ISO9660");
-			wMount.Flags.LowPart = FILE_READ_ONLY_VOLUME;
-			wMount.Flags.HighPart = WIN_MNT_DOOMED;
-			break;
-		default:
-			win_wcscpy(wMount.TypeName, L"FAT");
-	}
-	if (Config->DeviceType == DEV_TYPE_FLOPPY){
-		wMount.Flags.HighPart |= WIN_MNT_DOOMED;
-	}else if (DriveStatVolume(Config->DosPath, &wMount)){
-		Result->MaxPath = wMount.MaxPath;
-	}else if (ERROR_NOT_READY != GetLastError()){
-//		WIN_ERR("GetVolumeInformation(%ls): %s\n", wMount.Volume, win_strerror(GetLastError()));
-		return(FALSE);
-	}
-	if (Config->DeviceType == DEV_TYPE_REMOTE){
-		wMount.Flags.HighPart |= WIN_MNT_DOOMED;
-	}
-	win_wcscpy(Result->Path, Config->DosPath);
-	win_wcscpy(Result->TypeName, wMount.TypeName);
-	Result->Flags = wMount.Flags;
-	Result->DeviceId = DeviceId;
-	return(TRUE);
-}
-
-/****************************************************/
-
-BOOL 
 vfs_statfs(WIN_NAMEIDATA *Path, WIN_STATVFS *Result)
 {
 	return(drive_statvfs(&__Mounts[Path->MountId], Result));

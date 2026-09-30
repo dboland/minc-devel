@@ -124,7 +124,6 @@ HANDLE vfs_F_OSFHANDLE(WIN_VNODE Nodes[], DWORD Index);
 BOOL vfs_statfs(WIN_NAMEIDATA *Path, WIN_STATVFS *Result);
 BOOL vfs_mount(WIN_VNODE *Node, WIN_NAMEIDATA *Path, DWORD Flags, WIN_MODE *Mode);
 BOOL vfs_unmount(WIN_NAMEIDATA *Path);
-BOOL vfs_getfsstat(WIN_CFDATA *Config, DWORD DeviceId, WIN_STATVFS *Result);
 
 /* vfs_device.c */
 
@@ -229,10 +228,20 @@ BOOL pdo_WSKBDIO_GTYPE(UINT *Type, UINT *SubType, UINT *FKeys);
 BOOL pdo_revoke(WIN_DEVICE *Device);
 BOOL rand_read(LPSTR Buffer, DWORD Size, DWORD *Result);
 
+/* shell.c */
+
+BOOL shell_execve(LPSTR Command, LPCSTR Path, STARTUPINFO *Info);
+BOOL shell_statfs(WIN_CFDATA *Config, WIN_STATVFS *Result);
+
 /* char.c */
 
 BOOL char_revoke(WIN_TTY *Terminal);
 VOID char_init(VOID);
+
+/* winsock.c */
+
+UINT ws2_nametoindex(LPCSTR Name);
+UINT ws2_indextoname(DWORD Index, LPSTR Result);
 
 /* mailslot.c */
 
@@ -240,10 +249,4 @@ BOOL mail_revoke(WIN_TTY *Terminal);
 
 /* volume.c */
 
-BOOL vol_fstat(HANDLE Handle, LPSTR Result);
-BOOL vol_stat(LPCWSTR Path, LPSTR Result);
-
-/* winsock.c */
-
-UINT ws2_nametoindex(LPCSTR Name);
-UINT ws2_indextoname(DWORD Index, LPSTR Result);
+BOOL vol_lookup(LPCWSTR Path, LPSTR Result);

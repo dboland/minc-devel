@@ -99,7 +99,6 @@ BOOL win_group_member(PSID Group);
 BOOL win_getgroups(SID8 **Groups, DWORD *Count);
 BOOL win_setgroups(WIN_CAP_CONTROL *Control, SID8 Groups[], DWORD Count);
 BOOL win___tfork_thread(WIN___TFORK *Params, SIZE_T Size, LPTHREAD_START_ROUTINE *Start, PVOID Data, DWORD *Result);
-BOOL win_execve(LPSTR Command, LPCSTR Path, STARTUPINFO *Info);
 
 /* win_stdlib.c */
 

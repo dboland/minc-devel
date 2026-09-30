@@ -184,7 +184,7 @@ pdo_lookup(WIN_CFDATA *Config, DWORD Flags, WIN_CFDRIVER *Driver)
 	ZeroMemory(Driver, sizeof(WIN_CFDRIVER));
 	if (reg_open(reg_namei(&wPath, REG_DRIVER, Config->DosPath), &wFlags, &vNode)){
 
-		/* GUID of attached software device
+		/* GUID of attached device
 		 */
 		win_wcscpy(Driver->ClassId, wPath.R);
 

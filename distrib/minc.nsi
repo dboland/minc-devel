@@ -233,6 +233,5 @@ SectionEnd
 ;!insertmacro MUI_DESCRIPTION_TEXT ${SecPerl} "perl - The Perl 5 language interpreter"
 !insertmacro MUI_DESCRIPTION_TEXT ${SecBind} "Bind DNS tools"
 !insertmacro MUI_DESCRIPTION_TEXT ${SecSasl} "SASL authentication library"
-!insertmacro MUI_DESCRIPTION_TEXT ${SecSL} "cure your bad habit of mistyping"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 

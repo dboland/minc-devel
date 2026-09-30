@@ -33,32 +33,35 @@
 /****************************************************/
 
 BOOL 
-vol_fstat(HANDLE Handle, LPSTR Result)
+VolLookupPartition(HANDLE Handle, LPSTR Result)
 {
 	BOOL bResult = FALSE;
 	STORAGE_DEVICE_NUMBER Info;
 	DWORD dwSize = sizeof(STORAGE_DEVICE_NUMBER);
 
 	if (DeviceIoControl(Handle, IOCTL_STORAGE_GET_DEVICE_NUMBER, NULL, 0, &Info, dwSize, &dwSize, NULL)){
-		WIN_ERR(Result, "DeviceType(%d) DeviceNumber(%d) PartitionNumber(%d)", 
+		sprintf(Result, "DeviceType(%d) DeviceNumber(%d) PartitionNumber(%d)", 
 			Info.DeviceType, Info.DeviceNumber, Info.PartitionNumber);
 		bResult = TRUE;
 	}
 	return(bResult);
 }
+
+/****************************************************/
+
 BOOL 
-vol_stat(LPCWSTR Path, LPSTR Result)
+vol_lookup(LPCWSTR Name, LPSTR Result)
 {
 	BOOL bResult = FALSE;
 	WIN_VNODE vNode = {0};
 	HANDLE hResult;
 	WCHAR szPath[MAX_PATH] = L"\\\\.\\";
 
-	hResult = CreateFileW(win_wcscat(szPath, Path), READ_CONTROL, FILE_SHARE_READ, NULL, 
+	hResult = CreateFileW(win_wcscat(szPath, Name), READ_CONTROL, FILE_SHARE_READ, NULL, 
 		OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hResult == INVALID_HANDLE_VALUE){
 		WIN_ERR("CreateFile(%ls): %s\n", szPath, win_strerror(GetLastError()));
-	}else if (vol_fstat(hResult, Result)){
+	}else if (VolLookupPartition(hResult, Result)){
 		bResult = CloseHandle(hResult);
 	}
 	return(bResult);

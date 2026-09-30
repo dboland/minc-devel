@@ -46,7 +46,6 @@
 #include "win/aclapi.h"
 #include "win_posix.h"
 #include "vfs_posix.h"
-#include "ws2_posix.h"
 #include "msvc_posix.h"
 #include "bsd_posix.h"
 #include "arch_posix.h"
@@ -61,7 +60,6 @@ extern __import SID8 SidPackageRestrict;
 
 char 	_PWDBUF[MAX_PWDBUF];
 
-int _verbose;
 int _paths = 1;
 
 /* systm.h */
@@ -69,7 +67,7 @@ int _paths = 1;
 /****************************************************/
 
 void 
-print_fsent(WIN_CFDATA *Config, struct statfs *info)
+print_fsent(struct statfs *info)
 {
 	char line[255], *l = line;
 	mode_t mode;
@@ -105,17 +103,8 @@ print_usage(char *prog)
 	printf(" group\t\t\tprint entries for /etc/group\n");
 	printf(" fstab\t\t\tprint entries for /etc/fstab\n");
 	printf(" resolv\t\t\tprint entries for /etc/resolv.conf\n");
-	printf(" pdo\t\t\tWindows PDO device table (physical drivers)\n");
-	printf(" fdo\t\t\tWindows FDO device table (function drivers)\n");
-	printf(" vol\t\t\tWindows volume table\n");
-	printf(" link\t\t\tWindows link table\n");
-	printf(" drive\t\t\tWindows drive table\n");
-	printf(" npf\t\t\tNetGroup Packet Filter table\n");
-	printf(" ndis\t\t\tWindows network driver table\n");
-	printf(" if\t\t\tWindows network adapter table\n");
 	printf("\nOptions\n");
 	printf(" -p, --path\t\tcreate paths while printing\n");
-	printf(" -v, --verbose\t\tbe verbose if applicable\n");
 }
 
 /****************************************************/
@@ -172,7 +161,7 @@ mk_passwd(FILE *stream)
 	if (!sysctl(mib, 4, buf, &size, NULL, 0)){
 		fprintf(stream, "%s\n", buf);
 	}
-	mib[3] = DOMAIN_NT_SERVICE_RID_INSTALLER;	/* Vista */
+	mib[3] = DOMAIN_NT_SERVICE_RID_INSTALLER;	/* TrustedInstaller (Vista) */
 	if (!sysctl(mib, 4, buf, &size, NULL, 0)){
 		fprintf(stream, "%s\n", buf);
 	}
@@ -192,10 +181,10 @@ mk_resolv(FILE *stream)
 	DWORD dwIndex;
 	IP_ADDR_STRING *ipEntry;
 
-	dwStatus = GetNetworkParams(NULL, &lSize);
+	GetNetworkParams(NULL, &lSize);
 	if (lSize > 0){
 		fInfo = win_malloc(lSize);
-		GetNetworkParams(fInfo, &lSize);
+		dwStatus = GetNetworkParams(fInfo, &lSize);
 		fprintf(stream, "domain %s\n", fInfo->DomainName);
 		for (ipEntry = &fInfo->DnsServerList; ipEntry; ipEntry = ipEntry->Next){
 			fprintf(stream, "nameserver %s\n", ipEntry->IpAddress.String);
@@ -204,19 +193,6 @@ mk_resolv(FILE *stream)
 	}else{
 		WIN_ERR("GetNetworkParams(): %s\n", win_strerror(dwStatus));
 	}
-}
-int 
-mk_fsent(WIN_CFDATA *Config, DWORD DeviceId, struct statfs *info)
-{
-	int result = 0;
-	WIN_STATVFS fsInfo = {0};
-
-	if (vfs_getfsstat(Config, DeviceId, &fsInfo)){
-		statfs_posix(info, &fsInfo);
-	}else{
-		result = -1;
-	}
-	return(result);
 }
 int 
 mk_fstab(FILE *stream)
@@ -234,69 +210,14 @@ mk_fstab(FILE *stream)
 		if (cfData.FSType == FS_TYPE_DRIVE){
 			drive_lookup(&cfData, dwFlags, &fsInfo);
 			drive_match(cfData.NtName, cfData.DeviceType, &fsInfo);
-			if (!mk_fsent(&cfData, fsInfo.DeviceId, &info)){
-				print_fsent(&cfData, &info);
+			if (shell_statfs(&cfData, &fsInfo)){
+				statfs_posix(&info, &fsInfo);
+				print_fsent(&info);
 			}
 		}
 	}
 	vfs_endconf(&cfData);
 	return(result);
-}
-void 
-mk_vfsent(WIN_FS_TYPE Type)
-{
-	WIN_CFDATA fsEnum;
-	char buf[PATH_MAX] = "";
-
-	if (!vfs_setconf(&fsEnum, 0)){
-		fprintf(stderr, "vfs_setfsstat(): %s\n", strerror(errno));
-	}else while (vfs_getconf(&fsEnum, 0)){
-		if (fsEnum.FSType == Type){
-			if (_verbose){
-				printf("%ls: %ls\n", fsEnum.DosPath, fsEnum.NtPath);
-			}else{
-				printf("%ls: %ls\n", fsEnum.BusName, fsEnum.NtPath);
-			}
-		}
-	}
-	vfs_endconf(&fsEnum);
-}
-void 
-mk_vol(FILE *stream)
-{
-	WIN_CFDATA cfData;
-	CHAR szMessage[MAX_MESSAGE];
-	char buf[PATH_MAX];
-
-	if (!vfs_setconf(&cfData, 0)){
-		fprintf(stderr, "vfs_setfsstat(): %s\n", strerror(errno));
-	}else while (vfs_getconf(&cfData, 0)){
-		if (cfData.FSType == FS_TYPE_VOLUME){
-			printf("%ls: %ls\n", cfData.DosPath, cfData.NtPath);
-			if (!vol_stat(cfData.DosPath, szMessage)){
-				printf("   %s\n", win_strerror(errno_win()));
-			}else{
-				printf("   %s\n", szMessage);
-			}
-		}
-	}
-	vfs_endconf(&cfData);
-}
-void 
-mk_ifent(WIN_FS_TYPE Type)
-{
-	WIN_IFDATA ifData;
-	WIN_CFDRIVER ifDriver;
-
-	if (!ws2_setconf(&ifData)){
-		fprintf(stderr, "ws2_setvfs(): %s\n", strerror(errno));
-	}else while (ws2_getconf(&ifData, &ifDriver)){
-		if (ifData.FSType == Type){
-			printf("%ls: Index(%d) Type(%d): %ls\n", 
-				ifData.NtName, ifData.Index, ifData.Type, ifDriver.Comment);
-		}
-	}
-	ws2_endconf(&ifData);
 }
 
 /****************************************************/
@@ -310,9 +231,7 @@ main(int argc, char *argv[])
 	int result = 0;
 
 	while (token = *argv){
-		if (!strcmp(token, "-v")){
-			_verbose++;
-		}else if (!strcmp(token, "-p")){
+		if (!strcmp(token, "-p")){
 			_paths++;
 		}else if (token[0] != '-'){
 			cmd = token;
@@ -333,30 +252,6 @@ main(int argc, char *argv[])
 
 	}else if (!strcmp(cmd, "resolv")){
 		mk_resolv(stdout);
-
-	}else if (!strcmp(cmd, "pdo")){
-		mk_vfsent(FS_TYPE_PDO);
-
-	}else if (!strcmp(cmd, "vol")){
-		mk_vol(stdout);
-
-	}else if (!strcmp(cmd, "fdo")){
-		mk_vfsent(FS_TYPE_PROCESS);
-
-	}else if (!strcmp(cmd, "link")){
-		mk_vfsent(FS_TYPE_LINK);
-
-	}else if (!strcmp(cmd, "drive")){
-		mk_vfsent(FS_TYPE_DRIVE);
-
-	}else if (!strcmp(cmd, "npf")){
-		mk_vfsent(FS_TYPE_NPF);
-
-	}else if (!strcmp(cmd, "if")){
-		mk_ifent(FS_TYPE_WINSOCK);
-
-	}else if (!strcmp(cmd, "ndis")){
-		mk_ifent(FS_TYPE_NDIS);
 
 	}else{
 		printf("%s: no such entity.\n", cmd);

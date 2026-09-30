@@ -36,38 +36,6 @@
 /****************************************************/
 
 BOOL 
-drive_match_OLD(LPCWSTR NtName, DWORD DeviceType, WIN_CFDRIVER *Driver)
-{
-	BOOL bResult = FALSE;
-	WIN_DEVICE *pwDevice = DEVICE(DeviceType);
-	USHORT sClass = DeviceType & 0xFF00;
-	USHORT sUnit = DeviceType & 0x00FF;
-
-	while (sUnit < WIN_UNIT_MAX){
-		if (!wcscmp(pwDevice->NtName, NtName)){
-			if (!wcscmp(pwDevice->ClassId, Driver->ClassId)){
-				bResult = TRUE;
-			}
-			win_wcscpy(pwDevice->NtPath, Driver->NtPath);
-			break;
-		}else if (!pwDevice->Flags){
-			pwDevice->Flags = WIN_DVF_DRIVE_READY;
-			win_wcscpy(pwDevice->NtName, NtName);
-			win_wcscpy(pwDevice->NtPath, Driver->NtPath);
-			win_wcscpy(pwDevice->ClassId, Driver->ClassId);
-			pwDevice->DeviceType = DeviceType;
-			pwDevice->DeviceId = sClass + sUnit;
-			bResult = config_attach(pwDevice, sClass);
-			break;
-		}
-		pwDevice++;
-		sUnit++;
-	}
-	Driver->DeviceId = pwDevice->DeviceId;
-//	Driver->Flags = pwDevice->Flags;
-	return(bResult);
-}
-BOOL 
 drive_match(LPCWSTR NtName, DWORD DeviceType, WIN_STATVFS *Result)
 {
 	BOOL bResult = FALSE;

@@ -43,7 +43,7 @@ runcmd(char *argv[])
 	si.hStdOutput = vfs_F_OSFHANDLE(Nodes, 1);
 	si.hStdError = vfs_F_OSFHANDLE(Nodes, 2);
 	shell_wcstombs(szPath, __Strings[pwTask->TaskId].Path, PATH_MAX);
-	if (!win_execve(argv_win(pwTask, *argv, argv), szPath, &si)){
+	if (!shell_execve(argv_win(pwTask, *argv, argv), szPath, &si)){
 		result -= errno_posix(GetLastError());
 	}
 	return(result);

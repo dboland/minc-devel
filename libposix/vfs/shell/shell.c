@@ -32,3 +32,4 @@
 #include "shell_namei.c"
 #include "shell_stat.c"
 #include "shell_wchar.c"
+#include "shell_mount.c"
