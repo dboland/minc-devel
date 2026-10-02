@@ -209,7 +209,7 @@ mk_fstab(FILE *stream)
 	}else while (vfs_getconf(&cfData, dwFlags)){
 		if (cfData.FSType == FS_TYPE_DRIVE){
 			drive_lookup(&cfData, dwFlags, &fsInfo);
-			drive_match(cfData.NtName, cfData.DeviceType, &fsInfo);
+			drive_match(&cfData, &fsInfo);
 			if (shell_statfs(&cfData, &fsInfo)){
 				statfs_posix(&info, &fsInfo);
 				print_fsent(&info);

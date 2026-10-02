@@ -100,6 +100,8 @@ so_sockopt_win(WIN_TASK *Task, struct cmsghdr *cmsg)
 			vfs_F_DUPFD(&Task->Node[fd], FALSE, &vNode);
 			*(HANDLE *)data = vNode.Handle;
 			break;
+		default:
+WIN_ERR("so_sockopt_win(%d):\n", cmsg->cmsg_type);
 	}
 }
 void 
@@ -115,9 +117,8 @@ so_sockopt_posix(WIN_TASK *Task, struct cmsghdr *cmsg)
 			vfs_lookup(hChannel, &vNode);
 			*(int *)data = fd_posix(Task, &vNode, 0);
 			break;
-		case SCM_TIMESTAMP:
-WIN_ERR("SCM_TIMESTAMP:\n");
-			break;
+		default:
+WIN_ERR("so_sockopt_posix(%d):\n", cmsg->cmsg_type);
 	}
 }
 int 

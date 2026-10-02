@@ -47,17 +47,12 @@ cpu_configure(void)
 	if (!vfs_setconf(&cfData, dwFlags)){
 		return;
 	}else while (vfs_getconf(&cfData, dwFlags)){
-		if (cfData.FSType == FS_TYPE_PDO){
-			pdo_lookup(&cfData, dwFlags, &cfDriver);
-			if (!pdo_match(cfData.NtName, cfData.DeviceType, &cfDriver)){
-				if (!(cfDriver.Flags & WIN_DVF_ACTIVE)){
-					msgbuf_PDO(&cfData, &cfDriver, szMessage);
-					WIN_ERR(szMessage);
-				}
-			}
-		}else if (cfData.FSType == FS_TYPE_DRIVE){
+		if (cfData.FSType == FS_TYPE_DRIVE){
 			drive_lookup(&cfData, dwFlags, &fsInfo);
-			drive_match(cfData.NtName, cfData.DeviceType, &fsInfo);
+			if (!drive_match(&cfData, &fsInfo)){
+				msgbuf_DRIVE(&cfData, &fsInfo, szMessage);
+				WIN_ERR(szMessage);
+			}
 		}
 	}
 	vfs_endconf(&cfData);

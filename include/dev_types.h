@@ -88,10 +88,10 @@
 #define DEV_TYPE_STDOUT		(DEV_CLASS_CPU + 10)		/* standard stream pseudo device */
 #define DEV_TYPE_STDERR		(DEV_CLASS_CPU + 11)		/* standard stream pseudo device */
 #define DEV_TYPE_SWAP		(DEV_CLASS_CPU + 12)		/* disk swap pseudo device */
+#define DEV_TYPE_ROOT		(DEV_CLASS_CPU + 13)		/* Root mount point */
 #define DEV_TYPE_RAMDISK	(DEV_CLASS_CPU + 24)		/* Random Access Memory disk device (rd*) */
 #define DEV_TYPE_PROCESSOR	(DEV_CLASS_CPU + 32)		/* Central Processing Unit */
 
-//#define DEV_TYPE_ROOT		(DEV_CLASS_DISK)		/* Root mount point */
 #define DEV_TYPE_AHCI		(DEV_CLASS_DISK + DEV_BUS_SATA)	/* Serial ATA Advanced Host Controller Interface */
 #define DEV_TYPE_FDC		(DEV_CLASS_DISK + DEV_BUS_FDC)	/* Floppy Disk Controller */
 #define DEV_TYPE_USB		(DEV_CLASS_DISK + DEV_BUS_USB)	/* USB storage controller */
@@ -143,7 +143,6 @@
 #define DEV_TYPE_REMOVABLE	(DEV_CLASS_STORAGE + DEV_BUS_USB)	/* Hard Disk storage */
 #define DEV_TYPE_FLOPPY		(DEV_CLASS_STORAGE + DEV_BUS_FDC)	/* Floppy Disk storage */
 #define DEV_TYPE_SD		(DEV_CLASS_STORAGE + DEV_BUS_SCSI)	/* SCSI Disk storage */
-#define DEV_TYPE_ROOT		(DEV_CLASS_STORAGE + DEV_BUS_MAIN)	/* Root mount point */
 
 #define DEV_TYPE_OHCI		(DEV_CLASS_USB)			/* USB Open Host Controller Interface (USB 1.1) */
 #define DEV_TYPE_UHCI		(DEV_CLASS_USB + DEV_BUS_PCI)	/* USB Universal Host Controller Interface (USB 1.0) */

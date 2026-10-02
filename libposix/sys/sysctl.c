@@ -131,20 +131,19 @@ sysctl_HW_DISKNAMES(char *buf, size_t size)
 {
 	WIN_DEVICE *pwDevice = DEVICE(DEV_CLASS_STORAGE);
 	int unit = 0;
-	char name[MAX_NAME];
-	char *sep = "";
 	int len;
 
 	while (unit < WIN_UNIT_MAX){
 		if (pwDevice->Flags){
 			if (size < MAX_NAME){
 				break;
-			}else if (disk_HW_DISKNAMES(pwDevice, name)){
-				len = sprintf(buf, "%s%s", sep, name);
-				buf += len;
-				size -= len;
-				sep = ",";
+			}else if (unit){
+				*buf++ = ',';
+				size--;
 			}
+			len = drive_HW_DISKNAMES(pwDevice, buf);
+			buf += len;
+			size -= len;
 		}
 		unit++;
 		pwDevice++;

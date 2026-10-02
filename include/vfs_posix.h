@@ -203,14 +203,14 @@ BOOL proc__cxa_finalize(PVOID Param);
 /* drive.c */
 
 BOOL drive_lookup(WIN_CFDATA *Config, DWORD Flags, WIN_STATVFS *Result);
-BOOL drive_match(LPCWSTR NtName, DWORD DeviceType, WIN_STATVFS *Result);
+BOOL drive_match(WIN_CFDATA *Config, WIN_STATVFS *Result);
 BOOL drive_statvfs(WIN_MOUNT *Mount, WIN_STATVFS *Result);
+LONG drive_HW_DISKNAMES(WIN_DEVICE *Device, LPSTR Result);
 
 /* disk.c */
 
 BOOL disk_chflags(WIN_NAMEIDATA *Path, DWORD Attributes);
 BOOL disk_futimes(WIN_VNODE *Node, FILETIME FileTime[2]);
-BOOL disk_HW_DISKNAMES(WIN_DEVICE *Device, LPSTR Result);
 
 /* registry.c */
 

@@ -71,6 +71,13 @@ in their days. I am working on a solution which will maintain the
 mount table in semi real-time, like I have done with the /etc/passwd 
 and /etc/group tables.
 
+I tried the real-time solution, but that turned out to make the mounting 
+process overly complex. We need mounting to be rock-solid. Installing 
+MinC is done by the administrator, which hides the network shares on 
+Vista (and onwards) distros. So if you want to access all mounted 
+drives, use the **mkent** program to generate the file system table 
+(/etc/fstab).
+
 ## Hard Links
 
 Windows NT Hardlinks are POSIX compatible. However, if you use 

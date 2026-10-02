@@ -55,10 +55,10 @@ DriveLookupStorage(LPCWSTR ClassName)
 	DWORD dwResult = DEV_CLASS_STORAGE;
 
 	if (!wcsncmp(ClassName, L"Floppy", 6)){
-		dwResult |= DEV_BUS_FDC;
+		dwResult |= DEV_TYPE_FLOPPY;
 
-//	}else{
-//		dwResult |= DEV_BUS_USB;
+	}else{
+		dwResult |= DEV_BUS_USB;
 
 	}
 	return(dwResult);
@@ -75,7 +75,6 @@ drive_lookup(WIN_CFDATA *Config, DWORD Flags, WIN_STATVFS *Result)
 	ZeroMemory(Result, sizeof(WIN_STATVFS));
 	switch (uiType){
 		case DRIVE_REMOVABLE:
-			Result->Flags.HighPart = WIN_MNT_DOOMED;
 			Config->DeviceType = DriveLookupStorage(Config->ClassName);
 			break;
 		case DRIVE_NO_ROOT_DIR:		/* Not mounted */
@@ -89,7 +88,6 @@ drive_lookup(WIN_CFDATA *Config, DWORD Flags, WIN_STATVFS *Result)
 			break;
 		case DRIVE_REMOTE:
 			Config->DeviceType = DEV_TYPE_REMOTE;
-			Result->Flags.HighPart = WIN_MNT_DOOMED;
 			break;
 		case DRIVE_RAMDISK:
 			Config->DeviceType = DEV_TYPE_RAMDISK;

@@ -53,7 +53,7 @@ ifflags_posix(MIB_IFROW *Interface)
 			result |= IFF_LOOPBACK;
 			break;
 		case IF_TYPE_ETHERNET_CSMACD:
-		case IF_TYPE_IEEE80211:
+		case IF_TYPE_IEEE80211:		/* WLAN */
 			result |= IFF_BROADCAST;
 			break;
 	}

@@ -56,7 +56,7 @@ msgbuf_PDO(WIN_CFDATA *Config, WIN_CFDRIVER *Driver, LPSTR Result)
 	if (pwDevice->Flags & WIN_DVF_ACTIVE){
 		psz += sprintf(psz, "%s on ", pwDevice->Name);
 	}else{
-		psz += sprintf(psz, "+ not configured: ");
+		psz += sprintf(psz, "+ device not configured: ");
 	}
 	psz += sprintf(psz, "%ls at %ls", Config->NtName, Config->BusName);
 	psz += sprintf(psz, " %ls", cfexpand(Driver->Location));
@@ -74,7 +74,11 @@ msgbuf_DRIVE(WIN_CFDATA *Config, WIN_STATVFS *Stat, LPSTR Result)
 	LPSTR psz = Result;
 	WIN_DEVICE *pwDevice = DEVICE(Stat->DeviceId);
 
-	psz += sprintf(psz, "%s on ", pwDevice->Name);
+	if (pwDevice->Flags & WIN_DVF_ACTIVE){
+		psz += sprintf(psz, "%s on ", pwDevice->Name);
+	}else{
+		psz += sprintf(psz, "+ drive not configured: ");
+	}
 	psz += sprintf(psz, "%ls at %ls drive", Config->NtName, Config->BusName);
 	psz += sprintf(psz, ", type 0x%x", Config->DeviceType);
 	psz += sprintf(psz, ", flags 0x%x", pwDevice->Flags);
@@ -91,7 +95,7 @@ msgbuf_WINSOCK(WIN_IFDATA *Config, WIN_CFDRIVER *Driver, LPSTR Result)
 	if (pwDevice->Flags & WIN_DVF_ACTIVE){
 		psz += sprintf(psz, "%s on ", pwDevice->Name);
 	}else{
-		psz += sprintf(psz, "+ not configured: ");
+		psz += sprintf(psz, "+ interface not configured: ");
 	}
 	psz += sprintf(psz, "%ls", Config->AdapterName);
 	psz += sprintf(psz, ", index %d", Config->IfIndex);
@@ -129,7 +133,7 @@ msgbuf_KERN_MSGBUFSIZE(int *data, size_t *len)
 			}
 		}else if (cfData.FSType == FS_TYPE_DRIVE){
 			drive_lookup(&cfData, dwFlags, &fsInfo);
-			if (drive_match(cfData.NtName, cfData.DeviceType, &fsInfo)){
+			if (drive_match(&cfData, &fsInfo)){
 				bufsize += msgbuf_DRIVE(&cfData, &fsInfo, buf);
 				if (win_realloc(bufsize + MSGBUFSIZE, msgbuf, (PVOID *)&msgbuf)){
 					buf = msgbuf + bufsize;

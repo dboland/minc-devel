@@ -18,6 +18,7 @@ mknod /dev/stdin c 1 9
 mknod /dev/stdout c 1 10
 mknod /dev/stderr c 1 11
 mknod /dev/swap b 1 12
+mknod /dev/root b 1 13
 
 mknod /dev/rd0 b 1 24
 mknod /dev/rd1 b 1 25
@@ -140,10 +141,10 @@ mknod /dev/ulpt1 c 6 25
 mknod /dev/ulpt2 c 6 26
 mknod /dev/ulpt3 c 6 27
 
-mknod /dev/parallel0 c 6 32
-mknod /dev/parallel1 c 6 33
-mknod /dev/parallel2 c 6 34
-mknod /dev/parallel3 c 6 35
+mknod /dev/pclpt0 c 6 32
+mknod /dev/pclpt1 c 6 33
+mknod /dev/pclpt2 c 6 34
+mknod /dev/pclpt3 c 6 35
 
 # Display device #
 
@@ -219,8 +220,6 @@ mknod /dev/fd0 b 10 32
 mknod /dev/fd1 b 10 33
 mknod /dev/fd2 b 10 34
 mknod /dev/fd3 b 10 35
-
-mknod /dev/root b 10 64
 
 # USB device #
 

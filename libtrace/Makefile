@@ -13,7 +13,7 @@ ${ROOTDIR}/config.inc:
 	@exit 1
 
 %.a: %
-	${MAKE} -C $<
+	@${MAKE} -C $<
 
 ${LIB}: win.a vfs.a
 	ar cru $@ $(shell /bin/ls -f win/*.o vfs/*.o)

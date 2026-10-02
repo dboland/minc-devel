@@ -56,7 +56,6 @@ ws2_lookup(WIN_IFDATA *Config, WIN_CFDRIVER *Result)
 			Config->DeviceType = DEV_TYPE_TUNNEL;
 			break;
 		default:
-			Config->DeviceType = DEV_CLASS_IFNET;
 			bResult = FALSE;
 	}
 	win_wcscpy(Result->ClassId, NDIS_LAN_CLASS);

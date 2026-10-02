@@ -436,7 +436,7 @@ storage_attach(WIN_DEVICE *Device)
 			bResult = config_found("vol", WIN_VBLK, Device);
 			break;
 		case DEV_TYPE_REMOVABLE:
-			bResult = config_found("sd", WIN_VBLK, Device);
+			bResult = config_found("hd", WIN_VBLK, Device);
 			break;
 		case DEV_TYPE_CDROM:
 			bResult = config_found("cd", WIN_VBLK, Device);
@@ -445,7 +445,7 @@ storage_attach(WIN_DEVICE *Device)
 			bResult = config_found("fd", WIN_VBLK, Device);
 			break;
 		case DEV_TYPE_SD:
-			bResult = config_found("hd", WIN_VBLK, Device);
+			bResult = config_found("sd", WIN_VBLK, Device);
 			break;
 		default:
 			bResult = FALSE;

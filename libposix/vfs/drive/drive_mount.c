@@ -37,11 +37,12 @@ DriveStatVolume(LPCWSTR Drive, WIN_MOUNT *Result)
 {
 	BOOL bResult = FALSE;
 
-	if (!GetVolumeInformationW(win_volname(Result->Volume, Drive), Result->Label, MAX_LABEL, &Result->Serial, 
+	if (GetVolumeInformationW(win_volname(Result->Volume, Drive), Result->Label, MAX_LABEL, &Result->Serial, 
 		&Result->MaxPath, &Result->Flags.LowPart, Result->TypeName, MAX_LABEL)){
-		Result->Flags.HighPart |= WIN_MNT_DOOMED;
-	}else{
 		bResult = TRUE;
+	}else if (ERROR_NOT_READY != GetLastError()){
+		Result->Flags.HighPart |= WIN_MNT_DOOMED;
+//		WIN_ERR("GetVolumeInformation(%ls): %s\n", Result->Volume, win_strerror(GetLastError()));
 	}
 	return(bResult);
 }

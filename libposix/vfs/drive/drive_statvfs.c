@@ -40,7 +40,7 @@ drive_statvfs(WIN_MOUNT *Mount, WIN_STATVFS *Result)
 	/* mount.exe -a
 	 */
 	if (!Mount->Flags.QuadPart){
-		return(FALSE);
+		SetLastError(ERROR_BAD_ARGUMENTS);
 	}else if (GetDiskFreeSpaceW(Mount->Volume, &Result->SectorsPerCluster, 
 		&Result->BytesPerSector, &Result->FreeClusters, &Result->ClustersTotal)){
 		win_wcscpy(Result->Path, Mount->Path);
@@ -50,8 +50,9 @@ drive_statvfs(WIN_MOUNT *Mount, WIN_STATVFS *Result)
 		Result->Flags = Mount->Flags;
 		Result->MaxPath = Mount->MaxPath;
 		bResult = TRUE;
-	}else{
-		WIN_ERR("drive_statvfs(%ls): %s\n", Mount->Volume, win_strerror(GetLastError()));
+	}else if (ERROR_NOT_READY != GetLastError()){
+		Mount->Flags.HighPart |= WIN_MNT_DOOMED;
+//		WIN_ERR("drive_statvfs(%ls): %s\n", Mount->Volume, win_strerror(GetLastError()));
 	}
 	return(bResult);
 }

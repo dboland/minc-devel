@@ -36,24 +36,27 @@
 /****************************************************/
 
 BOOL 
-drive_match(LPCWSTR NtName, DWORD DeviceType, WIN_STATVFS *Result)
+drive_match(WIN_CFDATA *Config, WIN_STATVFS *Result)
 {
 	BOOL bResult = FALSE;
-	WIN_DEVICE *pwDevice = DEVICE(DeviceType);
-	USHORT sClass = DeviceType & 0xFF00;
-	USHORT sUnit = DeviceType & 0x00FF;
+	DWORD dwType = Config->DeviceType;
+	WIN_DEVICE *pwDevice = DEVICE(dwType);
+	USHORT sClass = dwType & 0xFF00;
+	USHORT sUnit = dwType & 0x00FF;
 
 	while (sUnit < WIN_UNIT_MAX){
-		if (!wcscmp(pwDevice->NtName, NtName)){
+		if (!wcscmp(pwDevice->NtName, Config->NtName)){
 			if (!wcscmp(pwDevice->ClassId, DEVINTERFACE_PARTITION)){
 				bResult = TRUE;
 			}
+//			win_wcscpy(pwDevice->NtPath, Config->DosPath);
 			break;
 		}else if (!pwDevice->Flags){
 			pwDevice->Flags = WIN_DVF_DRIVE_READY;
-			win_wcscpy(pwDevice->NtName, NtName);
+			win_wcscpy(pwDevice->NtName, Config->NtName);
+			win_wcscpy(pwDevice->NtPath, Config->DosPath);
 			win_wcscpy(pwDevice->ClassId, DEVINTERFACE_PARTITION);
-			pwDevice->DeviceType = DeviceType;
+			pwDevice->DeviceType = dwType;
 			pwDevice->DeviceId = sClass + sUnit;
 			bResult = config_attach(pwDevice, sClass);
 			break;
@@ -62,6 +65,5 @@ drive_match(LPCWSTR NtName, DWORD DeviceType, WIN_STATVFS *Result)
 		sUnit++;
 	}
 	Result->DeviceId = pwDevice->DeviceId;
-//	Driver->Flags = pwDevice->Flags;
 	return(bResult);
 }

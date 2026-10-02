@@ -32,6 +32,7 @@
 #include "drive_device.c"
 #include "drive_mount.c"
 #include "drive_statvfs.c"
+#include "drive_sysctl.c"
 
 /****************************************************/
 
