@@ -284,11 +284,12 @@ sys_getfsstat(call_t call, struct statfs *buf, size_t bufsize, int flags)
 
 	while (dwIndex < WIN_MOUNT_MAX){
 		if (pwMount->Flags.QuadPart){
-			if (buf){
-				drive_statvfs(pwMount, &fsInfo);
-				buf = statfs_posix(buf, &fsInfo);
+			if (drive_statvfs(pwMount, &fsInfo)){
+				if (buf){
+					buf = statfs_posix(buf, &fsInfo);
+				}
+				result++;
 			}
-			result++;
 		}
 		dwIndex++;
 		pwMount++;
