@@ -44,9 +44,9 @@ errno_posix(DWORD Error)
 			break;
 		case WSAEINVAL:
 		case ERROR_INVALID_PRIMARY_GROUP:
-		case ERROR_BAD_ARGUMENTS:		/* 160 */
-		case ERROR_NOT_LOCKED:			/* 158: The segment is already unlocked */
 		case ERROR_INVALID_PARAMETER:		/* 87: The parameter is incorrect (mailslot_read()) */
+		case ERROR_NOT_LOCKED:			/* 158: The segment is already unlocked */
+		case ERROR_BAD_ARGUMENTS:		/* 160 */
 			result = EINVAL;
 			break;
 		case ERROR_NO_SUCH_ALIAS:		/* 1376: The specified local group does not exist. */

@@ -61,7 +61,7 @@ msgbuf_PDO(WIN_CFDATA *Config, WIN_CFDRIVER *Driver, LPSTR Result)
 	psz += sprintf(psz, "%ls at %ls", Config->NtName, Config->BusName);
 	psz += sprintf(psz, " %ls", cfexpand(Driver->Location));
 	psz += sprintf(psz, ", class %ls", Driver->NtClass);
-	psz += sprintf(psz, ", type 0x%x", Config->DeviceType);
+	psz += sprintf(psz, ", type 0x%04x", Config->DeviceType);
 	psz += sprintf(psz, ", flags 0x%x", pwDevice->Flags);
 	psz += sprintf(psz, ", \"%ls\"", cfexpand(Driver->Comment));
 	*psz++ = '\n';
@@ -80,7 +80,7 @@ msgbuf_DRIVE(WIN_CFDATA *Config, WIN_STATVFS *Stat, LPSTR Result)
 		psz += sprintf(psz, "+ drive not configured: ");
 	}
 	psz += sprintf(psz, "%ls at %ls drive", Config->NtName, Config->BusName);
-	psz += sprintf(psz, ", type 0x%x", Config->DeviceType);
+	psz += sprintf(psz, ", type 0x%04x", Config->DeviceType);
 	psz += sprintf(psz, ", flags 0x%x", pwDevice->Flags);
 	*psz++ = '\n';
 	*psz = 0;
@@ -99,7 +99,7 @@ msgbuf_WINSOCK(WIN_IFDATA *Config, WIN_CFDRIVER *Driver, LPSTR Result)
 	}
 	psz += sprintf(psz, "%ls", Config->AdapterName);
 	psz += sprintf(psz, ", index %d", Config->IfIndex);
-	psz += sprintf(psz, ", type 0x%x", Config->DeviceType);
+	psz += sprintf(psz, ", type 0x%04x", Config->DeviceType);
 	psz += sprintf(psz, ", flags 0x%x", pwDevice->Flags);
 	psz += sprintf(psz, ", \"%ls\"", Driver->Comment);
 	*psz++ = '\n';

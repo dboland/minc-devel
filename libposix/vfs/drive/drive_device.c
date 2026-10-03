@@ -49,7 +49,6 @@ drive_match(WIN_CFDATA *Config, WIN_STATVFS *Result)
 			if (!wcscmp(pwDevice->ClassId, DEVINTERFACE_PARTITION)){
 				bResult = TRUE;
 			}
-//			win_wcscpy(pwDevice->NtPath, Config->DosPath);
 			break;
 		}else if (!pwDevice->Flags){
 			pwDevice->Flags = WIN_DVF_DRIVE_READY;

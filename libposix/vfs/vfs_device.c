@@ -215,34 +215,11 @@ dull_attach(WIN_DEVICE *Device)
 	return(bResult);
 }
 BOOL 
-system_attach(WIN_DEVICE *Device)
-{
-	BOOL bResult = TRUE;
-
-	switch (Device->DeviceType){
-		case DEV_TYPE_ENUM:
-			bResult = config_found("enum", WIN_VCHR, Device);
-			break;
-		case DEV_TYPE_ACPI:
-			bResult = config_found("acpi", WIN_VCHR, Device);
-			break;
-		case DEV_TYPE_PCI:
-			bResult = config_found("pci", WIN_VCHR, Device);
-			break;
-		default:
-			bResult = FALSE;
-	}
-	return(bResult);
-}
-BOOL 
 cpu_attach(WIN_DEVICE *Device)
 {
 	BOOL bResult = TRUE;
 
 	switch (Device->DeviceType){
-		case DEV_TYPE_RAMDISK:
-			bResult = config_found("rd", WIN_VCHR, Device);
-			break;
 		case DEV_TYPE_PROCESSOR:
 			bResult = config_found("cpu", WIN_VCHR, Device);
 			break;
@@ -304,9 +281,9 @@ ifnet_attach(WIN_DEVICE *Device)
 		case DEV_TYPE_PPP:
 			bResult = config_found("ppp", WIN_VSOCK, Device);
 			break;
-		case DEV_TYPE_REMOTE:
-			bResult = config_found("smb", WIN_VBLK, Device);
-			break;
+//		case DEV_TYPE_REMOTE:
+//			bResult = config_found("smb", WIN_VBLK, Device);
+//			break;
 		default:
 			bResult = FALSE;
 	}
@@ -344,9 +321,6 @@ serial_attach(WIN_DEVICE *Device)
 		case DEV_TYPE_LOG:		/* Vista */
 			bResult = config_init("printk", WIN_VCHR, DEV_TYPE_LOG);
 			break;
-//		case DEV_TYPE_TTY:
-//			bResult = config_found("tty", WIN_VCHR, Device);
-//			break;
 		case DEV_TYPE_PTY:
 			bResult = config_found("pty", WIN_VCHR, Device);
 			break;
@@ -444,8 +418,8 @@ storage_attach(WIN_DEVICE *Device)
 		case DEV_TYPE_FLOPPY:
 			bResult = config_found("fd", WIN_VBLK, Device);
 			break;
-		case DEV_TYPE_SD:
-			bResult = config_found("sd", WIN_VBLK, Device);
+		case DEV_TYPE_REMOTE:
+			bResult = config_found("smb", WIN_VBLK, Device);
 			break;
 		default:
 			bResult = FALSE;
@@ -492,6 +466,29 @@ hid_attach(WIN_DEVICE *Device)
 			break;
 		default:
 			bResult = config_found("hid", WIN_VCHR, Device);
+	}
+	return(bResult);
+}
+BOOL 
+system_attach(WIN_DEVICE *Device)
+{
+	BOOL bResult = TRUE;
+
+	switch (Device->DeviceType){
+		case DEV_TYPE_ENUM:
+			bResult = config_found("enum", WIN_VCHR, Device);
+			break;
+		case DEV_TYPE_ACPI:
+			bResult = config_found("acpi", WIN_VCHR, Device);
+			break;
+		case DEV_TYPE_PCI:
+			bResult = config_found("pci", WIN_VCHR, Device);
+			break;
+		case DEV_TYPE_SD:
+			bResult = config_found("sd", WIN_VBLK, Device);
+			break;
+		default:
+			bResult = FALSE;
 	}
 	return(bResult);
 }

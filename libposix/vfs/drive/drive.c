@@ -36,8 +36,3 @@
 
 /****************************************************/
 
-VOID 
-drive_init(WIN_MOUNT Mounts[])
-{
-	__Mounts = Mounts;
-}

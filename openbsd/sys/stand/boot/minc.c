@@ -158,7 +158,7 @@ main(int argc, char *argv[], char *env[])
 		signal(SIGQUIT, sig);
 		signal(SIGHUP, sig);
 		consinit();
-		cpu_configure();
+		disk_init();
 		ifinit();
 		fs_unmount();
 		fprintf(stderr, "\r\n");

@@ -181,10 +181,10 @@ mk_resolv(FILE *stream)
 	DWORD dwIndex;
 	IP_ADDR_STRING *ipEntry;
 
-	GetNetworkParams(NULL, &lSize);
+	dwStatus = GetNetworkParams(NULL, &lSize);
 	if (lSize > 0){
 		fInfo = win_malloc(lSize);
-		dwStatus = GetNetworkParams(fInfo, &lSize);
+		GetNetworkParams(fInfo, &lSize);
 		fprintf(stream, "domain %s\n", fInfo->DomainName);
 		for (ipEntry = &fInfo->DnsServerList; ipEntry; ipEntry = ipEntry->Next){
 			fprintf(stream, "nameserver %s\n", ipEntry->IpAddress.String);

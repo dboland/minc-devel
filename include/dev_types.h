@@ -50,10 +50,10 @@
 
 /* Hardware buses */
 
-#define DEV_BUS_MAIN		64
-#define DEV_BUS_BIOS		DEV_BUS_MAIN
-#define DEV_BUS_APM		56			/* Advanced Power Management interface bus */
-#define DEV_BUS_ACPI		DEV_BUS_APM		/* Advanced Configuration and Power Interface bus */
+#define DEV_BUS_MAX		64
+#define DEV_BUS_ROOT		DEV_BUS_MAX
+#define DEV_BUS_BIOS		56			/* Basic Input/Output System */
+#define DEV_BUS_ACPI		DEV_BUS_BIOS		/* Advanced Configuration and Power Interface bus */
 #define DEV_BUS_PCI		40			/* Peripheral Component Interconnect bus */
 #define DEV_BUS_SATA		DEV_BUS_PCI		/* Serial Advanced Technology Attachment bus */
 #define DEV_BUS_ISA		32			/* Industry Standard Architecture bus */
@@ -68,13 +68,9 @@
 /* System device types */
 
 #define DEV_TYPE_SWD		(DEV_CLASS_DULL)
-#define DEV_TYPE_BIOS		(DEV_CLASS_DULL + DEV_BUS_ACPI)
+#define DEV_TYPE_BIOS		(DEV_CLASS_DULL + DEV_BUS_BIOS)
 #define DEV_TYPE_USBT		(DEV_CLASS_DULL + DEV_BUS_USB)	/* USB Bluetooth adapter */
-#define DEV_TYPE_NVME		(DEV_CLASS_DULL + DEV_BUS_PCI)
-
-#define DEV_TYPE_ENUM		(DEV_CLASS_SYSTEM)
-#define DEV_TYPE_PCI		(DEV_CLASS_SYSTEM + DEV_BUS_PCI)	/* PCI controller device */
-#define DEV_TYPE_ACPI		(DEV_CLASS_SYSTEM + DEV_BUS_ACPI)
+#define DEV_TYPE_NVME		(DEV_CLASS_DULL + DEV_BUS_PCI)	/* Non-Volatile Memory Express (SSD) */
 
 #define DEV_TYPE_MEM		(DEV_CLASS_CPU + 1)		/* physical memory device */
 #define DEV_TYPE_KMEM		(DEV_CLASS_CPU + 2)		/* kernel memory device (libposix.dll) */
@@ -89,9 +85,9 @@
 #define DEV_TYPE_STDERR		(DEV_CLASS_CPU + 11)		/* standard stream pseudo device */
 #define DEV_TYPE_SWAP		(DEV_CLASS_CPU + 12)		/* disk swap pseudo device */
 #define DEV_TYPE_ROOT		(DEV_CLASS_CPU + 13)		/* Root mount point */
-#define DEV_TYPE_RAMDISK	(DEV_CLASS_CPU + 24)		/* Random Access Memory disk device (rd*) */
 #define DEV_TYPE_PROCESSOR	(DEV_CLASS_CPU + 32)		/* Central Processing Unit */
 
+#define DEV_TYPE_RAMDISK	(DEV_CLASS_DISK)		/* Random Access Memory disk device (rd*) */
 #define DEV_TYPE_AHCI		(DEV_CLASS_DISK + DEV_BUS_SATA)	/* Serial ATA Advanced Host Controller Interface */
 #define DEV_TYPE_FDC		(DEV_CLASS_DISK + DEV_BUS_FDC)	/* Floppy Disk Controller */
 #define DEV_TYPE_USB		(DEV_CLASS_DISK + DEV_BUS_USB)	/* USB storage controller */
@@ -105,7 +101,6 @@
 #define DEV_TYPE_ETH		(DEV_CLASS_IFNET + 28)			/* Ethernet network device */
 #define DEV_TYPE_WLAN		(DEV_CLASS_IFNET + 36)			/* IEEE80211 wireless network device */
 #define DEV_TYPE_NIC		(DEV_CLASS_IFNET + DEV_BUS_PCI)		/* Network Interface Card */
-#define DEV_TYPE_REMOTE		(DEV_CLASS_IFNET + DEV_BUS_MAIN)	/* Server Message Block storage */
 
 #define DEV_TYPE_MEDIA		(DEV_CLASS_MEDIA)
 #define DEV_TYPE_USBVIDEO	(DEV_CLASS_MEDIA + DEV_BUS_USB)
@@ -142,7 +137,7 @@
 #define DEV_TYPE_CDROM		(DEV_CLASS_STORAGE + DEV_BUS_WDC)	/* CDROM storage */
 #define DEV_TYPE_REMOVABLE	(DEV_CLASS_STORAGE + DEV_BUS_USB)	/* Hard Disk storage */
 #define DEV_TYPE_FLOPPY		(DEV_CLASS_STORAGE + DEV_BUS_FDC)	/* Floppy Disk storage */
-#define DEV_TYPE_SD		(DEV_CLASS_STORAGE + DEV_BUS_SCSI)	/* SCSI Disk storage */
+#define DEV_TYPE_REMOTE		(DEV_CLASS_STORAGE + DEV_BUS_ACPI)	/* Server Message Block storage */
 
 #define DEV_TYPE_OHCI		(DEV_CLASS_USB)			/* USB Open Host Controller Interface (USB 1.1) */
 #define DEV_TYPE_UHCI		(DEV_CLASS_USB + DEV_BUS_PCI)	/* USB Universal Host Controller Interface (USB 1.0) */
@@ -152,3 +147,8 @@
 
 #define DEV_TYPE_EHCI		(DEV_CLASS_HID + DEV_BUS_PCI)	/* USB Enhanced Host Controller Interface (USB 2.0) */
 #define DEV_TYPE_UHIDEV		(DEV_CLASS_HID + DEV_BUS_USB)	/* USB Human Interface Device */
+
+#define DEV_TYPE_ENUM		(DEV_CLASS_SYSTEM)
+#define DEV_TYPE_PCI		(DEV_CLASS_SYSTEM + DEV_BUS_PCI)	/* PCI controller device */
+#define DEV_TYPE_ACPI		(DEV_CLASS_SYSTEM + DEV_BUS_ACPI)
+#define DEV_TYPE_SD		(DEV_CLASS_SYSTEM + DEV_BUS_SCSI)	/* SCSI Disk storage */

@@ -32,6 +32,22 @@
 
 /************************************************************/
 
+VOID 
+PDOLookupClass(LPCWSTR ClassID, LPWSTR Result)
+{
+	WIN_VNODE vNode;
+	DWORD dwResult;
+	WIN_FLAGS wFlags = {GENERIC_READ, 0, 0, REG_SZ, FALSE};
+	WIN_NAMEIDATA wPath;
+
+	if (reg_open(reg_namei(&wPath, REG_CLASS, ClassID), &wFlags, &vNode)){
+		if (!reg_read(&vNode, L"Class", Result, MAX_NAME, &dwResult)){
+			win_wcscpy(Result, L"UNKNOWN");
+		}
+		reg_close(&vNode);
+		win_wcslcase(Result);
+	}
+}
 DWORD 
 PDOLookupBus(LPCWSTR BusName, DWORD Class)
 {
@@ -151,22 +167,6 @@ PDOLookup(LPCWSTR Bus, LPCWSTR Class, LPCWSTR Service)
 	}
 	return(dwResult);
 }
-VOID 
-PDOLookupClass(LPCWSTR ClassID, LPWSTR Result)
-{
-	WIN_VNODE vNode;
-	DWORD dwResult;
-	WIN_FLAGS wFlags = {GENERIC_READ, 0, 0, REG_SZ, FALSE};
-	WIN_NAMEIDATA wPath;
-
-	if (reg_open(reg_namei(&wPath, REG_CLASS, ClassID), &wFlags, &vNode)){
-		if (!reg_read(&vNode, L"Class", Result, MAX_NAME, &dwResult)){
-			win_wcscpy(Result, L"UNKNOWN");
-		}
-		reg_close(&vNode);
-		win_wcslcase(Result);
-	}
-}
 
 /************************************************************/
 
@@ -193,7 +193,6 @@ pdo_lookup(WIN_CFDATA *Config, DWORD Flags, WIN_CFDRIVER *Driver)
 		if (reg_read(&vNode, L"ClassGUID", szClass, MAX_GUID, &dwSize)){
 			PDOLookupClass(szClass, Driver->NtClass);
 		}
-
 		/* Device Driver (*.sys)
 		 */
 		if (!reg_read(&vNode, L"Service", Driver->Service, MAX_NAME, &dwSize)){
@@ -207,7 +206,6 @@ pdo_lookup(WIN_CFDATA *Config, DWORD Flags, WIN_CFDRIVER *Driver)
 		}else if (reg_read(&vNode, L"DeviceDesc", szText, MAX_TEXT, &dwSize)){
 			win_wcscpy(Driver->Comment, szText);
 		}
-
 		bResult = reg_close(&vNode);
 
 	}else{

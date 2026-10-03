@@ -33,7 +33,7 @@
 /****************************************************/
 
 void 
-cpu_configure(void)
+disk_init(void)
 {
 	WIN_CFDATA cfData;
 	WIN_CFDRIVER cfDriver;
@@ -42,7 +42,7 @@ cpu_configure(void)
 	CHAR szMessage[MAX_MESSAGE];
 	LONG lResult;
 
-	/* Determine i/o configuration for a machine.
+	/* Initialize the disklist.  Called by main() before autoconfiguration.
 	 */
 	if (!vfs_setconf(&cfData, dwFlags)){
 		return;

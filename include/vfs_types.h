@@ -179,7 +179,7 @@ typedef struct _WIN_NAMEIDATA {
  * vfs_device.c
  */
 
-#define WIN_UNIT_MAX		(DEV_BUS_MAIN + 16)
+#define WIN_UNIT_MAX		DEV_BUS_MAX
 
 typedef struct _WIN_DEVICE {
 	WIN_VTYPE FileType;
@@ -365,6 +365,7 @@ typedef struct _WIN_STATVFS {
 	DWORD ClustersTotal;
 	FILETIME MountTime;
 	WCHAR TypeName[MAX_LABEL];
+	WCHAR Label[MAX_LABEL];
 	WCHAR Path[MAX_PATH];
 } WIN_STATVFS;
 
