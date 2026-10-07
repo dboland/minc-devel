@@ -38,7 +38,7 @@
 /****************************************************/
 
 void *
-ifamsg_posix(WIN_TASK *Task, void *buf, WIN_IFENT *Adapter, PSOCKET_ADDRESS Address)
+ifamsg_posix(WIN_TASK *Task, void *buf, WIN_IFADDRS *Adapter, PSOCKET_ADDRESS Address)
 {
 	struct ifa_msghdr *hdr = buf;
 	UINT uiLength = Address->iSockaddrLength;
@@ -58,7 +58,7 @@ ifamsg_posix(WIN_TASK *Task, void *buf, WIN_IFENT *Adapter, PSOCKET_ADDRESS Addr
 	return(buf + uiLength);
 }
 void *
-ifmsg_posix(WIN_TASK *Task, void *buf, WIN_IFENT *Adapter)
+ifmsg_posix(WIN_TASK *Task, void *buf, WIN_IFADDRS *Adapter)
 {
 	struct if_msghdr *hdr = buf;
 	struct if_data *data = &hdr->ifm_data;
@@ -78,12 +78,12 @@ ifmsg_posix(WIN_TASK *Task, void *buf, WIN_IFENT *Adapter)
 	data->ifi_type = Adapter->IfType;
 	data->ifi_addrlen = sizeof(struct sockaddr_dl);
 	data->ifi_hdrlen = sizeof(struct if_data);
-//	data->ifi_link_state
+	data->ifi_link_state = dlstate_posix(Adapter->OperStatus);
 	data->ifi_mtu = Adapter->Mtu;
 //	data->ifi_metric
 	ifRow.dwIndex = Adapter->IfIndex;
 	if (ERROR_SUCCESS == GetIfEntry(&ifRow)){
-		data->ifi_baudrate = ifRow.dwSpeed;
+		data->ifi_baudrate = (uint64_t)ifRow.dwSpeed;
 		data->ifi_ipackets = ifRow.dwInUcastPkts;
 		data->ifi_ierrors = ifRow.dwInErrors;
 		data->ifi_opackets = ifRow.dwOutUcastPkts;
@@ -197,8 +197,8 @@ int
 route_NET_RT_IFLIST(void *buf, size_t *size)
 {
 	int result = 0;
-	WIN_IFENUM ifEnum;
-	WIN_IFENT ifInfo;
+	WIN_IFDATA ifData;
+	WIN_IFADDRS ifInfo;
 	WIN_TASK *pwTask = &__Tasks[CURRENT];
 
 	if (!buf){
@@ -206,16 +206,16 @@ route_NET_RT_IFLIST(void *buf, size_t *size)
 	}else{
 		win_bzero(buf, *size);
 	}
-	if (!ws2_setifaddrs(WS_AF_UNSPEC, &ifEnum)){
+	if (!ws2_setconf(&ifData, WS_AF_UNSPEC)){
 		result -= errno_posix(GetLastError());
-	}else while (ws2_getifaddrs(&ifEnum, &ifInfo)){
+	}else while (ws2_getifaddrs(&ifData, &ifInfo)){
 		if (!buf){
 			*size += ifmsg_size(ifInfo.Unicast);
 		}else{
 			buf = ifmsg_posix(pwTask, buf, &ifInfo);
 		}
 	}
-	ws2_endifaddrs(&ifEnum);
+	ws2_endconf(&ifData);
 	return(result);
 }
 int 
@@ -247,7 +247,9 @@ route_NET_RT_DUMP(void *buf, size_t *size)
 	MIB_IFROW ifRow;
 	DWORD dwResult;
 
-	if (buf){
+	if (!size){
+		return(-EINVAL);
+	}else if (buf){
 		win_bzero(buf, *size);
 	}
 	if (!ws2_NET_RT_DUMP(&pfwTable, &pfwRow, &dwCount)){

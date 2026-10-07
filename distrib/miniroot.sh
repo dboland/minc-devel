@@ -6,10 +6,10 @@ if ! [ -d "${MINIROOT}" ]; then
 fi
 
 echo -n "Creating miniroot... "
-cp /bin/tar "${MINIROOT}/tar.exe"
-cp /bin/chmod "${MINIROOT}/chmod.exe"
-cp /bin/sh "${MINIROOT}/sh.exe"
-cp /bsd.dll "${MINIROOT}/"
+cp -p /bsd.dll "$DISTROOT/"
+cp -p /bin/tar "${MINIROOT}/tar.exe"
+cp -p /bin/chmod "${MINIROOT}/chmod.exe"
+cp -p /bin/sh "${MINIROOT}/sh.exe"
 if ! cp ${BINDIR}/gzip.exe "${MINIROOT}/"; then
 	exit 1
 fi

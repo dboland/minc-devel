@@ -28,6 +28,8 @@
  *
  */
 
+#include "pdo_types.h"
+
 typedef enum _WIN_VTYPE {
 	WIN_VNON,
 	WIN_VREG,
@@ -199,7 +201,7 @@ typedef struct _WIN_DEVICE {
 
 #define WIN_DVF_PDO_READY		0x0100
 #define WIN_DVF_DRIVE_READY		0x0200
-#define WIN_DVF_IF_READY		0x0400
+#define WIN_DVF_WINSOCK_READY		0x0400
 
 /* Flags from NetBSD */
 
@@ -213,7 +215,6 @@ typedef struct _WIN_DEVICE {
 #define WIN_DVF_DETACH_SHUTDOWN		0x0080		/* device detaches safely at shutdown */
 
 typedef struct _WIN_CFDRIVER {
-	DWORD Flags;
 	DWORD DeviceId;
 	WCHAR ClassId[MAX_GUID];
 	WCHAR NtClass[MAX_NAME];
@@ -228,9 +229,10 @@ typedef struct _WIN_CFDATA {
 	LPCWSTR Next;
 	DWORD FSType;
 	DWORD DeviceType;
+	DWORD Depth;
+	DWORD Flags;
 	LPCWSTR DosPath;
 	LPCWSTR NtName;
-	DWORD Depth;
 	WCHAR BusName[MAX_NAME];
 	WCHAR ClassName[MAX_NAME];
 	WCHAR NtPath[MAX_TEXT];

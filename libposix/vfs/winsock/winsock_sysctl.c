@@ -102,14 +102,14 @@ ws2_NET_RT_OACTIVE(PMIB_IPNETTABLE *Table, PMIB_IPNETROW *Row, DWORD *Count)
 BOOL 
 ws2_NET_INET6_IPV6_DAD_PENDING(DWORD *Count)
 {
-	WIN_IFENUM ifEnum;
-	WIN_IFENT ifInfo;
+	WIN_IFDATA ifData;
+	WIN_IFADDRS ifInfo;
 	PIP_ADAPTER_UNICAST_ADDRESS paUnicast;
 	DWORD dwCount = 0;
 
-	if (!ws2_setifaddrs(AF_INET6, &ifEnum)){
+	if (!ws2_setconf(&ifData, AF_INET6)){
 		return(FALSE);
-	}else while (ws2_getifaddrs(&ifEnum, &ifInfo)){
+	}else while (ws2_getifaddrs(&ifData, &ifInfo)){
 		paUnicast = ifInfo.Unicast;
 		while (paUnicast){
 			if (paUnicast->DadState == IpDadStateDuplicate){
@@ -118,7 +118,7 @@ ws2_NET_INET6_IPV6_DAD_PENDING(DWORD *Count)
 			paUnicast = paUnicast->Next;
 		}
 	}
-	ws2_endifaddrs(&ifEnum);
+	ws2_endconf(&ifData);
 	*Count = dwCount;
 	return(TRUE);
 }

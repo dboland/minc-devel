@@ -50,9 +50,11 @@ Section
 
 	# Put files there
 	File /r 'miniroot'
+	File 'bsd.dll'
 
 	ExecDos::exec /DETAILED 'cacls $INSTDIR /E /R "$USERNAME"'
 	ExecDos::exec /DETAILED '.\miniroot\chmod -R 00755 miniroot'
+	ExecDos::exec /DETAILED '.\miniroot\chmod 00555 bsd.dll'
 
 SectionEnd
 Section "Uninstall"

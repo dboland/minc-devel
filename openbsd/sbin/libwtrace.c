@@ -13,7 +13,6 @@
 
 #include "win/ntdll.h"
 #include "win_types.h"
-#include "dev_types.h"
 #include "vfs_types.h"
 
 #include "../libtrace/libtrace.h"

@@ -47,3 +47,26 @@ dladdr_posix(struct sockaddr_dl *addr, DWORD Index, DWORD Type, BYTE Address[], 
 	win_memcpy(data, Address, Size);
 	return(addr + 1);
 }
+u_char 
+dlstate_posix(IF_OPER_STATUS OperStatus)
+{
+	u_char result;
+
+	switch (OperStatus){
+		IfOperStatusUp:
+			result = LINK_STATE_UP;
+			break;
+		IfOperStatusDown:
+		IfOperStatusDormant:
+		IfOperStatusNotPresent:
+		IfOperStatusLowerLayerDown:
+			result = LINK_STATE_DOWN;
+			break;
+		IfOperStatusUnknown:
+		IfOperStatusTesting:
+		default:
+			result = LINK_STATE_UNKNOWN;
+			break;
+	}
+	return(result);
+}

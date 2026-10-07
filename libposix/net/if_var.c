@@ -51,10 +51,10 @@ ifflags_posix(MIB_IFROW *Interface)
 			break;
 		case IF_TYPE_SOFTWARE_LOOPBACK:
 			result |= IFF_LOOPBACK;
-			break;
+//			break;
 		case IF_TYPE_ETHERNET_CSMACD:
 		case IF_TYPE_IEEE80211:		/* WLAN */
-			result |= IFF_BROADCAST;
+			result |= IFF_BROADCAST | IFF_MULTICAST;
 			break;
 	}
 	return(result);

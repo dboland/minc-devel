@@ -36,21 +36,19 @@ void
 ifinit(void)
 {
 	WIN_IFDATA ifData;
-	WIN_CFDRIVER cfDriver;
+	WIN_IFDRIVER ifDriver;
 	CHAR szMessage[MAX_MESSAGE];
 
-	if (!ws2_setconf(&ifData)){
+	if (!ws2_setconf(&ifData, WS_AF_UNSPEC)){
 		return;
-	}else while (ws2_getconf(&ifData, &cfDriver)){
-		if (ifData.FSType == FS_TYPE_WINSOCK){
-			ws2_lookup(&ifData, &cfDriver);
-			if (ws2_match(&ifData, &cfDriver)){
-				msgbuf_WINSOCK(&ifData, &cfDriver, szMessage);
-//				WIN_ERR(szMessage);
-			}else if (!(cfDriver.Flags & WIN_DVF_ACTIVE)){
-				msgbuf_WINSOCK(&ifData, &cfDriver, szMessage);
-				WIN_ERR(szMessage);
-			}
+	}else while (ws2_getconf(&ifData, &ifDriver)){
+		ws2_lookup(&ifData, &ifDriver);
+		if (ws2_match(&ifData, &ifDriver)){
+			msgbuf_WINSOCK(&ifData, &ifDriver, szMessage);
+			WIN_ERR(szMessage);
+		}else if (!(ifData.Flags & WIN_DVF_ACTIVE)){
+			msgbuf_WINSOCK(&ifData, &ifDriver, szMessage);
+			WIN_ERR(szMessage);
 		}
 	}
 	ws2_endconf(&ifData);

@@ -53,9 +53,9 @@
 
 /* winsock2.h */
 
-#define WS_AF_UNSPEC	AF_UNSPEC
-#define WS_AF_LOCAL	AF_UNIX
-#define WS_AF_INET	AF_INET
+#define WS_AF_UNSPEC	0
+#define WS_AF_LOCAL	1
+#define WS_AF_INET	2
 #define WS_AF_INET6	23
 #define WS_AF_ROUTE	24
 
@@ -63,28 +63,29 @@
  * winsock_device.c
  */
 
+typedef struct _WIN_IFDRIVER {
+	DWORD IfIndex;
+	DWORD IfType;
+	DWORD DeviceId;
+	WCHAR AdapterName[MAX_NAME];
+	WCHAR FriendlyName[MAX_COMMENT];
+} WIN_IFDRIVER;
+
 typedef struct _WIN_IFDATA {
 	PVOID Table;
 	PIP_ADAPTER_ADDRESSES Next;
-	DWORD IfIndex;
-	DWORD IfType;
-	DWORD FSType;
 	DWORD DeviceType;
-	WCHAR AdapterName[MAX_NAME];
+	DWORD Flags;
 } WIN_IFDATA;
 
 #define WS_SOCKET_SIZE		0x2000
 
 /*
- * winsock_if.c
+ * winsock_ifaddrs.c
  */
 
-typedef struct _WIN_IFENUM {
-	PVOID Table;
-	PIP_ADAPTER_ADDRESSES Next;
-} WIN_IFENUM;
-
-typedef struct _WIN_IFENT {
+typedef struct _WIN_IFADDRS {
+	IF_OPER_STATUS OperStatus;
 	DWORD IfIndex;
 	DWORD IfType;
 	DWORD IfFlags;
@@ -92,5 +93,5 @@ typedef struct _WIN_IFENT {
 	PIP_ADAPTER_UNICAST_ADDRESS Unicast;
 	DWORD AddrLen;
 	BYTE PhysAddr[MAXLEN_PHYSADDR];
-} WIN_IFENT;
+} WIN_IFADDRS;
 

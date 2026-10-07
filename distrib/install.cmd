@@ -1,8 +1,8 @@
 @ECHO OFF
 
 SET ROOT=%cd%
-SET Path=%ROOT%\miniroot
+:: SET Path=%ROOT%;%Path%
 
-gzip -dc %~1 | tar -C / -pxf -
+miniroot\gzip -dc %~1 | miniroot\tar -C / -pxf -
 
 DEL %~1

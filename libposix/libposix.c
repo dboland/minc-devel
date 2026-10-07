@@ -118,6 +118,7 @@ CHAR 			*__PROGNAME;		/* ktrace.c */
 #include "net/if.c"		/* ifinit() */
 #include "net/if_dl.c"
 #include "net/if_var.c"
+#include "net/if_media.c"
 #include "netinet/ip.c"
 #include "netinet6/ip6.c"
 #include "net/route.c"

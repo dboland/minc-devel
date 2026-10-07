@@ -28,7 +28,6 @@
  *
  */
 
-#include "dev_types.h"
 #include "vfs_types.h"
 
 BOOL vfs_PROCESS_ATTACH(HINSTANCE Instance, LPVOID Reserved);
@@ -222,7 +221,7 @@ BOOL reg_close(WIN_VNODE *Node);
 /* pdo.c */
 
 DWORD pdo_lookup(WIN_CFDATA *Config, DWORD Flags, WIN_CFDRIVER *Result);
-BOOL pdo_match(LPCWSTR NtName, DWORD DeviceType, WIN_CFDRIVER *Driver);
+BOOL pdo_match(WIN_CFDATA *Config, WIN_CFDRIVER *Driver);
 BOOL pdo_DIOCGDINFO(WIN_DEVICE *Device);
 BOOL pdo_WSKBDIO_GTYPE(UINT *Type, UINT *SubType, UINT *FKeys);
 BOOL pdo_revoke(WIN_DEVICE *Device);

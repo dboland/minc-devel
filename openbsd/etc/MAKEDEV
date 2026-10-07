@@ -3,10 +3,11 @@
 mknod /dev/mem b 1 1
 mknod /dev/kmem b 1 2
 mknod /dev/null c 1 3
-
+mknod /dev/port c 1 4
+mknod /dev/zero c 1 5
 mknod /dev/urandom c 1 6
 mknod /dev/random c 1 7
-
+mknod /dev/route c 1 8
 mknod /dev/stdin c 1 9
 mknod /dev/stdout c 1 10
 mknod /dev/stderr c 1 11
@@ -17,10 +18,6 @@ mknod /dev/cpu0 c 1 32
 mknod /dev/cpu1 c 1 33
 mknod /dev/cpu2 c 1 34
 mknod /dev/cpu3 c 1 35
-mknod /dev/cpu4 c 1 36
-mknod /dev/cpu5 c 1 37
-mknod /dev/cpu6 c 1 38
-mknod /dev/cpu7 c 1 39
 
 # Disk device #
 
@@ -51,23 +48,10 @@ mknod /dev/ahci3 b 2 43
 
 # Network device #
 
-mknod /dev/eth0 c 3 28
-mknod /dev/eth1 c 3 29
-mknod /dev/eth2 c 3 30
-mknod /dev/eth3 c 3 31
-mknod /dev/eth4 c 3 32
-mknod /dev/eth5 c 3 33
-mknod /dev/eth6 c 3 34
-mknod /dev/eth7 c 3 35
-
-mknod /dev/wlan0 c 3 36
-mknod /dev/wlan1 c 3 37
-mknod /dev/wlan2 c 3 38
-mknod /dev/wlan3 c 3 39
-mknod /dev/wlan4 c 3 40
-mknod /dev/wlan5 c 3 41
-mknod /dev/wlan6 c 3 42
-mknod /dev/wlan7 c 3 43
+mknod /dev/ndis0 c 3 0
+mknod /dev/ndis1 c 3 1
+mknod /dev/ndis2 c 3 2
+mknod /dev/ndis3 c 3 3
 
 # Media device #
 
@@ -185,16 +169,19 @@ mknod /dev/vol4 b 10 4
 mknod /dev/vol5 b 10 5
 mknod /dev/vol6 b 10 6
 mknod /dev/vol7 b 10 7
+mknod /dev/vol8 b 10 8
+mknod /dev/vol9 b 10 9
+mknod /dev/vol10 b 10 10
+mknod /dev/vol11 b 10 11
+mknod /dev/vol12 b 10 12
+mknod /dev/vol13 b 10 13
+mknod /dev/vol14 b 10 14
+mknod /dev/vol15 b 10 15
 
-mknod /dev/cd0 b 10 8
-mknod /dev/cd1 b 10 9
-mknod /dev/cd2 b 10 10
-mknod /dev/cd3 b 10 11
-
-mknod /dev/rd0 b 10 16
-mknod /dev/rd1 b 10 17
-mknod /dev/rd2 b 10 18
-mknod /dev/rd3 b 10 19
+mknod /dev/cd0 b 10 16
+mknod /dev/cd1 b 10 17
+mknod /dev/cd2 b 10 18
+mknod /dev/cd3 b 10 19
 
 mknod /dev/hd0 b 10 24
 mknod /dev/hd1 b 10 25

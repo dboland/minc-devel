@@ -30,57 +30,20 @@
 
 #include <winbase.h>
 
-/************************************************************/
+/****************************************************/
 
-BOOL 
-pdo_match(WIN_CFDATA *Config, WIN_CFDRIVER *Driver)
+LONG 
+drive_HW_DISKNAMES(WIN_DEVICE *Device, LPSTR Result)
 {
-	BOOL bResult = FALSE;
-	DWORD dwDeviceType = Config->DeviceType;
-	WIN_DEVICE *pwDevice = DEVICE(dwDeviceType);
-	USHORT sClass = dwDeviceType & 0xFF00;
-	USHORT sUnit = dwDeviceType & 0x00FF;
+	LONG lResult;
+	WIN_MOUNT wMount = {0};
 
-	while (sUnit < WIN_UNIT_MAX){
-		if (!wcscmp(pwDevice->NtName, Config->NtName)){
-			if (!wcscmp(pwDevice->ClassId, Driver->ClassId)){
-				bResult = TRUE;
-			}
-			break;
-		}else if (!pwDevice->Flags){
-			pwDevice->Flags = WIN_DVF_PDO_READY;
-			pwDevice->DeviceType = dwDeviceType;
-			pwDevice->DeviceId = sClass + sUnit;
-			win_wcscpy(pwDevice->NtName, Config->NtName);
-			win_wcscpy(pwDevice->ClassId, Driver->ClassId);
-			bResult = config_attach(pwDevice, sClass);
-			break;
-		}
-		pwDevice++;
-		sUnit++;
+	if (!(Device->Flags & WIN_DVF_DRIVE_READY)){
+		lResult = sprintf(Result, "%s", Device->Name);
+	}else if (DriveStatVolume(Device->NtPath, &wMount)){
+		lResult = sprintf(Result, "%s:%lu", Device->Name, wMount.Serial);
+	}else{
+		lResult = sprintf(Result, "%s", Device->Name);
 	}
-	Driver->DeviceId = pwDevice->DeviceId;
-	Config->Flags = pwDevice->Flags;
-	return(bResult);
-}
-WIN_DEVICE *
-pdo_attach(DWORD DeviceType)
-{
-	WIN_DEVICE *pwDevice = DEVICE(DeviceType);
-	USHORT sClass = DeviceType & 0xFF00;
-	USHORT sUnit = DeviceType & 0x00FF;
-
-	while (sUnit < WIN_UNIT_MAX){
-		if (!pwDevice->Flags){
-			pwDevice->DeviceType = DeviceType;
-			pwDevice->DeviceId = sClass + sUnit;
-			if (!config_attach(pwDevice, sClass)){
-				WIN_ERR("Warning: device 0x%x not configured\n", DeviceType);
-			}
-			break;
-		}
-		pwDevice++;
-		sUnit++;
-	}
-	return(pwDevice);
+	return(lResult);
 }

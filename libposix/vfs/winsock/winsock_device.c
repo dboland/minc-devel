@@ -30,10 +30,12 @@
 
 #include <iphlpapi.h>
 
+#define NDIS_LAN_CLASS		L"{ad498944-762f-11d0-8dcb-00c04fc3358c}"
+
 /************************************************************/
 
 BOOL 
-ws2_setconf(WIN_IFDATA *Config)
+ws2_setconf(WIN_IFDATA *Config, ULONG Family)
 {
 	BOOL bResult = FALSE;
 	ULONG ulStatus;
@@ -42,13 +44,12 @@ ws2_setconf(WIN_IFDATA *Config)
 	ULONG ulFlags = GAA_FLAG_SKIP_DNS_SERVER | GAA_FLAG_SKIP_MULTICAST;
 	DWORD dwCount = 0;
 
-	ulStatus = GetAdaptersAddresses(AF_UNSPEC, ulFlags, NULL, NULL, &lSize);
+	ulStatus = GetAdaptersAddresses(Family, ulFlags, NULL, NULL, &lSize);
 	if (lSize > 0){
 		pTable = win_malloc(lSize);
-		GetAdaptersAddresses(AF_UNSPEC, ulFlags, NULL, pTable, &lSize);
+		GetAdaptersAddresses(Family, ulFlags, NULL, pTable, &lSize);
 		Config->Table = pTable;
 		Config->Next = pTable;
-		Config->IfIndex = 0;
 		bResult = TRUE;
 	}else{
 		WIN_ERR("GetAdaptersAddresses(AF_UNSPEC): %s\n", win_strerror(ulStatus));
@@ -61,7 +62,7 @@ ws2_endconf(WIN_IFDATA *Config)
 	win_free(Config->Table);
 }
 BOOL 
-ws2_getconf(WIN_IFDATA *Config, WIN_CFDRIVER *Result)
+ws2_getconf(WIN_IFDATA *Config, WIN_IFDRIVER *Result)
 {
 	BOOL bResult = FALSE;
 	PIP_ADAPTER_ADDRESSES pRow = Config->Next;
@@ -69,12 +70,11 @@ ws2_getconf(WIN_IFDATA *Config, WIN_CFDRIVER *Result)
 	if (!pRow){
 		SetLastError(ERROR_NO_MORE_ITEMS);
 	}else{
-		ZeroMemory(Result, sizeof(WIN_CFDRIVER));
-		Config->FSType = FS_TYPE_WINSOCK;
-		Config->IfIndex = pRow->IfIndex;
-		Config->IfType = pRow->IfType;
-		win_mbstowcs(Config->AdapterName, pRow->AdapterName, MAX_NAME);
-		win_wcscpy(Result->Comment, pRow->FriendlyName);
+		ZeroMemory(Result, sizeof(WIN_IFDRIVER));
+		Result->IfIndex = pRow->IfIndex;
+		Result->IfType = pRow->IfType;
+		win_mbstowcs(Result->AdapterName, pRow->AdapterName, MAX_NAME);
+		win_wcslcpy(Result->FriendlyName, pRow->FriendlyName, MAX_COMMENT);
 		Config->Next = pRow->Next;
 		bResult = TRUE;
 	}
@@ -84,25 +84,25 @@ ws2_getconf(WIN_IFDATA *Config, WIN_CFDRIVER *Result)
 /****************************************************/
 
 BOOL 
-ws2_match(WIN_IFDATA *Config, WIN_CFDRIVER *Driver)
+ws2_match(WIN_IFDATA *Config, WIN_IFDRIVER *Driver)
 {
 	BOOL bResult = FALSE;
-	DWORD dwType = Config->DeviceType;
-	WIN_DEVICE *pwDevice = DEVICE(dwType);
-	USHORT sClass = dwType & 0xFF00;
-	USHORT sUnit = dwType & 0x00FF;
+	DWORD dwDeviceType = Config->DeviceType;
+	WIN_DEVICE *pwDevice = DEVICE(dwDeviceType);
+	USHORT sClass = dwDeviceType & 0xFF00;
+	USHORT sUnit = dwDeviceType & 0x00FF;
 
 	while (sUnit < WIN_UNIT_MAX){
-		if (!wcscmp(pwDevice->NtName, Config->AdapterName)){
+		if (!wcscmp(pwDevice->NtName, Driver->AdapterName)){
 			bResult = TRUE;
 			break;
 		}else if (!pwDevice->Flags){
-			pwDevice->Flags = WIN_DVF_IF_READY;
-			pwDevice->DeviceType = dwType;
+			pwDevice->Flags = WIN_DVF_WINSOCK_READY;
+			pwDevice->DeviceType = dwDeviceType;
 			pwDevice->DeviceId = sClass + sUnit;
-			pwDevice->Index = Config->IfIndex;
-			win_wcscpy(pwDevice->NtName, Config->AdapterName);
-			win_wcscpy(pwDevice->ClassId, Driver->ClassId);
+			pwDevice->Index = Driver->IfIndex;
+			win_wcscpy(pwDevice->NtName, Driver->AdapterName);
+			win_wcscpy(pwDevice->ClassId, NDIS_LAN_CLASS);
 			bResult = config_attach(pwDevice, sClass);
 			break;
 		}
@@ -110,6 +110,6 @@ ws2_match(WIN_IFDATA *Config, WIN_CFDRIVER *Driver)
 		sUnit++;
 	}
 	Driver->DeviceId = pwDevice->DeviceId;
-	Driver->Flags = pwDevice->Flags;
+	Config->Flags = pwDevice->Flags;
 	return(bResult);
 }

@@ -30,16 +30,14 @@
 
 #include <ipifcons.h>
 
-#define NDIS_LAN_CLASS		L"{ad498944-762f-11d0-8dcb-00c04fc3358c}"
-
 /************************************************************/
 
 BOOL 
-ws2_lookup(WIN_IFDATA *Config, WIN_CFDRIVER *Result)
+ws2_lookup(WIN_IFDATA *Config, WIN_IFDRIVER *Driver)
 {
 	BOOL bResult = TRUE;
 
-	switch (Config->IfType){
+	switch (Driver->IfType){
 		case IF_TYPE_ETHERNET_CSMACD:
 			Config->DeviceType = DEV_TYPE_ETH;
 			break;
@@ -58,6 +56,5 @@ ws2_lookup(WIN_IFDATA *Config, WIN_CFDRIVER *Result)
 		default:
 			bResult = FALSE;
 	}
-	win_wcscpy(Result->ClassId, NDIS_LAN_CLASS);
 	return(bResult);
 }

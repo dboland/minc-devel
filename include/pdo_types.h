@@ -150,5 +150,5 @@
 
 #define DEV_TYPE_ENUM		(DEV_CLASS_SYSTEM)
 #define DEV_TYPE_PCI		(DEV_CLASS_SYSTEM + DEV_BUS_PCI)	/* PCI controller device */
-#define DEV_TYPE_ACPI		(DEV_CLASS_SYSTEM + DEV_BUS_ACPI)
+#define DEV_TYPE_ACPI		(DEV_CLASS_SYSTEM + DEV_BUS_ACPI)	/* ACPI controller device */
 #define DEV_TYPE_SD		(DEV_CLASS_SYSTEM + DEV_BUS_SCSI)	/* SCSI Disk storage */

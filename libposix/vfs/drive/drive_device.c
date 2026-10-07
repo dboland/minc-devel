@@ -39,10 +39,10 @@ BOOL
 drive_match(WIN_CFDATA *Config, WIN_STATVFS *Result)
 {
 	BOOL bResult = FALSE;
-	DWORD dwType = Config->DeviceType;
-	WIN_DEVICE *pwDevice = DEVICE(dwType);
-	USHORT sClass = dwType & 0xFF00;
-	USHORT sUnit = dwType & 0x00FF;
+	DWORD dwDeviceType = Config->DeviceType;
+	WIN_DEVICE *pwDevice = DEVICE(dwDeviceType);
+	USHORT sClass = dwDeviceType & 0xFF00;
+	USHORT sUnit = dwDeviceType & 0x00FF;
 
 	while (sUnit < WIN_UNIT_MAX){
 		if (!wcscmp(pwDevice->NtName, Config->NtName)){
@@ -55,7 +55,7 @@ drive_match(WIN_CFDATA *Config, WIN_STATVFS *Result)
 			win_wcscpy(pwDevice->NtName, Config->NtName);
 			win_wcscpy(pwDevice->NtPath, Config->DosPath);
 			win_wcscpy(pwDevice->ClassId, DEVINTERFACE_PARTITION);
-			pwDevice->DeviceType = dwType;
+			pwDevice->DeviceType = dwDeviceType;
 			pwDevice->DeviceId = sClass + sUnit;
 			bResult = config_attach(pwDevice, sClass);
 			break;
@@ -64,5 +64,6 @@ drive_match(WIN_CFDATA *Config, WIN_STATVFS *Result)
 		sUnit++;
 	}
 	Result->DeviceId = pwDevice->DeviceId;
+	Config->Flags = pwDevice->Flags;
 	return(bResult);
 }

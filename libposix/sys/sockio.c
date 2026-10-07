@@ -189,6 +189,9 @@ sock_ioctl(WIN_TASK *Task, int fd, unsigned long request, va_list args)
 		case SIOCGIFALIFETIME_IN6:
 			result = -EADDRNOTAVAIL;
 			break;
+		case SIOCGIFMEDIA:
+			result = sock_SIOCGIFMEDIA(va_arg(args, struct ifmediareq *));
+			break;
 		default:
 			result = -EOPNOTSUPP;
 	}

@@ -53,16 +53,16 @@ msgbuf_PDO(WIN_CFDATA *Config, WIN_CFDRIVER *Driver, LPSTR Result)
 	LPSTR psz = Result;
 	WIN_DEVICE *pwDevice = DEVICE(Driver->DeviceId);
 
-	if (pwDevice->Flags & WIN_DVF_ACTIVE){
+	if (Config->Flags & WIN_DVF_ACTIVE){
 		psz += sprintf(psz, "%s on ", pwDevice->Name);
 	}else{
-		psz += sprintf(psz, "+ device not configured: ");
+		psz += sprintf(psz, "+ not configured: ");
 	}
 	psz += sprintf(psz, "%ls at %ls", Config->NtName, Config->BusName);
 	psz += sprintf(psz, " %ls", cfexpand(Driver->Location));
 	psz += sprintf(psz, ", class %ls", Driver->NtClass);
 	psz += sprintf(psz, ", type 0x%04x", Config->DeviceType);
-	psz += sprintf(psz, ", flags 0x%x", pwDevice->Flags);
+	psz += sprintf(psz, ", flags 0x%x", Config->Flags);
 	psz += sprintf(psz, ", \"%ls\"", cfexpand(Driver->Comment));
 	*psz++ = '\n';
 	*psz = 0;
@@ -74,34 +74,34 @@ msgbuf_DRIVE(WIN_CFDATA *Config, WIN_STATVFS *Stat, LPSTR Result)
 	LPSTR psz = Result;
 	WIN_DEVICE *pwDevice = DEVICE(Stat->DeviceId);
 
-	if (pwDevice->Flags & WIN_DVF_ACTIVE){
+	if (Config->Flags & WIN_DVF_ACTIVE){
 		psz += sprintf(psz, "%s on ", pwDevice->Name);
 	}else{
-		psz += sprintf(psz, "+ drive not configured: ");
+		psz += sprintf(psz, "+ not configured: ");
 	}
 	psz += sprintf(psz, "%ls at %ls drive", Config->NtName, Config->BusName);
 	psz += sprintf(psz, ", type 0x%04x", Config->DeviceType);
-	psz += sprintf(psz, ", flags 0x%x", pwDevice->Flags);
+	psz += sprintf(psz, ", flags 0x%x", Config->Flags);
 	*psz++ = '\n';
 	*psz = 0;
 	return(psz - Result);
 }
 int 
-msgbuf_WINSOCK(WIN_IFDATA *Config, WIN_CFDRIVER *Driver, LPSTR Result)
+msgbuf_WINSOCK(WIN_IFDATA *Config, WIN_IFDRIVER *Driver, LPSTR Result)
 {
 	LPSTR psz = Result;
 	WIN_DEVICE *pwDevice = DEVICE(Driver->DeviceId);
 
-	if (pwDevice->Flags & WIN_DVF_ACTIVE){
+	if (Config->Flags & WIN_DVF_ACTIVE){
 		psz += sprintf(psz, "%s on ", pwDevice->Name);
 	}else{
-		psz += sprintf(psz, "+ interface not configured: ");
+		psz += sprintf(psz, "+ not configured: ");
 	}
-	psz += sprintf(psz, "%ls", Config->AdapterName);
-	psz += sprintf(psz, ", index %d", Config->IfIndex);
+	psz += sprintf(psz, "%ls", Driver->AdapterName);
+	psz += sprintf(psz, ", index %d", pwDevice->Index);
 	psz += sprintf(psz, ", type 0x%04x", Config->DeviceType);
-	psz += sprintf(psz, ", flags 0x%x", pwDevice->Flags);
-	psz += sprintf(psz, ", \"%ls\"", Driver->Comment);
+	psz += sprintf(psz, ", flags 0x%x", Config->Flags);
+	psz += sprintf(psz, ", \"%ls\"", Driver->FriendlyName);
 	*psz++ = '\n';
 	*psz = 0;
 	return(psz - Result);
@@ -125,7 +125,7 @@ msgbuf_KERN_MSGBUFSIZE(int *data, size_t *len)
 	}else while (vfs_getconf(&cfData, dwFlags)){
 		if (cfData.FSType == FS_TYPE_PDO){
 			pdo_lookup(&cfData, dwFlags, &cfDriver);
-			if (pdo_match(cfData.NtName, cfData.DeviceType, &cfDriver)){
+			if (pdo_match(&cfData, &cfDriver)){
 				bufsize += msgbuf_PDO(&cfData, &cfDriver, buf);
 				if (win_realloc(bufsize + MSGBUFSIZE, msgbuf, (PVOID *)&msgbuf)){
 					buf = msgbuf + bufsize;

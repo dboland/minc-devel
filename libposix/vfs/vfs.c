@@ -43,13 +43,12 @@
 #include <iphlpapi.h>	/* Win32 network api */
 #include <winerror.h>
 
-#include "win_posix.h"
 #include "win/ntdll.h"
+#include "win_posix.h"
 #include "msvc_posix.h"
-#include "ws2_types.h"
-#include "dev_types.h"
 #include "vfs_types.h"
-#include "termio_types.h"
+#include "ws2_types.h"
+#include "char_types.h"
 
 #define WIN_ERR			msvc_printf
 #define OBJECT_NAME(name)	"Local\\MinC_" VERSION "_" name

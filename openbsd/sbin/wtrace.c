@@ -92,15 +92,13 @@ void
 wtrace_ifent(WIN_FS_TYPE Type)
 {
 	WIN_IFDATA ifData;
-	WIN_CFDRIVER ifDriver;
+	WIN_IFDRIVER ifDriver;
 
-	if (!ws2_setconf(&ifData)){
-		fprintf(stderr, "ws2_setvfs(): %s\n", strerror(errno));
+	if (!ws2_setconf(&ifData, WS_AF_UNSPEC)){
+		fprintf(stderr, "ws2_setconf(): %s\n", strerror(errno));
 	}else while (ws2_getconf(&ifData, &ifDriver)){
-		if (ifData.FSType == Type){
-			printf("%ls: Index(%d) Type(%d): %ls\n", 
-				ifData.AdapterName, ifData.IfIndex, ifData.IfType, ifDriver.Comment);
-		}
+		printf("%ls: Index(%d) Type(%d): %ls\n", 
+			ifDriver.AdapterName, ifDriver.IfIndex, ifDriver.IfType, ifDriver.FriendlyName);
 	}
 	ws2_endconf(&ifData);
 }
