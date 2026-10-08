@@ -113,10 +113,6 @@
 #define WIN_CWERASE         CTRL('w')
 #define WIN_CREPRINT        CTRL('r')
 #define WIN_CEOT            CEOF
-/* compat */
-#define WIN_CBRK            WIN_CEOL
-#define WIN_CRPRNT          WIN_CREPRINT
-#define WIN_CFLUSH          WIN_CDISCARD
 
 /* sys/ttycom.h */
 

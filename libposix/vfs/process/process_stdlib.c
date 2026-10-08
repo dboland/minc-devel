@@ -124,9 +124,9 @@ proc_init(WIN_SIGPROC SignalProc)
 		win_getegid(&__Process->GroupSid);
 		ProcInitLimits(__Process->Limit);
 	}
-//	if (proc_setugid(__Process)){
-//		__Process->IsSetUGid = 1;
-//	}
+	if (proc_setugid(__Process)){
+		__Process->IsSetUGid = 1;
+	}
 	__CTTY = TERMINAL(__Process->TerminalId);
 	return(__Process);
 }

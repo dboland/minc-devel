@@ -45,7 +45,7 @@ ifinit(void)
 		ws2_lookup(&ifData, &ifDriver);
 		if (ws2_match(&ifData, &ifDriver)){
 			msgbuf_WINSOCK(&ifData, &ifDriver, szMessage);
-			WIN_ERR(szMessage);
+//			WIN_ERR(szMessage);
 		}else if (!(ifData.Flags & WIN_DVF_ACTIVE)){
 			msgbuf_WINSOCK(&ifData, &ifDriver, szMessage);
 			WIN_ERR(szMessage);

@@ -56,6 +56,7 @@ extern SID8 SidSystem;
 extern SID8 SidUsers;
 extern SID8 SidTrustedInstaller;
 
+extern WIN_TASK		*__Process;
 extern WIN_TASK 	*__Tasks;
 extern WIN_DEV_CLASS 	*__Devices;
 extern WIN_TTY 		*__Terminals;
@@ -71,7 +72,7 @@ extern HANDLE		__PipeEvent;
 
 u_long	__THREAD_FRAME;
 
-CHAR 			*__PROGNAME;		/* ktrace.c */
+CHAR 	*__PROGNAME;		/* ktrace.c */
 
 #define WIN_ERR		msvc_printf
 
@@ -87,7 +88,7 @@ CHAR 			*__PROGNAME;		/* ktrace.c */
 #include "sys/namei.c"
 #include "sys/msgbuf.c"
 #include "sys/tty.c"
-#include "sys/systm.c"		/* cpu_configure() */
+#include "sys/systm.c"		/* disk_init() */
 #include "sys/stat.c"
 #include "sys/syscall.c"
 #include "sys/fcntl.c"

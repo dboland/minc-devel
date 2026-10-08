@@ -38,7 +38,7 @@
 /****************************************************/
 
 void *
-ifamsg_posix(WIN_TASK *Task, void *buf, WIN_IFADDRS *Adapter, PSOCKET_ADDRESS Address)
+ifamsg_posix(void *buf, WIN_IFADDRS *Adapter, PSOCKET_ADDRESS Address, WIN_TASK *Task)
 {
 	struct ifa_msghdr *hdr = buf;
 	UINT uiLength = Address->iSockaddrLength;
@@ -58,7 +58,7 @@ ifamsg_posix(WIN_TASK *Task, void *buf, WIN_IFADDRS *Adapter, PSOCKET_ADDRESS Ad
 	return(buf + uiLength);
 }
 void *
-ifmsg_posix(WIN_TASK *Task, void *buf, WIN_IFADDRS *Adapter)
+ifmsg_posix(void *buf, WIN_IFADDRS *Adapter, WIN_TASK *Task)
 {
 	struct if_msghdr *hdr = buf;
 	struct if_data *data = &hdr->ifm_data;
@@ -102,7 +102,7 @@ ifmsg_posix(WIN_TASK *Task, void *buf, WIN_IFADDRS *Adapter)
 	buf += hdr->ifm_hdrlen;
 	buf = dladdr_posix(buf, Adapter->IfIndex, Adapter->IfType, Adapter->PhysAddr, Adapter->AddrLen);
 	while (paUnicast){
-		buf = ifamsg_posix(Task, buf, Adapter, &paUnicast->Address);
+		buf = ifamsg_posix(buf, Adapter, &paUnicast->Address, Task);
 		paUnicast = paUnicast->Next;
 	}
 	return(buf);
@@ -199,7 +199,7 @@ route_NET_RT_IFLIST(void *buf, size_t *size)
 	int result = 0;
 	WIN_IFDATA ifData;
 	WIN_IFADDRS ifInfo;
-	WIN_TASK *pwTask = &__Tasks[CURRENT];
+//	WIN_TASK *pwTask = &__Tasks[CURRENT];
 
 	if (!buf){
 		*size = 0;
@@ -212,7 +212,7 @@ route_NET_RT_IFLIST(void *buf, size_t *size)
 		if (!buf){
 			*size += ifmsg_size(ifInfo.Unicast);
 		}else{
-			buf = ifmsg_posix(pwTask, buf, &ifInfo);
+			buf = ifmsg_posix(buf, &ifInfo, __Process);
 		}
 	}
 	ws2_endconf(&ifData);
