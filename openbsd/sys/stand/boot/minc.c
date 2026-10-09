@@ -160,7 +160,7 @@ main(int argc, char *argv[], char *env[])
 		consinit();
 		disk_init();
 		ifinit();
-		fs_unmount();
+		fs_unmount();		/* XXX fsck.exe */
 		fprintf(stderr, "\r\n");
 	}
 	switch (pid = fork()){

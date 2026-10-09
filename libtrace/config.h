@@ -44,9 +44,8 @@
 #include "win/ntdll.h"
 #include "win_posix.h"
 #include "msvc_posix.h"
-#include "dev_types.h"
 #include "vfs_types.h"
-#include "termio_types.h"
+#include "char_types.h"
 
 #define WIN_ERR		msvc_printf
 

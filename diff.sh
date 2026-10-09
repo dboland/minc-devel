@@ -22,9 +22,9 @@ diff_head()
 diff_file()
 {
 	if [ -z "$REVERT" ]; then
-		diff -au "$SOURCE/$1" "$1" | sed "s:$SOURCE/::"
-	else
 		diff -au "$1" "$SOURCE/$1" | sed "s:$SOURCE/::"
+	else
+		diff -au "$SOURCE/$1" "$1" | sed "s:$SOURCE/::"
 	fi
 }
 diff_list()
@@ -53,8 +53,8 @@ diff_dir()
 			echo "MinC: $file" >&2
 			;;
 		*)
-			diff -au "$file" "$SOURCE/$file" | sed "s:$SOURCE/::"
-#			diff_file "$file"
+#			diff -au "$file" "$SOURCE/$file" | sed "s:$SOURCE/::"
+			diff_file "$file"
 			;;
 	esac
 	done
