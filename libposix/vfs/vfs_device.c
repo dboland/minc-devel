@@ -281,9 +281,6 @@ ifnet_attach(WIN_DEVICE *Device)
 		case DEV_TYPE_PPP:
 			bResult = config_found("ppp", WIN_VSOCK, Device);
 			break;
-//		case DEV_TYPE_REMOTE:
-//			bResult = config_found("smb", WIN_VBLK, Device);
-//			break;
 		default:
 			bResult = FALSE;
 	}

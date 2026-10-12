@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Daniel Boland <dboland@xs4all.nl>.
+ * Copyright (c) 2026 Daniel Boland <dboland@xs4all.nl>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -94,7 +94,7 @@ x_init(VOID)
 /* In a real terminal emulation, we would not be reading from STDIN, but
  * directly from a window manager, processing window events and translating
  * them to ANSI encoded input as if coming from a terminal.
- * For details on implementation, see: ./libposix/vfs/char/char_input.c
+ * For details on implementation, see: libposix/vfs/char/console/char_input.c
  */
 
 int 
@@ -114,7 +114,7 @@ write_input(int master)
 /* In a real terminal emulation, we would not be writing to STDOUT, but
  * we would be reading the ANSI encoded output from the remote program and
  * translate it into drawing operations for the application window.
- * For details on implementation, see: ./libposix/vfs/char/char_screen.c
+ * For details on implementation, see: libposix/vfs/char/console/char_screen.c
  */
 
 int 

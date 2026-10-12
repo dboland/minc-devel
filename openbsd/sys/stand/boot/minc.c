@@ -45,7 +45,6 @@
 #include <unistd.h>
 #include <paths.h>
 #include <fstab.h>
-#include <regex.h>
 
 extern char *__progname;
 extern char **environ;
@@ -76,27 +75,7 @@ sig(int signum)
 	}
 }
 void 
-fs_mount(void)
-{
-	int result = 0;
-	struct fstab *tab;
-	char fspec[PATH_MAX];
-	struct ntfs_args args = {fspec, {0}, getuid(), getgid(), 00755, 0};
-	regex_t rebuf;
-
-	/* Yes, those are word boundaries */
-	regcomp(&rebuf, "[[:<:]]noauto[[:>:]]", REG_EXTENDED);
-	while (tab = getfsent()){
-		if (regexec(&rebuf, tab->fs_mntops, 0, NULL, REG_EXTENDED)){
-			strcpy(fspec, tab->fs_spec);
-			mount(tab->fs_vfstype, tab->fs_file, 0, &args);
-		}
-	}
-	endfsent();
-	regfree(&rebuf);
-}
-void 
-fs_unmount(void)
+fsck(void)
 {
 	int result = 0;
 	struct fstab *tab;
@@ -160,7 +139,7 @@ main(int argc, char *argv[], char *env[])
 		consinit();
 		disk_init();
 		ifinit();
-		fs_unmount();		/* XXX fsck.exe */
+		fsck();
 		fprintf(stderr, "\r\n");
 	}
 	switch (pid = fork()){

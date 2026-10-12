@@ -35,15 +35,15 @@
 int 
 ifmedia_ETHER(ULONG Speed)
 {
-	int result = IFM_ETHER;
+	int result = IFM_ETHER | IFM_AUTO;
 
 	/* FDX: Full duplex */
 	if (Speed >= 1000){
-		result |= IFM_1000_TX | IFM_AUTO | IFM_FDX;
+		result |= IFM_1000_TX | IFM_FDX;
 	}else if (Speed >= 100){
-		result |= IFM_100_TX | IFM_AUTO | IFM_FDX;
+		result |= IFM_100_TX | IFM_FDX;
 	}else{
-		result |= IFM_10_T | IFM_AUTO;
+		result |= IFM_10_T;
 	}
 	return(result);
 }
