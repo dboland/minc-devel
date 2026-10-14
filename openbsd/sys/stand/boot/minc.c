@@ -45,6 +45,9 @@
 #include <unistd.h>
 #include <paths.h>
 #include <fstab.h>
+#include <fcntl.h>
+#include <ttyent.h>
+#include <regex.h>
 
 extern char *__progname;
 extern char **environ;
@@ -57,12 +60,111 @@ extern char **environ;
 #define KTR_DEFAULT (KTRFAC_SYSCALL | KTRFAC_SYSRET | KTRFAC_NAMEI | \
 	KTRFAC_PSIG | KTRFAC_EMUL | KTRFAC_STRUCT | KTRFAC_INHERIT)
 
-char *_console[] = {"/sbin/console", NULL, NULL, NULL};
-char **_args = _console;
 char *_lctype = "en_US.UTF-8";
+
+char _term[NAME_MAX] = "interix";
+char _home;
 
 /************************************************************/
 
+int 
+shell(void)
+{
+	const struct passwd *pwd;
+	char *args[] = {"/bin/ksh", "-l", NULL};
+	uid_t uid = getuid();
+	char *home = "/";
+	char *sh;
+
+	if (pwd = getpwuid(uid)){
+		setenv("USER", pwd->pw_name, 1);
+		setenv("HOME", pwd->pw_dir, 1);
+		home = pwd->pw_dir;
+		args[0] = pwd->pw_shell;
+	}else{
+		fprintf(stderr, "getpwuid(%d): %s\n", uid, strerror(errno));
+	}
+	if (_home && chdir(home) < 0)
+		fprintf(stderr, "chdir(%s): %s\n", home, strerror(errno));
+	execve(*args, args, environ);
+	fprintf(stderr, "execve(%s): %s\n", *args, strerror(errno));
+	return(-1);
+}
+int 
+getty(const char *name)
+{
+	int result = -1;
+	int fd;
+	struct ttyent *term;
+	char path[PATH_MAX] = _PATH_DEV;
+
+	strcat(path, name);
+	fd = open(path, O_RDWR);
+	if (fd < 0){
+		fprintf(stderr, "open(%s): %s\n", path, strerror(errno));
+	}else if (ioctl(fd, TIOCSCTTY, NULL) < 0){
+		fprintf(stderr, "ioctl(TIOCSCTTY): %s\n", strerror(errno));
+	}else{
+		dup2(fd, STDIN_FILENO);
+		dup2(fd, STDOUT_FILENO);
+		dup2(fd, STDERR_FILENO);
+		if (fd > STDERR_FILENO)
+			close(fd);
+		result = 0;
+	}
+	while (term = getttyent()){
+		if (!strcmp(term->ty_name, name)){
+			strcpy(_term, term->ty_type);
+		}
+	}
+	endttyent();
+	setenv("TERM", _term, 1);
+	return(result);
+}
+void 
+mountfs(void)
+{
+	struct fstab *tab;
+	char fspec[PATH_MAX];
+	struct ntfs_args args = {fspec, {0}, getuid(), getgid(), 00755, 0};
+	regex_t rebuf;
+
+	/* Yes, those are word boundaries */
+	regcomp(&rebuf, "[[:<:]]noauto[[:>:]]", REG_EXTENDED);
+	while (tab = getfsent()){
+		if (regexec(&rebuf, tab->fs_mntops, 0, NULL, REG_EXTENDED)){
+			strcpy(fspec, tab->fs_spec);
+			mount(tab->fs_vfstype, tab->fs_file, 0, &args);
+		}
+	}
+	endfsent();
+	regfree(&rebuf);
+}
+int 
+console(pid_t pid)
+{
+	if (pid > 1){
+		setsid();
+		getty("ptm");
+	}else{
+		mountfs();
+		getty("console");
+	}
+	return(shell());
+}
+int 
+command(char *args[])
+{
+	int result = -1;
+
+	if (!*args){
+		result = console(getpid());
+	}else{
+		execvp(*args, args);
+		fprintf(stderr, "execvp(%s): %s\n", *args, strerror(errno));
+	}
+	return(result);
+}
 void 
 sig(int signum)
 {
@@ -98,36 +200,32 @@ trpoints(const char *opts)
 		result |= KTRFAC_GENIO;
 	return(result);
 }
-void 
-args(int argc, char *argv[])
-{
-	char *token;
-	char *prog = *argv++;
-
-	while (token = *argv){
-		if (token[0] != '-'){
-			_args = argv;
-			break;
-		}else if (token[1] == 'h'){
-			_args[1] = "-h";
-		}else if (token[1] == 't'){
-			ktrace("minc.out", KTROP_SET, KTR_DEFAULT, 0);
-		}
-		argv++;
-	}
-}
 
 /************************************************************/
 
 int 
 main(int argc, char *argv[], char *env[])
 {
-	int result = -1;
+	int result = 0;
 	pid_t pid = getpid();
 	int status;
 	char root[260];
+	char *prog = *argv++;
+	char *token;
 
-	args(argc, argv);
+	while (token = *argv){
+		if (token[0] != '-'){
+			break;
+		}else if (token[1] == 'h'){
+			_home++;
+		}else if (token[1] == 't'){
+			ktrace("minc.out", KTROP_SET, KTR_DEFAULT, 0);
+		}else{
+			fprintf(stderr, "%s: no such option\n", token);
+			return(1);
+		}
+		argv++;
+	}
 	diskconf(root);
 	setenv("MINCROOT", root, 1);
 	setenv("PATH", _PATH_DEFPATH, 1);
@@ -144,15 +242,13 @@ main(int argc, char *argv[], char *env[])
 	}
 	switch (pid = fork()){
 		case -1:
-			fprintf(stderr, "fork(): %s\n", *args, strerror(errno));
+			fprintf(stderr, "fork(): %s\n", strerror(errno));
 			break;
 		case 0:
-			execvp(*_args, _args);
-			fprintf(stderr, "execvp(%s): %s\n", *_args, strerror(errno));
+			result = command(argv);
 			break;
 		default:
 			waitpid(pid, &status, 0);
-			result = 0;
 	}
 	return(result);
 }

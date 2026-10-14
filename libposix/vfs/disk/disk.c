@@ -29,7 +29,6 @@
  */
 
 #include "disk_syscall.c"
-//#include "disk_sysctl.c"
 #include "link/link.c"
 #include "file/file.c"
 #include "disk_namei.c"
