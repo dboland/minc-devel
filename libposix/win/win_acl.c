@@ -33,68 +33,39 @@
 /************************************************************/
 
 BOOL 
-AclLookupW(LPCWSTR Name, SID8 *Result)
+AclLookup(LPCWSTR Account, SID8 *Result)
 {
-	WCHAR wszDomain[MAX_NAME];
+	BOOL bResult = FALSE;
+	WCHAR szDomain[MAX_NAME];
 	DWORD bufLen = MAX_NAME;
 	DWORD sidLen = sizeof(SID8);
 	SID_NAME_USE snType = 0;
 
-	return(LookupAccountNameW(NULL, Name, Result, &sidLen, wszDomain, &bufLen, &snType));
-}
-BOOL 
-AclLookup(LPCSTR Name, SID8 *Sid, DWORD *Size)
-{
-	BOOL bResult = FALSE;
-	CHAR szDomain[MAX_NAME];
-	DWORD dwSize = MAX_NAME;
-	SID_NAME_USE snType = 0;
-
-	if (!*Name){			// inetd.exe
+	if (!*Account){			/* inetd.exe */
 		SetLastError(ERROR_BAD_ARGUMENTS);
-	}else if (!LookupAccountName(NULL, Name, Sid, Size, szDomain, &dwSize, &snType)){
-		WIN_ERR("LookupAccountName(%s): %s\n", Name, win_strerror(GetLastError()));
+	}else if (!LookupAccountNameW(NULL, Account, Result, &sidLen, szDomain, &bufLen, &snType)){
+		WIN_ERR("LookupAccountName(%ls): %s\n", Account, win_strerror(GetLastError()));
 	}else{
 		bResult = TRUE;
 	}
 	return(bResult);
 }
 VOID 
-AclInit(SID8 *SidMachine, SID8 *SidNone)
+AclInit(SID8 *SidMachine)
 {
-	CHAR szName[MAX_NAME];
+	WCHAR szName[MAX_NAME];
 	DWORD dwLen = MAX_NAME;
-	DWORD dwSize = sizeof(SID8);
-	SID_NAME_USE snType = 0;
 
-	if (!GetComputerName(szName, &dwLen)){
+	if (!GetComputerNameW(szName, &dwLen)){
 		WIN_ERR("GetComputerName(): %s\n", win_strerror(GetLastError()));
-	}else if (AclLookup(szName, SidMachine, &dwSize)){
+	}else if (AclLookup(szName, SidMachine)){
+		SidMachine->SubAuthority[SidMachine->SubAuthorityCount] = DOMAIN_GROUP_RID_USERS;
 		SidMachine->SubAuthorityCount++;
-		CopySid(sizeof(SID8), SidNone, SidMachine);
-		SidNone->SubAuthority[SidNone->SubAuthorityCount-1] = DOMAIN_GROUP_RID_USERS;
 	}
 }
 
 /************************************************************/
 
-BOOL 
-win_acl_get_sid(LPCSTR Name, SID8 *Sid, DWORD *Size)
-{
-	BOOL bResult = FALSE;
-	CHAR szDomain[MAX_NAME];
-	DWORD dwSize = MAX_NAME;
-	SID_NAME_USE snType = 0;
-
-	if (!*Name){			// inetd.exe
-		SetLastError(ERROR_BAD_ARGUMENTS);
-	}else if (!LookupAccountName(NULL, Name, Sid, Size, szDomain, &dwSize, &snType)){
-		WIN_ERR("LookupAccountName(%s): %s\n", Name, win_strerror(GetLastError()));
-	}else{
-		bResult = TRUE;
-	}
-	return(bResult);
-}
 BOOL 
 win_acl_get_file(LPCWSTR FileName, PSECURITY_DESCRIPTOR *Result)
 {

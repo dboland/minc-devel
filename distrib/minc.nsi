@@ -64,6 +64,10 @@ Section "Uninstall"
 	# Put file there
 	File 'uninstall.cmd'
 
+	# Unmount MinC root
+	ExecDos::exec /DETAILED 'attrib -s -h .'
+
+	# Omit home folder
 	DetailPrint "Removing /usr..."
 	ExecDos::exec /DETAILED '.\uninstall.cmd usr'
 	DetailPrint "Removing /var..."

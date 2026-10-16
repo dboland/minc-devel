@@ -91,7 +91,6 @@ SID8 SidIntegritySystem		= {1, 1, {0, 0, 0, 0, 0, 16}, 0x4000};
 
 WIN_GLOBALS	*__Globals;
 SID8		*__SidMachine;
-SID8		*__SidNone;
 LARGE_INTEGER	*__Frequency;
 
 #include "win_string.c"
@@ -131,7 +130,7 @@ win_init(WIN_GLOBALS *Globals, HINSTANCE Instance)
 		win_dirname(Globals->Root);
 	}
 
-	AclInit(&Globals->SidMachine, &Globals->SidNone);
+	AclInit(&Globals->SidMachine);
 	TimeInit(&Globals->Frequency);
 	CapInit(&Globals->AuthId);
 

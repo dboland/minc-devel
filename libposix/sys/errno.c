@@ -170,7 +170,6 @@ errno_posix(DWORD Error)
 		case ERROR_NO_MORE_ITEMS:
 		case ERROR_IO_DEVICE:
 		case ERROR_HANDLE_EOF:			/* 38: on exit when xterm enabled (vim.exe) */
-		case ERROR_INVALID_USER_BUFFER:
 		case ERROR_OPERATION_ABORTED:		/* 995: The I/O operation has been aborted because of either a thread exit or an application request. */
 			result = EIO;
 			break;

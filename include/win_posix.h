@@ -111,7 +111,6 @@ BOOL win_realpath(LPCWSTR Path, DWORD Size, LPWSTR Resolved);
 
 /* win_acl.c */
 
-BOOL win_acl_get_sid(LPCSTR Name, SID8 *Sid, DWORD *Size);
 BOOL win_acl_get_file(LPCWSTR FileName, PSECURITY_DESCRIPTOR *Result);
 BOOL win_acl_get_fd(HANDLE Handle, PSECURITY_DESCRIPTOR *Result);
 BOOL win_acl_dup(PSECURITY_DESCRIPTOR Source, PSECURITY_DESCRIPTOR Result);
@@ -120,7 +119,7 @@ BOOL win_acl_dup(PSECURITY_DESCRIPTOR Source, PSECURITY_DESCRIPTOR Result);
 
 BOOL win_getpwnam(LPCWSTR Account, WIN_PWENT *Entity);
 BOOL win_getpwuid(SID8 *Sid, WIN_PWENT *Entity);
-BOOL win_setpwent(WIN_PWENUM *Info, DWORD Type);
+BOOL win_setpwent(WIN_PWENUM *Enum);
 BOOL win_getpwent(WIN_PWENUM *Info, WIN_PWENT *Result);
 VOID win_endpwent(WIN_PWENUM *Info);
 
@@ -128,7 +127,7 @@ VOID win_endpwent(WIN_PWENUM *Info);
 
 BOOL win_getgrnam(LPCWSTR Name, WIN_GRENT *Group);
 BOOL win_getgrgid(SID8 *Sid, WIN_GRENT *Group);
-BOOL win_setgrent(WIN_PWENUM *Info, DWORD Type);
+BOOL win_setgrent(WIN_PWENUM *Enum);
 BOOL win_getgrent(WIN_PWENUM *Info, WIN_GRENT *Group);
 VOID win_endgrent(WIN_PWENUM *Info);
 BOOL win_getgrouplist(WIN_PWENT *Passwd, SID8 *Primary, SID8 *Result[], DWORD *Count);

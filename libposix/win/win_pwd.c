@@ -34,15 +34,28 @@
 
 /************************************************************/
 
+LPWSTR 
+PwdGetController(LPWSTR Result)
+{
+	NET_API_STATUS naStatus;
+
+	naStatus = NetGetDCName(NULL, NULL, (LPBYTE *)&Result);
+	if (naStatus == NERR_Success){
+		return(Result);
+//	}else{
+//		WIN_ERR("NetGetDCName(): %s\n", szDomain, win_strerror(naStatus));
+	}
+	return(NULL);
+}
 BOOL 
-PwdLookupNTAuth(WIN_PWENT *Entity)
+PwdLookupNTAuth(WIN_PWENT *Entity, LPWSTR Controller)
 {
 	BOOL bResult = FALSE;
 	LPUSER_INFO_3 lpuInfo = NULL;
 	NET_API_STATUS naStatus;
 
 	/* latency if !NULL */
-	naStatus = NetUserGetInfo(NULL, Entity->Account, 3, (LPBYTE *)&lpuInfo);
+	naStatus = NetUserGetInfo(Controller, Entity->Account, 3, (LPBYTE *)&lpuInfo);
 	if (naStatus == NERR_Success){
 		win_wcstombs(Entity->Password, lpuInfo->usri3_password, MAX_NAME);
 		Entity->Privileges = lpuInfo->usri3_priv;
@@ -68,17 +81,18 @@ PwdLookupNTAuth(WIN_PWENT *Entity)
 	return(bResult);
 }
 BOOL 
-PwdLookup(WIN_PWENT *Entity)
+PwdLookup(WIN_PWENT *Entity, LPWSTR Controller)
 {
 	BOOL bResult = TRUE;
 	BYTE bAuth = Entity->UserSid.IdentifierAuthority.Value[5];
 	ULONG ulSubAuth = Entity->UserSid.SubAuthority[0];
+	WCHAR szDomain[MAX_NAME];
 
 	if (bAuth != SECURITY_NT_AUTHORITY_RID){
 		return(FALSE);
 	}else switch (ulSubAuth){
 		case SECURITY_MACHINE_DOMAIN_RID:	/* 21 (Machine) */
-			bResult = PwdLookupNTAuth(Entity);
+			bResult = PwdLookupNTAuth(Entity, Controller);
 			break;
 		case SECURITY_LOCAL_SYSTEM_RID:		/* 18 (SYSTEM) */
 			Entity->GroupSid = SidAdmins;
@@ -100,11 +114,15 @@ BOOL
 win_getpwnam(LPCWSTR Account, WIN_PWENT *Result)
 {
 	BOOL bResult = FALSE;
+	WCHAR wszDomain[MAX_NAME];
+	DWORD bufLen = MAX_NAME;
+	DWORD sidLen = sizeof(SID8);
+	SID_NAME_USE snType = 0;
 
 	ZeroMemory(Result, sizeof(WIN_PWENT));
-	if (AclLookupW(Account, &Result->UserSid)){
+	if (LookupAccountNameW(NULL, Account, &Result->UserSid, &sidLen, wszDomain, &bufLen, &snType)){
 		win_wcpcpy(Result->Account, win_basename(Account));
-		bResult = PwdLookup(Result);
+		bResult = PwdLookup(Result, NULL);
 	}
 	return(bResult);
 }
@@ -120,12 +138,12 @@ win_getpwuid(SID8 *Sid, WIN_PWENT *Result)
 	ZeroMemory(Result, sizeof(WIN_PWENT));
 	if (LookupAccountSidW(NULL, Sid, Result->Account, &accLen, Result->Domain, &domLen, &snType)){
 		CopySid(GetLengthSid(Sid), &Result->UserSid, Sid);
-		bResult = PwdLookup(Result);
+		bResult = PwdLookup(Result, NULL);
 	}
 	return(bResult);
 }
 BOOL 
-win_setpwent(WIN_PWENUM *Enum, DWORD Type)
+win_setpwent(WIN_PWENUM *Enum)
 {
 	BOOL bResult = TRUE;
 	NET_API_STATUS naStatus;

@@ -254,9 +254,6 @@ static VOID NTAPI TlsMainCRTStartup(LPVOID hinstDLL, DWORD fdwReason, LPVOID lpv
  * win_pwd.c
  */
 
-#define WIN_NETENUM_LOCAL		1
-#define WIN_NETENUM_GLOBAL		2
-
 typedef struct _WIN_PWENT {
 	SID8 UserSid;
 	SID8 GroupSid;
@@ -318,7 +315,6 @@ typedef struct _WIN_GLOBALS {
 	CHAR *MsgBuffer;
 	UINT MsgBufSize;
 	SID8 SidMachine;
-	SID8 SidNone;
 	LARGE_INTEGER Frequency;	/* result of QueryPerformanceFrequency() */
 	LUID AuthId;
 	ULONG PageSize;

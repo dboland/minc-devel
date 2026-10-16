@@ -85,13 +85,17 @@ rid_win(SID8 *Result, int rid)
 	if (rid == DOMAIN_NT_SERVICE_RID_INSTALLER){		/* TrustedInstaller */
 		*Result = SidTrustedInstaller;
 	}else if (rid < 0 || !bAuth){				/* tar.exe */
-		CopySid(sizeof(SID8), Result, __SidNone);
+		CopySid(sizeof(SID8), Result, __SidMachine);	/* "None" */
 	}else if (!ulSubAuth){					/* 0 (Local) */
 		*Result = SidNull;
 		Result->IdentifierAuthority.Value[5] = bAuth;
 		Result->SubAuthority[0] = rid % 100000000;
 	}else if (ulSubAuth == SECURITY_MACHINE_DOMAIN_RID){	/* 21 (Machine) */
-		CopySid(sizeof(SID8), Result, __SidMachine);
+		if (bAuth == SECURITY_OTHER_AUTHORITY_RID){
+			win_getuid(Result);
+		}else{
+			CopySid(sizeof(SID8), Result, __SidMachine);
+		}
 		Result->SubAuthority[Result->SubAuthorityCount-1] = ulRid;
 	}else if (ulSubAuth == SECURITY_BUILTIN_DOMAIN){	/* 32 (Builtin) */
 		*Result = SidBuiltinAuth;

@@ -70,7 +70,6 @@
 
 extern WIN_GLOBALS 	*__Globals;
 extern SID8 		*__SidMachine;
-extern SID8		*__SidNone;
 extern LARGE_INTEGER	*__Frequency;
 
 extern SID8 SidSystem;
@@ -168,7 +167,6 @@ vfs_PROCESS_ATTACH(HINSTANCE Instance, LPVOID Reserved)
 	__Strings = __Session->Strings;
 	__Globals = __Session->Globals;
 	__SidMachine = &__Globals->SidMachine;
-	__SidNone = &__Globals->SidNone;
 	__Frequency = &__Globals->Frequency;
 	__PipeEvent = event_attach(OBJECT_NAME("PipeEvent"), FALSE);
 	__Interrupt = event_attach(OBJECT_NAME("Interrupt"), FALSE);

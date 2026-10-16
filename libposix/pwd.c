@@ -82,7 +82,7 @@ pwd_PWD_SETPWENT(void)
 {
 	int result = 0;
 
-	if (!win_setpwent(&__PWDENUM, WIN_NETENUM_LOCAL)){
+	if (!win_setpwent(&__PWDENUM)){
 		result -= errno_posix(GetLastError());
 	}
 	return(result);
@@ -102,7 +102,7 @@ pwd_PWD_GETPWENT(char *buf, size_t buflen)
 	WIN_PWENT pwResult;
 
 	if (!__PWDENUM.Data){
-		win_setpwent(&__PWDENUM, WIN_NETENUM_LOCAL);
+		win_setpwent(&__PWDENUM);
 	}
 	if (!win_getpwent(&__PWDENUM, &pwResult)){
 		result -= errno_posix(GetLastError());

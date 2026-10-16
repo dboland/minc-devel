@@ -57,7 +57,7 @@ grp_GRP_SETGRENT(void)
 {
 	int result = 0;
 
-	if (!win_setgrent(&__GRPENUM, WIN_NETENUM_LOCAL)){
+	if (!win_setgrent(&__GRPENUM)){
 		result -= errno_posix(GetLastError());
 	}
 	return(result);
@@ -77,7 +77,7 @@ grp_GRP_GETGRENT(char *buf, size_t buflen)
 	WIN_GRENT wgResult;
 
 	if (!__GRPENUM.Data){
-		win_setgrent(&__GRPENUM, WIN_NETENUM_LOCAL);
+		win_setgrent(&__GRPENUM);
 	}
 	if (!win_getgrent(&__GRPENUM, &wgResult)){
 		result -= errno_posix(GetLastError());

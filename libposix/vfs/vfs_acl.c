@@ -129,6 +129,16 @@ AclAddEntry(PACL Acl, BYTE Flags, ACCESS_MASK Access, PSID Sid)
 	win_realloc(Acl->AclSize, Acl, (PVOID *)&Acl);
 	return(AddAce(Acl, ACL_REVISION, MAXDWORD, &acEntry, wAceSize));
 }
+BOOL 
+AclSidIsNone(SID8 *Sid)
+{
+	BOOL bResult = FALSE;
+
+	if (Sid->SubAuthority[Sid->SubAuthorityCount-1] == DOMAIN_GROUP_RID_USERS){
+		bResult = TRUE;
+	}
+	return(bResult);
+}
 
 /************************************************************/
 
@@ -299,13 +309,13 @@ vfs_acl_chown(WIN_ACL_CONTROL *Control, PSID NewUser, PSID NewGroup, PSECURITY_D
 		aceBuf.Header = pEntry->Header;
 		aceBuf.Mask = pEntry->Mask;
 		if (dwType == WIN_ACL_USER){
-			if (!EqualSid(NewUser, __SidNone)){
+			if (!AclSidIsNone(NewUser)){
 				aceBuf.Header.AceSize = aceSize + GetLengthSid(NewUser);
 				CopySid(GetLengthSid(NewUser), &aceBuf.Sid, NewUser);
 				pEntry = (ACE_PEEK *)&aceBuf;
 			}
 		}else if (dwType == WIN_ACL_GROUP){
-			if (!EqualSid(NewGroup, __SidNone)){
+			if (!AclSidIsNone(NewGroup)){
 				aceBuf.Header.AceSize = aceSize + GetLengthSid(NewGroup);
 				CopySid(GetLengthSid(NewGroup), &aceBuf.Sid, NewGroup);
 				pEntry = (ACE_PEEK *)&aceBuf;

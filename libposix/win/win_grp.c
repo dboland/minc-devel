@@ -110,7 +110,7 @@ win_getgrgid(SID8 *Sid, WIN_GRENT *Group)
 	return(bResult);
 }
 BOOL 
-win_setgrent(WIN_PWENUM *Enum, DWORD Type)
+win_setgrent(WIN_PWENUM *Enum)
 {
 	BOOL bResult = TRUE;
 	NET_API_STATUS naStatus;
@@ -172,7 +172,7 @@ win_getgrouplist(WIN_PWENT *Passwd, SID8 *Primary, SID8 *Result[], DWORD *Count)
 		if (!win_realloc(dwSize, psResult, (PVOID *)&psResult)){
 			bResult = FALSE;
 		}else while (dwIndex < dwCount){
-			AclLookupW(plguInfo->lgrui0_name, &psResult[dwResult]);
+			AclLookup(plguInfo->lgrui0_name, &psResult[dwResult]);
 			if (!EqualSid(&psResult[dwResult], Primary)){
 				dwResult++;
 			}
