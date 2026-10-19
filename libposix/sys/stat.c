@@ -92,7 +92,7 @@ rid_win(SID8 *Result, int rid)
 		Result->SubAuthority[0] = rid % 100000000;
 	}else if (ulSubAuth == SECURITY_MACHINE_DOMAIN_RID){	/* 21 (Machine) */
 		if (bAuth == SECURITY_OTHER_AUTHORITY_RID){
-			win_getuid(Result);
+			CopySid(sizeof(SID8), Result, &__Process->UserSid);
 		}else{
 			CopySid(sizeof(SID8), Result, __SidMachine);
 		}

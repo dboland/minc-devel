@@ -249,7 +249,7 @@ InputWaitChar(HANDLE Handle, WIN_TERMIO *Attribs, LPSTR Buffer)
 
 	dwStatus = WaitForSingleObjectEx(Handle, INFINITE, TRUE);
 	if (dwStatus == WAIT_FAILED){
-		WIN_ERR("WaitForMultipleObjectsEx(%d): %s\n", Handle, win_strerror(GetLastError()));
+		SetLastError(ERROR_IO_PENDING);
 	}else if (Attribs->LFlags & WIN_ICANON){		/* ENABLE_LINE_INPUT */
 		bResult = InputReadLine(Handle, Attribs, Buffer);
 	}else{

@@ -121,6 +121,7 @@ HANDLE vfs_F_OSFHANDLE(WIN_VNODE Nodes[], DWORD Index);
 /* vfs_mount.c */
 
 BOOL vfs_statfs(WIN_NAMEIDATA *Path, WIN_STATVFS *Result);
+BOOL vfs_fstatfs(WIN_VNODE *Node, WIN_STATVFS *Result);
 BOOL vfs_mount(WIN_VNODE *Node, WIN_NAMEIDATA *Path, DWORD Flags, WIN_MODE *Mode);
 BOOL vfs_unmount(WIN_NAMEIDATA *Path);
 
@@ -180,6 +181,10 @@ BOOL vfs_poll(WIN_TASK *Task, WIN_VNODE *Nodes[], WIN_POLLFD *Info[], DWORD *Tim
 /* vfs_wait.c */
 
 BOOL vfs_wait4(WIN_TASK *Task, WIN_TASK *Children[], BOOL NoHang, DWORD Status, WIN_RUSAGE *Result);
+
+/* vfs_statvfs.c */
+
+BOOL vfs_statvfs(WIN_MOUNT *Mount, WIN_STATVFS *Result);
 
 /****************************************************/
 

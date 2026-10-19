@@ -141,6 +141,7 @@ BOOL disk_F_NAMEI(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result);
 #include "process/process.c"
 #include "vfs_uio.c"
 #include "vfs_filio.c"
+#include "vfs_statvfs.c"
 #include "vfs_mount.c"
 #include "vfs_stat.c"
 #include "vfs_dirent.c"

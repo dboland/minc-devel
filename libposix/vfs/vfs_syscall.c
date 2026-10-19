@@ -128,7 +128,7 @@ vfs_seteuid(WIN_TASK *Task, SID8 *Sid)
 
 	if (EqualSid(Sid, &Task->UserSid)){
 		return(TRUE);
-	}else if (!win_getpwuid(Sid, &pwEntry)){
+	}else if (!win_getpwuid(Sid, NULL, &pwEntry)){
 		return(FALSE);
 	}else if (!win_cap_init(&wControl)){
 		return(FALSE);

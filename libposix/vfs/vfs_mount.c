@@ -33,9 +33,14 @@
 /****************************************************/
 
 BOOL 
+vfs_fstatfs(WIN_VNODE *Node, WIN_STATVFS *Result)
+{
+	return(vfs_statvfs(&__Mounts[Node->MountId], Result));
+}
+BOOL 
 vfs_statfs(WIN_NAMEIDATA *Path, WIN_STATVFS *Result)
 {
-	return(drive_statvfs(&__Mounts[Path->MountId], Result));
+	return(vfs_statvfs(&__Mounts[Path->MountId], Result));
 }
 BOOL 
 vfs_mount(WIN_VNODE *Node, WIN_NAMEIDATA *Path, DWORD Flags, WIN_MODE *Mode)

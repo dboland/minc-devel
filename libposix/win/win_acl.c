@@ -28,7 +28,8 @@
  *
  */
 
-#include <aclapi.h>
+#include <lmaccess.h>
+#include <lmerr.h>		/* NERR_Success */
 
 /************************************************************/
 
@@ -41,9 +42,7 @@ AclLookup(LPCWSTR Account, SID8 *Result)
 	DWORD sidLen = sizeof(SID8);
 	SID_NAME_USE snType = 0;
 
-	if (!*Account){			/* inetd.exe */
-		SetLastError(ERROR_BAD_ARGUMENTS);
-	}else if (!LookupAccountNameW(NULL, Account, Result, &sidLen, szDomain, &bufLen, &snType)){
+	if (!LookupAccountNameW(NULL, Account, Result, &sidLen, szDomain, &bufLen, &snType)){
 		WIN_ERR("LookupAccountName(%ls): %s\n", Account, win_strerror(GetLastError()));
 	}else{
 		bResult = TRUE;
@@ -66,6 +65,19 @@ AclInit(SID8 *SidMachine)
 
 /************************************************************/
 
+LPWSTR 
+win_acl_get_dc(LPWSTR Result)
+{
+	NET_API_STATUS naStatus;
+
+	naStatus = NetGetDCName(NULL, NULL, (LPBYTE *)&Result);
+	if (naStatus == NERR_Success){
+		return(Result);
+	}else if (naStatus != NERR_DCNotFound){
+		WIN_ERR("NetGetDCName(): %s\n", win_strerror(naStatus));
+	}
+	return(NULL);
+}
 BOOL 
 win_acl_get_file(LPCWSTR FileName, PSECURITY_DESCRIPTOR *Result)
 {

@@ -30,12 +30,14 @@
 
 #include <ddk/ntapi.h>
 
-/* The "Replace a process level token" (SeAssignPrimaryTokenPrivilege) setting
+/* The "Create a token object" (SeCreateTokenPrivilege) is needed for
+ * NtCreateToken(). The "Act as part of the operating system" (SeTcbPrivilege)
+ * is needed for assigning a TokenSessionId and a TokenPrimaryGroup.
+ * The "Replace a process level token" (SeAssignPrimaryTokenPrivilege) setting
  * determines which user accounts can call the CreateProcessAsUser() application
- * programming interface (API) so that one service can start another.
- * The "Create a token object" (SeCreateTokenPrivilege) is needed for NtCreateToken().
- * The "Act as part of the operating system" (SeTcbPrivilege) is needed for
- * assigning a TokenSessionId.
+ * programming interface (API) so that one service can start another. This
+ * privilege is not needed because we match the ACL of the Process with the ACL
+ * in the user account's login Token.
  */
 
 /************************************************************/
@@ -72,6 +74,8 @@ CapCreateToken(WIN_CAP_CONTROL *Control, HANDLE *Result)
 	ACCESS_MASK aMask = TOKEN_ALL_ACCESS | TOKEN_ADJUST_SESSIONID;
 	TOKEN_SOURCE tSource = {"*MINC*", {0, 0}};
 
+	/* hello Corinna Vinschen
+	 */
 	ntStatus = NtCreateToken(&hToken, aMask, &oa, TokenPrimary, &Control->AuthId, &liExpire, &tUser, 
 		Control->Groups, Control->Privs, &tOwner, &tPrimaryGroup, &tDefault, &tSource);
 	if (!NT_SUCCESS(ntStatus)){

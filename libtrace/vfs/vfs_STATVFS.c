@@ -35,8 +35,10 @@ vfs_STATVFS(WIN_STATVFS *Info, LPSTR Buffer)
 {
 	LPSTR psz = Buffer;
 
-	psz += sprintf(psz, "(%ls): DevId(0x%x) MaxPath(%d) ClustersTotal(%d) FreeClusters(%d)\n", 
+	psz += sprintf(psz, "(%ls): DevId(0x%x) MaxPath(%d) ClustersTotal(%lu) FreeClusters(%lu)\n", 
 		Info->TypeName, Info->DeviceId, Info->MaxPath, Info->ClustersTotal, Info->FreeClusters);
+	psz += sprintf(psz, "+ BytesPerSector(%lu) SectorsPerCluster(%lu)\n", 
+		Info->BytesPerSector, Info->SectorsPerCluster);
 	psz = VfsVolumeFlagsLow(psz, "+ Flags", Info->Flags.LowPart);
 	psz += sprintf(psz, "+ Path: %ls\n", Info->Path);
 	return(psz - Buffer);

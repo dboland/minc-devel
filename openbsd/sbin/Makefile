@@ -3,7 +3,7 @@ ROOTDIR= ../..
 include ${ROOTDIR}/Makefile.inc
 
 PROGS= mknod wtrace
-OBJECTS= ${PROGS} wrc mkent mount_refs mount_cdfs console xterm
+OBJECTS= ${PROGS} wrc mkent mount_refs mount_cdfs xterm
 TRACEDIR= ${ROOTDIR}/libtrace
 SBINSRC= ${SRCDIR}/sbin
 SBINDEST= ${DESTDIR}/sbin
@@ -34,7 +34,6 @@ version.o: bsd.rc
 	windres -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@
 
 wrc: wrc.exe
-console: console.exe
 
 mknod: ${SBINSRC}/mknod/mknod.c
 	${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $< 

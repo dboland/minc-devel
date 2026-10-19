@@ -65,6 +65,7 @@ drive_mount(WIN_DEVICE *Device, WIN_NAMEIDATA *Path, DWORD Flags, WIN_MODE *Mode
 		WIN_ERR("SetFileAttributes(%ls): %s\n", Path->Resolved, win_strerror(GetLastError()));
 	}else{
 		win_wcscpy(pwMount->Path, Path->Resolved);
+		pwMount->FSType = FS_TYPE_DRIVE;
 		pwMount->MountId = lMountId;
 		pwMount->DeviceId = Device->DeviceId;
 		pwMount->DeviceType = Device->DeviceType;

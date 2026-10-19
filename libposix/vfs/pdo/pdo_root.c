@@ -39,19 +39,37 @@ root_mount(WIN_DEVICE *Device, WIN_NAMEIDATA *Path, DWORD Flags, WIN_MODE *Mode)
 	WIN_MOUNT *pwMount = __Mounts;
 	WCHAR szDrive[MAX_NAME];
 
-	if (!DriveStatVolume(win_drivename(szDrive, Path->Base), pwMount)){
-		return(FALSE);
-	}else if (!SetFileAttributesW(Path->Resolved, FILE_CLASS_ROOT)){
+	if (!SetFileAttributesW(Path->Resolved, FILE_CLASS_ROOT)){
 		WIN_ERR("SetFileAttributes(%ls): %s\n", Path->Resolved, win_strerror(GetLastError()));
 	}else{
 		win_wcscpy(pwMount->Path, Path->Resolved);
 		win_wcscpy(pwMount->TypeName, L"FFS");
 		pwMount->MountId = 0;
+		pwMount->FSType = Device->FSType;
 		pwMount->DeviceId = Device->DeviceId;
 		pwMount->DeviceType = Device->DeviceType;
-		pwMount->Flags.HighPart |= WIN_MNT_ROOTFS;
+		pwMount->Flags.LowPart = FILE_PERSISTENT_ACLS;
+		pwMount->Flags.HighPart = WIN_MNT_ROOTFS;
+		pwMount->MaxPath = WIN_PATH_MAX;
 		GetSystemTimeAsFileTime(&pwMount->Time);
 		bResult = TRUE;
 	}
 	return(bResult);
+}
+BOOL 
+root_statvfs(WIN_MOUNT *Mount, WIN_STATVFS *Result)
+{
+	ZeroMemory(Result, sizeof(WIN_STATVFS));
+	Result->BytesPerSector = 512;
+	Result->SectorsPerCluster = 8;
+	Result->ClustersTotal = 0x8000;
+	Result->FreeClusters = 0x4FFF;
+	win_wcscpy(Result->Path, Mount->Path);
+	win_wcscpy(Result->TypeName, Mount->TypeName);
+	win_wcscpy(Result->Label, Mount->Label);
+	Result->DeviceId = Mount->DeviceId;
+	Result->MountTime = Mount->Time;
+	Result->Flags = Mount->Flags;
+	Result->MaxPath = Mount->MaxPath;
+	return(TRUE);
 }

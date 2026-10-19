@@ -43,6 +43,7 @@
 #include "pdo_stat.c"
 #include "pdo_namei.c"
 #include "pdo_mount.c"
+#include "pdo_statvfs.c"
 
 /****************************************************/
 

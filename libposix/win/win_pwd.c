@@ -28,25 +28,10 @@
  *
  */
 
-#include <lmaccess.h>
 #include <lmapibuf.h>		/* NetApiBufferFree() */
-#include <lmerr.h>		/* NERR_Success */
 
 /************************************************************/
 
-LPWSTR 
-PwdGetController(LPWSTR Result)
-{
-	NET_API_STATUS naStatus;
-
-	naStatus = NetGetDCName(NULL, NULL, (LPBYTE *)&Result);
-	if (naStatus == NERR_Success){
-		return(Result);
-//	}else{
-//		WIN_ERR("NetGetDCName(): %s\n", szDomain, win_strerror(naStatus));
-	}
-	return(NULL);
-}
 BOOL 
 PwdLookupNTAuth(WIN_PWENT *Entity, LPWSTR Controller)
 {
@@ -111,7 +96,7 @@ PwdLookup(WIN_PWENT *Entity, LPWSTR Controller)
 /************************************************************/
 
 BOOL 
-win_getpwnam(LPCWSTR Account, WIN_PWENT *Result)
+win_getpwnam(LPCWSTR Account, LPWSTR Controller, WIN_PWENT *Result)
 {
 	BOOL bResult = FALSE;
 	WCHAR wszDomain[MAX_NAME];
@@ -120,25 +105,27 @@ win_getpwnam(LPCWSTR Account, WIN_PWENT *Result)
 	SID_NAME_USE snType = 0;
 
 	ZeroMemory(Result, sizeof(WIN_PWENT));
-	if (LookupAccountNameW(NULL, Account, &Result->UserSid, &sidLen, wszDomain, &bufLen, &snType)){
+	if (!*Account){					/* inetd.exe */
+		SetLastError(ERROR_BAD_ARGUMENTS);
+	}else if (LookupAccountNameW(Controller, Account, &Result->UserSid, &sidLen, wszDomain, &bufLen, &snType)){
 		win_wcpcpy(Result->Account, win_basename(Account));
-		bResult = PwdLookup(Result, NULL);
+		bResult = PwdLookup(Result, Controller);
 	}
 	return(bResult);
 }
-
 BOOL 
-win_getpwuid(SID8 *Sid, WIN_PWENT *Result)
+win_getpwuid(SID8 *Sid, LPWSTR Controller, WIN_PWENT *Result)
 {
 	BOOL bResult = FALSE;
 	DWORD accLen = MAX_NAME;
 	DWORD domLen = MAX_NAME;
 	SID_NAME_USE snType = 0;
+	WCHAR wszDomain[MAX_NAME];
 
 	ZeroMemory(Result, sizeof(WIN_PWENT));
-	if (LookupAccountSidW(NULL, Sid, Result->Account, &accLen, Result->Domain, &domLen, &snType)){
+	if (LookupAccountSidW(Controller, Sid, Result->Account, &accLen, Result->Domain, &domLen, &snType)){
 		CopySid(GetLengthSid(Sid), &Result->UserSid, Sid);
-		bResult = PwdLookup(Result, NULL);
+		bResult = PwdLookup(Result, Controller);
 	}
 	return(bResult);
 }
@@ -166,9 +153,9 @@ win_getpwent(WIN_PWENUM *Enum, WIN_PWENT *Result)
 	LPUSER_INFO_0 puInfo = (LPUSER_INFO_0)Enum->Data;
 
 	if (!puInfo){
-		SetLastError(ERROR_INVALID_USER_BUFFER);
+		SetLastError(ERROR_INSUFFICIENT_BUFFER);
 	}else if (dwIndex < Enum->Count){
-		win_getpwnam(puInfo[dwIndex].usri0_name, Result);
+		win_getpwnam(puInfo[dwIndex].usri0_name, NULL, Result);
 		Enum->Index++;
 		bResult = TRUE;
 	}else{

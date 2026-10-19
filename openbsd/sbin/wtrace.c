@@ -36,6 +36,7 @@ usage(void)
 	printf(" -s\t\t\t%s\n", "print ACL Window Station");
 	printf(" -f PATH\t\t%s\n", "print ACL on PATH");
 	printf(" -p\t\t\t%s\n", "print ACL Process");
+	printf(" -i PATH\t\t%s\n", "print namei data on PATH");
 	printf(" -v, --verbose\t\tbe verbose if applicable\n");
 	printf(" -t TABLE\t\tshow TABLE (see below)\n");
 	printf("\nTables\n");
@@ -177,9 +178,9 @@ main(int argc, char* argv[])
 		case 'p':
 			win_ktrace(STRUCT_ACL_PROCESS, 0x0800, token);
 			break;
-//		case '?':
-//			win_ktrace(STRUCT_NAMEI, 0x1000, path_win(&wPath, token, O_NOFOLLOW));
-//			break;
+		case 'i':
+			win_ktrace(STRUCT_NAMEI, 0x1000, path_win(&wPath, token, O_NOFOLLOW));
+			break;
 		case 'I':
 			win_ktrace(STRUCT_SYSTEM_INFO, 0x0800, token);
 			break;

@@ -68,10 +68,7 @@ win_volname(LPWSTR Result, LPCWSTR FileName)
 	LPWSTR R = Result;
 	WCHAR C;
 
-	if (!wcscmp(FileName, L"ROOT:")){
-		*R++ = '.';
-		Result = NULL;
-	}else while (C = *FileName++){
+	while (C = *FileName++){
 		*R++ = C;
 		if (C == ':'){
 			break;
@@ -87,9 +84,6 @@ win_drivename(LPWSTR Result, LPCWSTR FileName)
 	LPWSTR R = Result;
 	WCHAR C;
 
-	if (!*FileName){
-		FileName = L"ROOT";
-	}
 	while (C = *FileName++){
 		if (C == ':'){
 			break;

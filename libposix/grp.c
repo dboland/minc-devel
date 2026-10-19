@@ -145,6 +145,7 @@ grp_GRP_GETGROUPLIST(const char *user, gid_t group, gid_t *groups, int *ngroups)
 	int result = 0;
 	WIN_PWENT pwEntry;
 	WCHAR szAccount[MAX_NAME];
+	WCHAR szName[MAX_NAME];
 	SID8 *psGroups = NULL;
 	SID8 sid;
 	DWORD dwCount = 0;
@@ -156,7 +157,7 @@ grp_GRP_GETGROUPLIST(const char *user, gid_t group, gid_t *groups, int *ngroups)
 	}
 	if (!win_mbstowcs(szAccount, user, MAX_NAME)){
 		result = -EINVAL;
-	}else if (!win_getpwnam(szAccount, &pwEntry)){
+	}else if (!win_getpwnam(szAccount, win_acl_get_dc(szName), &pwEntry)){
 		result -= errno_posix(GetLastError());
 	}else if (!win_getgrouplist(&pwEntry, rid_win(&sid, group), &psGroups, &dwCount)){
 		result -= errno_posix(GetLastError());

@@ -348,6 +348,7 @@ typedef struct _WIN_MOUNT {
 	DWORD DeviceId;
 	DWORD Serial;
 	DWORD MaxPath;
+	WIN_FS_TYPE FSType;
 	LARGE_INTEGER Flags;
 	FILETIME Time;
 	WCHAR Volume[MAX_LABEL];
@@ -360,7 +361,6 @@ typedef struct _WIN_STATVFS {
 	DWORD MaxPath;
 	LARGE_INTEGER Flags;
 	DWORD DeviceId;
-	DWORD MountId;
 	DWORD SectorsPerCluster;
 	DWORD BytesPerSector;
 	DWORD FreeClusters;

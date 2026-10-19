@@ -96,7 +96,6 @@ drive_lookup(WIN_CFDATA *Config, DWORD Flags, WIN_STATVFS *Result)
 			bResult = FALSE;
 	}
 	win_wcscpy(Result->Path, Config->DosPath);
-	Result->MountId = MOUNTID(Config->DosPath[0]);
 	return(bResult);
 }
 BOOL 
