@@ -182,15 +182,13 @@ typedef struct _WIN_CAP_CONTROL {
  * win_stdlib.c
  */
 
-//#define MIN_BUFSIZE		1024
-
 #define WIN_MSGBUFSIZE		(4 * WIN_PAGE_SIZE)
 #define WIN_ATEXIT_MAX		32
 
 typedef VOID (*WIN_ATEXITPROC)(VOID);
 
 /*
- * win_sched.c
+ * proc_task.c
  */
 
 /* Init, svinit, sh, init.sh, systemd, upstart, openrc all can act as

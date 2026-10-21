@@ -138,7 +138,7 @@ pipe_F_GETPATH(HANDLE Handle, LPWSTR Buffer)
 	if (!NT_SUCCESS(ntStatus)){
 		WIN_ERR("pipe_F_GETPATH(%d): %s\n", Handle, nt_strerror(ntStatus));
 	}else if (puString->Length){
-		win_wcslcpy(Buffer, win_basename(puString->Buffer), MAX_NAME);
+		win_wcslcpy(Buffer, win_basename(puString->Buffer), MAX_GUID);
 		bResult = TRUE;
 	}
 	LocalFree(puString);

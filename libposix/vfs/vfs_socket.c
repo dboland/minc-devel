@@ -84,6 +84,25 @@ vfs_bind(WIN_TASK *Task, WIN_VNODE *Node, LPSOCKADDR Address, INT Length)
 	return(bResult);
 }
 BOOL 
+vfs_listen(WIN_VNODE *Node, INT Backlog)
+{
+	BOOL bResult = FALSE;
+
+	/* The listen() system call enables the accept() mechanism.
+	 */
+	switch (Node->FSType){
+		case FS_TYPE_WINSOCK:
+			bResult = ws2_listen(Node, Backlog);
+			break;
+		case FS_TYPE_PIPE:
+			bResult = pipe_listen(Node, Backlog);
+			break;
+		default:
+			WSASetLastError(WSAEPFNOSUPPORT);
+	}
+	return(bResult);
+}
+BOOL 
 vfs_accept(WIN_TASK *Task, WIN_VNODE *Node, LPSOCKADDR Address, LPINT Length, WIN_VNODE *Result)
 {
 	BOOL bResult = FALSE;
@@ -227,23 +246,6 @@ vfs_setsockopt(WIN_VNODE *Node, INT Level, INT Name, CONST CHAR *Value, INT Leng
 			break;
 		case FS_TYPE_PIPE:
 			bResult = pipe_setsockopt(Node, Level, Name, Value, Length);
-			break;
-		default:
-			WSASetLastError(WSAEPFNOSUPPORT);
-	}
-	return(bResult);
-}
-BOOL 
-vfs_listen(WIN_VNODE *Node, INT Backlog)
-{
-	BOOL bResult = FALSE;
-
-	switch (Node->FSType){
-		case FS_TYPE_WINSOCK:
-			bResult = ws2_listen(Node, Backlog);
-			break;
-		case FS_TYPE_PIPE:
-			bResult = pipe_listen(Node, Backlog);
 			break;
 		default:
 			WSASetLastError(WSAEPFNOSUPPORT);
