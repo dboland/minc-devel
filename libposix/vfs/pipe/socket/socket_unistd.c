@@ -42,9 +42,7 @@ sock_close(WIN_VNODE *Node)
 	 * we set it to signalled beforehand to let the other side know there
 	 * will be nothing to read (tcpdump.exe).
 	 */
-	if (Node->Handle == INVALID_HANDLE_VALUE){	/* socket not bound (init.exe) */
-		bResult = TRUE;
-	}else if (!SetEvent(Node->Event)){
+	if (!SetEvent(Node->Event)){
 		WIN_ERR("SetEvent(%d): %s\n", Node->Event, win_strerror(GetLastError()));
 	}else if (!CloseHandle(Node->Handle)){
 		WIN_ERR("sock_close(%d): %s\n", Node->Handle, win_strerror(GetLastError()));

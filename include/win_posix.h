@@ -54,7 +54,6 @@ BOOL win_isu8cont(UCHAR C);
 /* win_wchar.c */
 
 INT win_mbstowcs(LPWSTR Destination, LPCSTR Source, int Bufsize);
-//LPWSTR win_mbstowcp(LPWSTR Destination, LPCSTR Source, INT Bufsize);
 INT win_wcstombs(LPSTR Destination, LPCWSTR Source, int Bufsize);
 LPSTR win_wcstombp(LPSTR Destination, LPCWSTR Source, int Bufsize);
 LPWSTR win_wcscpy(LPWSTR Destination, LPCWSTR Source);
@@ -137,7 +136,6 @@ BOOL win_getgrouplist(WIN_PWENT *Passwd, SID8 *Primary, SID8 *Result[], DWORD *C
 
 HANDLE win_F_DUPFD(HANDLE Handle, DWORD Flags);
 HANDLE win_F_SETFD(HANDLE Handle, DWORD Info);
-LPWSTR win_F_GETPATH(HANDLE Handle, LPWSTR Buffer);
 ACCESS_MASK win_F_GETFL(HANDLE Handle);
 DWORD win_F_GETFD(HANDLE Handle);
 HANDLE win_F_DISINHERIT(HANDLE Handle, DWORD ProcessId);

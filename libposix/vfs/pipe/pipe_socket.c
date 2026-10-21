@@ -36,13 +36,16 @@ BOOL
 pipe_socket(INT Family, INT Type, INT Protocol, WIN_VNODE *Result)
 {
 	BOOL bResult = FALSE;
+	WCHAR szName[MAX_NAME];
+	DWORD dwAttribs = FILE_FLAG_OVERLAPPED | PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE;
 
-	Result->Handle = INVALID_HANDLE_VALUE;
-	Result->FSType = FS_TYPE_PIPE;
-	Result->FileType = WIN_VSOCK;
-	Result->DeviceType = DEV_CLASS_CPU;
-	Result->Access = GENERIC_READ + GENERIC_WRITE;
-	return(TRUE);
+	if (PipeCreateFile(VfsCreateName(szName), dwAttribs, __PipeEvent, Result)){
+		Result->FileType = WIN_VSOCK;
+		Result->DeviceType = __Mounts->DeviceType;
+		Result->DeviceId = __Mounts->DeviceId;
+		bResult = TRUE;
+	}
+	return(bResult);
 }
 BOOL 
 pipe_bind(WIN_TASK *Task, WIN_VNODE *Node, LPSOCKADDR Name, INT Length)
@@ -50,12 +53,9 @@ pipe_bind(WIN_TASK *Task, WIN_VNODE *Node, LPSOCKADDR Name, INT Length)
 	BOOL bResult = FALSE;
 	WIN_MODE wMode = {WIN_VSOCK, WIN_S_IRW, WIN_S_IRW, WIN_S_IRW, 0};
 	WCHAR szName[MAX_NAME];
-	DWORD dwAttribs = FILE_FLAG_OVERLAPPED | PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE;
 
-	if (!PipeCreateFile(VfsCreateName(szName), dwAttribs, __PipeEvent, Node)){
-		return(FALSE);
-	}else if (pipe_mknod(Task, (LPWSTR)Name->sa_data, &wMode, szName)){
-		bResult = TRUE;
+	if (pipe_F_GETPATH(Node->Handle, szName)){
+		bResult = pipe_mknod(Task, (LPWSTR)Name->sa_data, &wMode, szName);
 	}
 	return(bResult);
 }

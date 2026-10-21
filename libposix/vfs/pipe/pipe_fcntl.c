@@ -125,3 +125,22 @@ pipe_F_BIND(LPWSTR FileName, DWORD FileType, SECURITY_ATTRIBUTES *Attribs, LPWST
 	}
 	return(bResult);
 }
+BOOL 
+pipe_F_GETPATH(HANDLE Handle, LPWSTR Buffer)
+{
+	BOOL bResult = FALSE;
+	NTSTATUS ntStatus;
+	LPWSTR pszResult = NULL;
+	ULONG ulSize = MAX_PATH * sizeof(WCHAR);
+	PUNICODE_STRING puString = LocalAlloc(LMEM_FIXED, ulSize);
+
+	ntStatus = NtQueryObject(Handle, ObjectNameInformation, puString, ulSize, &ulSize);
+	if (!NT_SUCCESS(ntStatus)){
+		WIN_ERR("pipe_F_GETPATH(%d): %s\n", Handle, nt_strerror(ntStatus));
+	}else if (puString->Length){
+		win_wcslcpy(Buffer, win_basename(puString->Buffer), MAX_NAME);
+		bResult = TRUE;
+	}
+	LocalFree(puString);
+	return(bResult);
+}

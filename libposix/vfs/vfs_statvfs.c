@@ -45,7 +45,7 @@ vfs_statvfs(WIN_MOUNT *Mount, WIN_STATVFS *Result)
 			bResult = drive_statvfs(Mount, Result);
 			break;
 		default:
-			SetLastError(ERROR_BAD_DEVICE);
+			SetLastError(ERROR_BAD_FILE_TYPE);
 	}
 	return(bResult);
 }

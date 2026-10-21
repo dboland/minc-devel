@@ -82,26 +82,6 @@ win_F_GETFL(HANDLE Handle)
 	}
 	return(amResult);
 }
-LPWSTR 
-win_F_GETPATH(HANDLE Handle, LPWSTR Buffer)
-{
-	NTSTATUS ntStatus;
-	LPWSTR pszResult = NULL;
-	ULONG ulSize = MAX_PATH * sizeof(WCHAR);
-	PUNICODE_STRING puString = LocalAlloc(LMEM_FIXED, ulSize);
-
-	ntStatus = NtQueryObject(Handle, ObjectNameInformation, puString, ulSize, &ulSize);
-	if (!NT_SUCCESS(ntStatus)){
-		WIN_ERR("win_F_GETPATH(%d): %s\n", Handle, nt_strerror(ntStatus));
-	}else if (puString->Length){
-		win_wcslcpy(win_wcpcpy(Buffer, L"\\\\.\\GLOBALROOT"), puString->Buffer, ulSize);
-		pszResult = Buffer;
-	}else{
-		*Buffer = 0;
-	}
-	LocalFree(puString);
-	return(pszResult);
-}
 HANDLE 
 win_F_DISINHERIT(HANDLE Handle, DWORD ProcessId)
 {

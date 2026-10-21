@@ -86,8 +86,11 @@ ifmedia_posix(struct ifmediareq *req, MIB_IFROW *Adapter)
 		case IF_TYPE_IEEE80211:
 			req->ifm_current = ifmedia_IEEE80211(ulSpeed);
 			break;
-		default:
+		case IF_TYPE_SOFTWARE_LOOPBACK:
 			result = -EADDRNOTAVAIL;
+			break;
+		default:
+			result = -EOPNOTSUPP;
 	}
 	return(result);
 }
@@ -103,8 +106,11 @@ ifmcount_posix(struct ifmediareq *req, MIB_IFROW *Adapter)
 		case IF_TYPE_IEEE80211:
 			req->ifm_count = 1;
 			break;
-		default:
+		case IF_TYPE_SOFTWARE_LOOPBACK:
 			result = -EADDRNOTAVAIL;
+			break;
+		default:
+			result = -EOPNOTSUPP;
 	}
 	return(result);
 }
