@@ -48,7 +48,7 @@ SockPollError(WIN_VNODE *Node, DWORD Error)
 			break;
 		case ERROR_BAD_PIPE:		/* 230: The pipe state is invalid */
 			ConnectNamedPipe(Node->Handle, &ovl);
-			sResult = WIN_POLLRDBAND;
+			sResult = WIN_POLLRDBAND;	/* ready for accept() */
 			break;
 		default:
 			WIN_ERR("SockPollError(%d): %s\n", Node->Handle, win_strerror(Error));
@@ -66,8 +66,14 @@ sock_poll(WIN_VNODE *Node, WIN_POLLFD *Info, DWORD *Result)
 	SHORT sMask = Info->Events | WIN_POLLIGNORE;
 	DWORD dwAvail = 0;
 	DWORD dwRemain = 0;
+	DWORD dwAttribs = Node->Attribs;
 
-	if (!PeekNamedPipe(Node->Handle, NULL, 0, NULL, &dwAvail, &dwRemain)){
+	/* Unpaired (listening) socket needs to be opened non-blocking
+	 * (FILE_FLAG_OVERLAPPED) so polling won't block.
+	 */
+	if (!(dwAttribs & FILE_FLAG_OVERLAPPED)){
+		bResult = pipe_FIONBIO(Node, dwAttribs | FILE_FLAG_OVERLAPPED);
+	}else if (!PeekNamedPipe(Node->Handle, NULL, 0, NULL, &dwAvail, &dwRemain)){
 		sResult = SockPollError(Node, GetLastError());
 	}else if (dwAvail || dwRemain){
 		sResult |= WIN_POLLIN;

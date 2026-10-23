@@ -37,7 +37,6 @@ pipe_socket(INT Family, INT Type, INT Protocol, WIN_VNODE *Result)
 {
 	BOOL bResult = FALSE;
 	WCHAR szName[MAX_GUID];
-//	DWORD dwAttribs = FILE_FLAG_OVERLAPPED | PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE;
 	DWORD dwAttribs = PIPE_TYPE_BYTE | PIPE_READMODE_BYTE;
 
 	if (Type == SOCK_DGRAM){
@@ -83,13 +82,17 @@ pipe_connect(WIN_VNODE *Node, CONST LPSOCKADDR Name, INT Length)
 	return(bResult);
 }
 BOOL 
-pipe_socketpair(INT Domain, INT Mode, INT Protocol, WIN_VNODE Result[2])
+pipe_socketpair(INT Domain, INT Type, INT Protocol, WIN_VNODE Result[2])
 {
 	BOOL bResult = FALSE;
 	WCHAR szName[MAX_GUID];
 	HANDLE hEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+	DWORD dwAttribs = PIPE_TYPE_BYTE | PIPE_READMODE_BYTE;
 
-	if (!PipeCreateFile(VfsCreateName(szName), Mode, hEvent, &Result[0])){
+	if (Type == SOCK_DGRAM){
+		dwAttribs = PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE;
+	}
+	if (!PipeCreateFile(VfsCreateName(szName), dwAttribs, hEvent, &Result[0])){
 		return(FALSE);
 	}else if (PipeOpenFile(szName, hEvent, &Result[1])){
 		Result[0].FileType = WIN_VSOCK;

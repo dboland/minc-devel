@@ -49,8 +49,12 @@ int
 file_FIONBIO(WIN_VNODE *Node, int *mode)
 {
 	int result = 0;
+	DWORD dwAttribs = Node->Attribs & ~FILE_FLAG_OVERLAPPED;
 
-	if (!vfs_FIONBIO(Node, *mode)){
+	if (*mode){
+		dwAttribs |= FILE_FLAG_OVERLAPPED;
+	}
+	if (!vfs_FIONBIO(Node, dwAttribs)){
 		result -= errno_posix(GetLastError());
 	}
 	return(result);

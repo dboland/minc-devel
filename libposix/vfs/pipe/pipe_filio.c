@@ -45,3 +45,20 @@ pipe_FIONREAD(WIN_VNODE *Node, ULONG *Result)
 	}
 	return(bResult);
 }
+BOOL 
+pipe_FIONBIO(WIN_VNODE *Node, DWORD Attribs)
+{
+	BOOL bResult = FALSE;
+	ULONG ulMode = PIPE_WAIT;
+
+	if (Attribs & FILE_FLAG_OVERLAPPED){   		/* perl.exe (Configure) */
+		ulMode = PIPE_NOWAIT;
+	}
+	if (SetNamedPipeHandleState(Node->Handle, &ulMode, NULL, NULL)){
+		Node->Attribs = Attribs;
+		bResult = TRUE;
+	}else{
+		WIN_ERR("SetNamedPipeHandleState(%d): %s\n", Node->Handle, win_strerror(GetLastError()));
+	}
+	return(bResult);
+}

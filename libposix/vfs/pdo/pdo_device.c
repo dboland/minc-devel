@@ -72,6 +72,7 @@ pdo_attach(DWORD DeviceType)
 
 	while (sUnit < WIN_UNIT_MAX){
 		if (!pwDevice->Flags){
+			pwDevice->Flags = WIN_DVF_PDO_READY;
 			pwDevice->DeviceType = DeviceType;
 			pwDevice->DeviceId = sClass + sUnit;
 			if (!config_attach(pwDevice, sClass)){

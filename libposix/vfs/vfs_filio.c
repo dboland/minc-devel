@@ -53,16 +53,19 @@ vfs_FIONREAD(WIN_VNODE *Node, ULONG *Result)
 	return(bResult);
 }
 BOOL 
-vfs_FIONBIO(WIN_VNODE *Node, ULONG NoWait)
+vfs_FIONBIO(WIN_VNODE *Node, DWORD Attribs)
 {
 	BOOL bResult = FALSE;
 
 	switch (Node->FSType){
 		case FS_TYPE_WINSOCK:		/* lynx.exe */
-			bResult = ws2_FIONBIO(Node->Socket, NoWait);
+			bResult = ws2_FIONBIO(Node, Attribs);
 			break;
 		case FS_TYPE_CHAR:
-			bResult = char_FIONBIO(Node, NoWait);
+			bResult = char_FIONBIO(Node, Attribs);
+			break;
+		case FS_TYPE_PIPE:
+			bResult = pipe_FIONBIO(Node, Attribs);
 			break;
 		default:
 			SetLastError(ERROR_BAD_FILE_TYPE);

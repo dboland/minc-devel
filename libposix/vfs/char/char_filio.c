@@ -33,16 +33,6 @@
 /****************************************************/
 
 BOOL 
-char_FIONBIO(WIN_VNODE *Node, ULONG NoWait)
-{
-	if (NoWait){
-		Node->Attribs |= FILE_FLAG_OVERLAPPED;
-	}else{
-		Node->Attribs &= ~FILE_FLAG_OVERLAPPED;
-	}
-	return(TRUE);
-}
-BOOL 
 char_FIONREAD(WIN_VNODE *Node, ULONG *Result)
 {
 	ULONG ulResult = 0;
@@ -54,5 +44,11 @@ char_FIONREAD(WIN_VNODE *Node, ULONG *Result)
 		ulResult += strlen(__Input);
 	}
 	*Result = ulResult;
+	return(TRUE);
+}
+BOOL 
+char_FIONBIO(WIN_VNODE *Node, DWORD Attribs)
+{
+	Node->Attribs = Attribs;
 	return(TRUE);
 }

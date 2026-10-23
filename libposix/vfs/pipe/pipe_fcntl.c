@@ -33,28 +33,6 @@
 /****************************************************/
 
 BOOL 
-PipeSetFlags(WIN_VNODE *Node, WIN_FLAGS *Flags)
-{
-	BOOL bResult = FALSE;
-	DWORD dwMode = PIPE_WAIT;
-
-	if (Flags->Attribs & FILE_FLAG_OVERLAPPED){     /* perl.exe (Configure) */
-		dwMode = PIPE_NOWAIT;
-	}
-	if (!SetNamedPipeHandleState(Node->Handle, &dwMode, NULL, NULL)){
-		WIN_ERR("SetNamedPipeHandleState(%d): %s\n", Node->Handle, win_strerror(GetLastError()));
-	}else{
-		Node->Access = Flags->Access;
-		Node->Attribs = Flags->Attribs;
-		Node->CloseExec = Flags->CloseExec;
-		bResult = TRUE;
-	}
-	return(bResult);
-}
-
-/****************************************************/
-
-BOOL 
 pipe_F_DUPFD(WIN_VNODE *Node, HANDLE Process, DWORD Options, WIN_VNODE *Result)
 {
 	BOOL bResult = FALSE;
@@ -78,11 +56,8 @@ pipe_F_SETFL(WIN_VNODE *Node, WIN_FLAGS *Flags)
 {
 	BOOL bResult = FALSE;
 
-	if (!(Node->Access & FILE_WRITE_DATA)){
-		bResult = PipeSetFlags(Node, Flags);
-	}else{
+	if (pipe_FIONBIO(Node, Flags->Attribs)){
 		Node->Access = Flags->Access;
-		Node->Attribs = Flags->Attribs;
 		Node->CloseExec = Flags->CloseExec;
 		bResult = TRUE;
 	}

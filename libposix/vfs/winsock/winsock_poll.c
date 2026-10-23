@@ -66,24 +66,6 @@ WSAPollEvents(WIN_VNODE *Node, LONG Events)
 	}
 	return(sResult);
 }
-SHORT 
-WSAUnblock(WIN_VNODE *Node)
-{
-	SHORT sResult = WIN_POLLERR;
-
-	/* Some softwares set O_NONBLOCK after socket(), but few of them handle 
-	 * EINPROGRESS during connect() or bind() (curl.exe).
-	 * On the other hand, some softwares leave the socket blocking, but
-	 * select() or poll() anyway (wget.exe).
-	 */
-	if (SOCKET_ERROR == WSAEventSelect(Node->Socket, Node->Event, FD_ALL_EVENTS)){
-		WIN_ERR("WSAEventSelect(%d): %s\n", Node->Socket, win_strerror(WSAGetLastError()));
-	}else{
-		Node->Attribs |= FILE_FLAG_OVERLAPPED;
-		sResult = 0;
-	}
-	return(sResult);
-}
 
 /****************************************************/
 
@@ -95,9 +77,15 @@ ws2_poll(WIN_VNODE *Node, WIN_POLLFD *Info, DWORD *Result)
 	SHORT sMask = Info->Events | WIN_POLLIGNORE;
 	WSANETWORKEVENTS nwEvents = {0};
 	ULONG ulCount = 0;
+	DWORD dwAttribs = Node->Attribs;
 
-	if (!(Node->Attribs & FILE_FLAG_OVERLAPPED)){		/* wget.exe */
-		sResult = WSAUnblock(Node);
+	/* Some softwares set O_NONBLOCK after socket(), but few of them handle 
+	 * EINPROGRESS during connect() or bind() (curl.exe).
+	 * On the other hand, some softwares leave the socket blocking, but
+	 * select() or poll() anyway (wget.exe).
+	 */
+	if (!(dwAttribs & FILE_FLAG_OVERLAPPED)){		/* wget.exe */
+		bResult = ws2_FIONBIO(Node, dwAttribs | FILE_FLAG_OVERLAPPED);
 	}else if (SOCKET_ERROR == WSAEnumNetworkEvents(Node->Socket, Node->Event, &nwEvents)){
 		bResult = FALSE;
 	}else if (nwEvents.lNetworkEvents){

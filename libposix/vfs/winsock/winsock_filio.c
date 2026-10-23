@@ -45,14 +45,21 @@ ws2_FIONREAD(SOCKET Socket, ULONG *Result)
 	return(bResult);
 }
 BOOL 
-ws2_FIONBIO(SOCKET Socket, ULONG NoWait)
+ws2_FIONBIO(WIN_VNODE *Node, DWORD Attribs)
 {
 	BOOL bResult = FALSE;
+	LONG lEvents = 0;
+	HANDLE hEvent = NULL;
 
-	if (SOCKET_ERROR != ioctlsocket(Socket, FIONBIO, &NoWait)){
+	if (Attribs & FILE_FLAG_OVERLAPPED){
+		lEvents = FD_ALL_EVENTS;
+		hEvent = Node->Event;
+	}
+	if (SOCKET_ERROR == WSAEventSelect(Node->Socket, hEvent, lEvents)){
+		WIN_ERR("WSAEventSelect(%d): %s\n", Node->Socket, win_strerror(WSAGetLastError()));
+	}else{
+		Node->Attribs = Attribs;
 		bResult = TRUE;
-//	}else{			// lynx.exe
-//		WIN_ERR("ioctlsocket(FIONBIO): %s\n", win_strerror(WSAGetLastError()));
 	}
 	return(bResult);
 }

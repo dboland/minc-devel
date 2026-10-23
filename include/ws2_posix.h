@@ -41,7 +41,7 @@ BOOL vfs_recvfrom(WIN_VNODE *Node, LPSTR Buffer, UINT Size, DWORD Flags, LPSOCKA
 BOOL vfs_sendmsg(WIN_VNODE *Node, WSAMSG *Message, DWORD *Result);
 BOOL vfs_recvmsg(WIN_VNODE *Node, WSAMSG *Message, DWORD *Result);
 BOOL vfs_shutdown(WIN_VNODE *Node, INT How);
-BOOL vfs_socketpair(INT Family, DWORD Mode, INT Protocol, WIN_VNODE Result[2]);
+BOOL vfs_socketpair(INT Family, INT Type, INT Protocol, WIN_VNODE Result[2]);
 BOOL vfs_getsockopt(WIN_VNODE *Node, INT Level, INT Name, CHAR *Value, INT *Length);
 BOOL vfs_setsockopt(WIN_VNODE *Node, INT Level, INT Name, CONST CHAR *Value, INT Length);
 BOOL vfs_listen(WIN_VNODE *Node, INT Backlog);

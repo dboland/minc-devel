@@ -145,7 +145,7 @@ BOOL vfs_ktrace_CLEAR(WIN_TASK *Task);
 /* vfs_filio.c */
 
 BOOL vfs_FIONREAD(WIN_VNODE *Node, ULONG *Result);
-BOOL vfs_FIONBIO(WIN_VNODE *Node, ULONG NoWait);
+BOOL vfs_FIONBIO(WIN_VNODE *Node, DWORD Attribs);
 
 /* vfs_namei.c */
 

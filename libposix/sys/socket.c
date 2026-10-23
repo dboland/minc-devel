@@ -419,12 +419,8 @@ sys_socketpair(call_t call, int domain, int type, int protocol, int sv[2])
 	int result = 0;
 	WIN_VNODE vnResult[2] = {0};
 	WIN_TASK *pwTask = call.Task;
-	DWORD dwAttribs = PIPE_TYPE_BYTE | PIPE_READMODE_BYTE;
 
-	if (type == SOCK_DGRAM){
-		dwAttribs = PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE;
-	}
-	if (!vfs_socketpair(af_win(domain), dwAttribs, protocol, vnResult)){
+	if (!vfs_socketpair(af_win(domain), type, protocol, vnResult)){
 		result -= errno_posix(WSAGetLastError());
 	}else{
 		sv[0] = fd_posix(pwTask, &vnResult[0], 0);
