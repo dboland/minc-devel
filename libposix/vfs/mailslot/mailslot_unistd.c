@@ -76,7 +76,7 @@ mail_revoke(WIN_TTY *Terminal)
 			bResult = TRUE;
 			break;
 		case DEV_TYPE_PTY:
-			bResult = pty_revoke(Terminal, DEVICE(Terminal->DeviceId));
+			bResult = pty_revoke(DEVICE(Terminal->DeviceId), Terminal);
 			break;
 		default:
 			SetLastError(ERROR_BAD_DEVICE);

@@ -44,7 +44,7 @@ con_revoke(WIN_TTY *Terminal, WIN_DEVICE *Device)
 	}else{
 		ZeroMemory(Terminal, sizeof(WIN_TTY));
 		Device->FSType = FS_TYPE_PDO;
-		Device->Flags = 0;
+		Device->Flags = WIN_DVF_PDO_READY;
 		bResult = TRUE;
 	}
 	return(bResult);

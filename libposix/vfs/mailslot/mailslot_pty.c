@@ -78,7 +78,7 @@ pty_write(WIN_DEVICE *Device, LPCSTR Buffer, DWORD Size, DWORD *Result)
 	return(bResult);
 }
 BOOL 
-pty_revoke(WIN_TTY *Terminal, WIN_DEVICE *Device)
+pty_revoke(WIN_DEVICE *Device, WIN_TTY *Terminal)
 {
 	BOOL bResult = FALSE;
 
@@ -89,7 +89,7 @@ pty_revoke(WIN_TTY *Terminal, WIN_DEVICE *Device)
 	}else{
 		ZeroMemory(Terminal, sizeof(WIN_TTY));
 		Device->FSType = FS_TYPE_PDO;
-		Device->Flags = 0;
+		Device->Flags = WIN_DVF_PDO_READY;
 		bResult = TRUE;
 	}
 	return(bResult);

@@ -96,9 +96,9 @@ pipe_socketpair(INT Domain, INT Type, INT Protocol, WIN_VNODE Result[2])
 		return(FALSE);
 	}else if (PipeOpenFile(szName, hEvent, &Result[1])){
 		Result[0].FileType = WIN_VSOCK;
-		Result[0].DeviceType = DEV_CLASS_CPU;
+		Result[0].DeviceType = __Mounts->DeviceType;
 		Result[1].FileType = WIN_VSOCK;
-		Result[1].DeviceType = DEV_CLASS_CPU;
+		Result[1].DeviceType = __Mounts->DeviceType;
 		bResult = TRUE;
 	}
 	return(bResult);

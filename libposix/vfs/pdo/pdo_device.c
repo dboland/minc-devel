@@ -79,6 +79,9 @@ pdo_attach(DWORD DeviceType)
 				WIN_ERR("Warning: device 0x%x not configured\n", DeviceType);
 			}
 			break;
+		}else if (pwDevice->Flags == WIN_DVF_PDO_READY){
+			pwDevice->Flags |= WIN_DVF_ACTIVE;
+			break;
 		}
 		pwDevice++;
 		sUnit++;
