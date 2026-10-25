@@ -30,3 +30,4 @@
 
 #include "link_stat.c"
 #include "link_unistd.c"
+#include "link_fcntl.c"

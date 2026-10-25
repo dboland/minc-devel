@@ -50,31 +50,14 @@ disk_F_DUPFD(WIN_VNODE *Node, HANDLE Process, DWORD Options, WIN_VNODE *Result)
 BOOL 
 disk_F_NAMEI(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
 {
-	BOOL bResult = TRUE;
-	WCHAR szBuffer[MAX_PATH];
-	DWORD dwResult;
-	LPWSTR pszBase = Result->Resolved;
+	BOOL bResult = FALSE;
 
-	if (Flags & WIN_ISSYMLINK){
-		Result->Object = Handle;
-	}else if (!(Flags & WIN_FOLLOW)){
-		bResult = CloseHandle(Handle);
-	}else if (ReadFile(Handle, szBuffer, Result->Size, &dwResult, NULL)){
-		if (szBuffer[1] == ':'){
-			Result->MountId = MOUNTID(szBuffer[0]);	/* nano.exe */
-		}else if (szBuffer[1] == '\\'){
-			Result->MountId = 0;
-		}else{
-			pszBase = Result->Base;
-		}
-		Result->R = win_wcpcpy(pszBase, szBuffer);
-		Result->Base = Result->R;
-		Result->Last = Result->R - 1;
-		Result->Attribs = GetFileAttributesW(Result->Resolved);
-		Result->FileType = WIN_VREG;
-		bResult = CloseHandle(Handle);
-	}else{
-		bResult = FALSE;
+	switch (Result->FileType){
+		case WIN_VLNK:
+			bResult = link_F_NAMEI(Handle, Flags, Result);
+			break;
+		default:
+			bResult = TRUE;
 	}
 	return(bResult);
 }

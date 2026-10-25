@@ -80,14 +80,14 @@ PathCopy(WIN_NAMEIDATA *Path)
 	Path->R = R;
 }
 BOOL 
-PathGlob(WIN_NAMEIDATA *Path, DWORD Flags)
+PathGlob_OLD(WIN_NAMEIDATA *Path, DWORD Flags)
 {
 	BOOL bResult = TRUE;
 	DWORD dwAttribs = GetFileAttributesW(Path->Resolved);
 
 	Path->Attribs = dwAttribs;
 	if (dwAttribs == -1){
-		bResult = FALSE;
+		return(FALSE);
 	}else switch (FILE_CLASS(dwAttribs)){
 		case FILE_CLASS_INODE:
 			bResult = disk_namei(Path, Flags);
@@ -96,6 +96,33 @@ PathGlob(WIN_NAMEIDATA *Path, DWORD Flags)
 			bResult = drive_namei(Path, Flags);
 			break;
 		case FILE_CLASS_ROOT:
+			break;
+	}
+	return(bResult);
+}
+BOOL 
+PathGlob(WIN_NAMEIDATA *Path, DWORD Flags)
+{
+	BOOL bResult = TRUE;
+	DWORD dwAttribs = GetFileAttributesW(Path->Resolved);
+	HANDLE hResult = NULL;
+
+	Path->Attribs = dwAttribs;
+	if (dwAttribs == -1){
+		bResult = FALSE;
+	}else if (Path->MountId){
+		bResult = TRUE;
+	}else if (!vfs_F_NAMEI(Path, dwAttribs, Flags, &hResult)){
+		bResult = FALSE;
+	}else switch (Path->FSType){
+		case FS_TYPE_DISK:
+			bResult = disk_F_NAMEI(hResult, Flags, Path);
+			break;
+		case FS_TYPE_PIPE:
+			bResult = pipe_F_NAMEI(hResult, Flags, Path);
+			break;
+		case FS_TYPE_PDO:
+			bResult = pdo_F_NAMEI(hResult, Flags, Path);
 			break;
 	}
 	return(bResult);

@@ -110,8 +110,22 @@ VfsStatNode(WIN_NAMEIDATA *Path, DWORD Flags, HANDLE *Result)
 		*Result = hResult;
 		bResult = TRUE;
 	}else{
-//		WIN_ERR("VfsStatNode(%ls): %s\n", Path->Resolved, win_strerror(ERROR_BAD_ARGUMENTS));
+		WIN_ERR("VfsStatNode(%ls): %s\n", Path->Resolved, win_strerror(ERROR_BAD_ARGUMENTS));
 		CloseHandle(hResult);
+	}
+	return(bResult);
+}
+BOOL 
+VfsStatDrive(WIN_NAMEIDATA *Path, DWORD Flags)
+{
+	BOOL bResult = TRUE;
+	WCHAR szDrive[MAX_NAME];
+	LPWSTR pszDrive = win_drivename(szDrive, Path->Base);
+
+	Path->MountId = MOUNTID(Path->Base[0]);
+	if (!(Flags & WIN_NOCROSSMOUNT)){	/* vfs_unmount() */
+		Path->R = win_wcpcpy(Path->Resolved, pszDrive);
+		Path->Base = Path->R;
 	}
 	return(bResult);
 }

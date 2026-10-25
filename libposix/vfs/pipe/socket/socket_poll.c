@@ -44,11 +44,11 @@ SockPollError(WIN_VNODE *Node, DWORD Error)
 	switch (Error){
 		case ERROR_BROKEN_PIPE:		/* 109: The pipe has been ended (write end closed) */
 			DisconnectNamedPipe(Node->Handle);
-			sResult = WIN_POLLHUP;
+			sResult = WIN_POLLHUP;		/* FD_CLOSE */
 			break;
 		case ERROR_BAD_PIPE:		/* 230: The pipe state is invalid */
 			ConnectNamedPipe(Node->Handle, &ovl);
-			sResult = 0;
+			sResult = WIN_POLLWRBAND;	/* FD_CONNECT */
 			break;
 		default:
 			WIN_ERR("SockPollError(%d): %s\n", Node->Handle, win_strerror(Error));

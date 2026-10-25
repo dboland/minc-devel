@@ -175,6 +175,23 @@ vfs_F_OSFHANDLE(WIN_VNODE Nodes[], DWORD Index)
 	}
 	return(hResult);
 }
+BOOL 
+vfs_F_NAMEI(WIN_NAMEIDATA *Path, DWORD Attribs, DWORD Flags, HANDLE *Result)
+{
+	BOOL bResult = TRUE;
+
+	switch (FILE_CLASS(Attribs)){
+		case FILE_CLASS_INODE:
+			bResult = VfsStatNode(Path, Flags, Result);
+			break;
+		case FILE_CLASS_MOUNT:
+			bResult = VfsStatDrive(Path, Flags);
+			break;
+		case FILE_CLASS_ROOT:
+			break;
+	}
+	return(bResult);
+}
 
 /****************************************************/
 
