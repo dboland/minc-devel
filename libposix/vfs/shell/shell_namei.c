@@ -58,7 +58,7 @@ SHGlobLink(WIN_NAMEIDATA *Path, DWORD Flags)
 	}else if (Flags & WIN_FOLLOW){
 		bResult = shell_readlink(Path);
 	}else{
-		Path->FSType = FS_TYPE_SHELL;
+		Path->FileType = WIN_VLNK;
 	}
 	return(bResult);
 }

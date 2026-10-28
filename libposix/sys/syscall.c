@@ -151,7 +151,7 @@ shebang_win(WIN_TASK *Task, WIN_VNODE *Node, WIN_NAMEIDATA *Path, const char *fi
 	}else if (line[0] != '#' || line[1] != '!'){
 		SetLastError(ERROR_BAD_EXE_FORMAT);
 	}else if (argv_posix(line, MAXLINE, argv)){
-		Result = win_wcstombp(Result, path_win(&wPath, *token++, 0)->Resolved, WIN_PATH_MAX);
+		Result += win_wcstombs(Result, path_win(&wPath, *token++, 0)->Resolved, WIN_PATH_MAX);
 		while (*token){
 			Result = win_stpcpy(win_stpcpy(Result, " "), *token++);
 		}

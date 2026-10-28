@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Daniel Boland <dboland@xs4all.nl>.
+ * Copyright (c) 2026 Daniel Boland <dboland@xs4all.nl>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,10 +32,10 @@
 
 const GUID CLSID_ShellLink = {0x00021401, 0, 0, {0xc0, 0, 0, 0, 0, 0, 0, 0x46}};
 
-/**************************************************************/
+/****************************************************/
 
 BOOL 
-LinkReadTarget(HANDLE Handle, LPWSTR Buffer)
+SHReadLinkTarget(HANDLE Handle, LPWSTR Buffer)
 {
 	BOOL bResult = FALSE;
 	USHORT IDListSize;
@@ -54,16 +54,16 @@ LinkReadTarget(HANDLE Handle, LPWSTR Buffer)
 	return(bResult);
 }
 LPWSTR 
-LinkReadNetworkInfo(COMMON_NETWORK_RELATIVE_LINK *Info, LPWSTR Buffer)
+SHReadNetworkInfo(COMMON_NETWORK_RELATIVE_LINK *Info, LPWSTR Buffer)
 {
 	BYTE *Data = (BYTE *)Info;
-	LPWSTR psz;
+	LPWSTR psz = Buffer;
 
-	psz = win_mbstowcp(Buffer, &Data[Info->DeviceNameOffset], MAX_PATH);
+	psz += shell_mbstowcs(psz, &Data[Info->DeviceNameOffset], MAX_PATH);
 	return(win_wcpcpy(psz, L"\\"));
 }
 BOOL 
-LinkReadInfo(HANDLE Handle, LPWSTR Buffer)
+SHReadLinkInfo(HANDLE Handle, LPWSTR Buffer)
 {
 	BOOL bResult = TRUE;
 	LINK_INFO *Info;
@@ -77,22 +77,45 @@ LinkReadInfo(HANDLE Handle, LPWSTR Buffer)
 	Info = (LINK_INFO *)Data;
 	ReadFile(Handle, &Data[4], LinkInfoSize - 4, &dwResult, NULL);
 	if (Info->LinkInfoFlags & VolumeIDAndLocalBasePath){
-		win_mbstowcs(Buffer, &Data[Info->LocalBasePathOffset], MAX_PATH);
+		shell_mbstowcs(Buffer, &Data[Info->LocalBasePathOffset], MAX_PATH);
 	}else if (Info->LinkInfoFlags & CommonNetworkRelativeLinkAndPathSuffix){
-		psz = LinkReadNetworkInfo((PVOID)&Data[Info->CommonNetworkRelativeLinkOffset], Buffer);
-		win_mbstowcs(psz, &Data[Info->CommonPathSuffixOffset], MAX_PATH - 3);
+		psz = SHReadNetworkInfo((PVOID)&Data[Info->CommonNetworkRelativeLinkOffset], Buffer);
+		shell_mbstowcs(psz, &Data[Info->CommonPathSuffixOffset], MAX_PATH - 3);
 	}else{
-		SetLastError(ERROR_BAD_ARGUMENTS);
+		SetLastError(ERROR_BAD_FILE_TYPE);
 		bResult = FALSE;
 	}
 	LocalFree(Data);
+	return(bResult);
+}
+BOOL 
+SHReadLink(LPCWSTR Path, SHELL_LINK_HEADER *Header, LPWSTR Target)
+{
+	BOOL bResult = FALSE;
+	DWORD dwResult;
+	HANDLE hFile;
+
+	hFile = CreateFileW(Path, FILE_READ_DATA, FILE_SHARE_READ, 
+		NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile == INVALID_HANDLE_VALUE){
+		WIN_ERR("CreateFile(%ls): %s\n", Path, win_strerror(GetLastError()));
+	}else if (!ReadFile(hFile, Header, sizeof(SHELL_LINK_HEADER), &dwResult, NULL)){
+		WIN_ERR("ReadFile(%ls): %s\n", Path, win_strerror(GetLastError()));
+	}else if (!IsEqualGUID(&Header->LinkCLSID, &CLSID_ShellLink)){
+		SetLastError(ERROR_BAD_ARGUMENTS);
+	}else if (Header->LinkFlags & HasLinkTargetIDList){
+		bResult = SHReadLinkTarget(hFile, Target);
+	}else if (Header->LinkFlags & HasLinkInfo){
+		bResult = SHReadLinkInfo(hFile, Target);
+	}
+	NtClose(hFile);
 	return(bResult);
 }
 
 /**************************************************************/
 
 BOOL 
-LinkStatVolume(LPCWSTR Drive, LPWSTR Label, DWORD *Serial)
+SHStatVolume(LPCWSTR Drive, LPWSTR Label, DWORD *Serial)
 {
 	BOOL bResult = FALSE;
 	WCHAR szVolume[MAX_NAME];
@@ -109,7 +132,7 @@ LinkStatVolume(LPCWSTR Drive, LPWSTR Label, DWORD *Serial)
 	return(bResult);
 }
 VOID 
-LinkWriteTarget(HANDLE Handle, LPCWSTR Target)
+SHWriteLinkTarget(HANDLE Handle, LPCWSTR Target)
 {
 	USHORT IDListSize;
 	USHORT TerminalID = 0;
@@ -117,30 +140,32 @@ LinkWriteTarget(HANDLE Handle, LPCWSTR Target)
 	LPITEMIDLIST pidList;
 	UINT uiSize = 0;
 	DWORD dwResult;
+	NTSTATUS ntStatus;
 
 	/* Use type cast to get past incorrect declaration by MinGW.
 	 */
-	if (S_OK == SHParseDisplayName(Target, NULL, (LPITEMIDLIST)&pidList, sfgaof, &sfgaof)){
+	ntStatus = SHParseDisplayName(Target, NULL, (LPITEMIDLIST)&pidList, sfgaof, &sfgaof);
+	if (NT_SUCCESS(ntStatus)){
 		uiSize = ILGetSize(pidList);
 		IDListSize = uiSize + sizeof(USHORT);
 		WriteFile(Handle, &IDListSize, sizeof(USHORT), &dwResult, NULL);
 		WriteFile(Handle, pidList, uiSize, &dwResult, NULL);
 		WriteFile(Handle, &TerminalID, sizeof(USHORT), &dwResult, NULL);
 	}else{
-		WIN_ERR("SHParseDisplayName(%ls): %s\n", Target, win_strerror(GetLastError()));
+		WIN_ERR("SHParseDisplayName(%ls): %s\n", Target, nt_strerror(ntStatus));
 	}
 }
 VOLUME_ID *
-LinkWriteVolumeInfo(LPCWSTR Target)
+SHWriteVolumeInfo(LPCWSTR Target)
 {
 	VOLUME_ID *Info;
 	BYTE *Data;
-	WCHAR szDrive[MAX_NAME];
+	WCHAR szDrive[MAX_NAME] = L"";
 	DWORD dwSize = sizeof(VOLUME_ID);
 	WCHAR szLabel[MAX_LABEL] = L"";
 	DWORD dwSerial = 0;
 
-	LinkStatVolume(win_drivename(szDrive, Target), szLabel, &dwSerial);
+	SHStatVolume(win_drivename(szDrive, Target), szLabel, &dwSerial);
 	dwSize += wcslen(szLabel) + 1;
 	Data = LocalAlloc(LPTR, dwSize);
 	Info = (VOLUME_ID *)Data;
@@ -148,20 +173,21 @@ LinkWriteVolumeInfo(LPCWSTR Target)
 	Info->DriveType = GetDriveTypeW(szDrive);
 	Info->DriveSerialNumber = dwSerial;
 	Info->VolumeLabelOffset = sizeof(VOLUME_ID);
-	win_wcstombs(&Data[Info->VolumeLabelOffset], szLabel, MAX_NAME);
+	shell_wcstombs(&Data[Info->VolumeLabelOffset], szLabel, MAX_NAME);
 	return(Info);
 }
 COMMON_NETWORK_RELATIVE_LINK *
-LinkWriteNetworkInfo(LPCSTR NetName, LPCSTR DeviceName)
+SHWriteNetworkInfo(LPCSTR NetName, LPCSTR DeviceName)
 {
+	/* XXX see SHReadNetworkInfo() */
 }
 VOID 
-LinkWriteInfo(HANDLE Handle, LPCWSTR Target)
+SHWriteLinkInfo(HANDLE Handle, LPCWSTR Target)
 {
 	LINK_INFO lInfo = {0};
-	VOLUME_ID *pvInfo = LinkWriteVolumeInfo(Target);
+	VOLUME_ID *pvInfo = SHWriteVolumeInfo(Target);
 	CHAR szTarget[MAX_PATH];
-	DWORD dwSize = win_wcstombs(szTarget, Target, MAX_PATH);
+	DWORD dwSize = shell_wcstombs(szTarget, Target, MAX_PATH);
 	DWORD dwResult;
 
 	lInfo.LinkInfoSize = sizeof(LINK_INFO) + pvInfo->VolumeIDSize + dwSize + 1;
@@ -174,53 +200,38 @@ LinkWriteInfo(HANDLE Handle, LPCWSTR Target)
 	WriteFile(Handle, szTarget, dwSize + 1, &dwResult, NULL);
 	LocalFree(pvInfo);
 }
-
-/**************************************************************/
-
 BOOL 
-win_chroot(LPCWSTR Path)
+SHGlobHeader(LPCWSTR Target, SHELL_LINK_HEADER *Result)
 {
-	BOOL bResult = FALSE;
-	WCHAR szPath[MAX_PATH];
+	BOOL bResult = TRUE;
+	WIN32_FILE_ATTRIBUTE_DATA faData;
+	FILETIME ftNow;
 
-	if (!win_realpath(Path, MAX_PATH, szPath)){
-		return(FALSE);
-	}else if (!SetCurrentDirectoryW(szPath)){
-		WIN_ERR("SetCurrentDirectory(%ls): %s\n", szPath, win_strerror(GetLastError()));
+	if (GetFileAttributesExW(Target, GetFileExInfoStandard, &faData)){
+		Result->FileAttributes = faData.dwFileAttributes;
+		Result->CreationTime = faData.ftCreationTime;
+		Result->AccessTime = faData.ftLastAccessTime;
+		Result->WriteTime = faData.ftLastWriteTime;
+		Result->FileSize = faData.nFileSizeLow;
+	}else if (ERROR_PATH_NOT_FOUND == GetLastError()){
+		GetSystemTimeAsFileTime(&ftNow);
+		Result->FileAttributes = FILE_ATTRIBUTE_ARCHIVE;
+		Result->CreationTime = ftNow;
+		Result->AccessTime = ftNow;
+		Result->WriteTime = ftNow;
+		Result->FileSize = 4096;
 	}else{
-		bResult = TRUE;
+		bResult = FALSE;
+		WIN_ERR("GetFileAttributesEx(%ls): %s\n", Target, win_strerror(GetLastError()));
 	}
-}
-BOOL 
-win_readlink(LPCWSTR Path, SHELL_LINK_HEADER *Header, LPWSTR Target)
-{
-	BOOL bResult = FALSE;
-	DWORD dwResult;
-	HANDLE hFile;
-
-	hFile = CreateFileW(Path, FILE_READ_DATA, FILE_SHARE_READ, 
-		NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (hFile == INVALID_HANDLE_VALUE){
-		WIN_ERR("CreateFile(%ls): %s\n", Path, win_strerror(GetLastError()));
-	}else if (!ReadFile(hFile, Header, sizeof(SHELL_LINK_HEADER), &dwResult, NULL)){
-		WIN_ERR("ReadFile(%ls): %s\n", Path, win_strerror(GetLastError()));
-	}else if (!IsEqualGUID(&Header->LinkCLSID, &CLSID_ShellLink)){
-		SetLastError(ERROR_BAD_ARGUMENTS);
-	}else if (Header->LinkFlags & HasLinkTargetIDList){
-		bResult = LinkReadTarget(hFile, Target);
-	}else if (Header->LinkFlags & HasLinkInfo){
-		bResult = LinkReadInfo(hFile, Target);
-	}
-	NtClose(hFile);
 	return(bResult);
 }
 BOOL 
-win_symlink(LPCWSTR Path, LPCWSTR Target)
+SHWriteLink(LPCWSTR Path, DWORD LinkFlags, LPCWSTR Target)
 {
 	BOOL bResult = FALSE;
 	HANDLE hFile;
 	DWORD TerminalBlock = 0;
-	WIN32_FILE_ATTRIBUTE_DATA faData;
 	SHELL_LINK_HEADER slHeader = {0};
 	DWORD dwResult;
 
@@ -228,22 +239,20 @@ win_symlink(LPCWSTR Path, LPCWSTR Target)
 		NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE){
 		return(FALSE);
-	}else if (GetFileAttributesExW(Target, GetFileExInfoStandard, &faData)){
+	}else if (SHGlobHeader(Target, &slHeader)){
 		slHeader.HeaderSize = sizeof(SHELL_LINK_HEADER);
 		slHeader.LinkCLSID = CLSID_ShellLink;
-		slHeader.LinkFlags = HasLinkInfo | HasLinkTargetIDList;
-		slHeader.FileAttributes = faData.dwFileAttributes;
-		slHeader.CreationTime = faData.ftCreationTime;
-		slHeader.AccessTime = faData.ftLastAccessTime;
-		slHeader.WriteTime = faData.ftLastWriteTime;
-		slHeader.FileSize = faData.nFileSizeLow;
+		slHeader.LinkFlags = LinkFlags;
 		WriteFile(hFile, &slHeader, sizeof(SHELL_LINK_HEADER), &dwResult, NULL);
-		LinkWriteTarget(hFile, Target);
-		LinkWriteInfo(hFile, Target);
+		if (LinkFlags & HasLinkTargetIDList){
+			SHWriteLinkTarget(hFile, Target);
+		}
+		if (LinkFlags & HasLinkInfo){
+			SHWriteLinkInfo(hFile, Target);
+		}
 		WriteFile(hFile, &TerminalBlock, sizeof(DWORD), &dwResult, NULL);
-		bResult = CloseHandle(hFile);
-	}else{
-		WIN_ERR("GetFileAttributesEx(%ls): %s\n", Target, win_strerror(GetLastError()));
+		bResult = TRUE;
 	}
+	NtClose(hFile);
 	return(bResult);
 }

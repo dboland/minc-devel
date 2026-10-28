@@ -86,17 +86,13 @@ DiskGetEntity(WIN32_FIND_DATAW *Data, WIN_NAMEIDATA *Path, PVOID Buffer, DWORD *
 	WIN_DIRENT *pdInfo = Buffer;
 	LPWSTR pszType = win_typename(Data->cFileName);
 	DWORD dwRecSize, dwNameSize;
+	WIN_VTYPE vType = WIN_VREG;
 
 	if (dwAttribs & FILE_ATTRIBUTE_DIRECTORY){
-		Path->FileType = WIN_VDIR;
+		vType = WIN_VDIR;
 	}else if (!wcscmp(pszType, L".lnk")){
-		Path->FileType = WIN_VLNK;
-		Path->FSType = FS_TYPE_SHELL;
+		vType = WIN_VLNK;
 		*pszType = 0;			/* chop off extension */
-	}else if (FILE_CLASS_INODE == FILE_CLASS(dwAttribs)){
-		Path->FileType = WIN_VNON;
-	}else{
-		Path->FileType = WIN_VREG;
 	}
 	dwNameSize = win_wcstombs(pdInfo->FileName, Data->cFileName, WIN_MAXNAMLEN);
 	dwRecSize = DIRENT_RECSIZE(dwNameSize);
@@ -104,7 +100,7 @@ DiskGetEntity(WIN32_FIND_DATAW *Data, WIN_NAMEIDATA *Path, PVOID Buffer, DWORD *
 	pdInfo->Offset = (DWORDLONG)dwRecSize;
 	pdInfo->RecSize = dwRecSize;
 	pdInfo->NameSize = dwNameSize;
-	pdInfo->FileType = __DTYPE_POSIX[Path->FileType];
+	pdInfo->FileType = __DTYPE_POSIX[vType];
 	*Result = dwRecSize;
 	return(bResult);
 }

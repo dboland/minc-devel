@@ -30,6 +30,28 @@
 
 #include "pdo_types.h"
 
+/* These are hard-coded on disk. Used for identifying symlinks,
+ * devices and sockets. Don't change them.
+ */
+typedef enum _WIN_FS_TYPE {
+	FS_TYPE_UNKNOWN,
+	FS_TYPE_DISK,
+	FS_TYPE_CHAR,
+	FS_TYPE_PIPE,
+	FS_TYPE_MAILSLOT,
+	FS_TYPE_PDO,
+	FS_TYPE_DRIVE,
+	FS_TYPE_PROCESS,
+	FS_TYPE_WINSOCK,
+	FS_TYPE_REGISTRY,
+	FS_TYPE_VOLUME,
+	FS_TYPE_NPF,
+	FS_TYPE_LINK,
+	FS_TYPE_NDIS,
+	FS_TYPE_SHELL,
+	FS_TYPE_MAX
+} WIN_FS_TYPE;
+
 typedef enum _WIN_VTYPE {
 	WIN_VNON,
 	WIN_VREG,
@@ -102,33 +124,11 @@ typedef struct _WIN_INODE {
 	DWORD Magic;		/* file signature */
 	DWORD DeviceId;		/* in kernelland, everything is a device */
 	WIN_VTYPE FileType;	/* in userland, everything is a file */
-	DWORD FSType;		/* See below */
+	WIN_FS_TYPE FSType;
 	DWORD NameSize;
 	DWORD Reserved1;
 	DWORD Reserved2;
 } WIN_INODE;
-
-/* These are hard-coded on disk. Used for identifying symlinks,
- * devices and sockets. Don't change them.
- */
-typedef enum _WIN_FS_TYPE {
-	FS_TYPE_UNKNOWN,
-	FS_TYPE_DISK,
-	FS_TYPE_CHAR,
-	FS_TYPE_PIPE,
-	FS_TYPE_MAILSLOT,
-	FS_TYPE_PDO,
-	FS_TYPE_DRIVE,
-	FS_TYPE_PROCESS,
-	FS_TYPE_WINSOCK,
-	FS_TYPE_REGISTRY,
-	FS_TYPE_VOLUME,
-	FS_TYPE_NPF,
-	FS_TYPE_LINK,
-	FS_TYPE_NDIS,
-	FS_TYPE_SHELL,
-	FS_TYPE_MAX
-} WIN_FS_TYPE;
 
 #define INAMESIZE(wcs)		((wcslen(wcs) + 1) * sizeof(WCHAR))
 

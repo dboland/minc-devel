@@ -147,9 +147,9 @@ PathClose(WIN_NAMEIDATA *Path, DWORD Flags)
 	}else if (SHGlobType(L".exe", Path)){
 		Path->FileType = WIN_VREG;
 	}else if (SHGlobLink(Path, Flags)){
-		Path->FileType = WIN_VLNK;
+		Path->FSType = FS_TYPE_SHELL;
 //	}else{
-//		vfs_ktrace("PathClose", STRUCT_NAMEI, Path);
+//		vfs_ktrace(L"PathClose", STRUCT_NAMEI, Path);
 	}
 	Path->Last = Path->R - 1;
 }

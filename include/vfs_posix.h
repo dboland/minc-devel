@@ -236,6 +236,7 @@ BOOL rand_read(LPSTR Buffer, DWORD Size, DWORD *Result);
 
 BOOL shell_execve(LPSTR Command, LPCSTR Path, STARTUPINFO *Info);
 BOOL shell_statfs(WIN_CFDATA *Config, WIN_STATVFS *Result);
+BOOL shell_chroot(LPCWSTR Path);
 
 /* char.c */
 

@@ -33,6 +33,20 @@
 /****************************************************/
 
 BOOL 
+shell_chroot(LPCWSTR Path)
+{
+	BOOL bResult = FALSE;
+	WCHAR szPath[MAX_PATH];
+
+	if (!win_realpath(Path, MAX_PATH, szPath)){
+		return(FALSE);
+	}else if (!SetCurrentDirectoryW(szPath)){
+		WIN_ERR("SetCurrentDirectory(%ls): %s\n", szPath, win_strerror(GetLastError()));
+	}else{
+		bResult = TRUE;
+	}
+}
+BOOL 
 shell_rename(WIN_NAMEIDATA *Path, WIN_NAMEIDATA *Result)
 {
 	BOOL bResult = FALSE;
@@ -59,14 +73,29 @@ shell_readlink(WIN_NAMEIDATA *Path)
 	SHELL_LINK_HEADER slHead;
 	WCHAR szBuffer[MAX_PATH];
 
-	if (win_readlink(Path->Resolved, &slHead, szBuffer)){
+	if (SHReadLink(Path->Resolved, &slHead, szBuffer)){
+		Path->MountId = 0;
 		if (szBuffer[1] == ':'){
 			Path->MountId = MOUNTID(szBuffer[0]);
 		}
 		Path->R = win_wcpcpy(Path->Resolved, szBuffer);
+		Path->Base = win_basename(Path->Resolved);
 		Path->Last = Path->R - 1;
 		Path->FSType = FS_TYPE_DISK;
-		Path->Attribs = slHead.FileAttributes;
+		Path->FileType = WIN_VREG;
+		Path->Attribs = GetFileAttributesW(szBuffer);
+//vfs_ktrace(L"shell_readlink", STRUCT_NAMEI, Path);
+		bResult = TRUE;
+	}
+	return(bResult);
+}
+BOOL 
+shell_symlink(WIN_NAMEIDATA *Path, WIN_NAMEIDATA *Target)
+{
+	BOOL bResult = FALSE;
+
+	win_wcscpy(Path->R, L".lnk");
+	if (SHWriteLink(Path->Resolved, HasLinkInfo, Target->Resolved)){
 		bResult = TRUE;
 	}
 	return(bResult);

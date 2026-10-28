@@ -102,7 +102,6 @@ LARGE_INTEGER	*__Frequency;
 #include "win_acl.c"
 #include "win_pwd.c"
 #include "win_fcntl.c"
-#include "win_unistd.c"
 #include "win_grp.c"
 #include "win_mman.c"
 #include "win_uio.c"
@@ -117,7 +116,7 @@ VOID
 win_init(WIN_GLOBALS *Globals, HINSTANCE Instance)
 {
 	SYSTEM_INFO sInfo;
-	CHAR szRoot[MAX_PATH];
+	CHAR szRoot[MAX_PATH] = "";
 	LPSTR psz;
 	DWORD dwSize;
 

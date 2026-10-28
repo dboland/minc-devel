@@ -68,6 +68,9 @@ win_volname(LPWSTR Result, LPCWSTR FileName)
 	LPWSTR R = Result;
 	WCHAR C;
 
+	if (!FileName){
+		return(NULL);
+	}
 	while (C = *FileName++){
 		*R++ = C;
 		if (C == ':'){
@@ -84,6 +87,9 @@ win_drivename(LPWSTR Result, LPCWSTR FileName)
 	LPWSTR R = Result;
 	WCHAR C;
 
+	if (FileName[0] == '.'){
+		return(NULL);
+	}
 	while (C = *FileName++){
 		if (C == ':'){
 			break;

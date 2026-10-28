@@ -55,7 +55,6 @@ BOOL win_isu8cont(UCHAR C);
 
 INT win_mbstowcs(LPWSTR Destination, LPCSTR Source, int Bufsize);
 INT win_wcstombs(LPSTR Destination, LPCWSTR Source, int Bufsize);
-LPSTR win_wcstombp(LPSTR Destination, LPCWSTR Source, int Bufsize);
 LPWSTR win_wcscpy(LPWSTR Destination, LPCWSTR Source);
 LPWSTR win_wcpcpy(LPWSTR Destination, LPCWSTR Source);
 LPWSTR win_wcscat(LPWSTR Destination, LPCWSTR Source);
@@ -164,12 +163,6 @@ HMODULE win_dlopen(LPCWSTR FileName);
 BOOL win_dlclose(HMODULE Module);
 FARPROC win_dlsym(HMODULE Module, LPCSTR ProcName);
 BOOL win_dladdr(LPCVOID Address, MEMORY_BASIC_INFORMATION *Info, LPWSTR FileName);
-
-/* win_unistd.c */
-
-BOOL win_readlink(LPCWSTR Path, SHELL_LINK_HEADER *Header, LPWSTR Target);
-BOOL win_symlink(LPCWSTR Path, LPCWSTR Target);
-BOOL win_chroot(LPCWSTR Path);
 
 /* win_ldt.c */
 

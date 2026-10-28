@@ -50,10 +50,10 @@ GrpLookupNTAuth(WIN_GRENT *Group)
 		SetLastError(naStatus);
 		bResult = FALSE;
 	}else if (dwCount--){
-		pszMembers = win_wcstombp(pszMembers, lgmInfo[dwCount].lgrmi1_name, MAX_NAME);
+		pszMembers += win_wcstombs(pszMembers, lgmInfo[dwCount].lgrmi1_name, MAX_NAME);
 		while (dwCount--){
 			pszMembers = win_stpcpy(pszMembers, ",");
-			pszMembers = win_wcstombp(pszMembers, lgmInfo[dwCount].lgrmi1_name, MAX_NAME);
+			pszMembers += win_wcstombs(pszMembers, lgmInfo[dwCount].lgrmi1_name, MAX_NAME);
 		}
 		NetApiBufferFree(lgmInfo);
 	}

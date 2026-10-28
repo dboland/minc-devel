@@ -199,3 +199,22 @@ disk_readlink(WIN_NAMEIDATA *Path)
 	}
 	return(bResult);
 }
+BOOL 
+disk_symlink(WIN_NAMEIDATA *Path, WIN_MODE *Mode, WIN_NAMEIDATA *Target)
+{
+	BOOL bResult = FALSE;
+	SECURITY_DESCRIPTOR sd;
+	WIN_ACL_CONTROL wControl = {Path->Owner, Path->Group, NULL, NULL};
+	SECURITY_ATTRIBUTES sa = {sizeof(sa), &sd, FALSE};
+	WCHAR szDirName[WIN_PATH_MAX];
+
+	if (!win_acl_get_file(vfs_dirname(szDirName, Path->Resolved), &wControl.Source)){
+		return(FALSE);
+	}else if (!vfs_acl_init(&wControl, Path->MountId, Mode->Special, &sd)){
+		WIN_ERR("vfs_acl_init(%ls): %s\n", szDirName, win_strerror(GetLastError()));
+	}else if (vfs_acl_create(&wControl, Mode, 0, &sd)){
+		bResult = disk_F_BIND(Path->Resolved, WIN_VLNK, &sa, Target->Resolved);
+	}
+	vfs_acl_free(&wControl);
+	return(bResult);
+}

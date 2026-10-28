@@ -62,8 +62,8 @@ diskconf(char *root)
 {
 	/* Configure root/swap devices
 	 */
-	win_chroot(__Globals->Root);
-	win_wcstombs(root, __Globals->Root, MAX_PATH);
+	shell_chroot(__Globals->Root);
+	shell_wcstombs(root, __Globals->Root, MAX_PATH);
 }
 void 
 consinit(void)

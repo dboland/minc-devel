@@ -41,14 +41,6 @@ win_mbstowcs(LPWSTR Destination, LPCSTR Source, INT Size)
 	iResult = MultiByteToWideChar(CP_UTF8, 0, Source, -1, Destination, Size);
 	return(iResult - 1);
 }
-LPWSTR 
-win_mbstowcp(LPWSTR Destination, LPCSTR Source, INT Size)
-{
-	INT iResult;
-
-	iResult = MultiByteToWideChar(CP_UTF8, 0, Source, -1, Destination, Size);
-	return(Destination + iResult - 1);
-}
 INT 
 win_wcstombs(LPSTR Destination, LPCWSTR Source, INT Size)
 {
@@ -57,14 +49,6 @@ win_wcstombs(LPSTR Destination, LPCWSTR Source, INT Size)
 	if (!Destination) Size = 0;
 	iResult = WideCharToMultiByte(CP_UTF8, 0, Source, -1, Destination, Size, NULL, NULL);
 	return(iResult - 1);
-}
-LPSTR 
-win_wcstombp(LPSTR Destination, LPCWSTR Source, INT Size)
-{
-	INT iResult;
-
-	iResult = WideCharToMultiByte(CP_UTF8, 0, Source, -1, Destination, Size, NULL, NULL);
-	return(Destination + iResult - 1);
 }
 LPWSTR 
 win_wcscpy(LPWSTR Destination, LPCWSTR Source)

@@ -77,15 +77,18 @@ printf: ${UBINSRC}/printf/printf.c
 	@echo -n "$@ "
 	@${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $<
 
-# In Windows, "install", "setup" and "patch" seem to be reserved 
+# In Windows, "install", "setup" and "update" seem to be reserved 
 # words. When executed with such name, Vista checks if user is
 # elevated, yields ERROR_ELEVATION_REQUIRED if not. XP just slows
 # down execution to a crawl.
 # see: https://irq5.io/2011/06/26/gnu-patch-and-windows-uac/
 
-xinstall: ${UBINSRC}/xinstall/xinstall.c
+xinstall.o: xinstall.rc
+	windres -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@
+
+xinstall: ${UBINSRC}/xinstall/xinstall.c xinstall.o
 	@echo -n "$@ "
-	@${XGCC} -s -static ${CFLAGS} -DNOPIE -I${UBINSRC}/xinstall -o $@ $<
+	${XGCC} -s -static ${CFLAGS} -DNOPIE -I${UBINSRC}/xinstall -o $@ $^
 
 du: ${UBINSRC}/du/du.c
 	@echo -n "$@ "
@@ -104,18 +107,18 @@ install-local:
 	@/bin/mkdir -p ${BINDIR}
 	/bin/cp -vu ${PROGS} ${BINDIR}/
 	/bin/cp -vu xinstall ${BINDIR}/install
-	/bin/cp -vu manifest ${BINDIR}/install.exe.manifest
+	@#/bin/cp -vu manifest ${BINDIR}/install.exe.manifest
 
 install: ${DESTDIR} ${OBJECTS} xinstall
 	@${MKDIR} -p ${DESTDIR}${UBINDIR}
 	${INSTALL} -m ${BINMODE} ${OBJECTS} ${DESTDIR}${UBINDIR}/
 	${INSTALL} -m ${BINMODE} xinstall ${DESTDIR}${UBINDIR}/install
-	${INSTALL} -m ${NONBINMODE} manifest ${DESTDIR}${UBINDIR}/install.manifest
+	@#${INSTALL} -m ${NONBINMODE} manifest ${DESTDIR}${UBINDIR}/install.manifest
 	${INSTALL} -m ${NONBINMODE} manifest ${DESTDIR}${UBINDIR}/patch.manifest
 	@${MAKE} -C make install
 	@${MAKE} -C kdump install
 
 clean:
-	/bin/rm -f *.exe *.o
+	/bin/rm -f *.exe *.o *.res
 	${MAKE} -C make clean
 	${MAKE} -C kdump clean

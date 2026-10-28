@@ -41,3 +41,12 @@ shell_wcstombs(LPSTR Destination, LPCWSTR Source, INT Size)
 	iResult = WideCharToMultiByte(GetACP(), 0, Source, -1, Destination, Size, NULL, NULL);
 	return(iResult - 1);
 }
+INT 
+shell_mbstowcs(LPWSTR Destination, LPCSTR Source, INT Size)
+{
+	INT iResult;
+
+	if (!Destination) Size = 0;
+	iResult = MultiByteToWideChar(GetACP(), 0, Source, -1, Destination, Size);
+	return(iResult - 1);
+}
