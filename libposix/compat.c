@@ -39,9 +39,9 @@ runcmd(char *argv[])
 	WIN_VNODE *Nodes = pwTask->Node;
 	STARTUPINFO si = {0};
 
-	si.hStdInput = vfs_F_OSFHANDLE(Nodes, 0);
-	si.hStdOutput = vfs_F_OSFHANDLE(Nodes, 1);
-	si.hStdError = vfs_F_OSFHANDLE(Nodes, 2);
+	si.hStdInput = vfs_F_GETOSFHANDLE(Nodes, 0);
+	si.hStdOutput = vfs_F_GETOSFHANDLE(Nodes, 1);
+	si.hStdError = vfs_F_GETOSFHANDLE(Nodes, 2);
 	shell_wcstombs(szPath, __Strings[pwTask->TaskId].Path, PATH_MAX);
 	if (!shell_execve(argv_win(pwTask, *argv, argv), szPath, &si)){
 		result -= errno_posix(GetLastError());

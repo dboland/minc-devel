@@ -83,8 +83,11 @@ VfsStatFile(LPCWSTR FileName, DWORD Attribs, WIN_VATTR *Result)
 	}
 	return(bResult);
 }
+
+/****************************************************/
+
 BOOL 
-VfsStatNode(WIN_NAMEIDATA *Path, DWORD Flags, HANDLE *Result)
+VfsGlobNode(WIN_NAMEIDATA *Path, DWORD Flags, HANDLE *Result)
 {
 	BOOL bResult = FALSE;
 	DWORD dwSize;
@@ -101,7 +104,7 @@ VfsStatNode(WIN_NAMEIDATA *Path, DWORD Flags, HANDLE *Result)
 	if (hResult == INVALID_HANDLE_VALUE){
 		return(FALSE);
 	}else if (!ReadFile(hResult, &iNode, sizeof(WIN_INODE), &dwSize, NULL)){
-		WIN_ERR("VfsStatNode(%ls): %s\n", Path->Resolved, win_strerror(GetLastError()));
+		WIN_ERR("ReadFile(%ls): %s\n", Path->Resolved, win_strerror(GetLastError()));
 	}else if (iNode.Magic == TypeNameVirtual){
 		Path->DeviceId = iNode.DeviceId;
 		Path->FileType = iNode.FileType;
@@ -115,7 +118,7 @@ VfsStatNode(WIN_NAMEIDATA *Path, DWORD Flags, HANDLE *Result)
 	return(bResult);
 }
 BOOL 
-VfsStatDrive(WIN_NAMEIDATA *Path, DWORD Flags)
+VfsGlobDrive(WIN_NAMEIDATA *Path, DWORD Flags)
 {
 	BOOL bResult = TRUE;
 	WCHAR szDrive[MAX_NAME];
@@ -125,6 +128,25 @@ VfsStatDrive(WIN_NAMEIDATA *Path, DWORD Flags)
 	if (!(Flags & WIN_NOCROSSMOUNT)){	/* vfs_unmount() */
 		Path->R = win_wcpcpy(Path->Resolved, pszDrive);
 		Path->Base = Path->R;
+	}
+	return(bResult);
+}
+BOOL 
+VfsGlobClass(WIN_NAMEIDATA *Path, DWORD Flags, HANDLE *Result)
+{
+	BOOL bResult = TRUE;
+
+	if (Path->Attribs == -1){
+		bResult = FALSE;
+	}else switch (FILE_CLASS(Path->Attribs)){
+		case FILE_CLASS_INODE:
+			bResult = VfsGlobNode(Path, Flags, Result);
+			break;
+		case FILE_CLASS_MOUNT:
+			bResult = VfsGlobDrive(Path, Flags);
+			break;
+		case FILE_CLASS_ROOT:
+			break;
 	}
 	return(bResult);
 }

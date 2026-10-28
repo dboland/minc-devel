@@ -80,23 +80,19 @@ PathCopy(WIN_NAMEIDATA *Path)
 	Path->R = R;
 }
 BOOL 
-PathGlob_OLD(WIN_NAMEIDATA *Path, DWORD Flags)
+PathGlobLink(WIN_NAMEIDATA *Path, DWORD Flags)
 {
 	BOOL bResult = TRUE;
-	DWORD dwAttribs = GetFileAttributesW(Path->Resolved);
 
-	Path->Attribs = dwAttribs;
-	if (dwAttribs == -1){
-		return(FALSE);
-	}else switch (FILE_CLASS(dwAttribs)){
-		case FILE_CLASS_INODE:
-			bResult = disk_namei(Path, Flags);
-			break;
-		case FILE_CLASS_MOUNT:
-			bResult = drive_namei(Path, Flags);
-			break;
-		case FILE_CLASS_ROOT:
-			break;
+	if (Path->Attribs != -1){
+		return(TRUE);
+	}else if (!SHGlobType(L".lnk", Path)){
+		bResult = FALSE;
+	}else if (Flags & WIN_FOLLOW){
+		bResult = shell_readlink(Path);
+	}else{
+		Path->FSType = FS_TYPE_SHELL;
+		Path->FileType = WIN_VLNK;
 	}
 	return(bResult);
 }
@@ -104,25 +100,23 @@ BOOL
 PathGlob(WIN_NAMEIDATA *Path, DWORD Flags)
 {
 	BOOL bResult = TRUE;
-	DWORD dwAttribs = GetFileAttributesW(Path->Resolved);
+//	DWORD dwAttribs = GetFileAttributesW(Path->Resolved);
 	HANDLE hResult = NULL;
 
-	Path->Attribs = dwAttribs;
-	if (dwAttribs == -1){
-		bResult = FALSE;
-	}else if (Path->MountId){
-		bResult = TRUE;
-	}else if (!vfs_F_NAMEI(Path, dwAttribs, Flags, &hResult)){
+	Path->Attribs = GetFileAttributesW(Path->Resolved);
+	if (Path->MountId){
+		bResult = PathGlobLink(Path, Flags);
+	}else if (!VfsGlobClass(Path, Flags, &hResult)){
 		bResult = FALSE;
 	}else switch (Path->FSType){
 		case FS_TYPE_DISK:
-			bResult = disk_F_NAMEI(hResult, Flags, Path);
+			bResult = disk_F_GETNAMEI(hResult, Flags, Path);
 			break;
 		case FS_TYPE_PIPE:
-			bResult = pipe_F_NAMEI(hResult, Flags, Path);
+			bResult = pipe_F_GETNAMEI(hResult, Flags, Path);
 			break;
 		case FS_TYPE_PDO:
-			bResult = pdo_F_NAMEI(hResult, Flags, Path);
+			bResult = pdo_F_GETNAMEI(hResult, Flags, Path);
 			break;
 	}
 	return(bResult);
@@ -146,8 +140,8 @@ PathClose(WIN_NAMEIDATA *Path, DWORD Flags)
 		}
 	}else if (SHGlobType(L".exe", Path)){
 		Path->FileType = WIN_VREG;
-	}else if (SHGlobLink(Path, Flags)){
-		Path->FSType = FS_TYPE_SHELL;
+//	}else if (PathGlobLink(Path, Flags)){
+//		Path->FSType = FS_TYPE_SHELL;
 //	}else{
 //		vfs_ktrace(L"PathClose", STRUCT_NAMEI, Path);
 	}

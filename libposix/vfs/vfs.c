@@ -116,7 +116,7 @@ WIN_TASK	*__Process;
 
 BOOL proc_poll(WIN_TASK *Task);
 BOOL pdo_fstat(WIN_VNODE *Node, WIN_VATTR *Result);
-BOOL disk_F_NAMEI(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result);
+BOOL disk_closedir(WIN_VNODE *Node);
 
 #include "vfs_acl.c"
 #include "vfs_signal.c"

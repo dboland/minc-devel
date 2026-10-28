@@ -33,31 +33,6 @@
 /****************************************************/
 
 BOOL 
-disk_namei(WIN_NAMEIDATA *Path, DWORD Flags)
-{
-	BOOL bResult = FALSE;
-	HANDLE hResult = NULL;
-
-	if (!VfsStatNode(Path, Flags, &hResult)){	/* Windows IFS node (.cat files) */
-		Path->FSType = FS_TYPE_DISK;
-		Path->FileType = WIN_VREG;
-		bResult = TRUE;
-	}else switch (Path->FSType){
-		case FS_TYPE_DISK:
-			bResult = disk_F_NAMEI(hResult, Flags, Path);
-			break;
-		case FS_TYPE_PIPE:
-			bResult = pipe_F_NAMEI(hResult, Flags, Path);
-			break;
-		case FS_TYPE_PDO:
-			bResult = pdo_F_NAMEI(hResult, Flags, Path);
-			break;
-		default:
-			SetLastError(ERROR_BAD_FILE_TYPE);
-	}
-	return(bResult);
-}
-BOOL 
 disk_lookup(HANDLE Handle, WIN_VNODE *Result)
 {
 	BOOL bResult = FALSE;

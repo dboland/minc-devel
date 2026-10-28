@@ -33,13 +33,13 @@
 /****************************************************/
 
 HANDLE 
-mail_F_OSFHANDLE(WIN_VNODE *Node, DWORD Index)
+mail_F_GETOSFHANDLE(WIN_VNODE *Node, DWORD Index)
 {
 	HANDLE hResult = NULL;
 
 	switch(Node->DeviceType){
 		case DEV_TYPE_TTY:
-			hResult = con_F_OSFHANDLE(__Terminals, Index);
+			hResult = con_F_GETOSFHANDLE(__Terminals, Index);
 			break;
 		default:
 			hResult = Node->Handle;

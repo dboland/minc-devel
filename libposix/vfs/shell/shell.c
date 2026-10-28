@@ -31,6 +31,5 @@
 #include "shell_wchar.c"
 #include "shell_syscall.c"
 #include "shell_unistd.c"
-#include "shell_namei.c"
 #include "shell_stat.c"
 #include "shell_mount.c"

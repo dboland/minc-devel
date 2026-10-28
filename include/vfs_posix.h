@@ -116,7 +116,7 @@ BOOL vfs_F_SETLK(WIN_VNODE *Node, DWORD Flags, LARGE_INTEGER *Offset, LARGE_INTE
 BOOL vfs_F_SETFL(WIN_VNODE *Node, WIN_FLAGS *Flags);
 BOOL vfs_F_GETPATH(WIN_VNODE *Node, SID8 *Owner, SID8 *Group, WIN_NAMEIDATA *Result);
 BOOL vfs_F_DUPFD(WIN_VNODE *Node, BOOL CloseExec, WIN_VNODE *Result);
-HANDLE vfs_F_OSFHANDLE(WIN_VNODE Nodes[], DWORD Index);
+HANDLE vfs_F_GETOSFHANDLE(WIN_VNODE Nodes[], DWORD Index);
 
 /* vfs_mount.c */
 

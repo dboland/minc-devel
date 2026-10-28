@@ -158,39 +158,22 @@ vfs_F_SETLK(WIN_VNODE *Node, DWORD Flags, LARGE_INTEGER *Offset, LARGE_INTEGER *
 	return(bResult);
 }
 HANDLE 
-vfs_F_OSFHANDLE(WIN_VNODE Nodes[], DWORD Index)
+vfs_F_GETOSFHANDLE(WIN_VNODE Nodes[], DWORD Index)
 {
 	HANDLE hResult = NULL;
 	WIN_VNODE *pwNode = &Nodes[Index];
 
 	switch (pwNode->FSType){
 		case FS_TYPE_CHAR:
-			hResult = char_F_OSFHANDLE(pwNode, Index);
+			hResult = char_F_GETOSFHANDLE(pwNode, Index);
 			break;
 		case FS_TYPE_MAILSLOT:
-			hResult = mail_F_OSFHANDLE(pwNode, Index);
+			hResult = mail_F_GETOSFHANDLE(pwNode, Index);
 			break;
 		default:
 			hResult = win_F_SETFD(pwNode->Handle, HANDLE_FLAG_INHERIT);
 	}
 	return(hResult);
-}
-BOOL 
-vfs_F_NAMEI(WIN_NAMEIDATA *Path, DWORD Attribs, DWORD Flags, HANDLE *Result)
-{
-	BOOL bResult = TRUE;
-
-	switch (FILE_CLASS(Attribs)){
-		case FILE_CLASS_INODE:
-			bResult = VfsStatNode(Path, Flags, Result);
-			break;
-		case FILE_CLASS_MOUNT:
-			bResult = VfsStatDrive(Path, Flags);
-			break;
-		case FILE_CLASS_ROOT:
-			break;
-	}
-	return(bResult);
 }
 
 /****************************************************/

@@ -98,17 +98,3 @@ drive_lookup(WIN_CFDATA *Config, DWORD Flags, WIN_STATVFS *Result)
 	win_wcscpy(Result->Path, Config->DosPath);
 	return(bResult);
 }
-BOOL 
-drive_namei(WIN_NAMEIDATA *Path, DWORD Flags)
-{
-	BOOL bResult = TRUE;
-	WCHAR szDrive[MAX_NAME];
-	LPWSTR pszDrive = win_drivename(szDrive, Path->Base);
-
-	Path->MountId = MOUNTID(Path->Base[0]);
-	if (!(Flags & WIN_NOCROSSMOUNT)){	/* vfs_unmount() */
-		Path->R = win_wcpcpy(Path->Resolved, pszDrive);
-		Path->Base = Path->R;
-	}
-	return(bResult);
-}

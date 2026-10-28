@@ -48,7 +48,7 @@ disk_F_DUPFD(WIN_VNODE *Node, HANDLE Process, DWORD Options, WIN_VNODE *Result)
 	return(bResult);
 }
 BOOL 
-disk_F_NAMEI(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
+disk_F_GETNAMEI(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
 {
 	BOOL bResult = FALSE;
 

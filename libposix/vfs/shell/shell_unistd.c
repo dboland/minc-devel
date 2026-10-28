@@ -93,9 +93,15 @@ BOOL
 shell_symlink(WIN_NAMEIDATA *Path, WIN_NAMEIDATA *Target)
 {
 	BOOL bResult = FALSE;
+	DWORD dwFlags = HasLinkInfo;
 
+	if (Target->Attribs == -1){
+		dwFlags = HasLinkInfo;
+	}else if (Target->MountId){
+		dwFlags |= HasLinkTargetIDList;
+	}
 	win_wcscpy(Path->R, L".lnk");
-	if (SHWriteLink(Path->Resolved, HasLinkInfo, Target->Resolved)){
+	if (SHWriteLink(Path->Resolved, dwFlags, Target->Resolved)){
 		bResult = TRUE;
 	}
 	return(bResult);

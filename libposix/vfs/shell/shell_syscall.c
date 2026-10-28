@@ -54,13 +54,14 @@ SHReadLinkTarget(HANDLE Handle, LPWSTR Buffer)
 	return(bResult);
 }
 LPWSTR 
-SHReadNetworkInfo(COMMON_NETWORK_RELATIVE_LINK *Info, LPWSTR Buffer)
+SHReadNetworkInfo(LPWSTR Buffer, COMMON_NETWORK_RELATIVE_LINK *Info)
 {
 	BYTE *Data = (BYTE *)Info;
 	LPWSTR psz = Buffer;
 
 	psz += shell_mbstowcs(psz, &Data[Info->DeviceNameOffset], MAX_PATH);
-	return(win_wcpcpy(psz, L"\\"));
+	psz = win_wcpcpy(psz, L"\\");	/* the bot was wrong */
+	return(psz);
 }
 BOOL 
 SHReadLinkInfo(HANDLE Handle, LPWSTR Buffer)
@@ -79,7 +80,7 @@ SHReadLinkInfo(HANDLE Handle, LPWSTR Buffer)
 	if (Info->LinkInfoFlags & VolumeIDAndLocalBasePath){
 		shell_mbstowcs(Buffer, &Data[Info->LocalBasePathOffset], MAX_PATH);
 	}else if (Info->LinkInfoFlags & CommonNetworkRelativeLinkAndPathSuffix){
-		psz = SHReadNetworkInfo((PVOID)&Data[Info->CommonNetworkRelativeLinkOffset], Buffer);
+		psz = SHReadNetworkInfo(Buffer, (PVOID)&Data[Info->CommonNetworkRelativeLinkOffset]);
 		shell_mbstowcs(psz, &Data[Info->CommonPathSuffixOffset], MAX_PATH - 3);
 	}else{
 		SetLastError(ERROR_BAD_FILE_TYPE);
@@ -176,11 +177,6 @@ SHWriteVolumeInfo(LPCWSTR Target)
 	shell_wcstombs(&Data[Info->VolumeLabelOffset], szLabel, MAX_NAME);
 	return(Info);
 }
-COMMON_NETWORK_RELATIVE_LINK *
-SHWriteNetworkInfo(LPCSTR NetName, LPCSTR DeviceName)
-{
-	/* XXX see SHReadNetworkInfo() */
-}
 VOID 
 SHWriteLinkInfo(HANDLE Handle, LPCWSTR Target)
 {
@@ -222,7 +218,6 @@ SHGlobHeader(LPCWSTR Target, SHELL_LINK_HEADER *Result)
 		Result->FileSize = 4096;
 	}else{
 		bResult = FALSE;
-		WIN_ERR("GetFileAttributesEx(%ls): %s\n", Target, win_strerror(GetLastError()));
 	}
 	return(bResult);
 }
@@ -242,7 +237,7 @@ SHWriteLink(LPCWSTR Path, DWORD LinkFlags, LPCWSTR Target)
 	}else if (SHGlobHeader(Target, &slHeader)){
 		slHeader.HeaderSize = sizeof(SHELL_LINK_HEADER);
 		slHeader.LinkCLSID = CLSID_ShellLink;
-		slHeader.LinkFlags = LinkFlags;
+		slHeader.LinkFlags = LinkFlags | IsUnicode;
 		WriteFile(hFile, &slHeader, sizeof(SHELL_LINK_HEADER), &dwResult, NULL);
 		if (LinkFlags & HasLinkTargetIDList){
 			SHWriteLinkTarget(hFile, Target);
@@ -254,5 +249,21 @@ SHWriteLink(LPCWSTR Path, DWORD LinkFlags, LPCWSTR Target)
 		bResult = TRUE;
 	}
 	NtClose(hFile);
+	return(bResult);
+}
+BOOL 
+SHGlobType(LPCWSTR TypeName, WIN_NAMEIDATA *Path)
+{
+	BOOL bResult = FALSE;
+	DWORD dwAttribs;
+
+	win_wcscpy(Path->R, TypeName);
+	dwAttribs = GetFileAttributesW(Path->Resolved);
+	if (dwAttribs == -1){
+		*Path->R = 0;		/* undo extension probe */
+	}else{
+		Path->Attribs = dwAttribs;
+		bResult = TRUE;
+	}
 	return(bResult);
 }

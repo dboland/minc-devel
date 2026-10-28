@@ -48,37 +48,6 @@ static const UCHAR __DTYPE_POSIX[] = {
 /************************************************************/
 
 BOOL 
-DiskGetEntity_OLD(WIN32_FIND_DATAW *Data, WIN_NAMEIDATA *Path, PVOID Buffer, DWORD *Result)
-{
-	BOOL bResult = TRUE;
-	DWORD dwAttribs = Data->dwFileAttributes;
-	WIN_DIRENT *pdInfo = Buffer;
-	LPWSTR pszType = win_typename(Data->cFileName);
-	DWORD dwRecSize, dwNameSize;
-
-	if (FILE_CLASS_INODE == FILE_CLASS(dwAttribs)){
-		win_wcscpy(Path->Base, Data->cFileName);
-		bResult = disk_namei(Path, 0);
-	}else if (dwAttribs & FILE_ATTRIBUTE_DIRECTORY){
-		Path->FileType = WIN_VDIR;
-	}else if (!wcscmp(pszType, L".lnk")){
-		Path->FileType = WIN_VLNK;
-		Path->FSType = FS_TYPE_SHELL;
-		*pszType = 0;			/* chop off extension */
-	}else{
-		Path->FileType = WIN_VREG;
-	}
-	dwNameSize = win_wcstombs(pdInfo->FileName, Data->cFileName, WIN_MAXNAMLEN);
-	dwRecSize = DIRENT_RECSIZE(dwNameSize);
-	pdInfo->FileId = (DWORDLONG)Path->Index;
-	pdInfo->Offset = (DWORDLONG)dwRecSize;
-	pdInfo->RecSize = dwRecSize;
-	pdInfo->NameSize = dwNameSize;
-	pdInfo->FileType = __DTYPE_POSIX[Path->FileType];
-	*Result = dwRecSize;
-	return(bResult);
-}
-BOOL 
 DiskGetEntity(WIN32_FIND_DATAW *Data, WIN_NAMEIDATA *Path, PVOID Buffer, DWORD *Result)
 {
 	BOOL bResult = TRUE;

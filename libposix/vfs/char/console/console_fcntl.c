@@ -33,7 +33,7 @@
 /****************************************************/
 
 HANDLE 
-con_F_OSFHANDLE(WIN_TTY *Terminal, DWORD Index)
+con_F_GETOSFHANDLE(WIN_TTY *Terminal, DWORD Index)
 {
 	if (!Index){
 		return(Terminal->Input);
