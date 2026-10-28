@@ -86,7 +86,7 @@ printf: ${UBINSRC}/printf/printf.c
 xinstall.o: xinstall.rc
 	windres -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@
 
-xinstall: ${UBINSRC}/xinstall/xinstall.c xinstall.o
+xinstall: ${UBINSRC}/xinstall/xinstall.c
 	@echo -n "$@ "
 	${XGCC} -s -static ${CFLAGS} -DNOPIE -I${UBINSRC}/xinstall -o $@ $^
 
@@ -107,13 +107,13 @@ install-local:
 	@/bin/mkdir -p ${BINDIR}
 	/bin/cp -vu ${PROGS} ${BINDIR}/
 	/bin/cp -vu xinstall ${BINDIR}/install
-	@#/bin/cp -vu manifest ${BINDIR}/install.exe.manifest
+	@/bin/cp -vu manifest ${BINDIR}/install.exe.manifest
 
 install: ${DESTDIR} ${OBJECTS} xinstall
 	@${MKDIR} -p ${DESTDIR}${UBINDIR}
 	${INSTALL} -m ${BINMODE} ${OBJECTS} ${DESTDIR}${UBINDIR}/
 	${INSTALL} -m ${BINMODE} xinstall ${DESTDIR}${UBINDIR}/install
-	@#${INSTALL} -m ${NONBINMODE} manifest ${DESTDIR}${UBINDIR}/install.manifest
+	${INSTALL} -m ${NONBINMODE} manifest ${DESTDIR}${UBINDIR}/install.manifest
 	${INSTALL} -m ${NONBINMODE} manifest ${DESTDIR}${UBINDIR}/patch.manifest
 	@${MAKE} -C make install
 	@${MAKE} -C kdump install
