@@ -82,6 +82,9 @@ shell_readlink(WIN_NAMEIDATA *Path, DWORD Flags)
 		Path->Base = win_basename(Path->Resolved);
 		if (Flags & WIN_FOLLOW){
 			Path->Attribs = GetFileAttributesW(Path->Resolved);	/* stat() */
+		}else{
+			Path->FSType = FS_TYPE_SHELL;
+			Path->FileType = WIN_VLNK;
 		}
 //vfs_ktrace(L"shell_readlink", STRUCT_NAMEI, Path);
 		bResult = TRUE;

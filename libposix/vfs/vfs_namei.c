@@ -100,7 +100,6 @@ BOOL
 PathGlob(WIN_NAMEIDATA *Path, DWORD Flags)
 {
 	BOOL bResult = TRUE;
-//	DWORD dwAttribs = GetFileAttributesW(Path->Resolved);
 	HANDLE hResult = NULL;
 
 	Path->Attribs = GetFileAttributesW(Path->Resolved);

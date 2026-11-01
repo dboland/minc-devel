@@ -19,9 +19,9 @@ admins_only()
 
 echo -n "Creating system directories... "
 mkdir -p /mnt /dev /root /home /tmp
-mkdir -p /var/run /var/mail /var/empty /var/log
+mkdir -p /var/run /var/mail /var/empty /var/log /var/tmp
 mkdir -p /usr/share/dict
-chown "${USER}" /mnt /tmp /home
+chown "${USER}" /mnt /home /tmp /var/tmp
 chmod 0775 /root /tmp
 chgrp 0 /root /var/log
 admins_only "/var/mail"
