@@ -32,7 +32,9 @@ BUILD= $(shell date +%s)
 # In GCC 6.3.0, -ffixed-ebx crashes compilation
 
 CC= gcc
+
 CFLAGS= -ffreestanding -Wl,--disable-auto-import
 CFLAGS+= -Wimplicit-function-declaration -Werror
 CFLAGS+= -Wno-pointer-sign
+
 LDFLAGS= --disable-auto-import

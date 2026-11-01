@@ -77,7 +77,7 @@ printf: ${UBINSRC}/printf/printf.c
 	@echo -n "$@ "
 	@${XGCC} -s -static ${CFLAGS} -DNOPIE -o $@ $<
 
-# In Windows, "install", "setup" and "update" seem to be reserved 
+# In Windows, "install", "setup", "patch" and "update" seem to be reserved 
 # words. When executed with such name, Vista checks if user is
 # elevated, yields ERROR_ELEVATION_REQUIRED if not. XP just slows
 # down execution to a crawl.
@@ -86,9 +86,9 @@ printf: ${UBINSRC}/printf/printf.c
 xinstall.o: xinstall.rc
 	windres -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@
 
-xinstall: ${UBINSRC}/xinstall/xinstall.c
+xinstall: ${UBINSRC}/xinstall/xinstall.c xinstall.o
 	@echo -n "$@ "
-	${XGCC} -s -static ${CFLAGS} -DNOPIE -I${UBINSRC}/xinstall -o $@ $^
+	@${XGCC} -s -static ${CFLAGS} -DNOPIE -I${UBINSRC}/xinstall -o $@ $^
 
 du: ${UBINSRC}/du/du.c
 	@echo -n "$@ "

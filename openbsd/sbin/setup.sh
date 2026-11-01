@@ -19,11 +19,12 @@ admins_only()
 
 echo -n "Creating system directories... "
 mkdir -p /mnt /dev /root /home /tmp
-mkdir -p /var/run /var/mail /var/empty
+mkdir -p /var/run /var/mail /var/empty /var/log
 mkdir -p /usr/share/dict
 chown "${USER}" /mnt /tmp /home
 chmod 0775 /root /tmp
-chgrp 0 /root
+chgrp 0 /root /var/log
+admins_only "/var/mail"
 mkent group >/etc/group
 mkent passwd >/tmp/passwd
 pwd_mkdb -p /tmp/passwd
@@ -52,6 +53,7 @@ ln -sn "$WINHOME\Downloads" "$HOME/Downloads" 2>/dev/null
 ln -sn "$WINHOME\Desktop" "$HOME/Desktop" 2>/dev/null
 ln -sn "$WINHOME\Videos" "$HOME/Videos" 2>/dev/null
 ln -sn "$WINHOME\Pictures" "$HOME/Pictures" 2>/dev/null
+ln -sn "$APPDATA" "$HOME/AppData" 2>/dev/null
 if ! [ -f "$HOME/.profile" ]; then
 	echo "mkent resolv 2>/dev/null >/etc/resolv.conf" >"$HOME/.profile"
 fi

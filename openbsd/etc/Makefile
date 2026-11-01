@@ -4,15 +4,15 @@ include ${ROOTDIR}/Makefile.inc
 
 SOURCES= man.conf motd gettytab login.conf sysctl.conf ftpchroot ftpusers \
 	syslog.conf
-FILES= ${ETCDEST}/profile ${ETCDEST}/ttys
 ETCSRC= ${SRCDIR}/etc
 ETCDEST= ${DESTDIR}/etc
+FILES= ${ETCDEST}/profile ${ETCDEST}/ttys
 
 all: ${ETCSRC} ${SOURCES}
 
 ${ETCSRC}:
 	@echo " ---------------------------------------------------"
-	@echo "| OpenBSD 'etc' directory ($@) not found. Make sure"
+	@echo "| OpenBSD config directory ($@) not found. Make sure"
 	@echo "| you extracted this directory from the source archive."
 	@echo " ---------------------------------------------------"
 	@exit 1

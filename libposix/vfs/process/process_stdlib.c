@@ -116,6 +116,7 @@ proc_init(WIN_SIGPROC SignalProc)
 		__Process = ProcCreateTask(0);
 		__Process->Flags |= WIN_PS_SYSTEM;
 		__Process->FileMask = 0022;
+//		__Process->MountId = WIN_MOUNT_MAX;	/* no special files for pid 0 */
 		vfs_lookup(GetStdHandle(STD_INPUT_HANDLE), &__Process->Node[0]);
 		vfs_lookup(GetStdHandle(STD_OUTPUT_HANDLE), &__Process->Node[1]);
 		vfs_lookup(GetStdHandle(STD_ERROR_HANDLE), &__Process->Node[2]);

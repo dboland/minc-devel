@@ -67,23 +67,22 @@ shell_unlink(WIN_NAMEIDATA *Path)
 	return(DeleteFileW(Path->Resolved));
 }
 BOOL 
-shell_readlink(WIN_NAMEIDATA *Path)
+shell_readlink(WIN_NAMEIDATA *Path, DWORD Flags)
 {
 	BOOL bResult = FALSE;
 	SHELL_LINK_HEADER slHead;
 	WCHAR szBuffer[MAX_PATH];
+	LPWSTR pszBase = Path->Resolved;
 
 	if (SHReadLink(Path->Resolved, &slHead, szBuffer)){
-		Path->MountId = 0;
-		if (szBuffer[1] == ':'){
-			Path->MountId = MOUNTID(szBuffer[0]);
+		if (szBuffer[1] != ':'){
+			pszBase = Path->Base;
 		}
-		Path->R = win_wcpcpy(Path->Resolved, szBuffer);
+		Path->R = win_wcpcpy(pszBase, szBuffer);
 		Path->Base = win_basename(Path->Resolved);
-		Path->Last = Path->R - 1;
-		Path->FSType = FS_TYPE_DISK;
-		Path->FileType = WIN_VREG;
-		Path->Attribs = GetFileAttributesW(szBuffer);
+		if (Flags & WIN_FOLLOW){
+			Path->Attribs = GetFileAttributesW(Path->Resolved);	/* stat() */
+		}
 //vfs_ktrace(L"shell_readlink", STRUCT_NAMEI, Path);
 		bResult = TRUE;
 	}
@@ -100,6 +99,7 @@ shell_symlink(WIN_NAMEIDATA *Path, WIN_NAMEIDATA *Target)
 	}else if (Target->MountId){
 		dwFlags |= HasLinkTargetIDList;
 	}
+//vfs_ktrace(L"shell_symlink", STRUCT_NAMEI, Path);
 	win_wcscpy(Path->R, L".lnk");
 	if (SHWriteLink(Path->Resolved, dwFlags, Target->Resolved)){
 		bResult = TRUE;

@@ -89,7 +89,7 @@ PathGlobLink(WIN_NAMEIDATA *Path, DWORD Flags)
 	}else if (!SHGlobType(L".lnk", Path)){
 		bResult = FALSE;
 	}else if (Flags & WIN_FOLLOW){
-		bResult = shell_readlink(Path);
+		bResult = shell_readlink(Path, Flags);
 	}else{
 		Path->FSType = FS_TYPE_SHELL;
 		Path->FileType = WIN_VLNK;
@@ -140,8 +140,6 @@ PathClose(WIN_NAMEIDATA *Path, DWORD Flags)
 		}
 	}else if (SHGlobType(L".exe", Path)){
 		Path->FileType = WIN_VREG;
-//	}else if (PathGlobLink(Path, Flags)){
-//		Path->FSType = FS_TYPE_SHELL;
 //	}else{
 //		vfs_ktrace(L"PathClose", STRUCT_NAMEI, Path);
 	}

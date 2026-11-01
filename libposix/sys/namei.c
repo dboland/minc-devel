@@ -157,7 +157,6 @@ pathat_win(WIN_NAMEIDATA *Result, int dirfd, const char *path, int atflags)
 		path = root_win(Result, path);
 
 	}else if (path[1] == ':'){		/* MSYS sh.exe */
-		Result->MountId = MOUNTID(path[0]);
 		*Result->R++ = *path++;
 		*Result->R++ = *path++;
 		if (path[0]) path++;

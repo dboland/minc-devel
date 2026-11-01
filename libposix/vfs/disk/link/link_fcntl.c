@@ -47,16 +47,14 @@ link_F_NAMEI(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
 	}else if (ReadFile(Handle, szBuffer, Result->Size, &dwResult, NULL)){
 		if (szBuffer[1] == ':'){
 			Result->MountId = MOUNTID(szBuffer[0]);	/* nano.exe */
-		}else if (szBuffer[1] == '\\'){
-			Result->MountId = 0;
-		}else{
+		}else if (szBuffer[1] != '\\'){
 			pszBase = Result->Base;
 		}
 		Result->R = win_wcpcpy(pszBase, szBuffer);
-		Result->Base = Result->R;
+		Result->Base = win_basename(Result->Resolved);
 		Result->Last = Result->R - 1;
-		Result->Attribs = GetFileAttributesW(Result->Resolved);
 		Result->FileType = WIN_VREG;
+		Result->Attribs = GetFileAttributesW(Result->Resolved);
 		bResult = CloseHandle(Handle);
 	}else{
 		bResult = FALSE;

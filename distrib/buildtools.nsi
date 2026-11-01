@@ -85,6 +85,11 @@ Section "Vim editor" SecVim
 	DetailPrint "Installing vim 8.1..."
 	ExecDos::exec /DETAILED '.\install.cmd vim81.tgz'
 SectionEnd
+Section "PNG image format library" SecPng
+	File 'libpng16.tgz'
+	DetailPrint "Installing PNG 1.6.37..."
+	ExecDos::exec /DETAILED '.\install.cmd libpng16.tgz'
+SectionEnd
 Section
 	DetailPrint "Cleaning up..."
 	RMDir /r "$INSTDIR\miniroot"
@@ -99,5 +104,6 @@ SectionEnd
 !insertmacro MUI_DESCRIPTION_TEXT ${SecGit} "git - the stupid content tracker"
 !insertmacro MUI_DESCRIPTION_TEXT ${SecMake} 'gmake - GNU make utility to maintain groups of programs'
 !insertmacro MUI_DESCRIPTION_TEXT ${SecVim} "Vi IMproved, a programmer's text editor"
+!insertmacro MUI_DESCRIPTION_TEXT ${SecPng} "libpng - Portable Network Graphics (PNG)"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 

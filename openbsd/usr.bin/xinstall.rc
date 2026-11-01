@@ -1,8 +1,11 @@
+#include <winuser.h>
+#include <commctrl.h>
+
 1 VERSIONINFO
 FILEVERSION 0,6,1,0
 PRODUCTVERSION 0,6,1,0
-FILEOS 0x4
-FILETYPE 0x1
+FILEOS 0x40004L
+FILETYPE 0x1L
 {
 	BLOCK "StringFileInfo"
 	{
@@ -11,10 +14,10 @@ FILETYPE 0x1
 			VALUE "CompanyName", "BOLAND Automatisering\000"
 			VALUE "FileDescription", "MinC Unix Emulator\000"
 			VALUE "FileVersion", RELEASE "." VERSION
-			VALUE "InternalName", "install.exe\000"
+			VALUE "InternalName", "xinstall\000"
 			VALUE "LegalCopyright", "2016 BOLAND Automatisering\000"
 			VALUE "LegalTrademarks", "Unix®\000"
-			VALUE "OriginalFilename", "install.exe\000"
+			VALUE "OriginalFilename", "xinstall.exe\000"
 			VALUE "ProductName", "MinC\000"
 			VALUE "ProductVersion", RELEASE
 			VALUE "Comments", "\000"
@@ -26,4 +29,4 @@ FILETYPE 0x1
 		VALUE "Translation", 0x0413, 0x04E4
 	}
 }
-CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "manifest"
+//CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "manifest"

@@ -103,7 +103,7 @@ SHReadLink(LPCWSTR Path, SHELL_LINK_HEADER *Header, LPWSTR Target)
 	}else if (!ReadFile(hFile, Header, sizeof(SHELL_LINK_HEADER), &dwResult, NULL)){
 		WIN_ERR("ReadFile(%ls): %s\n", Path, win_strerror(GetLastError()));
 	}else if (!IsEqualGUID(&Header->LinkCLSID, &CLSID_ShellLink)){
-		SetLastError(ERROR_BAD_ARGUMENTS);
+		SetLastError(ERROR_BAD_FILE_TYPE);
 	}else if (Header->LinkFlags & HasLinkTargetIDList){
 		bResult = SHReadLinkTarget(hFile, Target);
 	}else if (Header->LinkFlags & HasLinkInfo){
@@ -166,7 +166,11 @@ SHWriteVolumeInfo(LPCWSTR Target)
 	WCHAR szLabel[MAX_LABEL] = L"";
 	DWORD dwSerial = 0;
 
-	SHStatVolume(win_drivename(szDrive, Target), szLabel, &dwSerial);
+	if (Target[1] == ':'){
+		SHStatVolume(win_drivename(szDrive, Target), szLabel, &dwSerial);
+	}else{
+		SHStatVolume(L"", szLabel, &dwSerial);
+	}
 	dwSize += wcslen(szLabel) + 1;
 	Data = LocalAlloc(LPTR, dwSize);
 	Info = (VOLUME_ID *)Data;
@@ -196,10 +200,9 @@ SHWriteLinkInfo(HANDLE Handle, LPCWSTR Target)
 	WriteFile(Handle, szTarget, dwSize + 1, &dwResult, NULL);
 	LocalFree(pvInfo);
 }
-BOOL 
+VOID 
 SHGlobHeader(LPCWSTR Target, SHELL_LINK_HEADER *Result)
 {
-	BOOL bResult = TRUE;
 	WIN32_FILE_ATTRIBUTE_DATA faData;
 	FILETIME ftNow;
 
@@ -209,17 +212,14 @@ SHGlobHeader(LPCWSTR Target, SHELL_LINK_HEADER *Result)
 		Result->AccessTime = faData.ftLastAccessTime;
 		Result->WriteTime = faData.ftLastWriteTime;
 		Result->FileSize = faData.nFileSizeLow;
-	}else if (ERROR_PATH_NOT_FOUND == GetLastError()){
+	}else{
 		GetSystemTimeAsFileTime(&ftNow);
 		Result->FileAttributes = FILE_ATTRIBUTE_ARCHIVE;
 		Result->CreationTime = ftNow;
 		Result->AccessTime = ftNow;
 		Result->WriteTime = ftNow;
 		Result->FileSize = 4096;
-	}else{
-		bResult = FALSE;
 	}
-	return(bResult);
 }
 BOOL 
 SHWriteLink(LPCWSTR Path, DWORD LinkFlags, LPCWSTR Target)
@@ -234,7 +234,8 @@ SHWriteLink(LPCWSTR Path, DWORD LinkFlags, LPCWSTR Target)
 		NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE){
 		return(FALSE);
-	}else if (SHGlobHeader(Target, &slHeader)){
+	}else{
+		SHGlobHeader(Target, &slHeader);
 		slHeader.HeaderSize = sizeof(SHELL_LINK_HEADER);
 		slHeader.LinkCLSID = CLSID_ShellLink;
 		slHeader.LinkFlags = LinkFlags | IsUnicode;
@@ -251,6 +252,9 @@ SHWriteLink(LPCWSTR Path, DWORD LinkFlags, LPCWSTR Target)
 	NtClose(hFile);
 	return(bResult);
 }
+
+/**************************************************************/
+
 BOOL 
 SHGlobType(LPCWSTR TypeName, WIN_NAMEIDATA *Path)
 {

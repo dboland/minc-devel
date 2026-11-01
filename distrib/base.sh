@@ -2,19 +2,13 @@ if ! cd "$PKGROOT/minc-base"; then
         exit 1
 fi
 
-copy_src()
-{
-        for file in $2; do
-                cp "${DEVROOT}/openbsd/$1/$file" "./$1/$file"
-        done
-}
+copy_dev etc "$ETC"
+copy_dev sbin "$SBIN"
 
 cp -p /minc.exe .
+ln -s /usr/share/zoneinfo/Europe/Amsterdam ./etc/localtime
 
-copy_src etc "$ETC"
-
-copy_file sbin "$SBIN"
-copy_posix usr/bin "$UBIN"
+ln ./bin/ksh ./bin/sh
 
 echo -n "Compressing base61.tgz... "
 tar -zcf $DISTROOT/base61.tgz *

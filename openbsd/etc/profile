@@ -2,3 +2,11 @@ export ENV=$HOME/.kshrc
 export HISTFILE=$HOME/.shhist
 export LESSHISTFILE=$HOME/.lesshist
 export HOSTALIASES=/etc/hosts.ics
+export PS1='\e[1;32m\u\e[37m@\e[34m\h \e[33m\w\n\e[0;37m\p\e[0m '
+
+alias clear="wrc 'CMD /C CLS'"
+alias netstat="wrc NETSTAT"
+alias traceroute="wrc TRACERT"
+alias traceroute6="wrc TRACERT6"
+
+bind '[U'=end-of-line

@@ -41,6 +41,8 @@ shell_stat(WIN_NAMEIDATA *Path, WIN_VATTR *Result)
 		Result->DeviceId = __Mounts[Path->MountId].DeviceId;
 		Result->Mode.FileType = Path->FileType;
 		bResult = TRUE;
+	}else{
+		WIN_ERR("VfsStatFile(%ls): %s\n", Path->Resolved, win_strerror(GetLastError()));
 	}
 	return(bResult);
 }

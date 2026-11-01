@@ -465,7 +465,7 @@ vfs_readlink(WIN_NAMEIDATA *Path)
 			bResult = disk_readlink(Path);
 			break;
 		case FS_TYPE_SHELL:
-			bResult = shell_readlink(Path);
+			bResult = shell_readlink(Path, 0);
 			break;
 		default:
 			SetLastError(ERROR_BAD_FILE_TYPE);
