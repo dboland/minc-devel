@@ -7,8 +7,7 @@ OpenBSD 6.1.0 source code and MinGW:
 
 I pulled the OpenBSD source code from the read-only GitHub 
 repository. There is an article which explains how to pull 
-the source for a specific version, but you will need the 
-CVS software:
+the source for a specific version:
 
 * https://www.openbsd.org/anoncvs.html
 
@@ -26,8 +25,8 @@ To build the new kernel and compile the operating system code,
 you would have to build an OpenBSD cross compiler first. This 
 can be very laborious and frustrating. Instead we will create 
 an isolated, slightly modified instance of the MinGW compiler. 
-Let's call it a *poor man's cross-compiler*. Your current MinGW 
-installation will be left completely untouched.
+Let's call it our *poor man's cross-compiler*. Your current 
+MinGW installation will be left completely untouched.
 
 Open the MSYS terminal, **cd** to your *minc-devel* directory 
 and make the *opt* target. All files will be installed in a 
@@ -105,8 +104,8 @@ the address bar, like *C:\minc-release*.
 
 ## Step 4: building the GCC compiler
 
-Building the GNU C Compiler and build tools for MinC is as simple 
-as running the *configure* and *make* commands. But in reality it 
+Building the GNU C compiler and build tools for MinC is as simple 
+as running the **configure** and **make** commands. But in reality it 
 is a bit more complicated. You have to provide the OpenBSD headers 
 and import libraries yourself, of which the latter have to be built 
 first. So you immediately run into the *chicken-and-egg* problem.

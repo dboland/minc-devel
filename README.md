@@ -1,5 +1,7 @@
 # MinC Is Not Cygwin
 
+<img src="MinC.png" width="448" align="right">
+
 MinC was written to help children at vocational education 
 learn Linux without the hassle of virtualization. It runs 
 on Windows NT, version 2000/XP/2003/Vista/7/8/10/11.
@@ -9,19 +11,47 @@ Windows. The rest of the software was taken verbatim from
 OpenBSD, version 6.1. This means that by installing MinC, 
 you run OpenBSD on your Windows machine at native speed.
 
-![MinC](MinC.png)
+MinC is already pretty much functional for normal usage, but 
+there are still some issues which need to be solved. Read 
+about them in the [ISSUES.md](ISSUES.md) document.
 
 If you want to build the MinC system yourself, read the
-BUILD.md document. For downloading the installer and more 
-information go to:
+[BUILD.md](BUILD.md) document. For downloading the 
+installer and more information go to:
 
 https://minc.commandlinerevolution.nl/english/home.html
 
-## Known Issues
+## Why developers use MinC over WSL/Cygwin
 
-MinC is already pretty much functional for normal usage, but 
-there are still some issues which need to be solved. Read 
-about them in the ISSUES.md document.
+* It's a Unix environment, without the need for a whole GNU 
+userland. I appreciate GNU's efforts but I greatly prefer 
+BSD and Solaris style environments to them.
+* It's more than just a userland port. Since we have the 
+*bsd.dll* providing the PTYs and process management etc., 
+it makes it to where depending on Windows for some things 
+is less necessary. I especially appreciate the fact that 
+unlike Cygwin, we don't need to have .exe or .dll on every 
+single PE file.
+* Like mentioned on the home page, the programs are where 
+the data is. Makes it easier than WSL which transfers files 
+over a 9P connection and runs an entire Linux kernel in a 
+Hyper-V VM.
+* Integration with the NT kernel makes using network 
+utilities like **ifconfig** and **route** incredibly nice, 
+because I am more used to Unix networking utilities so being 
+able to see network info and other stuff like ACPI devices 
+and whatnot in a format I am familiar with is really nice.
+* Compatibility with older Windows versions. I daily-drive 
+Windows 7 on my laptop because of better HW compat and a nicer 
+graphical interface to use. Having MinC work on older platforms 
+is incredibly nice for this, and that's one of the biggest 
+parts of why I like it. Cygwin nuked support for older Windows 
+recently, so having something similar but even better is 
+really good.
+* Forgot to mention, **ifconfig** showing other NDIS devices 
+that aren't just Ethernet or WLAN are awesome, as I have a 
+WWAN Sierra modem so that being detected as ndis14 in **ifconfig** 
+is super cool.
 
 ## Contribute
 
