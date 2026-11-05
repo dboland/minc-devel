@@ -7,6 +7,7 @@ copy_dev sbin "$SBIN"
 
 cp -p /minc.exe .
 ln -s /usr/share/zoneinfo/Europe/Amsterdam ./etc/localtime
+ln -s opencvs ./usr/bin/cvs
 
 ln ./bin/ksh ./bin/sh
 

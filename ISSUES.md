@@ -61,6 +61,17 @@ enabled in viewing and editing programs, like less or nano, you have to
 disable *QuickEdit* mode. This is done by right-clicking the title bar, 
 choosing *Properties* and clicking the *Options* tab.
 
+## Pseudo TTY
+
+The openpty() API is fully functional, but I implemented pseudo 
+terminals in the wrong file system (MAILSLOT). Mailslots are ideal 
+to implement virtual file systems in Windows because they support 
+hierarchical file names and unlimited buffering.
+
+I am planning to re-implement pseudo terminals as sockets (named 
+pipes) in the PIPE file system with limited buffering, which speeds 
+up a Pseudo TTY.
+
 ## Mounting
 
 Mounting is properly implemented, but if you frequently plug and 
