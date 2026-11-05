@@ -14,7 +14,7 @@ FILETYPE 0x1
 			VALUE "InternalName", "libposix.so\000"
 			VALUE "LegalCopyright", "(2016) Daniel Boland\000"
 			VALUE "LegalTrademarks", "POSIX®, Windows NT®\000"
-			VALUE "OriginalFilename", "libposix-" RELEASE ".dll\000"
+			VALUE "OriginalFilename", "bsd.dll\000"
 			VALUE "ProductName", "MinC\000"
 			VALUE "ProductVersion", RELEASE
 			VALUE "Comments", "\000"

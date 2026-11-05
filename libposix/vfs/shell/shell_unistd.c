@@ -75,17 +75,17 @@ shell_readlink(WIN_NAMEIDATA *Path, DWORD Flags)
 	LPWSTR pszBase = Path->Resolved;
 
 	if (SHReadLink(Path->Resolved, &slHead, szBuffer)){
-		if (szBuffer[1] != ':'){
+		if (!(Flags & WIN_FOLLOW)){
+			Path->FSType = FS_TYPE_SHELL;
+			Path->FileType = WIN_VLNK;
+		}else if (szBuffer[1] == ':'){
+			Path->MountId = MOUNTID(szBuffer[0]);
+		}else if (szBuffer[1] != '\\'){
 			pszBase = Path->Base;
 		}
 		Path->R = win_wcpcpy(pszBase, szBuffer);
 		Path->Base = win_basename(Path->Resolved);
-		if (Flags & WIN_FOLLOW){
-			Path->Attribs = GetFileAttributesW(Path->Resolved);	/* stat() */
-		}else{
-			Path->FSType = FS_TYPE_SHELL;
-			Path->FileType = WIN_VLNK;
-		}
+		Path->Attribs = GetFileAttributesW(Path->Resolved);	/* stat() */
 //vfs_ktrace(L"shell_readlink", STRUCT_NAMEI, Path);
 		bResult = TRUE;
 	}

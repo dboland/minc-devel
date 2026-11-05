@@ -93,7 +93,7 @@ VfsGlobNode(WIN_NAMEIDATA *Path, DWORD Flags, HANDLE *Result)
 	DWORD dwSize;
 	HANDLE hResult;
 	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, TRUE};
-	WIN_INODE iNode;
+	WIN_INODE iNode = {0};
 	ACCESS_MASK amAccess = FILE_READ_DATA | READ_CONTROL;
 
 	if (Flags & WIN_LOCKLEAF){

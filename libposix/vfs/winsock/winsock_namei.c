@@ -54,6 +54,7 @@ ws2_lookup(WIN_IFDATA *Config, WIN_IFDRIVER *Driver)
 			Config->DeviceType = DEV_TYPE_TUNNEL;
 			break;
 		default:
+			Config->DeviceType = DEV_CLASS_IFNET;
 			bResult = FALSE;
 	}
 	return(bResult);
