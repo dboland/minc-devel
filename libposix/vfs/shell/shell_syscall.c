@@ -218,7 +218,6 @@ SHGlobHeader(LPCWSTR Target, SHELL_LINK_HEADER *Result)
 		Result->CreationTime = ftNow;
 		Result->AccessTime = ftNow;
 		Result->WriteTime = ftNow;
-		Result->FileSize = 4096;
 	}
 }
 BOOL 

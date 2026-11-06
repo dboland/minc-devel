@@ -48,7 +48,7 @@ disk_F_DUPFD(WIN_VNODE *Node, HANDLE Process, DWORD Options, WIN_VNODE *Result)
 	return(bResult);
 }
 BOOL 
-disk_F_GETNAMEI(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
+disk_F_NAMEI(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
 {
 	BOOL bResult = FALSE;
 
@@ -56,8 +56,12 @@ disk_F_GETNAMEI(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
 		case WIN_VLNK:
 			bResult = link_F_NAMEI(Handle, Flags, Result);
 			break;
-		default:
+		case WIN_VREG:
+		case WIN_VDIR:
 			bResult = TRUE;
+			break;
+		default:
+			SetLastError(ERROR_BAD_FILE_TYPE);
 	}
 	return(bResult);
 }

@@ -64,9 +64,9 @@ pipe_F_SETFL(WIN_VNODE *Node, WIN_FLAGS *Flags)
 	return(bResult);
 }
 BOOL 
-pipe_F_GETNAMEI(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
+pipe_F_NAMEI(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
 {
-	BOOL bResult = FALSE;
+	BOOL bResult = TRUE;
 	DWORD dwResult;
 
 	if (Flags & WIN_NEEDHANDLE){
@@ -76,7 +76,7 @@ pipe_F_GETNAMEI(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
 	}else if (ReadFile(Handle, Result->Resolved, Result->Size, &dwResult, NULL)){
 		bResult = CloseHandle(Handle);
 	}else{
-		WIN_ERR("ReadFile(%ls): %s\n", Result->Resolved, win_strerror(GetLastError()));
+		bResult = FALSE;
 	}
 	return(bResult);
 }

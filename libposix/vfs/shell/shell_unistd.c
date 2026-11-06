@@ -86,6 +86,7 @@ shell_readlink(WIN_NAMEIDATA *Path, DWORD Flags)
 		Path->R = win_wcpcpy(pszBase, szBuffer);
 		Path->Base = win_basename(Path->Resolved);
 		Path->Attribs = GetFileAttributesW(Path->Resolved);	/* stat() */
+		Path->FileType = WIN_VREG;
 //vfs_ktrace(L"shell_readlink", STRUCT_NAMEI, Path);
 		bResult = TRUE;
 	}

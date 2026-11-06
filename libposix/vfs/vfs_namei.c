@@ -109,13 +109,13 @@ PathGlob(WIN_NAMEIDATA *Path, DWORD Flags)
 		bResult = FALSE;
 	}else switch (Path->FSType){
 		case FS_TYPE_DISK:
-			bResult = disk_F_GETNAMEI(hResult, Flags, Path);
+			bResult = disk_F_NAMEI(hResult, Flags, Path);
 			break;
 		case FS_TYPE_PIPE:
-			bResult = pipe_F_GETNAMEI(hResult, Flags, Path);
+			bResult = pipe_F_NAMEI(hResult, Flags, Path);
 			break;
 		case FS_TYPE_PDO:
-			bResult = pdo_F_GETNAMEI(hResult, Flags, Path);
+			bResult = pdo_F_NAMEI(hResult, Flags, Path);
 			break;
 	}
 	return(bResult);
