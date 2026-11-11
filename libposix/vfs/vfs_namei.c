@@ -139,6 +139,8 @@ PathClose(WIN_NAMEIDATA *Path, DWORD Flags)
 		}
 	}else if (SHGlobType(L".exe", Path)){
 		Path->FileType = WIN_VREG;
+	}else if (SHGlobType(L".dll", Path)){
+		Path->FileType = WIN_VREG;
 //	}else{
 //		vfs_ktrace(L"PathClose", STRUCT_NAMEI, Path);
 	}

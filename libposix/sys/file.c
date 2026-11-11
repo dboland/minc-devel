@@ -33,34 +33,28 @@
 /****************************************************/
 
 void *
-kfile_posix(struct kinfo_file *buf, WIN_TASK *Task, WIN_VNODE *Node)
+kfile_posix(WIN_TASK *Task, WIN_VNODE *Node, struct kinfo_file *buf)
 {
 	WIN_VATTR wStat = {0};
 	struct stat info;
-	WIN_VNODE vNode;
 	WCHAR szBuffer[MAX_PATH];
 	HANDLE hResult = NULL;
 	wchar_t *command = win_basename(__Strings[Task->TaskId].Command);
 
+	/* Below stat_posix() tracing will depend on Task's PS flags.
+	 */
 	win_bzero(buf, sizeof(struct kinfo_file));
-	win_memcpy(&vNode, Node, sizeof(WIN_VNODE));
-	if (!(Node->Flags & HANDLE_FLAG_INHERIT)){
-		if (hResult = win_F_INHERIT(Node->Handle, 0, Task->ProcessId)){
-			vNode.Handle = hResult;
-			vNode.Access = win_F_GETFL(hResult);
-		}
-	}
-	buf->f_flag = FFLAGS(flflags_posix(&vNode));	/* SHORT: flags (see fcntl.h) */
+	buf->f_flag = FFLAGS(flflags_posix(Node));	/* SHORT: flags (see fcntl.h) */
 	buf->f_type = WIN_DTYPE_VNODE;			/* INT: descriptor type */
-	buf->v_type = vNode.FileType;			/* ENUM: vnode type */
+	buf->v_type = Node->FileType;			/* ENUM: vnode type */
 	buf->p_pid = Task->TaskId;			/* PID_T: process id */
-	buf->fd_fd = vNode.FileId;			/* INT: descriptor number */
+	buf->fd_fd = Node->FileId;			/* INT: descriptor number */
 	buf->v_tag = WIN_VT_NTFS;			/* ENUM: type of underlying data */
 	buf->p_uid = rid_posix(&Task->UserSid);		/* UID_T: process credentials */
 	buf->p_gid = rid_posix(&Task->GroupSid);	/* GID_T: process credentials */
 	buf->p_tid = Task->ThreadId;			/* PID_T: thread id */
 	win_wcstombs(buf->p_comm, command, KI_MAXCOMLEN);
-	if (vfs_fstat(&vNode, &wStat)){
+	if (vfs_fstat(Node, &wStat)){
 		stat_posix(Task, &info, &wStat);
 		buf->va_fsid = info.st_dev;		/* DEV_T: filesystem device */
 		buf->va_rdev = info.st_rdev;		/* DEV_T: raw device */
@@ -70,7 +64,8 @@ kfile_posix(struct kinfo_file *buf, WIN_TASK *Task, WIN_VNODE *Node)
 		buf->f_gid = info.st_gid;		/* GID_T: descriptor credentials */
 		buf->va_size = info.st_size;
 	}else{
-		vfs_ktrace(L"kfile_posix", STRUCT_VNODE, &vNode);
+		WIN_ERR("vfs_fstat(%d): %s\n", Node->Handle, win_strerror(GetLastError()));
+		vfs_ktrace(L"kfile_posix", STRUCT_VNODE, Node);
 	}
 	return(buf + 1);
 }
@@ -86,7 +81,7 @@ file_KERN_FILE_BYPID(void *buf, size_t *size, WIN_TASK *Task, WIN_VNODE Node[])
 	while (fd < OPEN_MAX){
 		if (Node->Access){
 			if (buf){
-				buf = kfile_posix(buf, Task, Node);
+				buf = kfile_posix(Task, Node, buf);
 			}
 			result += sizeof(struct kinfo_file);
 		}

@@ -265,8 +265,8 @@ sysctl_NET_RT(const int *name, void *buf, size_t *size)
 {
 	int result = 0;
 
-	/* net/route.c */
-
+	/* route(4)
+	 */
 	switch (name[4]){
 		case NET_RT_DUMP:	/* 1 */
 			result = route_NET_RT_DUMP(buf, size);

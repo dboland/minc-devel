@@ -59,17 +59,26 @@ root_mount(WIN_DEVICE *Device, WIN_NAMEIDATA *Path, DWORD Flags, WIN_MODE *Mode)
 BOOL 
 root_statvfs(WIN_MOUNT *Mount, WIN_STATVFS *Result)
 {
-	ZeroMemory(Result, sizeof(WIN_STATVFS));
-	Result->BytesPerSector = 512;
-	Result->SectorsPerCluster = 8;
-	Result->ClustersTotal = 0x8000;
-	Result->FreeClusters = 0x4FFF;
-	win_wcscpy(Result->Path, Mount->Path);
-	win_wcscpy(Result->TypeName, Mount->TypeName);
-	win_wcscpy(Result->Label, Mount->Label);
-	Result->DeviceId = Mount->DeviceId;
-	Result->MountTime = Mount->Time;
-	Result->Flags = Mount->Flags;
-	Result->MaxPath = Mount->MaxPath;
-	return(TRUE);
+	BOOL bResult = FALSE;
+	DWORD dwClustersTotal;
+	DWORD dwFreeClusters;
+
+	if (GetDiskFreeSpace(NULL, &Result->SectorsPerCluster, 
+		&Result->BytesPerSector, &Result->FreeClusters, &Result->ClustersTotal)){
+		dwClustersTotal = Result->FreeClusters;
+		dwFreeClusters = dwClustersTotal - 0x8000;
+		Result->ClustersTotal = dwClustersTotal;
+		Result->FreeClusters = dwFreeClusters;
+		win_wcscpy(Result->Path, Mount->Path);
+		win_wcscpy(Result->TypeName, Mount->TypeName);
+		win_wcscpy(Result->Label, Mount->Label);
+		Result->DeviceId = Mount->DeviceId;
+		Result->MountTime = Mount->Time;
+		Result->Flags = Mount->Flags;
+		Result->MaxPath = Mount->MaxPath;
+		bResult = TRUE;
+	}else{
+		WIN_ERR("GetDiskFreeSpace(%s): %s\n", NULL, win_strerror(GetLastError()));
+	}
+	return(bResult);
 }

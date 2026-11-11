@@ -39,11 +39,9 @@ WSAcceptFile(WIN_VNODE *Node, LPSOCKADDR Address, LPINT Length, WIN_VNODE *Resul
 	SOCKET sResult;
 
 	sResult = WSAAccept(Node->Socket, Address, Length, NULL, 0);
-	if (sResult == INVALID_SOCKET){
-		WIN_ERR("WSAAccept(%d): %s\n", Node->Socket, win_strerror(WSAGetLastError()));
-	}else{
+	if (sResult != INVALID_SOCKET){
 		Node->Pending = 0;
-		SetHandleInformation((HANDLE)sResult, 0, 0);
+//		SetHandleInformation((HANDLE)sResult, 0, 0);
 		Result->Socket = sResult;
 		Result->FSType = Node->FSType;
 		Result->DeviceType = Node->DeviceType;
@@ -53,6 +51,8 @@ WSAcceptFile(WIN_VNODE *Node, LPSOCKADDR Address, LPINT Length, WIN_VNODE *Resul
 		Result->Flags = win_F_GETFD((HANDLE)sResult);
 		Result->CloseExec = FALSE;
 		bResult = TRUE;
+	}else if (WSAEWOULDBLOCK != WSAGetLastError()){
+		WIN_ERR("WSAAccept(%d): %s\n", Node->Socket, win_strerror(WSAGetLastError()));
 	}
 	return(bResult);
 }

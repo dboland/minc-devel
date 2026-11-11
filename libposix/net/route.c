@@ -31,14 +31,14 @@
 #include <net/route.h>
 
 #define IFMSGLEN	(sizeof(struct if_msghdr) + sizeof(struct sockaddr_dl))
-#define IFAMSGLEN	(sizeof(struct ifa_msghdr) + (sizeof(struct sockaddr_in) * 3))
+//#define IFAMSGLEN	(sizeof(struct ifa_msghdr) + (sizeof(struct sockaddr_in) * 3))
 #define RTMSGLEN	(sizeof(struct rt_msghdr) + (sizeof(struct sockaddr_in) * 2))
 #define INMSGLEN	(sizeof(struct ifa_msghdr) + sizeof(struct sockaddr_in) + sizeof(struct sockaddr_dl))
 
 /****************************************************/
 
 void *
-ifamsg_posix(void *buf, WIN_IFADDRS *Adapter, PSOCKET_ADDRESS Address, WIN_TASK *Task)
+ifamsg_posix(void *buf, WIN_IFADDRS *Adapter, PSOCKET_ADDRESS Address)
 {
 	struct ifa_msghdr *hdr = buf;
 	UINT uiLength = Address->iSockaddrLength;
@@ -54,11 +54,11 @@ ifamsg_posix(void *buf, WIN_IFADDRS *Adapter, PSOCKET_ADDRESS Address, WIN_TASK 
 	hdr->ifam_flags = Adapter->IfFlags;
 //	hdr->ifam_metric
 	buf += hdr->ifam_hdrlen;
-	saddr_posix(Task, buf, Address->lpSockaddr, &uiLength);
+	saddr_posix(__Process, buf, Address->lpSockaddr, &uiLength);
 	return(buf + uiLength);
 }
 void *
-ifmsg_posix(void *buf, WIN_IFADDRS *Adapter, WIN_TASK *Task)
+ifmsg_posix(void *buf, WIN_IFADDRS *Adapter)
 {
 	struct if_msghdr *hdr = buf;
 	struct if_data *data = &hdr->ifm_data;
@@ -70,7 +70,7 @@ ifmsg_posix(void *buf, WIN_IFADDRS *Adapter, WIN_TASK *Task)
 	hdr->ifm_type = RTM_IFINFO;
 	hdr->ifm_hdrlen = sizeof(struct if_msghdr);
 	hdr->ifm_index = Adapter->IfIndex;
-//	hdr->ifm_tableid
+	hdr->ifm_tableid = __Process->TaskId;
 	/* announce type of records added below */
 	hdr->ifm_addrs = RTA_IFP | RTA_IFA;
 	hdr->ifm_flags = Adapter->IfFlags;
@@ -81,16 +81,17 @@ ifmsg_posix(void *buf, WIN_IFADDRS *Adapter, WIN_TASK *Task)
 	data->ifi_link_state = dlstate_posix(Adapter->OperStatus);
 	data->ifi_mtu = Adapter->Mtu;
 //	data->ifi_metric
+//	data->ifi_pad
 	ifRow.dwIndex = Adapter->IfIndex;
 	if (ERROR_SUCCESS == GetIfEntry(&ifRow)){
 		data->ifi_baudrate = (uint64_t)ifRow.dwSpeed;
-		data->ifi_ipackets = ifRow.dwInUcastPkts;
-		data->ifi_ierrors = ifRow.dwInErrors;
-		data->ifi_opackets = ifRow.dwOutUcastPkts;
-		data->ifi_oerrors = ifRow.dwOutErrors;
+		data->ifi_ipackets = (uint64_t)ifRow.dwInUcastPkts;
+		data->ifi_ierrors = (uint64_t)ifRow.dwInErrors;
+		data->ifi_opackets = (uint64_t)ifRow.dwOutUcastPkts;
+		data->ifi_oerrors = (uint64_t)ifRow.dwOutErrors;
 //		data->ifi_collisions
-		data->ifi_ibytes = ifRow.dwInOctets;
-		data->ifi_obytes = ifRow.dwOutOctets;
+		data->ifi_ibytes = (uint64_t)ifRow.dwInOctets;
+		data->ifi_obytes = (uint64_t)ifRow.dwOutOctets;
 	}
 //	data->ifi_imcasts
 //	data->ifi_omcasts
@@ -102,7 +103,7 @@ ifmsg_posix(void *buf, WIN_IFADDRS *Adapter, WIN_TASK *Task)
 	buf += hdr->ifm_hdrlen;
 	buf = dladdr_posix(buf, Adapter->IfIndex, Adapter->IfType, Adapter->PhysAddr, Adapter->AddrLen);
 	while (paUnicast){
-		buf = ifamsg_posix(buf, Adapter, &paUnicast->Address, Task);
+		buf = ifamsg_posix(buf, Adapter, &paUnicast->Address);
 		paUnicast = paUnicast->Next;
 	}
 	return(buf);
@@ -119,7 +120,7 @@ rtmsg_posix(void *buf, MIB_IFROW *Interface, MIB_IPFORWARDROW *Address)
 	hdr->rtm_type = RTM_NEWADDR;
 	hdr->rtm_hdrlen = sizeof(struct rt_msghdr);
 	hdr->rtm_index = Address->dwForwardIfIndex;
-//	hdr->rtm_tableid
+	hdr->rtm_tableid = __Process->TaskId;
 //	hdr->rtm_priority
 //	hdr->rtm_mpls
 	/* address types added below */
@@ -152,13 +153,13 @@ inmsg_posix(void *buf, MIB_IPNETROW *Address)
 	struct ifa_msghdr *hdr = buf;
 
 	hdr->ifam_msglen = INMSGLEN;
+	hdr->ifam_msglen += sizeof(struct sockaddr_dl);
 	hdr->ifam_version = RTM_VERSION;
 	hdr->ifam_type = RTM_NEWADDR;
 	hdr->ifam_hdrlen = sizeof(struct ifa_msghdr);
 	hdr->ifam_index = Address->dwIndex;
-//	hdr->ifam_tableid
-//	hdr->ifam_addrs = RTA_IFP | RTA_IFA | RTA_DST;
-	hdr->ifam_addrs = RTA_IFA | RTA_DST;
+	hdr->ifam_tableid = __Process->TaskId;
+	hdr->ifam_addrs = RTA_IFP | RTA_IFA;
 	if (Address->dwType == MIB_IPNET_TYPE_DYNAMIC){
 		hdr->ifam_flags = IFA_ROUTE;
 	}
@@ -168,16 +169,6 @@ inmsg_posix(void *buf, MIB_IPNETROW *Address)
 	buf = dladdr_posix(buf, Address->dwIndex, Address->dwType, Address->bPhysAddr, Address->dwPhysAddrLen);
 	return(buf);
 }
-/* void 
-rtaddr_posix(struct sockaddr_in *addr, DWORD Port, BYTE Address[4])
-{
-//	if (Row->dwForwardType == MIB_IPROUTE_TYPE_INDIRECT){
-
-	addr->sin_len = sizeof(struct sockaddr_in);
-	addr->sin_family = AF_ROUTE;
-	addr->sin_port = Port;
-	win_memcpy(&addr->sin_addr, Address, 4);
-} */
 size_t 
 ifmsg_size(PIP_ADAPTER_UNICAST_ADDRESS Unicast)
 {
@@ -199,9 +190,10 @@ route_NET_RT_IFLIST(void *buf, size_t *size)
 	int result = 0;
 	WIN_IFDATA ifData;
 	WIN_IFADDRS ifInfo;
-//	WIN_TASK *pwTask = &__Tasks[CURRENT];
 
-	if (!buf){
+	if (!size){
+		return(-EINVAL);
+	}else if (!buf){
 		*size = 0;
 	}else{
 		win_bzero(buf, *size);
@@ -212,7 +204,7 @@ route_NET_RT_IFLIST(void *buf, size_t *size)
 		if (!buf){
 			*size += ifmsg_size(ifInfo.Unicast);
 		}else{
-			buf = ifmsg_posix(buf, &ifInfo, __Process);
+			buf = ifmsg_posix(buf, &ifInfo);
 		}
 	}
 	ws2_endconf(&ifData);
@@ -226,7 +218,9 @@ route_NET_RT_OACTIVE(void *buf, size_t *size)
 	PMIB_IPNETROW pinRow;
 	DWORD dwCount;
 
-	if (!ws2_NET_RT_OACTIVE(&pinTable, &pinRow, &dwCount)){
+	if (!size){
+		return(-EINVAL);
+	}else if (!ws2_NET_RT_OACTIVE(&pinTable, &pinRow, &dwCount)){
 		result -= errno_posix(GetLastError());
 	}else if (!buf){
 		*size = INMSGLEN * dwCount;

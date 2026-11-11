@@ -41,6 +41,9 @@ ws2_lookup(WIN_IFDATA *Config, WIN_IFDRIVER *Driver)
 		case IF_TYPE_ETHERNET_CSMACD:
 			Config->DeviceType = DEV_TYPE_ETH;
 			break;
+		case IF_TYPE_IS088023_CSMACD:
+			Config->DeviceType = DEV_TYPE_WWAN;
+			break;
 		case IF_TYPE_PPP:
 			Config->DeviceType = DEV_TYPE_PPP;
 			break;

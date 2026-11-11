@@ -40,7 +40,7 @@ DiskCreateFile(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_MODE *Mode, WIN_VNODE 
 	WCHAR szDirName[WIN_PATH_MAX] = L"";
 	HANDLE hResult;
 	WIN_ACL_CONTROL wControl = {Path->Owner, Path->Group, NULL, NULL};
-	SECURITY_ATTRIBUTES sa = {sizeof(sa), &sd, FALSE};
+	SECURITY_ATTRIBUTES sa = {sizeof(sa), &sd, TRUE};
 
 	Flags->Access |= WRITE_DAC | WRITE_OWNER;		/* disk_fchown() */
 	if (!win_acl_get_file(vfs_dirname(szDirName, Path->Resolved), &wControl.Source)){
@@ -72,7 +72,7 @@ DiskOpenFile(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_VNODE *Result)
 {
 	BOOL bResult = FALSE;
 	HANDLE hResult;
-	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, FALSE};
+	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, TRUE};
 
 	hResult = CreateFileW(Path->Resolved, Flags->Access, Flags->Share, 
 		&sa, Flags->Creation, Flags->Attribs, NULL);

@@ -37,9 +37,10 @@ null_open(WIN_FLAGS *Flags, WIN_VNODE *Result)
 {
 	BOOL bResult = FALSE;
 	HANDLE hResult = NULL;
+	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, TRUE};
 
 	hResult = CreateFile("NUL", Flags->Access, Flags->Share, 
-		NULL, Flags->Creation, Flags->Attribs, NULL);
+		&sa, Flags->Creation, Flags->Attribs, NULL);
 	if (hResult != INVALID_HANDLE_VALUE){
 		Result->Handle = hResult;
 		Result->Event = hResult;

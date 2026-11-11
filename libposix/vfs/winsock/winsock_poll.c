@@ -86,6 +86,7 @@ ws2_poll(WIN_VNODE *Node, WIN_POLLFD *Info, DWORD *Result)
 	 */
 	if (!(dwAttribs & FILE_FLAG_OVERLAPPED)){		/* wget.exe */
 		bResult = ws2_FIONBIO(Node, dwAttribs | FILE_FLAG_OVERLAPPED);
+		sResult = 0;
 	}else if (SOCKET_ERROR == WSAEnumNetworkEvents(Node->Socket, Node->Event, &nwEvents)){
 		bResult = FALSE;
 	}else if (nwEvents.lNetworkEvents){

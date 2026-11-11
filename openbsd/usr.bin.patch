@@ -2,6 +2,17 @@
 +++ openbsd-master/usr.bin/.patch	2025-09-12 11:34:13 +0200
 @@ -0,0 +1 @@
 +This directory has been patched.
+--- openbsd-master/usr.bin/fstat/fstat.c
++++ openbsd-master/usr.bin/fstat/fstat.c	Tue Nov 10 07:57:50 2026
+@@ -297,7 +297,7 @@
+ "USER     CMD          PID   FD  DEV      INUM       MODE R/W    SZ|DV");
+ 	else
+ 		printf("%s",
+-"USER     CMD          PID   FD MOUNT        INUM MODE       R/W    SZ|DV");
++"USER     CMD          PID   FD MOUNT                INUM MODE       R/W    SZ|DV");
+ 	if (oflg)
+ 		printf("%s", ":OFFSET  ");
+ 	if (checkfile && fsflg == 0)
 --- openbsd-master/usr.bin/ftp/Makefile
 +++ openbsd-master/usr.bin/ftp/Makefile	Tue Jan 20 05:51:05 2026
 @@ -15,11 +15,12 @@
@@ -58,16 +69,31 @@
  DPADD += ${LIBUTIL}
  LDADD	+= -lsqlite3 -lutil
  
---- openbsd-master/usr.bin/netstat/main.c
-+++ openbsd-master/usr.bin/netstat/main.c	Sat Oct 18 06:13:22 2025
-@@ -335,6 +335,7 @@
- 	need_nlist = !mflag && (pflag || nlistf != NULL || memf != NULL ||
- 	    (!iflag && !sflag && (rflag ? Aflag :
- 	    (gflag || af != AF_UNIX || Pflag))));
-+need_nlist = 0;
+--- openbsd-master/usr.bin/netstat/if.c
++++ openbsd-master/usr.bin/netstat/if.c	Wed Nov 11 16:43:58 2026
+@@ -195,8 +195,13 @@
+ 		break;
+ 	case AF_INET:
+ 		sin = (struct sockaddr_in *)sa;
++		/* This a hack? */
++#if 0
+ 		cp = netname4(sin->sin_addr.s_addr,
+ 		    ((struct sockaddr_in *)rtinfo[RTAX_NETMASK])->sin_addr.s_addr);
++#else
++		cp = NULL;
++#endif
+ 		if (vflag)
+ 			n = strlen(cp) < 11 ? 11 : strlen(cp);
+ 		else
+--- openbsd-master/usr.bin/netstat/Makefile
++++ openbsd-master/usr.bin/netstat/Makefile	Wed Oct  7 09:25:03 2026
+@@ -8,4 +8,6 @@
+ LDADD=	-lkvm -lutil
+ DPADD=	${LIBKVM} ${LIBUTIL}
  
- 	/*
- 	 * Discard setgid privileges if not the running kernel so that bad
++CFLAGS+= -g
++
+ .include <bsd.prog.mk>
 --- openbsd-master/usr.bin/sqlite3/Makefile
 +++ openbsd-master/usr.bin/sqlite3/Makefile	Sat Oct 18 06:13:22 2025
 @@ -11,8 +11,8 @@

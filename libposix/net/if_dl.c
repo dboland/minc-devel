@@ -44,6 +44,7 @@ dladdr_posix(struct sockaddr_dl *addr, DWORD Index, DWORD Type, BYTE Address[], 
 	addr->sdl_nlen = ws2_indextoname(Index, data);	/* interface name length, no trailing 0 reqd. */
 	data += addr->sdl_nlen;
 	addr->sdl_alen = Size;				/* link level address length */
+	addr->sdl_slen = 0;
 	win_memcpy(data, Address, Size);
 	return(addr + 1);
 }
@@ -62,8 +63,6 @@ dlstate_posix(IF_OPER_STATUS OperStatus)
 		IfOperStatusLowerLayerDown:
 			result = LINK_STATE_DOWN;
 			break;
-		IfOperStatusUnknown:
-		IfOperStatusTesting:
 		default:
 			result = LINK_STATE_UNKNOWN;
 			break;

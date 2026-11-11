@@ -170,7 +170,7 @@ kern_KERN_CPTIME(long states[CPUSTATES])
 	/* System time is not kernel time!
 	 */
 	GetSystemTimes(&ftIdle, &ftKernel, &ftUser);
-	states[CP_USER] = ticks_posix(&ftUser);;
+	states[CP_USER] = ticks_posix(&ftUser);
 	states[CP_IDLE] = ticks_posix(&ftIdle);
 	states[CP_SYS] = states[CP_USER] + ticks_posix(&ftKernel) - states[CP_IDLE];
 	states[CP_NICE] = 0;
