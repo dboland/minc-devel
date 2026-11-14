@@ -73,7 +73,7 @@ pipe_mknod(WIN_TASK *Task, LPWSTR FileName, WIN_MODE *Mode, LPWSTR NtName)
 {
 	BOOL bResult = FALSE;
 	SECURITY_DESCRIPTOR sd;
-	WIN_ACL_CONTROL wControl = {&Task->UserSid, &Task->GroupSid, NULL, NULL};
+	WIN_ACL_CONTROL wControl = {&__Process->UserSid, &__Process->GroupSid, NULL, NULL};
 	SECURITY_ATTRIBUTES sa = {sizeof(sa), &sd, FALSE};
 	WCHAR szDirName[WIN_PATH_MAX];
 
@@ -94,7 +94,7 @@ pipe_chmod(WIN_NAMEIDATA *Path, WIN_MODE *Mode)
 	SECURITY_INFORMATION siType = OWNER_SECURITY_INFORMATION + GROUP_SECURITY_INFORMATION + DACL_SECURITY_INFORMATION;
 	SECURITY_DESCRIPTOR sd;
 	DWORD dwSize = 0;
-	WIN_ACL_CONTROL wControl = {Path->Owner, Path->Group, NULL, NULL};
+	WIN_ACL_CONTROL wControl = {&__Process->UserSid, &__Process->GroupSid, NULL, NULL};
 
 	if (!win_acl_get_fd(Path->Object, &wControl.Source)){
 		return(FALSE);

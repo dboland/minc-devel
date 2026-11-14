@@ -84,7 +84,7 @@ printf: ${UBINSRC}/printf/printf.c
 # see: https://irq5.io/2011/06/26/gnu-patch-and-windows-uac/
 
 xinstall.o: xinstall.rc
-	windres -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@
+	@windres -DVERSION=\\\"${VERSION}\\\" -DRELEASE=\\\"${RELEASE}\\\" $< $@
 
 xinstall: ${UBINSRC}/xinstall/xinstall.c xinstall.o
 	@echo -n "$@ "
@@ -119,6 +119,6 @@ install: ${DESTDIR} ${OBJECTS} xinstall
 	@${MAKE} -C kdump install
 
 clean:
-	/bin/rm -f *.exe *.o *.res
+	/bin/rm -f *.exe *.o
 	${MAKE} -C make clean
 	${MAKE} -C kdump clean

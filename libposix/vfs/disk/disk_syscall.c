@@ -39,7 +39,7 @@ DiskCreateFile(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_MODE *Mode, WIN_VNODE 
 	SECURITY_DESCRIPTOR sd;
 	WCHAR szDirName[WIN_PATH_MAX] = L"";
 	HANDLE hResult;
-	WIN_ACL_CONTROL wControl = {Path->Owner, Path->Group, NULL, NULL};
+	WIN_ACL_CONTROL wControl = {&__Process->UserSid, &__Process->GroupSid, NULL, NULL};
 	SECURITY_ATTRIBUTES sa = {sizeof(sa), &sd, TRUE};
 
 	Flags->Access |= WRITE_DAC | WRITE_OWNER;		/* disk_fchown() */

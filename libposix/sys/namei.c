@@ -147,11 +147,9 @@ pathat_win(WIN_NAMEIDATA *Result, int dirfd, const char *path, int atflags)
 	Result->FSType = FS_TYPE_DISK;
 	Result->R = Result->Resolved;
 	Result->Base = Result->R;
-	Result->Owner = &pwTask->UserSid;
-	Result->Group = &pwTask->GroupSid;
 
 	if (dirfd > 0 && dirfd < OPEN_MAX){
-		vfs_F_GETPATH(&pwTask->Node[dirfd], &pwTask->UserSid, &pwTask->GroupSid, Result);
+		vfs_F_GETPATH(&pwTask->Node[dirfd], Result);
 
 	}else if (path[0] == '/'){
 		path = root_win(Result, path);

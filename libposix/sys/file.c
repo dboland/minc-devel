@@ -73,19 +73,20 @@ kfile_posix(WIN_TASK *Task, WIN_VNODE *Node, struct kinfo_file *buf)
 /****************************************************/
 
 void *
-file_KERN_FILE_BYPID(void *buf, size_t *size, WIN_TASK *Task, WIN_VNODE Node[])
+file_KERN_FILE_BYPID(WIN_TASK *Task, void *buf, size_t *size)
 {
 	size_t result = 0;
 	int fd = 0;
+	WIN_VNODE *pwNode = Task->Node;
 
 	while (fd < OPEN_MAX){
-		if (Node->Access){
+		if (pwNode->Access){
 			if (buf){
-				buf = kfile_posix(Task, Node, buf);
+				buf = kfile_posix(Task, pwNode, buf);
 			}
 			result += sizeof(struct kinfo_file);
 		}
-		Node++;
+		pwNode++;
 		fd++;
 	}
 	*size += result;
@@ -102,7 +103,7 @@ file_KERN_FILE(const int *name, void *buf, size_t *size)
 	*size = 0;
 	while (pid < CHILD_MAX){
 		if (pwTask->Flags && pwTask->State != WIN_SZOMB){
-			buf = file_KERN_FILE_BYPID(buf, size, pwTask, pwTask->Node);
+			buf = file_KERN_FILE_BYPID(pwTask, buf, size);
 		}
 		pwTask++;
 		pid++;

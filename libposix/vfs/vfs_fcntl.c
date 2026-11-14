@@ -110,7 +110,7 @@ vfs_F_GETFL(HANDLE Handle, ACCESS_MASK *Result)
 	return(bResult);
 }
 BOOL 
-vfs_F_GETPATH(WIN_VNODE *Node, SID8 *Owner, SID8 *Group, WIN_NAMEIDATA *Result)
+vfs_F_GETPATH(WIN_VNODE *Node, WIN_NAMEIDATA *Result)
 {
 	BOOL bResult = FALSE;
 	NTSTATUS ntStatus;
@@ -129,8 +129,6 @@ vfs_F_GETPATH(WIN_VNODE *Node, SID8 *Owner, SID8 *Group, WIN_NAMEIDATA *Result)
 		Result->S = NULL;
 		Result->Base = psz;
 		Result->Last = psz - 1;
-		Result->Owner = Owner;
-		Result->Group = Group;
 		Result->FSType = Node->FSType;
 		Result->Attribs = Node->Attribs;
 		Result->FileType = Node->FileType;

@@ -96,7 +96,7 @@ BOOL vfs_stat(WIN_NAMEIDATA *Path, WIN_VATTR *Result);
 BOOL vfs_chmod(WIN_NAMEIDATA *Path, WIN_MODE *Mode);
 BOOL vfs_mkfifo(WIN_NAMEIDATA *Path, WIN_MODE *Mode, WIN_VNODE *Result);
 BOOL vfs_mknod(WIN_NAMEIDATA *Path, WIN_MODE *Mode, DWORD DeviceId);
-BOOL vfs_fchmod(WIN_VNODE *Node, SID8 *Owner, SID8 *Group, WIN_MODE *Mode);
+BOOL vfs_fchmod(WIN_VNODE *Node, WIN_MODE *Mode);
 BOOL vfs_mkdir(WIN_NAMEIDATA *Path, WIN_MODE *Mode);
 
 /* vfs_signal.c */
@@ -114,7 +114,7 @@ BOOL vfs_kill_SYS(DWORD CallerId, UINT Message, WPARAM WParam, LPARAM LParam);
 BOOL vfs_open(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_MODE *Mode, WIN_VNODE *Result);
 BOOL vfs_F_SETLK(WIN_VNODE *Node, DWORD Flags, LARGE_INTEGER *Offset, LARGE_INTEGER *Size);
 BOOL vfs_F_SETFL(WIN_VNODE *Node, WIN_FLAGS *Flags);
-BOOL vfs_F_GETPATH(WIN_VNODE *Node, SID8 *Owner, SID8 *Group, WIN_NAMEIDATA *Result);
+BOOL vfs_F_GETPATH(WIN_VNODE *Node, WIN_NAMEIDATA *Result);
 BOOL vfs_F_DUPFD(WIN_VNODE *Node, BOOL CloseExec, WIN_VNODE *Result);
 HANDLE vfs_F_GETOSFHANDLE(WIN_VNODE Nodes[], DWORD Index);
 

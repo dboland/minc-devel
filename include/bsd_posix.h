@@ -63,7 +63,7 @@ WIN_NAMEIDATA *path_win(WIN_NAMEIDATA *Path, const char *path, int flags);
 int sys_fork(call_t call);
 int sys_vfork(call_t call);
 
-/* sched.c */
+/* task.c */
 
 void task_init(char *arg0, exec_t *exec);
 

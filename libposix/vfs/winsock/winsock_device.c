@@ -41,7 +41,8 @@ ws2_setconf(WIN_IFDATA *Config, ULONG Family)
 	ULONG ulStatus;
 	PIP_ADAPTER_ADDRESSES pTable;
 	LONG lSize = 0;
-	ULONG ulFlags = GAA_FLAG_SKIP_DNS_SERVER | GAA_FLAG_SKIP_MULTICAST;
+	ULONG ulFlags = GAA_FLAG_SKIP_DNS_SERVER | GAA_FLAG_SKIP_MULTICAST | \
+		GAA_FLAG_INCLUDE_PREFIX;
 	DWORD dwCount = 0;
 
 	ulStatus = GetAdaptersAddresses(Family, ulFlags, NULL, NULL, &lSize);

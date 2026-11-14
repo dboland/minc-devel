@@ -28,6 +28,8 @@
  *
  */
 
+#include <lmaccess.h>
+#include <lmerr.h>		/* NERR_Success */
 #include <lmapibuf.h>		/* NetApiBufferFree() */
 
 /************************************************************/
@@ -95,6 +97,19 @@ PwdLookup(WIN_PWENT *Entity, LPWSTR Controller)
 
 /************************************************************/
 
+LPWSTR 
+win_get_dc(LPWSTR Result)
+{
+	NET_API_STATUS naStatus;
+
+	naStatus = NetGetDCName(NULL, NULL, (LPBYTE *)&Result);
+	if (naStatus == NERR_Success){
+		return(Result);
+	}else if (naStatus != NERR_DCNotFound){
+		WIN_ERR("NetGetDCName(): %s\n", win_strerror(naStatus));
+	}
+	return(NULL);
+}
 BOOL 
 win_getpwnam(LPCWSTR Account, LPWSTR Controller, WIN_PWENT *Result)
 {

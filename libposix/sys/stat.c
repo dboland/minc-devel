@@ -261,7 +261,6 @@ stat_posix(WIN_TASK *Task, struct stat *buf, WIN_VATTR *Stat)
 	}
 }
 
-
 /****************************************************/
 
 int 
@@ -354,7 +353,7 @@ sys_fchmod(call_t call, int fd, mode_t mode)
 
 	if (fd < 0 || fd >= OPEN_MAX){
 		result = -EBADF;
-	}else if (!vfs_fchmod(&pwTask->Node[fd], &pwTask->UserSid, &pwTask->GroupSid, mode_win(&wMode, mode))){
+	}else if (!vfs_fchmod(&pwTask->Node[fd], mode_win(&wMode, mode))){
 		result -= errno_posix(GetLastError());
 	}
 	return(result);

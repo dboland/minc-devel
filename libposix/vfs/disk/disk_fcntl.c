@@ -66,26 +66,6 @@ disk_F_NAMEI(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
 	return(bResult);
 }
 BOOL 
-disk_F_BIND(LPWSTR FileName, DWORD FileType, SECURITY_ATTRIBUTES *Attribs, LPWSTR Target)
-{
-	BOOL bResult = FALSE;
-	DWORD dwResult;
-	WIN_INODE iNode = {TypeNameVirtual, DEV_TYPE_ROOT, FileType, 
-		FS_TYPE_DISK, INAMESIZE(Target), 0, 0};
-	HANDLE hNode;
-
-	hNode = CreateFileW(FileName, GENERIC_WRITE, FILE_SHARE_READ, 
-		Attribs, CREATE_NEW, FILE_CLASS_INODE, NULL);
-	if (hNode == INVALID_HANDLE_VALUE){
-		return(FALSE);
-	}else if (!WriteFile(hNode, &iNode, sizeof(WIN_INODE), &dwResult, NULL)){
-		WIN_ERR("WriteFile(%ls): %s\n", FileName, win_strerror(GetLastError()));
-	}else if (WriteFile(hNode, Target, iNode.NameSize, &dwResult, NULL)){
-		bResult = CloseHandle(hNode);
-	}
-	return(bResult);
-}
-BOOL 
 disk_F_SETLK(WIN_VNODE *Node, DWORD Flags, LARGE_INTEGER *Offset, LARGE_INTEGER *Size)
 {
 	BOOL bResult = FALSE;

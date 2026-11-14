@@ -40,7 +40,7 @@ PipeCreateFile(LPCWSTR Name, DWORD Attribs, HANDLE Event, WIN_VNODE *Result)
 	DWORD dwPipeMode = (Attribs & 0x0000FFFF) | PIPE_WAIT;
 	WCHAR szPath[MAX_PATH] = L"\\\\.\\PIPE\\";
 	DWORD dwMax = PIPE_UNLIMITED_INSTANCES;
-	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, FALSE};
+	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, TRUE};
 	HANDLE hResult;
 
 	hResult = CreateNamedPipeW(win_wcscat(szPath, Name), dwOpenMode, dwPipeMode, 
@@ -49,6 +49,9 @@ PipeCreateFile(LPCWSTR Name, DWORD Attribs, HANDLE Event, WIN_VNODE *Result)
 		Result->Handle = hResult;
 		Result->Event = Event;
 		Result->FSType = FS_TYPE_PIPE;
+		Result->FileType = WIN_VSOCK;
+		Result->DeviceType = __Mounts->DeviceType;
+//		Result->DeviceId = __Mounts->DeviceId;
 		Result->Attribs = Attribs & 0xFFFF0000;
 		Result->Access = win_F_GETFL(hResult);
 		Result->Flags = win_F_GETFD(hResult);
@@ -66,7 +69,7 @@ PipeOpenFile(LPCWSTR Name, HANDLE Event, WIN_VNODE *Result)
 	DWORD dwShare = FILE_SHARE_WRITE + FILE_SHARE_READ;
 	WCHAR szPath[MAX_PATH] = L"\\\\.\\PIPE\\";
 	DWORD dwAttribs = FILE_ATTRIBUTE_NORMAL;
-	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, FALSE};
+	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, TRUE};
 	HANDLE hResult;
 
 	hResult = CreateFileW(win_wcscat(szPath, Name), aMask, dwShare, NULL, 
@@ -75,6 +78,8 @@ PipeOpenFile(LPCWSTR Name, HANDLE Event, WIN_VNODE *Result)
 		Result->Handle = hResult;
 		Result->Event = Event;
 		Result->FSType = FS_TYPE_PIPE;
+		Result->FileType = WIN_VSOCK;
+		Result->DeviceType = __Mounts->DeviceType;
 		Result->Attribs = dwAttribs;
 		Result->Access = win_F_GETFL(hResult);
 		Result->Flags = win_F_GETFD(hResult);

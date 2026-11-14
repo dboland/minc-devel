@@ -43,9 +43,6 @@ pipe_socket(INT Family, INT Type, INT Protocol, WIN_VNODE *Result)
 		dwAttribs = PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE;
 	}
 	if (PipeCreateFile(VfsCreateName(szName), dwAttribs, __PipeEvent, Result)){
-		Result->FileType = WIN_VSOCK;
-		Result->DeviceType = __Mounts->DeviceType;
-		Result->DeviceId = __Mounts->DeviceId;
 		bResult = TRUE;
 	}
 	return(bResult);
@@ -95,10 +92,6 @@ pipe_socketpair(INT Domain, INT Type, INT Protocol, WIN_VNODE Result[2])
 	if (!PipeCreateFile(VfsCreateName(szName), dwAttribs, hEvent, &Result[0])){
 		return(FALSE);
 	}else if (PipeOpenFile(szName, hEvent, &Result[1])){
-		Result[0].FileType = WIN_VSOCK;
-		Result[0].DeviceType = __Mounts->DeviceType;
-		Result[1].FileType = WIN_VSOCK;
-		Result[1].DeviceType = __Mounts->DeviceType;
 		bResult = TRUE;
 	}
 	return(bResult);

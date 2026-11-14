@@ -143,8 +143,6 @@ typedef struct _WIN_NAMEIDATA {
 	HANDLE Object;
 	DWORD Attribs;
 	DWORD Flags;			/* see below */
-	SID8 *Owner;			/* owner at file creation */
-	SID8 *Group;			/* group at file creation */
 	WCHAR *Base;
 	WCHAR *Last;
 	WCHAR *R;			/* current WCHAR in resolved path buffer */

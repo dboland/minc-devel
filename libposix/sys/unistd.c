@@ -442,6 +442,59 @@ sys_truncate(call_t call, const char *path, off_t length)
 /****************************************************/
 
 int 
+__openat(WIN_TASK *Task, WIN_NAMEIDATA *Path, int flags, va_list args)
+{
+	int result = 0;
+	mode_t mode = va_arg(args, mode_t);
+	WIN_FLAGS wFlags;
+	WIN_MODE wMode;
+	WIN_VNODE vNode = {0};
+
+	mode &= ~Task->FileMask;
+	if ((Path->FileType == WIN_VLNK) && (Path->Flags == WIN_NOFOLLOW)){
+		result = -ELOOP;
+	}else if (!vfs_open(Path, flags_win(&wFlags, flags), mode_win(&wMode, mode), &vNode)){
+		result -= errno_posix(GetLastError());
+	}else{
+		result = fd_posix(Task, &vNode, 0);
+	}
+	return(result);
+}
+int 
+sys_open(call_t call, const char *path, int flags, ...)
+{
+	int result;
+	va_list args;
+	WIN_NAMEIDATA wPath = {0};
+
+	if (!path[0]){
+		return(-ENOENT);
+	}
+	va_start(args, flags);
+	result = __openat(call.Task, path_win(&wPath, path, flags | O_INODE), flags, args);
+	va_end(args);
+	return(result);
+}
+int 
+sys_openat(call_t call, int dirfd, const char *path, int flags, ...)
+{
+	int result;
+	va_list args;
+	WIN_NAMEIDATA wPath = {0};
+	int atflags = AT_INODE;
+
+	if (flags & O_NOFOLLOW){
+		atflags |= AT_SYMLINK_NOFOLLOW;
+	}
+	if (flags & O_DIRECTORY){
+		atflags |= AT_REMOVEDIR;
+	}
+	va_start(args, flags);
+	result = __openat(call.Task, pathat_win(&wPath, dirfd, path, atflags), flags, args);
+	va_end(args);
+	return(result);
+}
+int 
 __dup(WIN_TASK *Task, WIN_VNODE *Node)
 {
 	int result = 0;
@@ -481,6 +534,7 @@ sys_dup2(call_t call, int oldfd, int newfd)
 	}else if (!vfs_dup2(&pvNodes[oldfd], &pvNodes[newfd])){
 		result -= errno_posix(GetLastError());
 	}else{
+		pvNodes[newfd].FileId = newfd;
 		result = newfd;
 	}
 	return(result);

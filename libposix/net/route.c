@@ -31,7 +31,6 @@
 #include <net/route.h>
 
 #define IFMSGLEN	(sizeof(struct if_msghdr) + sizeof(struct sockaddr_dl))
-//#define IFAMSGLEN	(sizeof(struct ifa_msghdr) + (sizeof(struct sockaddr_in) * 3))
 #define RTMSGLEN	(sizeof(struct rt_msghdr) + (sizeof(struct sockaddr_in) * 2))
 #define INMSGLEN	(sizeof(struct ifa_msghdr) + sizeof(struct sockaddr_in) + sizeof(struct sockaddr_dl))
 
@@ -41,21 +40,28 @@ void *
 ifamsg_posix(void *buf, WIN_IFADDRS *Adapter, PSOCKET_ADDRESS Address)
 {
 	struct ifa_msghdr *hdr = buf;
-	UINT uiLength = Address->iSockaddrLength;
+	UINT uiAddrLen = Address->iSockaddrLength;
 
-	hdr->ifam_msglen = sizeof(struct ifa_msghdr) + uiLength;
+	/* This message should include a netmask/prefix socket
+	 * record. Adding bogus socket record until we have a
+	 * matching algoritm (netstat.exe).
+	 */
+	hdr->ifam_msglen = sizeof(struct ifa_msghdr) + uiAddrLen + uiAddrLen;
 	hdr->ifam_version = RTM_VERSION;
 	hdr->ifam_type = RTM_NEWADDR;
 	hdr->ifam_hdrlen = sizeof(struct ifa_msghdr);
 	hdr->ifam_index = Adapter->IfIndex;
-//	hdr->ifam_tableid
+	hdr->ifam_tableid = __Process->TaskId;
 	/* records added below need to be announced here */
-	hdr->ifam_addrs = RTA_IFA;
+	hdr->ifam_addrs = RTA_NETMASK | RTA_IFA;
 	hdr->ifam_flags = Adapter->IfFlags;
 //	hdr->ifam_metric
 	buf += hdr->ifam_hdrlen;
-	saddr_posix(__Process, buf, Address->lpSockaddr, &uiLength);
-	return(buf + uiLength);
+	saddr_posix(__Process, buf, Address->lpSockaddr, &uiAddrLen);
+	buf += uiAddrLen;
+	saddr_posix(__Process, buf, Address->lpSockaddr, &uiAddrLen);
+	buf += uiAddrLen;
+	return(buf);
 }
 void *
 ifmsg_posix(void *buf, WIN_IFADDRS *Adapter)
@@ -153,7 +159,6 @@ inmsg_posix(void *buf, MIB_IPNETROW *Address)
 	struct ifa_msghdr *hdr = buf;
 
 	hdr->ifam_msglen = INMSGLEN;
-	hdr->ifam_msglen += sizeof(struct sockaddr_dl);
 	hdr->ifam_version = RTM_VERSION;
 	hdr->ifam_type = RTM_NEWADDR;
 	hdr->ifam_hdrlen = sizeof(struct ifa_msghdr);
@@ -176,7 +181,7 @@ ifmsg_size(PIP_ADAPTER_UNICAST_ADDRESS Unicast)
 
 	while (Unicast){
 		result += sizeof(struct ifa_msghdr);
-		result += Unicast->Address.iSockaddrLength;
+		result += (Unicast->Address.iSockaddrLength * 2);
 		Unicast = Unicast->Next;
 	}
 	return(result);

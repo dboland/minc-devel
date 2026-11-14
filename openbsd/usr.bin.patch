@@ -69,22 +69,6 @@
  DPADD += ${LIBUTIL}
  LDADD	+= -lsqlite3 -lutil
  
---- openbsd-master/usr.bin/netstat/if.c
-+++ openbsd-master/usr.bin/netstat/if.c	Wed Nov 11 16:43:58 2026
-@@ -195,8 +195,13 @@
- 		break;
- 	case AF_INET:
- 		sin = (struct sockaddr_in *)sa;
-+		/* This a hack? */
-+#if 0
- 		cp = netname4(sin->sin_addr.s_addr,
- 		    ((struct sockaddr_in *)rtinfo[RTAX_NETMASK])->sin_addr.s_addr);
-+#else
-+		cp = NULL;
-+#endif
- 		if (vflag)
- 			n = strlen(cp) < 11 ? 11 : strlen(cp);
- 		else
 --- openbsd-master/usr.bin/netstat/Makefile
 +++ openbsd-master/usr.bin/netstat/Makefile	Wed Oct  7 09:25:03 2026
 @@ -8,4 +8,6 @@

@@ -50,8 +50,14 @@ PdoOpenFile(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_VNODE *Result)
 		Result->Attribs = Path->Attribs;
 		Result->Handle = Path->Object;
 		Result->CloseExec = Flags->CloseExec;
-		Result->Access = Flags->Access;
-		Result->Flags = HANDLE_FLAG_INHERIT;
+		if (Path->Object){
+			Result->Access = win_F_GETFL(Path->Object);
+			Result->Flags = win_F_GETFD(Path->Object);
+		}else{
+			Result->Access = Flags->Access;
+			Result->Flags = HANDLE_FLAG_INHERIT;
+		}
+//vfs_ktrace(L"PdoOpenFile", STRUCT_NAMEI, Path);
 		bResult = TRUE;
 	}
 	return(bResult);

@@ -37,13 +37,13 @@ VfsPathFlags(LPSTR Buffer, LPCSTR Label, DWORD Flags)
 
 	psz += sprintf(psz, "%s([0x%x]", Label, Flags);
 	psz = WinFlagName(psz, WIN_PATHCOPY, "PATHCOPY", Flags, &Flags);
-	psz = WinFlagName(psz, WIN_NEEDHANDLE, "REQUIREOBJECT", Flags, &Flags);
+	psz = WinFlagName(psz, WIN_NEEDHANDLE, "NEEDHANDLE", Flags, &Flags);
 	psz = WinFlagName(psz, WIN_LOCKLEAF, "LOCKLEAF", Flags, &Flags);
 	psz = WinFlagName(psz, WIN_FOLLOW, "FOLLOW", Flags, &Flags);
 	psz = WinFlagName(psz, WIN_NOCROSSMOUNT, "NOCROSSMOUNT", Flags, &Flags);
-	psz = WinFlagName(psz, WIN_RDONLY, "ISSYMLINK", Flags, &Flags);
-	psz = WinFlagName(psz, WIN_HASBUF, "REQUIREDIR", Flags, &Flags);
-	psz = WinFlagName(psz, WIN_SAVENAME, "STRIPSLASHES", Flags, &Flags);
+	psz = WinFlagName(psz, WIN_RDONLY, "RDONLY", Flags, &Flags);
+	psz = WinFlagName(psz, WIN_HASBUF, "HASBUF", Flags, &Flags);
+	psz = WinFlagName(psz, WIN_SAVENAME, "SAVENAME", Flags, &Flags);
 	psz = WinFlagName(psz, WIN_SAVESTART, "SAVESTART", Flags, &Flags);
 	psz = WinFlagName(psz, WIN_ISDOTDOT, "ISDOTDOT", Flags, &Flags);
 	psz = WinFlagName(psz, WIN_MAKEENTRY, "MAKEENTRY", Flags, &Flags);

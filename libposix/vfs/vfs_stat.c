@@ -106,14 +106,14 @@ vfs_chmod(WIN_NAMEIDATA *Path, WIN_MODE *Mode)
 	return(bResult);
 }
 BOOL 
-vfs_fchmod(WIN_VNODE *Node, SID8 *Owner, SID8 *Group, WIN_MODE *Mode)
+vfs_fchmod(WIN_VNODE *Node, WIN_MODE *Mode)
 {
 	BOOL bResult = FALSE;
 	WIN_NAMEIDATA wPath = {0};
 
 	if (Node->Access & WRITE_DAC){		/* install.exe */
-		bResult = disk_fchmod(Node, Owner, Group, Mode);
-	}else if (vfs_F_GETPATH(Node, Owner, Group, &wPath)){
+		bResult = disk_fchmod(Node, Mode);
+	}else if (vfs_F_GETPATH(Node, &wPath)){
 		bResult = vfs_chmod(&wPath, Mode);
 	}
 	return(bResult);
@@ -123,7 +123,7 @@ vfs_mknod(WIN_NAMEIDATA *Path, WIN_MODE *Mode, DWORD DeviceId)
 {
 	BOOL bResult = FALSE;
 	SECURITY_DESCRIPTOR sd;
-	WIN_ACL_CONTROL wControl = {Path->Owner, Path->Group, NULL, NULL};
+	WIN_ACL_CONTROL wControl = {&__Process->UserSid, &__Process->GroupSid, NULL, NULL};
 	SECURITY_ATTRIBUTES sa = {sizeof(sa), &sd, FALSE};
 	WCHAR szDirName[WIN_PATH_MAX];
 
@@ -163,7 +163,7 @@ vfs_mkdir(WIN_NAMEIDATA *Path, WIN_MODE *Mode)
 	DWORD dwSize = 0;
 	SECURITY_DESCRIPTOR sd;
 	WCHAR szParent[WIN_PATH_MAX];
-	WIN_ACL_CONTROL wControl = {Path->Owner, Path->Group, NULL, NULL};
+	WIN_ACL_CONTROL wControl = {&__Process->UserSid, &__Process->GroupSid, NULL, NULL};
 	SECURITY_ATTRIBUTES sa = {sizeof(sa), &sd, FALSE};
 	BYTE bAceFlags = OBJECT_INHERIT_ACE + CONTAINER_INHERIT_ACE;
 

@@ -112,7 +112,6 @@ BOOL win_realpath(LPCWSTR Path, DWORD Size, LPWSTR Resolved);
 BOOL win_acl_get_file(LPCWSTR FileName, PSECURITY_DESCRIPTOR *Result);
 BOOL win_acl_get_fd(HANDLE Handle, PSECURITY_DESCRIPTOR *Result);
 BOOL win_acl_dup(PSECURITY_DESCRIPTOR Source, PSECURITY_DESCRIPTOR Result);
-LPWSTR win_acl_get_dc(LPWSTR Result);
 
 /* win_pwd.c */
 
@@ -121,6 +120,7 @@ BOOL win_getpwuid(SID8 *Sid, LPWSTR Controller, WIN_PWENT *Result);
 BOOL win_setpwent(WIN_PWENUM *Enum);
 BOOL win_getpwent(WIN_PWENUM *Info, WIN_PWENT *Result);
 VOID win_endpwent(WIN_PWENUM *Info);
+LPWSTR win_get_dc(LPWSTR Result);
 
 /* win_grp.c */
 

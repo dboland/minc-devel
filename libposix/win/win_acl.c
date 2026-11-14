@@ -28,8 +28,7 @@
  *
  */
 
-#include <lmaccess.h>
-#include <lmerr.h>		/* NERR_Success */
+#include <aclapi.h>
 
 /************************************************************/
 
@@ -65,19 +64,6 @@ AclInit(SID8 *SidMachine)
 
 /************************************************************/
 
-LPWSTR 
-win_acl_get_dc(LPWSTR Result)
-{
-	NET_API_STATUS naStatus;
-
-	naStatus = NetGetDCName(NULL, NULL, (LPBYTE *)&Result);
-	if (naStatus == NERR_Success){
-		return(Result);
-	}else if (naStatus != NERR_DCNotFound){
-		WIN_ERR("NetGetDCName(): %s\n", win_strerror(naStatus));
-	}
-	return(NULL);
-}
 BOOL 
 win_acl_get_file(LPCWSTR FileName, PSECURITY_DESCRIPTOR *Result)
 {
@@ -103,12 +89,12 @@ win_acl_get_fd(HANDLE Handle, PSECURITY_DESCRIPTOR *Result)
 	SECURITY_INFORMATION siType = OWNER_SECURITY_INFORMATION
 		 + GROUP_SECURITY_INFORMATION + DACL_SECURITY_INFORMATION;
 
-	GetUserObjectSecurity(Handle, &siType, NULL, lSize, &lSize);
+	GetKernelObjectSecurity(Handle, siType, NULL, lSize, &lSize);
 	if (lSize > 0){
 		*Result = LocalAlloc(LMEM_FIXED, lSize);
-		bResult = GetUserObjectSecurity(Handle, &siType, *Result, lSize, &lSize);
+		bResult = GetKernelObjectSecurity(Handle, siType, *Result, lSize, &lSize);
 //	}else{
-//		WIN_ERR("GetUserObjectSecurity(%d): %s\n", Handle, win_strerror(GetLastError()));
+//		WIN_ERR("GetKernelObjectSecurity(%d): %s\n", Handle, win_strerror(GetLastError()));
 	}
 	return(bResult);
 }

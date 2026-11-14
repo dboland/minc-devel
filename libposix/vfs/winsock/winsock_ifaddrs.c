@@ -75,6 +75,7 @@ ws2_getifaddrs(WIN_IFDATA *Config, WIN_IFADDRS *Result)
 		Result->IfFlags = WSALookupFlags(pAdapter);
 		Result->Mtu = pAdapter->Mtu;
 		Result->Unicast = pAdapter->FirstUnicastAddress;
+		Result->Prefix = pAdapter->FirstPrefix;
 		Result->AddrLen = pAdapter->PhysicalAddressLength;
 		win_memcpy(Result->PhysAddr, pAdapter->PhysicalAddress, Result->AddrLen);
 		Config->Next = pAdapter->Next;

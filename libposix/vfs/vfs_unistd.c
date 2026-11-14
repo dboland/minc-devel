@@ -177,7 +177,6 @@ vfs_dup(WIN_VNODE *Node, WIN_VNODE *Result)
 {
 	BOOL bResult = FALSE;
 
-//	Result->FileId = Node->FileId;		/* pdo_F_DUPFD() */
 	if (vfs_F_DUPFD(Node, FALSE, Result)){
 		bResult = TRUE;
 	}
@@ -257,7 +256,7 @@ vfs_fchown(WIN_TASK *Task, WIN_VNODE *Node, PSID NewUser, PSID NewGroup)
 
 	if (Node->Access & WRITE_DAC){		/* install.exe */
 		bResult = disk_fchown(Node, NewUser, NewGroup);
-	}else if (vfs_F_GETPATH(Node, &Task->UserSid, &Task->GroupSid, &wPath)){
+	}else if (vfs_F_GETPATH(Node, &wPath)){
 		bResult = disk_chown(&wPath, NewUser, NewGroup);
 	}
 	return(bResult);

@@ -31,6 +31,15 @@
 #include <uvm/uvm_param.h>	/* VM_LOADAVG */
 #include <uvm/uvm_extern.h>	/* struct uvmexp */
 
+/* OpenBSD has an elaborate algorithm to forget 90% of usage statistics,
+ * which they call 'digital decay' or 'exponential decay value' (KERN_CCPU).
+ * When a process is coming back from a high CPU load, the CPU percentage
+ * goes down very slowly, because the time spent has to be spread over
+ * seconds which haven't occurred yet.
+ */
+
+fixpt_t __CCPU = 0.95122942450071400909 * FSCALE;         /* exp(-1/20) */
+
 /****************************************************/
 
 int 
