@@ -57,7 +57,7 @@ PdoOpenFile(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_VNODE *Result)
 			Result->Access = Flags->Access;
 			Result->Flags = HANDLE_FLAG_INHERIT;
 		}
-//vfs_ktrace(L"PdoOpenFile", STRUCT_NAMEI, Path);
+//vfs_ktrace(L"PdoOpenFile", STRUCT_VNODE, Result);
 		bResult = TRUE;
 	}
 	return(bResult);

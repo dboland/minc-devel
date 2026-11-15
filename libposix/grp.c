@@ -157,7 +157,7 @@ grp_GRP_GETGROUPLIST(const char *user, gid_t group, gid_t *groups, int *ngroups)
 	}
 	if (!win_mbstowcs(szAccount, user, MAX_NAME)){
 		result = -EINVAL;
-	}else if (!win_getpwnam(szAccount, win_get_dc(szName), &pwEntry)){
+	}else if (!win_getpwnam(szAccount, win_getdcnam(szName), &pwEntry)){
 		result -= errno_posix(GetLastError());
 	}else if (!win_getgrouplist(&pwEntry, rid_win(&sid, group), &psGroups, &dwCount)){
 		result -= errno_posix(GetLastError());

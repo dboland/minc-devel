@@ -97,6 +97,25 @@ PathGlobLink(WIN_NAMEIDATA *Path, DWORD Flags)
 	return(bResult);
 }
 BOOL 
+PathGlobClass(WIN_NAMEIDATA *Path, DWORD Flags, HANDLE *Result)
+{
+	BOOL bResult = TRUE;
+
+	if (Path->Attribs == -1){
+		bResult = FALSE;
+	}else switch (FILE_CLASS(Path->Attribs)){
+		case FILE_CLASS_INODE:
+			bResult = vfs_F_NAMEI(Path, Flags, Result);
+			break;
+		case FILE_CLASS_MOUNT:
+			bResult = drive_F_NAMEI(Path, Flags);
+			break;
+		case FILE_CLASS_ROOT:
+			break;
+	}
+	return(bResult);
+}
+BOOL 
 PathGlob(WIN_NAMEIDATA *Path, DWORD Flags)
 {
 	BOOL bResult = TRUE;
@@ -105,7 +124,7 @@ PathGlob(WIN_NAMEIDATA *Path, DWORD Flags)
 	Path->Attribs = GetFileAttributesW(Path->Resolved);
 	if (Path->MountId){
 		bResult = PathGlobLink(Path, Flags);
-	}else if (!VfsGlobClass(Path, Flags, &hResult)){
+	}else if (!PathGlobClass(Path, Flags, &hResult)){
 		bResult = FALSE;
 	}else switch (Path->FSType){
 		case FS_TYPE_DISK:

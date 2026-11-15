@@ -33,6 +33,23 @@
 /****************************************************/
 
 BOOL 
+vfs_open(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_MODE *Mode, WIN_VNODE *Result)
+{
+	BOOL bResult = FALSE;
+
+	switch (Path->FSType){
+		case FS_TYPE_PDO:
+			bResult = pdo_open(Path, Flags, Result);
+			break;
+		case FS_TYPE_DISK:
+			bResult = disk_open(Path, Flags, Mode, Result);
+			break;
+		default:
+			SetLastError(ERROR_BAD_FILE_TYPE);
+	}
+	return(bResult);
+}
+BOOL 
 vfs_close(WIN_VNODE *Node)
 {
 	BOOL bResult = FALSE;

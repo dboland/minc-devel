@@ -124,7 +124,7 @@ pwd_PWD_GETPWUID(uid_t uid, char *buf, size_t buflen)
 	}
 	if (uid < 0){
 		result = -EINVAL;
-	}else if (!win_getpwuid(rid_win(&sid, uid), win_get_dc(szName), &pwResult)){
+	}else if (!win_getpwuid(rid_win(&sid, uid), win_getdcnam(szName), &pwResult)){
 		result -= errno_posix(GetLastError());
 	}else{
 		passwd_posix(buf, buflen, &pwResult);
@@ -145,7 +145,7 @@ pwd_PWD_GETPWNAM(const char *name, char *buf, size_t buflen)
 		result = pwd_PWD_GETPWUID(ROOT_UID, buf, buflen);
 	}else if (!win_mbstowcs(szAccount, name, MAX_NAME)){
 		result = -EINVAL;
-	}else if (!win_getpwnam(szAccount, win_get_dc(szName), &pwResult)){
+	}else if (!win_getpwnam(szAccount, win_getdcnam(szName), &pwResult)){
 		result -= errno_posix(GetLastError());
 	}else{
 		passwd_posix(buf, buflen, &pwResult);

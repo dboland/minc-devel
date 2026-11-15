@@ -312,10 +312,10 @@ typedef struct _WIN_VNODE {
 	DWORDLONG LockRegion;
 	DWORDLONG LockSize;
 	union {
-		HANDLE Object;	/* search handle */
+		HANDLE Object;	/* inode-specific object handle */
 		UINT Options;	/* socket layer options */
 	};
-	DWORD Index;
+	DWORD Index;		/* device-specific software context */
 	BOOL CloseExec;
 	LONG Owner;
 } WIN_VNODE;

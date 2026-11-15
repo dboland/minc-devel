@@ -173,23 +173,34 @@ vfs_F_GETOSFHANDLE(WIN_VNODE Nodes[], DWORD Index)
 	}
 	return(hResult);
 }
-
-/****************************************************/
-
 BOOL 
-vfs_open(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_MODE *Mode, WIN_VNODE *Result)
+vfs_F_NAMEI(WIN_NAMEIDATA *Path, DWORD Flags, HANDLE *Result)
 {
 	BOOL bResult = FALSE;
+	DWORD dwSize;
+	HANDLE hResult;
+	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, TRUE};
+	WIN_INODE iNode = {0};
+	ACCESS_MASK amAccess = GENERIC_READ | READ_CONTROL;
 
-	switch (Path->FSType){
-		case FS_TYPE_PDO:
-			bResult = pdo_open(Path, Flags, Result);
-			break;
-		case FS_TYPE_DISK:
-			bResult = disk_open(Path, Flags, Mode, Result);
-			break;
-		default:
-			SetLastError(ERROR_BAD_FILE_TYPE);
+	if (Flags & WIN_LOCKLEAF){
+		amAccess |= WRITE_DAC | WRITE_OWNER;
+	}
+	hResult = CreateFileW(Path->Resolved, amAccess, FILE_SHARE_READ, 
+		&sa, OPEN_EXISTING, FILE_CLASS_INODE, NULL);
+	if (hResult == INVALID_HANDLE_VALUE){
+		return(FALSE);
+	}else if (!ReadFile(hResult, &iNode, sizeof(WIN_INODE), &dwSize, NULL)){
+		WIN_ERR("ReadFile(%ls): %s\n", Path->Resolved, win_strerror(GetLastError()));
+	}else if (iNode.Magic == TypeNameVirtual){
+		Path->DeviceId = iNode.DeviceId;
+		Path->FileType = iNode.FileType;
+		Path->FSType = iNode.FSType;
+		Path->Size = iNode.NameSize;
+		*Result = hResult;
+		bResult = TRUE;
+	}else if (CloseHandle(hResult)){
+		SetLastError(ERROR_BAD_FILE_TYPE);
 	}
 	return(bResult);
 }

@@ -28,11 +28,10 @@
  *
  */
 
+#include "drive_fcntl.c"
 #include "drive_namei.c"
 #include "drive_device.c"
 #include "drive_mount.c"
 #include "drive_statvfs.c"
 #include "drive_sysctl.c"
-
-/****************************************************/
 

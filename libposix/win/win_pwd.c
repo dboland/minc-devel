@@ -98,7 +98,7 @@ PwdLookup(WIN_PWENT *Entity, LPWSTR Controller)
 /************************************************************/
 
 LPWSTR 
-win_get_dc(LPWSTR Result)
+win_getdcnam(LPWSTR Result)
 {
 	NET_API_STATUS naStatus;
 

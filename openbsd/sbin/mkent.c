@@ -91,7 +91,7 @@ print_fsent(struct statfs *info)
 	printf("%s\t0\t0\n", line);	/* frequency, passno (1=root, 2=other) */
 
 	if (_paths){
-		mkdir(info->f_mntonname, 00700);
+		mkdir(info->f_mntonname, 00500);
 	}
 }
 void 
