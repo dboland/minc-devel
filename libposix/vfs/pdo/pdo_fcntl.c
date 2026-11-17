@@ -33,18 +33,6 @@
 /****************************************************/
 
 BOOL 
-pdo_F_NAMEI(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
-{
-	BOOL bResult = TRUE;
-
-	if (Flags & WIN_NEEDHANDLE){
-		Result->Object = Handle;
-	}else{
-		bResult = CloseHandle(Handle);
-	}
-	return(bResult);
-}
-BOOL 
 pdo_F_BIND(LPWSTR FileName, DWORD FileType, SECURITY_ATTRIBUTES *Attribs, DWORD DeviceId)
 {
 	BOOL bResult = FALSE;
@@ -59,6 +47,21 @@ pdo_F_BIND(LPWSTR FileName, DWORD FileType, SECURITY_ATTRIBUTES *Attribs, DWORD 
 		return(FALSE);
 	}else if (WriteFile(hNode, &iNode, sizeof(WIN_INODE), &dwResult, NULL)){
 		bResult = CloseHandle(hNode);
+	}
+	return(bResult);
+}
+BOOL 
+pdo_F_DUPFD(WIN_VNODE *Node, HANDLE Process, DWORD Options, WIN_VNODE *Result)
+{
+	BOOL bResult = FALSE;
+	HANDLE hResult = NULL;
+	BOOL bInherit = (Node->Flags & HANDLE_FLAG_INHERIT);
+
+	if (!DuplicateHandle(GetCurrentProcess(), Node->Object, Process, &hResult, 0, bInherit, Options)){
+		WIN_ERR("pdo_F_DUPFD(%d): %s\n", Node->Object, win_strerror(GetLastError()));
+	}else{
+		Result->Object = hResult;
+		bResult = TRUE;
 	}
 	return(bResult);
 }

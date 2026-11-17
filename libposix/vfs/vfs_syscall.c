@@ -83,6 +83,28 @@ VfsStatFile(LPCWSTR FileName, DWORD Attribs, WIN_VATTR *Result)
 	}
 	return(bResult);
 }
+BOOL 
+VfsAccessCheck(PSECURITY_DESCRIPTOR Descriptor, ACCESS_MASK Access)
+{
+	BOOL bResult = FALSE;
+	HANDLE hToken = NULL;
+	GENERIC_MAPPING map = {WIN_S_IREAD, WIN_S_IWRITE, WIN_S_IEXEC, WIN_S_IRWX};
+	PRIVILEGE_SET priv = {0};
+	ACCESS_MASK amGranted;
+	DWORD dwSize = sizeof(PRIVILEGE_SET);
+
+	/* For AccessCheck() we need a handle to an impersonation token that
+	 * represents the client that is attempting to gain access, so we also
+	 * need to TOKEN_DUPLICATE.
+	 */
+	if (!win_cap_get_proc(TOKEN_DUPLICATE | TOKEN_QUERY, TokenImpersonation, &hToken)){
+		WIN_ERR("win_cap_get_proc(DUPLICATE|QUERY): %s\n", win_strerror(GetLastError()));
+	}else if (!AccessCheck(Descriptor, hToken, Access, &map, &priv, &dwSize, &amGranted, &bResult)){
+		WIN_ERR("AccessCheck(%d): %s\n", Descriptor, win_strerror(GetLastError()));
+	}
+	NtClose(hToken);
+	return(bResult);
+}
 
 /****************************************************/
 

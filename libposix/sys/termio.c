@@ -40,9 +40,10 @@ openpt_posix(WIN_TASK *Task, const char *name, int flags, ...)
 	char path[PATH_MAX] = _PATH_DEV;
 	WIN_NAMEIDATA wPath = {0};
 
+//	flags |= O_INODE;
 	win_strcat(path, name);
 	va_start(args, flags);
-	result = __openat(Task, path_win(&wPath, path, flags | O_INODE), flags, args);
+	result = __openat(Task, path_win(&wPath, path, flags), flags, args);
 	va_end(args);
 	return(result);
 }

@@ -30,6 +30,7 @@
 
 #include "pdo_syscall.c"
 #include "pdo_device.c"
+#include "pdo_object.c"
 #include "pdo_random.c"
 #include "pdo_route.c"
 #include "pdo_dkio.c"

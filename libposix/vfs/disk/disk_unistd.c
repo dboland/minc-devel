@@ -33,6 +33,23 @@
 /****************************************************/
 
 BOOL 
+disk_open(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_MODE *Mode, WIN_VNODE *Result)
+{
+	BOOL bResult = FALSE;
+
+	if (Flags->Access == GENERIC_WRITE){	/* git.exe (git-remote-https) */
+		Flags->Access |= FILE_READ_ATTRIBUTES | FILE_READ_EA;
+	}
+	Flags->Access |= READ_CONTROL;
+	Flags->Share |= FILE_SHARE_DELETE;
+	if (Path->FileType == WIN_VDIR){
+		bResult = dir_open(Path, Flags, Mode, Result);
+	}else{
+		bResult = file_open(Path, Flags, Mode, Result);
+	}
+	return(bResult);
+}
+BOOL 
 disk_close(WIN_VNODE *Node)
 {
 	BOOL bResult = FALSE;
@@ -51,7 +68,7 @@ disk_fchown(WIN_VNODE *Node, PSID NewUser, PSID NewGroup)
 {
 	BOOL bResult = FALSE;
 	SECURITY_DESCRIPTOR sd;
-	SECURITY_INFORMATION si = DACL_SECURITY_INFORMATION;
+	SECURITY_INFORMATION siType = DACL_SECURITY_INFORMATION;
 	FILETIME fTime = {0, 0};
 	WIN_ACL_CONTROL wControl = {NULL, NULL, NULL, NULL};
 
@@ -61,8 +78,8 @@ disk_fchown(WIN_VNODE *Node, PSID NewUser, PSID NewGroup)
 		WIN_ERR("win_acl_dup(%d): %s\n", Node->Handle, win_strerror(GetLastError()));
 	}else if (vfs_acl_chown(&wControl, NewUser, NewGroup, &sd)){
 		GetSystemTimeAsFileTime(&fTime);
-		if (!SetUserObjectSecurity(Node->Handle, &si, &sd)){
-			WIN_ERR("SetUserObjectSecurity(%d): %s\n", Node->Handle, win_strerror(GetLastError()));
+		if (!SetKernelObjectSecurity(Node->Handle, siType, &sd)){
+			WIN_ERR("SetKernelObjectSecurity(%d): %s\n", Node->Handle, win_strerror(GetLastError()));
 		}else if (!SetFileTime(Node->Handle, &fTime, NULL, NULL)){
 			WIN_ERR("SetFileTime(%lu): %s\n", fTime.dwHighDateTime, win_strerror(GetLastError()));
 		}else{
@@ -216,5 +233,21 @@ disk_symlink(WIN_NAMEIDATA *Path, WIN_MODE *Mode, WIN_NAMEIDATA *Target)
 		bResult = link_F_BIND(Path->Resolved, &sa, Target->Resolved);
 	}
 	vfs_acl_free(&wControl);
+	return(bResult);
+}
+BOOL 
+disk_access(WIN_NAMEIDATA *Path, ACCESS_MASK Access)
+{
+	BOOL bResult = FALSE;
+	PSECURITY_DESCRIPTOR psd = NULL;	/* LocalFree() sets last error */
+
+	if (!Access){
+		return(Path->Attribs != -1);
+	}else if (!win_acl_get_file(Path->Resolved, &psd)){
+		return(FALSE);
+	}else{
+		bResult = VfsAccessCheck(psd, Access);
+	}
+	LocalFree(psd);
 	return(bResult);
 }

@@ -33,6 +33,29 @@
 /****************************************************/
 
 BOOL 
+char_close(WIN_VNODE *Node)
+{
+	BOOL bResult = FALSE;
+
+	switch (Node->DeviceType){
+		case DEV_TYPE_NULL:
+			bResult = null_close(Node);
+			break;
+		case DEV_TYPE_INPUT:
+		case DEV_TYPE_SCREEN:
+			bResult = file_close(Node);
+			break;
+		case DEV_TYPE_TTY:
+		case DEV_TYPE_CONSOLE:
+			ZeroMemory(Node, sizeof(WIN_VNODE));
+			bResult = TRUE;
+			break;
+		default:
+			SetLastError(ERROR_BAD_DEVICE);
+	}
+	return(bResult);
+}
+BOOL 
 char_read(WIN_TASK *Task, WIN_VNODE *Node, LPSTR Buffer, LONG Size, DWORD *Result)
 {
 	BOOL bResult = FALSE;

@@ -37,14 +37,13 @@ pdo_close(WIN_VNODE *Node)
 {
 	BOOL bResult = FALSE;
 
-	if (Node->Handle == INVALID_HANDLE_VALUE){	/* DEV_TYPE_ROUTE (route.exe) */
-		bResult = TRUE;
-	}else if (!CloseHandle(Node->Handle)){
-		WIN_ERR("pdo_close(%d): %s\n", Node->Handle, win_strerror(GetLastError()));
-	}else{
-		bResult = TRUE;
+	switch (Node->FileType){
+		case WIN_VSOCK:
+			bResult = sock_close(Node);
+			break;
+		default:
+			bResult = object_close(Node);
 	}
-	ZeroMemory(Node, sizeof(WIN_VNODE));
 	return(bResult);
 }
 BOOL 
@@ -86,7 +85,7 @@ pdo_unlink(WIN_NAMEIDATA *Path)
 
 	if (*Path->Last == '\\'){		/* GNU conftest.exe */
 		SetLastError(ERROR_BAD_PATHNAME);
-	}else{
+	}else if (CloseHandle(Path->Object)){
 		bResult = DeleteFileW(Path->Resolved);
 	}
 	return(bResult);
@@ -104,5 +103,21 @@ pdo_revoke(WIN_DEVICE *Device)
 		default:
 			SetLastError(ERROR_BAD_DEVICE);
 	}
+	return(bResult);
+}
+BOOL 
+pdo_access(WIN_NAMEIDATA *Path, ACCESS_MASK Access)
+{
+	BOOL bResult = FALSE;
+	PSECURITY_DESCRIPTOR psd = NULL;
+
+	if (!Access){
+		return(Path->Attribs != -1);
+	}else if (!win_acl_get_fd(Path->Object, &psd)){
+		return(FALSE);
+	}else if (CloseHandle(Path->Object)){
+		bResult = VfsAccessCheck(psd, Access);
+	}
+	LocalFree(psd);
 	return(bResult);
 }

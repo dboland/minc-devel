@@ -79,12 +79,12 @@
 #define DEV_TYPE_ZERO		(DEV_CLASS_CPU + 5)		/* null byte read device */
 #define DEV_TYPE_URANDOM	(DEV_CLASS_CPU + 6)		/* random generator pseudo device */
 #define DEV_TYPE_RANDOM		(DEV_CLASS_CPU + 7)		/* crypto random generator pseudo device */
-#define DEV_TYPE_ROUTE		(DEV_CLASS_CPU + 8)		/* message routing pseudo device */
-#define DEV_TYPE_STDIN		(DEV_CLASS_CPU + 9)		/* standard stream pseudo device */
-#define DEV_TYPE_STDOUT		(DEV_CLASS_CPU + 10)		/* standard stream pseudo device */
-#define DEV_TYPE_STDERR		(DEV_CLASS_CPU + 11)		/* standard stream pseudo device */
-#define DEV_TYPE_SWAP		(DEV_CLASS_CPU + 12)		/* disk swap pseudo device */
-#define DEV_TYPE_ROOT		(DEV_CLASS_CPU + 13)		/* Root mount point */
+#define DEV_TYPE_STDIN		(DEV_CLASS_CPU + 8)		/* standard stream pseudo device */
+#define DEV_TYPE_STDOUT		(DEV_CLASS_CPU + 9)		/* standard stream pseudo device */
+#define DEV_TYPE_STDERR		(DEV_CLASS_CPU + 10)		/* standard stream pseudo device */
+#define DEV_TYPE_SWAP		(DEV_CLASS_CPU + 11)		/* disk swap pseudo device */
+#define DEV_TYPE_ROOT		(DEV_CLASS_CPU + 12)		/* Root mount point pseudo device */
+#define DEV_TYPE_ROUTE		(DEV_CLASS_CPU + 13)		/* message routing pseudo device */
 #define DEV_TYPE_PROCESSOR	(DEV_CLASS_CPU + 32)		/* Central Processing Unit */
 
 #define DEV_TYPE_RAMDISK	(DEV_CLASS_DISK)		/* Random Access Memory disk device (rd*) */

@@ -47,13 +47,11 @@
 #define O_NOCROSS		0x00001000
 #define O_NOSLASH		0x00002000
 #define O_SYMLINK		0x00004000
-#define O_INODE			0x00008000
 
 #define AT_NOCROSS		0x0010
 #define AT_NOSLASH		0x0020
 #define AT_SYMLINK		0x0040
-#define AT_INODE		0x0080
-#define AT_LOCKLEAF		0x0100
+#define AT_LOCKLEAF		0x0080
 
 /* machine/param.h */
 

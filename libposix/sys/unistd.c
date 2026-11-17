@@ -190,6 +190,7 @@ int
 __unlinkat(WIN_TASK *Task, int fd, const char *path, int flag)
 {
 	int result = 0;
+	int atflags = flag | AT_SYMLINK_NOFOLLOW;
 	WIN_NAMEIDATA wPath = {0};
 	BOOL bResult = FALSE;
 
@@ -197,10 +198,10 @@ __unlinkat(WIN_TASK *Task, int fd, const char *path, int flag)
 		result = -EFAULT;
 	}else if (!*path){
 		result = -ENOENT;
-	}else if (flag & AT_REMOVEDIR){
-		bResult = vfs_rmdir(pathat_win(&wPath, fd, path, AT_SYMLINK_NOFOLLOW));
+	}else if (atflags & AT_REMOVEDIR){
+		bResult = vfs_rmdir(pathat_win(&wPath, fd, path, atflags));
 	}else{
-		bResult = vfs_unlink(pathat_win(&wPath, fd, path, AT_SYMLINK_NOFOLLOW));
+		bResult = vfs_unlink(pathat_win(&wPath, fd, path, atflags));
 	}
 	if (!bResult){
 		result -= errno_posix(GetLastError());
@@ -467,11 +468,12 @@ sys_open(call_t call, const char *path, int flags, ...)
 	va_list args;
 	WIN_NAMEIDATA wPath = {0};
 
+//	flags |= O_INODE;
 	if (!path[0]){
 		return(-ENOENT);
 	}
 	va_start(args, flags);
-	result = __openat(call.Task, path_win(&wPath, path, flags | O_INODE), flags, args);
+	result = __openat(call.Task, path_win(&wPath, path, flags), flags, args);
 	va_end(args);
 	return(result);
 }
@@ -481,7 +483,8 @@ sys_openat(call_t call, int dirfd, const char *path, int flags, ...)
 	int result;
 	va_list args;
 	WIN_NAMEIDATA wPath = {0};
-	int atflags = AT_INODE;
+//	int atflags = AT_INODE;
+	int atflags = 0;
 
 	if (flags & O_NOFOLLOW){
 		atflags |= AT_SYMLINK_NOFOLLOW;

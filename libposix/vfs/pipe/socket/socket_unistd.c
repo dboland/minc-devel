@@ -49,9 +49,9 @@ sock_close(WIN_VNODE *Node)
 //	}else if (!CloseHandle(Node->Event)){
 //		WIN_ERR("sock_close(%d): %s\n", Node->Event, win_strerror(GetLastError()));
 	}else{
+		ZeroMemory(Node, sizeof(WIN_VNODE));
 		bResult = TRUE;
 	}
-	ZeroMemory(Node, sizeof(WIN_VNODE));
 	return(bResult);
 }
 BOOL 

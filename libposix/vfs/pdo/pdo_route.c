@@ -62,13 +62,18 @@ BOOL
 route_socket(INT Family, INT Type, INT Protocol, WIN_VNODE *Result)
 {
 	BOOL bResult = FALSE;
+	WCHAR szName[MAX_GUID];
+	DWORD dwAttribs = PIPE_TYPE_BYTE | PIPE_READMODE_BYTE;
 
-	Result->Handle = INVALID_HANDLE_VALUE;
-	Result->FSType = FS_TYPE_PDO;
-	Result->FileType = WIN_VSOCK;
-	Result->DeviceType = DEV_TYPE_ROUTE;
-	Result->DeviceId = DEV_TYPE_ROUTE;
-	Result->Access = GENERIC_READ + GENERIC_WRITE;
+	if (Type == SOCK_DGRAM){
+		dwAttribs = PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE;
+	}
+	if (PipeCreateFile(VfsCreateName(szName), dwAttribs, __PipeEvent, Result)){
+		Result->FSType = FS_TYPE_PDO;
+		Result->DeviceType = DEV_TYPE_ROUTE;
+		Result->DeviceId = DEV_TYPE_ROUTE;
+		bResult = TRUE;
+	}
 	return(TRUE);
 }
 BOOL 

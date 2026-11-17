@@ -300,7 +300,8 @@ __fstatat(WIN_TASK *Task, int dirfd, const char *path, struct stat *buf, int fla
 int 
 sys_lstat(call_t call, const char *path, struct stat *buf)
 {
-	int atflags = AT_SYMLINK | AT_INODE | AT_SYMLINK_NOFOLLOW;
+//	int atflags = AT_SYMLINK | AT_INODE | AT_SYMLINK_NOFOLLOW;
+	int atflags = AT_SYMLINK | AT_SYMLINK_NOFOLLOW;
 
 	return(__fstatat(call.Task, AT_FDCWD, path, buf, atflags));
 }
@@ -321,7 +322,8 @@ int
 __fchmodat(WIN_TASK *Task, int fd, const char *path, mode_t mode, int flag)
 {
 	int result = 0;
-	int atflags = flag | AT_INODE | AT_LOCKLEAF;	/* syslogd.exe */
+//	int atflags = flag | AT_INODE | AT_LOCKLEAF;	/* syslogd.exe */
+	int atflags = flag | AT_LOCKLEAF;	/* syslogd.exe */
 	WIN_MODE wMode;
 	WIN_NAMEIDATA wPath = {0};
 
@@ -342,7 +344,7 @@ sys_fchmodat(call_t call, int fd, const char *path, mode_t mode, int flag)
 int 
 sys_chmod(call_t call, const char *path, mode_t mode)
 {
-	return(__fchmodat(call.Task, AT_FDCWD, path, mode, 0));
+	return(__fchmodat(call.Task, AT_FDCWD, path, mode, AT_SYMLINK_NOFOLLOW));
 }
 int 
 sys_fchmod(call_t call, int fd, mode_t mode)

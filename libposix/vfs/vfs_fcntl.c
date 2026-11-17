@@ -39,16 +39,20 @@ vfs_F_DUPFD(WIN_VNODE *Node, BOOL CloseExec, WIN_VNODE *Result)
 	HANDLE hProcess = GetCurrentProcess();
 	DWORD dwOptions = DUPLICATE_SAME_ACCESS;
 
-	win_memcpy(Result, Node, sizeof(WIN_VNODE));
+//	win_memcpy(Result, Node, sizeof(WIN_VNODE));
+	*Result = *Node;
 	Result->CloseExec = CloseExec;
 	switch (Node->FSType){
 		case FS_TYPE_WINSOCK:
 		case FS_TYPE_PIPE:
 			bResult = pipe_F_DUPFD(Node, hProcess, dwOptions, Result);
 			break;
-//		case FS_TYPE_MAILSLOT:
-//			bResult = mail_F_DUPFD(DEVICE(Node->DeviceId), hProcess, dwOptions, Result);
-//			break;
+		case FS_TYPE_CHAR:
+			bResult = char_F_DUPFD(Node, hProcess, dwOptions, Result);
+			break;
+		case FS_TYPE_PDO:
+			bResult = pdo_F_DUPFD(Node, hProcess, dwOptions, Result);
+			break;
 		default:
 			bResult = disk_F_DUPFD(Node, hProcess, dwOptions, Result);
 	}
@@ -65,9 +69,12 @@ vfs_F_INHERIT(WIN_VNODE *Node, HANDLE Process)
 		case FS_TYPE_PIPE:
 			bResult = pipe_F_DUPFD(Node, Process, dwOptions, Node);
 			break;
-//		case FS_TYPE_MAILSLOT:
-//			bResult = mail_F_DUPFD(DEVICE(Node->DeviceId), Process, dwOptions, Node);
-//			break;
+		case FS_TYPE_CHAR:
+			bResult = char_F_DUPFD(Node, Process, dwOptions, Node);
+			break;
+		case FS_TYPE_PDO:
+			bResult = pdo_F_DUPFD(Node, Process, dwOptions, Node);
+			break;
 		default:
 			bResult = disk_F_DUPFD(Node, Process, dwOptions, Node);
 	}
@@ -197,7 +204,7 @@ vfs_F_NAMEI(WIN_NAMEIDATA *Path, DWORD Flags, HANDLE *Result)
 		Path->FileType = iNode.FileType;
 		Path->FSType = iNode.FSType;
 		Path->Size = iNode.NameSize;
-		*Result = hResult;
+		Path->Object = hResult;
 		bResult = TRUE;
 	}else if (CloseHandle(hResult)){
 		SetLastError(ERROR_BAD_FILE_TYPE);

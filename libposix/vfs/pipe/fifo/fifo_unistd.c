@@ -40,9 +40,9 @@ fifo_close(WIN_VNODE *Node)
 	if (!CloseHandle(Node->Handle)){
 		WIN_ERR("fifo_close(%d): %s\n", Node->Handle, win_strerror(GetLastError()));
 	}else{
+		ZeroMemory(Node, sizeof(WIN_VNODE));
 		bResult = TRUE;
 	}
-	ZeroMemory(Node, sizeof(WIN_VNODE));
 	return(bResult);
 }
 BOOL 

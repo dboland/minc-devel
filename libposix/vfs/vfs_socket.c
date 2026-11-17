@@ -210,7 +210,7 @@ vfs_shutdown(WIN_VNODE *Node, INT How)
 		case FS_TYPE_WINSOCK:
 			bResult = ws2_shutdown(Node, How);
 			break;
-		case FS_TYPE_PDO:	/* route.exe add */
+		case FS_TYPE_PDO:	/* route.exe (add) */
 			bResult = TRUE;
 			break;
 		default:

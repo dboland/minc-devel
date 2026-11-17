@@ -48,13 +48,13 @@ disk_F_DUPFD(WIN_VNODE *Node, HANDLE Process, DWORD Options, WIN_VNODE *Result)
 	return(bResult);
 }
 BOOL 
-disk_F_NAMEI(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
+disk_F_NAMEI(WIN_NAMEIDATA *Path, DWORD Flags)
 {
 	BOOL bResult = FALSE;
 
-	switch (Result->FileType){
+	switch (Path->FileType){
 		case WIN_VLNK:
-			bResult = link_F_NAMEI(Handle, Flags, Result);
+			bResult = link_F_NAMEI(Path, Flags);
 			break;
 		case WIN_VREG:
 		case WIN_VDIR:
@@ -79,26 +79,6 @@ disk_F_SETLK(WIN_VNODE *Node, DWORD Flags, LARGE_INTEGER *Offset, LARGE_INTEGER 
 			break;
 		default:
 			SetLastError(ERROR_BAD_FILE_TYPE);
-	}
-	return(bResult);
-}
-
-/****************************************************/
-
-BOOL 
-disk_open(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_MODE *Mode, WIN_VNODE *Result)
-{
-	BOOL bResult = FALSE;
-
-	if (Flags->Access == GENERIC_WRITE){	/* git.exe (git-remote-https) */
-		Flags->Access |= FILE_READ_ATTRIBUTES | FILE_READ_EA;
-	}
-	Flags->Access |= READ_CONTROL;
-	Flags->Share |= FILE_SHARE_DELETE;
-	if (Path->FileType == WIN_VDIR){
-		bResult = dir_open(Path, Flags, Mode, Result);
-	}else{
-		bResult = file_open(Path, Flags, Mode, Result);
 	}
 	return(bResult);
 }

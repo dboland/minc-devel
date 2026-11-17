@@ -50,8 +50,7 @@ PipeCreateFile(LPCWSTR Name, DWORD Attribs, HANDLE Event, WIN_VNODE *Result)
 		Result->Event = Event;
 		Result->FSType = FS_TYPE_PIPE;
 		Result->FileType = WIN_VSOCK;
-		Result->DeviceType = __Mounts->DeviceType;
-//		Result->DeviceId = __Mounts->DeviceId;
+		Result->DeviceId = DEV_TYPE_ROOT;
 		Result->Attribs = Attribs & 0xFFFF0000;
 		Result->Access = win_F_GETFL(hResult);
 		Result->Flags = win_F_GETFD(hResult);
@@ -79,7 +78,7 @@ PipeOpenFile(LPCWSTR Name, HANDLE Event, WIN_VNODE *Result)
 		Result->Event = Event;
 		Result->FSType = FS_TYPE_PIPE;
 		Result->FileType = WIN_VSOCK;
-		Result->DeviceType = __Mounts->DeviceType;
+		Result->DeviceId = DEV_TYPE_ROOT;
 		Result->Attribs = dwAttribs;
 		Result->Access = win_F_GETFL(hResult);
 		Result->Flags = win_F_GETFD(hResult);

@@ -74,35 +74,28 @@ BOOL
 disk_fchmod(WIN_VNODE *Node, WIN_MODE *Mode)
 {
 	BOOL bResult = FALSE;
-	SECURITY_INFORMATION siType = OWNER_SECURITY_INFORMATION \
-		| GROUP_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION;
-	SECURITY_DESCRIPTOR sd;
-//	DWORD dwSize = 0;
-	WIN_ACL_CONTROL wControl = {&__Process->UserSid, &__Process->GroupSid, NULL, NULL};
 
-	if (!win_acl_get_fd(Node->Handle, &wControl.Source)){
-		return(FALSE);
-	}else if (!vfs_acl_init(&wControl, Node->MountId, Mode->Special, &sd)){
-		WIN_ERR("disk_fchmod(%d): %s\n", Node->Handle, win_strerror(GetLastError()));
-	}else if (vfs_acl_chmod(&wControl, Mode, &sd)){
-		bResult = SetUserObjectSecurity(Node->Handle, &siType, &sd);
+	if (DiskChmodHandle(Node->Handle, Node->MountId, Mode)){
+		bResult = TRUE;
 	}
-	vfs_acl_free(&wControl);
 	return(bResult);
 }
 BOOL 
 disk_chmod(WIN_NAMEIDATA *Path, WIN_MODE *Mode)
 {
 	BOOL bResult = FALSE;
-	WIN_FLAGS wFlags = {READ_CONTROL + WRITE_DAC + WRITE_OWNER, 
-		FILE_SHARE_READ, OPEN_EXISTING, 0};
-	WIN_VNODE vNode = {0};
-	WIN_MODE wMode = {0};
+	HANDLE hFile;
+	ACCESS_MASK amAccess = READ_CONTROL | WRITE_DAC | WRITE_OWNER;
 
-	if (!disk_open(Path, &wFlags, &wMode, &vNode)){
+	if (Path->FileType == WIN_VDIR){
+		Path->Attribs |= FILE_FLAG_BACKUP_SEMANTICS;
+	}
+	hFile = CreateFileW(Path->Resolved, amAccess, FILE_SHARE_READ, 
+		NULL, OPEN_EXISTING, Path->Attribs, NULL);
+	if (hFile == INVALID_HANDLE_VALUE){
 		return(FALSE);
-	}else if (disk_fchmod(&vNode, Mode)){
-		bResult = CloseHandle(vNode.Handle);
+	}else if (DiskChmodHandle(hFile, Path->MountId, Mode)){
+		bResult = CloseHandle(hFile);
 	}
 	return(bResult);
 }

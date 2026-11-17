@@ -33,31 +33,27 @@
 /****************************************************/
 
 BOOL 
-link_F_NAMEI(HANDLE Handle, DWORD Flags, WIN_NAMEIDATA *Result)
+link_F_NAMEI(WIN_NAMEIDATA *Path, DWORD Flags)
 {
-	BOOL bResult = TRUE;
+	BOOL bResult = FALSE;
 	WCHAR szBuffer[MAX_PATH];
 	DWORD dwResult;
-	LPWSTR pszBase = Result->Resolved;
+	LPWSTR pszBase = Path->Resolved;
 
-	if (Flags & WIN_ISSYMLINK){
-		Result->Object = Handle;
-	}else if (!(Flags & WIN_FOLLOW)){
-		bResult = CloseHandle(Handle);
-	}else if (ReadFile(Handle, szBuffer, Result->Size, &dwResult, NULL)){
+	if (!(Flags & WIN_FOLLOW)){
+		bResult = TRUE;
+	}else if (ReadFile(Path->Object, szBuffer, Path->Size, &dwResult, NULL)){
 		if (szBuffer[1] == ':'){
-			Result->MountId = MOUNTID(szBuffer[0]);	/* nano.exe */
+			Path->MountId = MOUNTID(szBuffer[0]);	/* nano.exe */
 		}else if (szBuffer[1] != '\\'){
-			pszBase = Result->Base;
+			pszBase = Path->Base;
 		}
-		Result->R = win_wcpcpy(pszBase, szBuffer);
-		Result->Base = win_basename(Result->Resolved);
-		Result->Last = Result->R - 1;
-		Result->FileType = WIN_VREG;
-		Result->Attribs = GetFileAttributesW(Result->Resolved);
-		bResult = CloseHandle(Handle);
-	}else{
-		bResult = FALSE;
+		Path->R = win_wcpcpy(pszBase, szBuffer);
+		Path->Base = win_basename(Path->Resolved);
+		Path->Last = Path->R - 1;
+		Path->FileType = WIN_VREG;
+		Path->Attribs = GetFileAttributesW(Path->Resolved);
+		bResult = CloseHandle(Path->Object);
 	}
 	return(bResult);
 }
@@ -66,7 +62,7 @@ link_F_BIND(LPWSTR FileName, SECURITY_ATTRIBUTES *Attribs, LPWSTR Target)
 {
 	BOOL bResult = FALSE;
 	DWORD dwResult;
-	WIN_INODE iNode = {TypeNameVirtual, __Mounts->DeviceId, WIN_VLNK, 
+	WIN_INODE iNode = {TypeNameVirtual, DEV_TYPE_ROOT, WIN_VLNK, 
 		FS_TYPE_DISK, INAMESIZE(Target), 0, 0};
 	HANDLE hNode;
 

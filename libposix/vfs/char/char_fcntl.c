@@ -46,3 +46,23 @@ char_F_GETOSFHANDLE(WIN_VNODE *Node, DWORD Index)
 	}
 	return(hResult);
 }
+BOOL 
+char_F_DUPFD(WIN_VNODE *Node, HANDLE Process, DWORD Options, WIN_VNODE *Result)
+{
+	BOOL bResult = FALSE;
+
+	switch (Node->DeviceType){
+		case DEV_TYPE_NULL:
+			bResult = null_F_DUPFD(Node, Process, Options, Result);
+			break;
+		case DEV_TYPE_INPUT:
+		case DEV_TYPE_SCREEN:
+		case DEV_TYPE_TTY:
+		case DEV_TYPE_CONSOLE:
+			bResult = disk_F_DUPFD(Node, Process, Options, Result);
+			break;
+		default:
+			SetLastError(ERROR_BAD_FILE_TYPE);
+	}
+	return(bResult);
+}

@@ -151,7 +151,6 @@ typedef struct _WIN_NAMEIDATA {
 } WIN_NAMEIDATA;
 
 #define WIN_PATHCOPY		0x00400000	/* copy path verbatim */
-#define WIN_NEEDHANDLE		0x01000000	/* keep handle open (if special file) */
 
 /* sys/namei.h */
 

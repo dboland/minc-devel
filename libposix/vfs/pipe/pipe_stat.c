@@ -47,25 +47,12 @@ pipe_fstat(WIN_VNODE *Node, WIN_VATTR *Result)
 		Result->LastAccessTime = ftNow;
 		Result->LastWriteTime = ftNow;
 		Result->NumberOfLinks = 1;
-		Result->DeviceId = __Mounts->DeviceId;
+		Result->DeviceId = DEV_TYPE_ROOT;
 		Result->RawDeviceId = Node->DeviceId;
 		Result->Mode.FileType = Node->FileType;
 		bResult = TRUE;
 	}
 	LocalFree(psd);
-	return(bResult);
-}
-BOOL 
-pipe_stat(WIN_NAMEIDATA *Path, WIN_VATTR *Result)
-{
-	BOOL bResult = FALSE;
-
-	if (VfsStatHandle(Path->Object, Result)){
-		Result->DeviceId = __Mounts->DeviceId;
-		Result->Mode.FileType = Path->FileType;
-		Result->RawDeviceId = Path->DeviceId;
-		bResult = CloseHandle(Path->Object);
-	}
 	return(bResult);
 }
 BOOL 
@@ -83,27 +70,6 @@ pipe_mknod(WIN_TASK *Task, LPWSTR FileName, WIN_MODE *Mode, LPWSTR NtName)
 		WIN_ERR("vfs_acl_init(%ls): %s\n", szDirName, win_strerror(GetLastError()));
 	}else if (vfs_acl_create(&wControl, Mode, 0, &sd)){
 		bResult = pipe_F_BIND(FileName, Mode->FileType, &sa, NtName);
-	}
-	vfs_acl_free(&wControl);
-	return(bResult);
-}
-BOOL 
-pipe_chmod(WIN_NAMEIDATA *Path, WIN_MODE *Mode)
-{
-	BOOL bResult = FALSE;
-	SECURITY_INFORMATION siType = OWNER_SECURITY_INFORMATION + GROUP_SECURITY_INFORMATION + DACL_SECURITY_INFORMATION;
-	SECURITY_DESCRIPTOR sd;
-	DWORD dwSize = 0;
-	WIN_ACL_CONTROL wControl = {&__Process->UserSid, &__Process->GroupSid, NULL, NULL};
-
-	if (!win_acl_get_fd(Path->Object, &wControl.Source)){
-		return(FALSE);
-	}else if (!vfs_acl_init(&wControl, Path->MountId, Mode->Special, &sd)){
-		WIN_ERR("pipe_chmod(%d): %s\n", Path->Object, win_strerror(GetLastError()));
-	}else if (!vfs_acl_chmod(&wControl, Mode, &sd)){
-		WIN_ERR("pipe_chmod(%d): %s\n", Path->Object, win_strerror(GetLastError()));
-	}else if (SetUserObjectSecurity(Path->Object, &siType, &sd)){
-		bResult = CloseHandle(Path->Object);
 	}
 	vfs_acl_free(&wControl);
 	return(bResult);

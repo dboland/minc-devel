@@ -73,14 +73,12 @@ vfs_stat(WIN_NAMEIDATA *Path, WIN_VATTR *Result)
 		case FS_TYPE_DISK:
 			bResult = disk_stat(Path, Result);
 			break;
+		case FS_TYPE_PIPE:
 		case FS_TYPE_PDO:
 			bResult = pdo_stat(Path, Result);
 			break;
 		case FS_TYPE_SHELL:
 			bResult = shell_stat(Path, Result);
-			break;
-		case FS_TYPE_PIPE:
-			bResult = pipe_stat(Path, Result);
 			break;
 		default:
 			SetLastError(ERROR_BAD_FILE_TYPE);
@@ -94,9 +92,9 @@ vfs_chmod(WIN_NAMEIDATA *Path, WIN_MODE *Mode)
 
 	switch (Path->FSType){
 		case FS_TYPE_PIPE:
-			bResult = pipe_chmod(Path, Mode);
-			break;
 		case FS_TYPE_PDO:
+			bResult = pdo_chmod(Path, Mode);
+			break;
 		case FS_TYPE_DISK:
 			bResult = disk_chmod(Path, Mode);
 			break;

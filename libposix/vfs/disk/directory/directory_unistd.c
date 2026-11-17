@@ -33,6 +33,20 @@
 /****************************************************/
 
 BOOL 
+dir_open(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_MODE *Mode, WIN_VNODE *Result)
+{
+	BOOL bResult = FALSE;
+	HANDLE hResult;
+
+	Flags->Attribs |= FILE_FLAG_BACKUP_SEMANTICS;
+	if (Path->Attribs == -1){
+		return(FALSE);
+	}else if (DiskOpenFile(Path, Flags, Result)){
+		bResult = TRUE;
+	}
+	return(bResult);
+}
+BOOL 
 dir_close(WIN_VNODE *Node)
 {
 	BOOL bResult = FALSE;

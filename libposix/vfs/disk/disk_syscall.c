@@ -56,6 +56,7 @@ DiskCreateFile(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_MODE *Mode, WIN_VNODE 
 			Result->FSType = Path->FSType;
 			Result->FileType = Path->FileType;
 			Result->Attribs = Flags->Attribs;
+			Result->DeviceId = Path->DeviceId;
 			Result->CloseExec = Flags->CloseExec;
 			Result->Access = win_F_GETFL(hResult);
 			Result->Flags = win_F_GETFD(hResult);
@@ -82,6 +83,7 @@ DiskOpenFile(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_VNODE *Result)
 		Result->FSType = Path->FSType;
 		Result->FileType = Path->FileType;
 		Result->Attribs = Flags->Attribs;
+		Result->DeviceId = Path->DeviceId;
 		Result->CloseExec = Flags->CloseExec;
 		Result->Access = win_F_GETFL(hResult);
 		Result->Flags = win_F_GETFD(hResult);
@@ -89,5 +91,25 @@ DiskOpenFile(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_VNODE *Result)
 //	}else{
 //		WIN_ERR("CreateFile(%ls): %s\n", Path->Resolved, win_strerror(GetLastError()));
 	}
+	return(bResult);
+}
+BOOL 
+DiskChmodHandle(HANDLE Handle, DWORD MountId, WIN_MODE *Mode)
+{
+	BOOL bResult = FALSE;
+	SECURITY_INFORMATION siType = OWNER_SECURITY_INFORMATION \
+		| GROUP_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION;
+	SECURITY_DESCRIPTOR sd;
+	WIN_ACL_CONTROL wControl = {&__Process->UserSid, &__Process->GroupSid, NULL, NULL};
+
+	if (!win_acl_get_fd(Handle, &wControl.Source)){
+		return(FALSE);
+	}else if (!vfs_acl_init(&wControl, MountId, Mode->Special, &sd)){
+		WIN_ERR("disk_fchmod(%d): %s\n", Handle, win_strerror(GetLastError()));
+	}else if (vfs_acl_chmod(&wControl, Mode, &sd)){
+//		bResult = SetUserObjectSecurity(Handle, &siType, &sd);
+		bResult = SetKernelObjectSecurity(Handle, siType, &sd);
+	}
+	vfs_acl_free(&wControl);
 	return(bResult);
 }

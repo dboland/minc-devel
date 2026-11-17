@@ -63,6 +63,9 @@ vfs_close(WIN_VNODE *Node)
 		case FS_TYPE_WINSOCK:
 			bResult = ws2_close(Node);
 			break;
+		case FS_TYPE_CHAR:
+			bResult = char_close(Node);
+			break;
 		case FS_TYPE_PDO:
 			bResult = pdo_close(Node);
 			break;
@@ -218,28 +221,17 @@ BOOL
 vfs_access(WIN_NAMEIDATA *Path, ACCESS_MASK Access)
 {
 	BOOL bResult = FALSE;
-	HANDLE hToken = NULL;
-	PSECURITY_DESCRIPTOR psd;
-	GENERIC_MAPPING map = {WIN_S_IREAD, WIN_S_IWRITE, WIN_S_IEXEC, WIN_S_IRWX};
-	PRIVILEGE_SET priv = {0};
-	ACCESS_MASK amGranted;
-	DWORD dwSize = sizeof(PRIVILEGE_SET);
 
-	/* For AccessCheck() we need a handle to an impersonation token that
-	 * represents the client that is attempting to gain access, so we also
-	 * need to TOKEN_DUPLICATE.
-	 */
-	if (!Access){
-		return(Path->Attribs != -1);
-	}else if (!win_acl_get_file(Path->Resolved, &psd)){
-		return(FALSE);
-	}else if (!win_cap_get_proc(TOKEN_DUPLICATE | TOKEN_QUERY, TokenImpersonation, &hToken)){
-		WIN_ERR("win_cap_get_proc(DUPLICATE|QUERY): %s\n", win_strerror(GetLastError()));
-	}else if (!AccessCheck(psd, hToken, Access, &map, &priv, &dwSize, &amGranted, &bResult)){
-		WIN_ERR("AccessCheck(%ls): %s\n", Path->Resolved, win_strerror(GetLastError()));
+	switch (Path->FSType){
+		case FS_TYPE_DISK:
+			bResult = disk_access(Path, Access);
+			break;
+		case FS_TYPE_PDO:
+			bResult = pdo_access(Path, Access);
+			break;
+		default:
+			SetLastError(ERROR_BAD_FILE_TYPE);
 	}
-	CloseHandle(hToken);
-	LocalFree(psd);
 	return(bResult);
 }
 BOOL 
@@ -337,13 +329,11 @@ vfs_unlink(WIN_NAMEIDATA *Path)
 			bResult = disk_unlink(Path);
 			break;
 		case FS_TYPE_PDO:
+		case FS_TYPE_PIPE:
 			bResult = pdo_unlink(Path);
 			break;
 		case FS_TYPE_SHELL:
 			bResult = shell_unlink(Path);
-			break;
-		case FS_TYPE_PIPE:
-			bResult = pipe_unlink(Path);
 			break;
 		default:
 			SetLastError(ERROR_BAD_FILE_TYPE);
@@ -432,7 +422,7 @@ vfs_chroot(WIN_NAMEIDATA *Path)
 	}else if (!win_group_member(&SidAdmins)){
 		SetLastError(ERROR_PRIVILEGE_NOT_HELD);
 	}else{
-//		bResult = win_chroot(Path->Resolved);
+//		bResult = shell_chroot(Path->Resolved);
 		bResult = TRUE;
 	}
 	return(bResult);

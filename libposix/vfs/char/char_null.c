@@ -33,6 +33,41 @@
 /****************************************************/
 
 BOOL 
+null_F_DUPFD(WIN_VNODE *Node, HANDLE Process, DWORD Options, WIN_VNODE *Result)
+{
+	BOOL bResult = FALSE;
+	HANDLE hResult = NULL;
+	HANDLE hObject = NULL;
+	BOOL bInherit = (Node->Flags & HANDLE_FLAG_INHERIT);
+
+	if (!DuplicateHandle(GetCurrentProcess(), Node->Handle, Process, &hResult, 0, bInherit, Options)){
+		WIN_ERR("null_F_DUPFD(%d): %s\n", Node->Handle, win_strerror(GetLastError()));
+	}else if (!DuplicateHandle(GetCurrentProcess(), Node->Object, Process, &hObject, 0, bInherit, Options)){
+		WIN_ERR("null_F_DUPFD(%d): %s\n", Node->Object, win_strerror(GetLastError()));
+	}else{
+		Result->Handle = hResult;
+		Result->Object = hObject;
+		bResult = TRUE;
+	}
+	return(bResult);
+}
+
+BOOL 
+null_close(WIN_VNODE *Node)
+{
+	BOOL bResult = FALSE;
+
+	if (!CloseHandle(Node->Handle)){
+		WIN_ERR("null_close(%d): %s\n", Node->Handle, win_strerror(GetLastError()));
+	}else if (!CloseHandle(Node->Object)){
+		WIN_ERR("null_close(%d): %s\n", Node->Object, win_strerror(GetLastError()));
+	}else{
+		ZeroMemory(Node, sizeof(WIN_VNODE));
+		bResult = TRUE;
+	}
+	return(bResult);
+}
+BOOL 
 null_open(WIN_FLAGS *Flags, WIN_VNODE *Result)
 {
 	BOOL bResult = FALSE;
@@ -49,5 +84,26 @@ null_open(WIN_FLAGS *Flags, WIN_VNODE *Result)
 		Result->Access = win_F_GETFL(hResult);
 		bResult = TRUE;
 	}
+	return(bResult);
+}
+BOOL 
+null_fstat(WIN_VNODE *Node, WIN_VATTR *Result)
+{
+	BOOL bResult = FALSE;
+	PSECURITY_DESCRIPTOR psd;
+
+	if (!win_acl_get_fd(Node->Handle, &psd)){
+		return(FALSE);
+	}else if (GetFileInformationByHandle(Node->Object, (BY_HANDLE_FILE_INFORMATION *)Result)){
+		Result->DeviceId = DEV_TYPE_ROOT;
+		Result->Mode.FileType = Node->FileType;
+		Result->RawDeviceId = Node->DeviceId;
+		bResult = vfs_acl_stat(psd, Result);
+	}else if (ERROR_INVALID_FUNCTION == GetLastError()){	/* Windows devices: COM, AUX (rm.exe) */
+		SetLastError(ERROR_FILE_NOT_FOUND);
+	}else{
+		WIN_ERR("GetFileInformationByHandle(%d): %s\n", Node->Object, win_strerror(GetLastError()));
+	}
+	LocalFree(psd);
 	return(bResult);
 }

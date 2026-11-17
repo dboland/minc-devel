@@ -39,6 +39,8 @@ char_fstat(WIN_VNODE *Node, WIN_VATTR *Result)
 
 	switch (Node->DeviceType){
 		case DEV_TYPE_NULL:
+			bResult = null_fstat(Node, Result);
+			break;
 		case DEV_TYPE_INPUT:
 		case DEV_TYPE_SCREEN:
 			bResult = pipe_fstat(Node, Result);

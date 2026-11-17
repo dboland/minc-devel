@@ -90,8 +90,3 @@ pipe_write(WIN_VNODE *Node, LPCSTR Buffer, DWORD Size, DWORD *Result)
 	}
 	return(bResult);
 }
-BOOL 
-pipe_unlink(WIN_NAMEIDATA *Path)
-{
-	return(DeleteFileW(Path->Resolved));
-}
