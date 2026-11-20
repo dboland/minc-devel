@@ -39,7 +39,9 @@ disk_F_DUPFD(WIN_VNODE *Node, HANDLE Process, DWORD Options, WIN_VNODE *Result)
 	HANDLE hResult = NULL;
 	BOOL bInherit = (Node->Flags & HANDLE_FLAG_INHERIT);
 
-	if (!DuplicateHandle(GetCurrentProcess(), Node->Handle, Process, &hResult, 0, bInherit, Options)){
+	if (Node->Handle == INVALID_HANDLE_VALUE){	/* don't dup process handle (-1) */
+		SetLastError(ERROR_INVALID_HANDLE);
+	}else if (!DuplicateHandle(GetCurrentProcess(), Node->Handle, Process, &hResult, 0, bInherit, Options)){
 		WIN_ERR("disk_F_DUPFD(%d): %s\n", Node->Handle, win_strerror(GetLastError()));
 	}else{
 		Result->Handle = hResult;

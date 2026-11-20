@@ -35,6 +35,7 @@
 #include <pwd.h>
 
 #include "arch_types.h"
+#include "bsd_types.h"
 
 #include <sys/sysctl.h>
 
@@ -67,7 +68,7 @@ pwent_posix(struct passwd *pwd, char *buf)
 	}
 	*buf++ = 0;
 	pwd->pw_gid = strtoul(buf, &buf, 10);
-	if (pwd->pw_gid == ROOT_GID){
+	if (pwd->pw_gid == WHEEL_GID){
 		pwd->pw_gid = 0;
 	}
 	*buf++ = 0;

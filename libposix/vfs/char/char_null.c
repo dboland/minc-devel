@@ -99,6 +99,7 @@ null_fstat(WIN_VNODE *Node, WIN_VATTR *Result)
 		Result->Mode.FileType = Node->FileType;
 		Result->RawDeviceId = Node->DeviceId;
 		bResult = vfs_acl_stat(psd, Result);
+//vfs_ktrace(L"null_fstat", STRUCT_VNODE, Node);
 	}else if (ERROR_INVALID_FUNCTION == GetLastError()){	/* Windows devices: COM, AUX (rm.exe) */
 		SetLastError(ERROR_FILE_NOT_FOUND);
 	}else{

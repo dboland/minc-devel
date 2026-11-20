@@ -231,7 +231,7 @@ vfs_acl_create(WIN_ACL_CONTROL *Control, WIN_MODE *Mode, BYTE AceFlags, PSECURIT
 			break;
 		}
 	}
-	/* When creating files/subfolders in in user's profile tree (git.exe)
+	/* When creating files/subfolders in user's profile tree (git.exe)
 	 */
 	if (!(dwTypeMask & WIN_ACL_OTHER)){
 		aMaskNew = READ_CONTROL | SYNCHRONIZE;
@@ -326,6 +326,8 @@ vfs_acl_chown(WIN_ACL_CONTROL *Control, PSID NewUser, PSID NewGroup, PSECURITY_D
 		paclNew->AclSize += pEntry->Header.AceSize;
 		if (win_realloc(paclNew->AclSize, paclNew, (PVOID *)&paclNew)){
 			AddAce(paclNew, ACL_REVISION, 0, pEntry, pEntry->Header.AceSize);
+		}else{
+			break;
 		}
 	}
 	if (!SetSecurityDescriptorDacl(Result, bPresent, paclNew, bDefaulted)){

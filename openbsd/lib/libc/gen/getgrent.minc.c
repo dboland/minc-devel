@@ -36,6 +36,7 @@
 #include <grp.h>
 
 #include "arch_types.h"
+#include "bsd_types.h"
 
 #include <sys/sysctl.h>
 
@@ -68,7 +69,7 @@ grent_posix(struct group *grp, char *buf)
 //	buf = grp_skip(buf, ':');		/* comment (gecos) */
 	buf = grp_skip(buf, ':');		/* gid */
 	grp->gr_gid = strtoul(buf, &buf, 10);
-	if (grp->gr_gid == ROOT_GID){
+	if (grp->gr_gid == WHEEL_GID){
 		grp->gr_gid = 0;
 	}
 	*buf++ = 0;			/* members */

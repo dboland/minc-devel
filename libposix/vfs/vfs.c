@@ -94,6 +94,7 @@ WIN_TASK	*__Process;
 
 BOOL proc_poll(WIN_TASK *Task);
 BOOL pdo_fstat(WIN_VNODE *Node, WIN_VATTR *Result);
+BOOL pdo_F_DUPFD(WIN_VNODE *Node, HANDLE Process, DWORD Options, WIN_VNODE *Result);
 
 #include "vfs_acl.c"
 #include "vfs_signal.c"

@@ -78,7 +78,9 @@ file_KERN_FILE_TASK(void *buf, size_t *size, WIN_TASK *Task)
 	int fd = 0;
 	WIN_VNODE *pwNode = Task->Node;
 
-	while (fd < OPEN_MAX){
+	if (Task->Flags & WIN_PS_SYSTEM){
+		return(buf);
+	}else while (fd < OPEN_MAX){
 		if (pwNode->Access){
 			if (buf){
 				buf = kfile_posix(Task, pwNode, buf);
@@ -93,7 +95,7 @@ file_KERN_FILE_TASK(void *buf, size_t *size, WIN_TASK *Task)
 void *
 file_KERN_FILE_ALL(void *buf, size_t *size)
 {
-	pid_t pid = WIN_PID_INIT;
+	pid_t pid = 0;
 	WIN_TASK *pwTask = &__Tasks[pid];
 
 	while (pid < CHILD_MAX){

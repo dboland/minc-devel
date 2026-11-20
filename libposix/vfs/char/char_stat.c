@@ -43,7 +43,7 @@ char_fstat(WIN_VNODE *Node, WIN_VATTR *Result)
 			break;
 		case DEV_TYPE_INPUT:
 		case DEV_TYPE_SCREEN:
-			bResult = pipe_fstat(Node, Result);
+			bResult = disk_fstat(Node, Result);
 			break;
 		case DEV_TYPE_TTY:
 		case DEV_TYPE_CONSOLE:

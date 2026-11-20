@@ -57,9 +57,11 @@ char_F_DUPFD(WIN_VNODE *Node, HANDLE Process, DWORD Options, WIN_VNODE *Result)
 			break;
 		case DEV_TYPE_INPUT:
 		case DEV_TYPE_SCREEN:
+			bResult = disk_F_DUPFD(Node, Process, Options, Result);
+			break;
 		case DEV_TYPE_TTY:
 		case DEV_TYPE_CONSOLE:
-			bResult = disk_F_DUPFD(Node, Process, Options, Result);
+			bResult = pdo_F_DUPFD(Node, Process, Options, Result);
 			break;
 		default:
 			SetLastError(ERROR_BAD_FILE_TYPE);
