@@ -270,8 +270,9 @@ typedef struct _WIN_DIRENT {
  */
 
 typedef struct _WIN_ACL_CONTROL {
-	SID8 *Owner;
-	SID8 *Group;
+//	BYTE AceFlags;
+	PSID Owner;
+	PSID Group;
 	PACL Acl;
 	PSECURITY_DESCRIPTOR Source;
 } WIN_ACL_CONTROL;

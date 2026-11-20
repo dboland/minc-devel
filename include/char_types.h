@@ -118,3 +118,29 @@
 
 #define TIOCFLAG_ACTIVE		0x00010000
 
+/* console.c */
+
+#define CC_NUL	0x00	/* Padding (Ignore) */
+#define CC_SOH	0x01	/* Ctrl+A (Start of Header) */
+#define CC_ETX	0x03	/* Ctrl+C (End of Text) */
+#define CC_EOT	0x04	/* Ctrl+D (End of Transmission) */
+#define CC_BS	0x08	/* Ctrl+H (Back Space) */
+#define CC_LF	0x0A	/* Ctrl+J (Line Feed) */
+#define CC_CR	0x0D	/* Ctrl+M (Carriage Return) */
+#define CC_SO	0x0E	/* Ctrl+N (Shift In) */
+#define CC_SI	0x0F	/* Ctrl+O (Shift Out) */
+#define CC_DC1	0x11	/* Ctrl+Q (Device Control 1: XON) */
+#define CC_DC3	0x13	/* Ctrl+S (Device Control 3: XOFF) */
+#define CC_ESC	0x1B	/* Escape */
+#define CC_FS	0x1C	/* Ctrl+\ */
+#define CC_DEL	0x7F	/* Delete */
+
+typedef struct _SEQUENCE {
+	CHAR *Args;
+	LONG Arg1;
+	CHAR Char1;
+	CHAR CSI;
+	CHAR Buf[128];
+} SEQUENCE;
+
+

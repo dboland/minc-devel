@@ -9,6 +9,7 @@
 #include "win/windows.h"
 #include "win/winsock2.h"
 #include "win/iphlpapi.h"
+#include "win/aclapi.h"
 #include "win_posix.h"
 #include "vfs_posix.h"
 #include "ws2_posix.h"
@@ -32,13 +33,14 @@ usage(void)
 	printf(" -P\t\t\t%s\n", "print Process token");
 	printf(" -T\t\t\t%s\n", "print Thread token (if any)");
 	printf(" -M DRIVE\t\t%s\n", "print mount info of DRIVE letter");
+	printf(" -F PATH\t\t%s\n", "print ACL on PATH in Windows GUI Mode");
 	printf(" -d\t\t\t%s\n", "print ACL Desktop");
 	printf(" -s\t\t\t%s\n", "print ACL Window Station");
 	printf(" -f PATH\t\t%s\n", "print ACL on PATH");
 	printf(" -p\t\t\t%s\n", "print ACL Process");
 	printf(" -i PATH\t\t%s\n", "print namei data on PATH");
-	printf(" -v, --verbose\t\tbe verbose if applicable\n");
 	printf(" -t TABLE\t\tshow TABLE (see below)\n");
+	printf(" -v, --verbose\t\tbe verbose if applicable\n");
 	printf("\nTables\n");
 	printf(" pdo\t\t\tWindows PDO device table (physical drivers)\n");
 	printf(" fdo\t\t\tWindows FDO device table (function drivers)\n");
@@ -171,6 +173,9 @@ main(int argc, char* argv[])
 			break;
 		case 'f':
 			win_ktrace(STRUCT_ACL_FILE, 0x1000, path_win(&wPath, token, O_NOFOLLOW)->Resolved);
+			break;
+		case 'F':
+			win_ktrace(STRUCT_ACL_FILE_GUI, 0x1000, path_win(&wPath, token, O_NOFOLLOW)->Resolved);
 			break;
 		case 'o':
 			win_ktrace(STRUCT_ACL_OBJECT, 0x1000, token);

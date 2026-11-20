@@ -1,9 +1,8 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
-
 #include <aclapi.h>
-#include <accctrl.h>
+#include <accctrl.h>	/* SE_OBJECT_TYPE */
 
 #include <ddk/ntapi.h>
 #include <ddk/ntifs.h>	// Object types
@@ -12,7 +11,7 @@
 #include <stdlib.h>
 
 #include "win/ntdll.h"
-#include "win_types.h"
+#include "win_posix.h"
 #include "vfs_types.h"
 
 #include "../libtrace/libtrace.h"
@@ -49,6 +48,41 @@ GetThreadHandle(DWORD ThreadId)
 		WIN_ERR("OpenThread(%d): %s\n", ThreadId, win_strerror(GetLastError()));
 	}
 	return(hResult);
+}
+
+/************************************************************/
+
+BOOL 
+wtrace_acl_get_file(LPWSTR FileName, SE_OBJECT_TYPE Type, PSECURITY_DESCRIPTOR *Result)
+{
+	BOOL bResult = FALSE;
+	SECURITY_INFORMATION siType = OWNER_SECURITY_INFORMATION
+		 + GROUP_SECURITY_INFORMATION + DACL_SECURITY_INFORMATION;
+	DWORD dwResult;
+
+	dwResult = GetNamedSecurityInfoW(FileName, Type, siType, NULL, NULL, NULL, NULL, Result);
+	if (dwResult == ERROR_SUCCESS){
+		bResult = TRUE;
+//	}else{
+//		WIN_ERR("GetNamedSecurityInfo(%ls): %s\n", FileName, win_strerror(GetLastError()));
+	}
+	return(bResult);
+}
+BOOL 
+wtrace_acl_get_fd(HANDLE Handle, SE_OBJECT_TYPE Type, PSECURITY_DESCRIPTOR *Result)
+{
+	BOOL bResult = FALSE;
+	SECURITY_INFORMATION siType = OWNER_SECURITY_INFORMATION \
+		 | GROUP_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION;
+	DWORD dwResult;
+
+	dwResult = GetSecurityInfo(Handle, Type, siType, NULL, NULL, NULL, NULL, Result);
+	if (dwResult == ERROR_SUCCESS){
+		bResult = TRUE;
+//	}else{
+//		WIN_ERR("GetSecurityInfo(%d): %s\n", Handle, win_strerror(dwResult));
+	}
+	return(bResult);
 }
 
 /************************************************************/
@@ -105,18 +139,28 @@ wtrace_ACL_PROCESS(LPSTR Buffer)
 VOID 
 wtrace_ACL_FILE(LPCWSTR FileName, LPSTR Buffer)
 {
-	DWORD dwType = OWNER_SECURITY_INFORMATION + GROUP_SECURITY_INFORMATION + DACL_SECURITY_INFORMATION;
 	PSECURITY_DESCRIPTOR psd;
-	DWORD dwSize = 0;
-	BOOL bDefaulted;
-	BOOL bPresent;
-	PACL Acl;
 	WCHAR szPath[MAX_PATH];
 	LPWSTR pszBase = NULL;
 
-	GetFileSecurityW(FileName, dwType, NULL, dwSize, &dwSize);
-	psd = LocalAlloc(LMEM_FIXED, dwSize);
-	if (!GetFileSecurityW(FileName, dwType, psd, dwSize, &dwSize)){
+	if (!win_acl_get_file(FileName, &psd)){
+		WIN_ERR("GetFileSecurity(%ls): %s\n", FileName, win_strerror(GetLastError()));
+	}else if (!GetFullPathNameW(FileName, MAX_PATH, szPath, &pszBase)){
+		WIN_ERR("GetFullPathName(%ls): %s", FileName, win_strerror(GetLastError()));
+	}else{
+		printf("FileName: %ls\n", szPath);
+		win_SECURITY_DESCRIPTOR(psd, OB_TYPE_FILE, Buffer);
+	}
+	LocalFree(psd);
+}
+VOID 
+wtrace_ACL_FILE_GUI(LPWSTR FileName, LPSTR Buffer)
+{
+	PSECURITY_DESCRIPTOR psd;
+	WCHAR szPath[MAX_PATH];
+	LPWSTR pszBase = NULL;
+
+	if (!wtrace_acl_get_file(FileName, SE_FILE_OBJECT, &psd)){
 		WIN_ERR("GetFileSecurity(%ls): %s\n", FileName, win_strerror(GetLastError()));
 	}else if (!GetFullPathNameW(FileName, MAX_PATH, szPath, &pszBase)){
 		WIN_ERR("GetFullPathName(%ls): %s", FileName, win_strerror(GetLastError()));
@@ -238,6 +282,9 @@ win_ktrace(STRUCT_TYPE Type, LONG Size, PVOID Data)
 			break;
 		case STRUCT_ACL_FILE:
 			wtrace_ACL_FILE((LPCWSTR)Data, pszBuffer);
+			break;
+		case STRUCT_ACL_FILE_GUI:
+			wtrace_ACL_FILE_GUI((LPWSTR)Data, pszBuffer);
 			break;
 		case STRUCT_ACL_PROCESS:
 			wtrace_ACL_PROCESS(pszBuffer);

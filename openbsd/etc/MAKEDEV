@@ -7,12 +7,11 @@ mknod /dev/port c 1 4
 mknod /dev/zero c 1 5
 mknod /dev/urandom c 1 6
 mknod /dev/random c 1 7
-mknod /dev/route c 1 8
-mknod /dev/stdin c 1 9
-mknod /dev/stdout c 1 10
-mknod /dev/stderr c 1 11
-mknod /dev/swap b 1 12
-mknod /dev/root b 1 13
+mknod /dev/stdin c 1 8
+mknod /dev/stdout c 1 9
+mknod /dev/stderr c 1 10
+mknod /dev/swap b 1 11
+mknod /dev/root b 1 12
 
 mknod /dev/cpu0 c 1 32
 mknod /dev/cpu1 c 1 33

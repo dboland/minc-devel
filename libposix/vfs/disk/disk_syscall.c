@@ -39,13 +39,13 @@ DiskCreateFile(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_MODE *Mode, WIN_VNODE 
 	SECURITY_DESCRIPTOR sd;
 	WCHAR szDirName[WIN_PATH_MAX] = L"";
 	HANDLE hResult;
-	WIN_ACL_CONTROL wControl = {&__Process->UserSid, &__Process->GroupSid, NULL, NULL};
+	WIN_ACL_CONTROL wControl;
 	SECURITY_ATTRIBUTES sa = {sizeof(sa), &sd, TRUE};
 
 	Flags->Access |= WRITE_DAC | WRITE_OWNER;		/* disk_fchown() */
 	if (!win_acl_get_file(vfs_dirname(szDirName, Path->Resolved), &wControl.Source)){
 		return(FALSE);
-	}else if (!vfs_acl_init(&wControl, Path->MountId, Mode->Special, &sd)){
+	}else if (!vfs_acl_init(wControl.Source, Path->MountId, Mode->Special, &sd)){
 		WIN_ERR("vfs_acl_init(%s): %s\n", szDirName, win_strerror(GetLastError()));
 	}else if (vfs_acl_create(&wControl, Mode, 0, &sd)){
 		hResult = CreateFileW(Path->Resolved, Flags->Access, Flags->Share, 
@@ -100,16 +100,15 @@ DiskChmodHandle(HANDLE Handle, DWORD MountId, WIN_MODE *Mode)
 	SECURITY_INFORMATION siType = OWNER_SECURITY_INFORMATION \
 		| GROUP_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION;
 	SECURITY_DESCRIPTOR sd;
-	WIN_ACL_CONTROL wControl = {&__Process->UserSid, &__Process->GroupSid, NULL, NULL};
+	PSECURITY_DESCRIPTOR psd;
 
-	if (!win_acl_get_fd(Handle, &wControl.Source)){
+	if (!win_acl_get_fd(Handle, &psd)){
 		return(FALSE);
-	}else if (!vfs_acl_init(&wControl, MountId, Mode->Special, &sd)){
+	}else if (!vfs_acl_init(psd, MountId, Mode->Special, &sd)){
 		WIN_ERR("disk_fchmod(%d): %s\n", Handle, win_strerror(GetLastError()));
-	}else if (vfs_acl_chmod(&wControl, Mode, &sd)){
-//		bResult = SetUserObjectSecurity(Handle, &siType, &sd);
+	}else if (vfs_acl_chmod(psd, Mode, &sd)){
 		bResult = SetKernelObjectSecurity(Handle, siType, &sd);
 	}
-	vfs_acl_free(&wControl);
+	LocalFree(psd);
 	return(bResult);
 }

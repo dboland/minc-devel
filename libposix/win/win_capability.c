@@ -296,6 +296,8 @@ win_cap_set_flag(HANDLE Token, LPCSTR Name, DWORD Value)
 BOOL 
 win_cap_set_mode(ACCESS_MASK Group, ACCESS_MASK Other, ACL *Result)
 {
+	BOOL bResult = FALSE;
+
 	Result->AclRevision = ACL_REVISION;
 	Result->AclSize = sizeof(ACL);
 	Result->AceCount = 0;
@@ -304,8 +306,12 @@ win_cap_set_mode(ACCESS_MASK Group, ACCESS_MASK Other, ACL *Result)
 	Result->AclSize += ACL_ACESIZE + GetLengthSid(&SidUsers);
 	AddAccessAllowedAce(Result, ACL_REVISION, Group, &SidUsers);
 	Result->AclSize += ACL_ACESIZE + GetLengthSid(&SidAuthenticated);
-	AddAccessAllowedAce(Result, ACL_REVISION, Other, &SidAuthenticated);
-	return(TRUE);
+	if (!AddAccessAllowedAce(Result, ACL_REVISION, Other, &SidAuthenticated)){
+		WIN_ERR("AddAccessAllowedAce(): %s\n", win_strerror(GetLastError()));
+	}else{
+		bResult = TRUE;
+	}
+	return(bResult);
 }
 BOOL 
 win_cap_init(WIN_CAP_CONTROL *Result)

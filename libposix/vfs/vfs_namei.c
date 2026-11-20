@@ -120,8 +120,8 @@ PathGlob(WIN_NAMEIDATA *Path, DWORD Flags)
 {
 	BOOL bResult = TRUE;
 	HANDLE hResult = NULL;
-
 	Path->Attribs = GetFileAttributesW(Path->Resolved);
+
 	if (Path->MountId){
 		bResult = PathGlobLink(Path, Flags);
 	}else if (!PathGlobClass(Path, Flags, &hResult)){

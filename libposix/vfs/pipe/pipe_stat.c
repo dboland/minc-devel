@@ -36,8 +36,8 @@ BOOL
 pipe_fstat(WIN_VNODE *Node, WIN_VATTR *Result)
 {
 	BOOL bResult = FALSE;
-	PSECURITY_DESCRIPTOR psd;
 	FILETIME ftNow;
+	PSECURITY_DESCRIPTOR psd;
 
 	if (!win_acl_get_fd(Node->Handle, &psd)){
 		return(FALSE);
@@ -60,14 +60,14 @@ pipe_mknod(WIN_TASK *Task, LPWSTR FileName, WIN_MODE *Mode, LPWSTR NtName)
 {
 	BOOL bResult = FALSE;
 	SECURITY_DESCRIPTOR sd;
-	WIN_ACL_CONTROL wControl = {&__Process->UserSid, &__Process->GroupSid, NULL, NULL};
+	WIN_ACL_CONTROL wControl;
 	SECURITY_ATTRIBUTES sa = {sizeof(sa), &sd, FALSE};
 	WCHAR szDirName[WIN_PATH_MAX];
 
 	if (!win_acl_get_file(vfs_dirname(szDirName, FileName), &wControl.Source)){
 		return(FALSE);
-	}else if (!vfs_acl_init(&wControl, 0, Mode->Special, &sd)){
-		WIN_ERR("vfs_acl_init(%ls): %s\n", szDirName, win_strerror(GetLastError()));
+	}else if (!vfs_acl_init(wControl.Source, 0, Mode->Special, &sd)){
+		WIN_ERR("pipe_mknod(%ls): %s\n", szDirName, win_strerror(GetLastError()));
 	}else if (vfs_acl_create(&wControl, Mode, 0, &sd)){
 		bResult = pipe_F_BIND(FileName, Mode->FileType, &sa, NtName);
 	}

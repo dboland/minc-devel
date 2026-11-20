@@ -101,6 +101,9 @@ vfs_ktrace(LPCWSTR Label, STRUCT_TYPE Type, PVOID Data)
 		case STRUCT_STATVFS:
 			vfs_STATVFS((WIN_STATVFS *)Data, pszBuffer);
 			break;
+//		case STRUCT_SD:
+//			win_SECURITY_DESCRIPTOR((SECURITY_DESCRIPTOR *)Data, OB_TYPE_FILE, pszBuffer);
+//			break;
 		default:
 			strcpy(pszBuffer, ": Not implemented.\n");
 	}

@@ -39,6 +39,7 @@
 #include "win/windows.h"		/* minimal Win32 */
 #include "win/winsock2.h"		/* minimal Windows Sockets v.2 */
 #include "win/iphlpapi.h"		/* minimal Network API */
+#include "win/aclapi.h"
 #include "win/ntdll.h"
 #include "win_posix.h"
 #include "msvc_posix.h"

@@ -109,7 +109,7 @@ BOOL
 pdo_access(WIN_NAMEIDATA *Path, ACCESS_MASK Access)
 {
 	BOOL bResult = FALSE;
-	PSECURITY_DESCRIPTOR psd = NULL;
+	PSECURITY_DESCRIPTOR psd;
 
 	if (!Access){
 		return(Path->Attribs != -1);
@@ -118,6 +118,6 @@ pdo_access(WIN_NAMEIDATA *Path, ACCESS_MASK Access)
 	}else if (CloseHandle(Path->Object)){
 		bResult = VfsAccessCheck(psd, Access);
 	}
-	LocalFree(psd);
+	LocalFree(psd);		/* resets last error */
 	return(bResult);
 }

@@ -73,9 +73,8 @@ kfile_posix(WIN_TASK *Task, WIN_VNODE *Node, struct kinfo_file *buf)
 /****************************************************/
 
 void *
-file_KERN_FILE_BYPID(WIN_TASK *Task, void *buf, size_t *size)
+file_KERN_FILE_TASK(void *buf, size_t *size, WIN_TASK *Task)
 {
-	size_t result = 0;
 	int fd = 0;
 	WIN_VNODE *pwNode = Task->Node;
 
@@ -84,29 +83,58 @@ file_KERN_FILE_BYPID(WIN_TASK *Task, void *buf, size_t *size)
 			if (buf){
 				buf = kfile_posix(Task, pwNode, buf);
 			}
-			result += sizeof(struct kinfo_file);
+			*size += sizeof(struct kinfo_file);
 		}
 		pwNode++;
 		fd++;
 	}
-	*size += result;
 	return(buf);
+}
+void *
+file_KERN_FILE_ALL(void *buf, size_t *size)
+{
+	pid_t pid = WIN_PID_INIT;
+	WIN_TASK *pwTask = &__Tasks[pid];
+
+	while (pid < CHILD_MAX){
+		if (pwTask->Flags && pwTask->State != WIN_SZOMB){
+			buf = file_KERN_FILE_TASK(buf, size, pwTask);
+		}
+		pwTask++;
+		pid++;
+	}
+	return(buf);
+}
+int 
+file_KERN_FILE_BYPID(void *buf, size_t *size, pid_t pid)
+{
+	int result = 0;
+
+	if (pid < 0){
+		buf = file_KERN_FILE_ALL(buf, size);
+	}else if (pid < CHILD_MAX){
+		buf = file_KERN_FILE_TASK(buf, size, &__Tasks[pid]);
+	}else{
+		result = -EFAULT;
+	}
+	return(result);
 }
 int 
 file_KERN_FILE(const int *name, void *buf, size_t *size)
 {
 	int result = 0;
-	pid_t pid = WIN_PID_INIT;
-	WIN_TASK *pwTask = &__Tasks[pid];
-	DWORD dwRemain;
 
 	*size = 0;
-	while (pid < CHILD_MAX){
-		if (pwTask->Flags && pwTask->State != WIN_SZOMB){
-			buf = file_KERN_FILE_BYPID(pwTask, buf, size);
-		}
-		pwTask++;
-		pid++;
+	switch (name[2]){
+		case KERN_FILE_BYPID:
+			result = file_KERN_FILE_BYPID(buf, size, name[3]);
+			break;
+		case KERN_FILE_BYFILE:
+		case KERN_FILE_BYUID:
+			result = -ENOENT;
+			break;
+		default:
+			result = -EOPNOTSUPP;
 	}
-	return(0);
+	return(result);
 }

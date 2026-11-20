@@ -37,7 +37,6 @@ VfsPathFlags(LPSTR Buffer, LPCSTR Label, DWORD Flags)
 
 	psz += sprintf(psz, "%s([0x%x]", Label, Flags);
 	psz = WinFlagName(psz, WIN_PATHCOPY, "PATHCOPY", Flags, &Flags);
-	psz = WinFlagName(psz, WIN_NEEDHANDLE, "NEEDHANDLE", Flags, &Flags);
 	psz = WinFlagName(psz, WIN_LOCKLEAF, "LOCKLEAF", Flags, &Flags);
 	psz = WinFlagName(psz, WIN_FOLLOW, "FOLLOW", Flags, &Flags);
 	psz = WinFlagName(psz, WIN_NOCROSSMOUNT, "NOCROSSMOUNT", Flags, &Flags);

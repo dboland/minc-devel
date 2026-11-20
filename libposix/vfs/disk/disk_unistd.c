@@ -70,12 +70,12 @@ disk_fchown(WIN_VNODE *Node, PSID NewUser, PSID NewGroup)
 	SECURITY_DESCRIPTOR sd;
 	SECURITY_INFORMATION siType = DACL_SECURITY_INFORMATION;
 	FILETIME fTime = {0, 0};
-	WIN_ACL_CONTROL wControl = {NULL, NULL, NULL, NULL};
+	WIN_ACL_CONTROL wControl;
 
 	if (!win_acl_get_fd(Node->Handle, &wControl.Source)){
 		return(FALSE);
-	}else if (!win_acl_dup(wControl.Source, &sd)){
-		WIN_ERR("win_acl_dup(%d): %s\n", Node->Handle, win_strerror(GetLastError()));
+	}else if (!win_acl_init(wControl.Source, &sd)){
+		WIN_ERR("disk_fchown(%d): %s\n", Node->Handle, win_strerror(GetLastError()));
 	}else if (vfs_acl_chown(&wControl, NewUser, NewGroup, &sd)){
 		GetSystemTimeAsFileTime(&fTime);
 		if (!SetKernelObjectSecurity(Node->Handle, siType, &sd)){
@@ -209,9 +209,7 @@ disk_readlink(WIN_NAMEIDATA *Path)
 
 	if (Path->FileType != WIN_VLNK){		/* git.exe */
 		SetLastError(ERROR_BAD_ARGUMENTS);
-	}else if (!ReadFile(Path->Object, Path->Resolved, Path->Size, &dwResult, NULL)){
-		WIN_ERR("ReadFile(%d): %s\n", Path->Object, win_strerror(GetLastError()));
-	}else{
+	}else if (ReadFile(Path->Object, Path->Resolved, Path->Size, &dwResult, NULL)){
 		bResult = CloseHandle(Path->Object);
 	}
 	return(bResult);
@@ -221,13 +219,13 @@ disk_symlink(WIN_NAMEIDATA *Path, WIN_MODE *Mode, WIN_NAMEIDATA *Target)
 {
 	BOOL bResult = FALSE;
 	SECURITY_DESCRIPTOR sd;
-	WIN_ACL_CONTROL wControl = {&__Process->UserSid, &__Process->GroupSid, NULL, NULL};
+	WIN_ACL_CONTROL wControl;
 	SECURITY_ATTRIBUTES sa = {sizeof(sa), &sd, FALSE};
 	WCHAR szDirName[WIN_PATH_MAX];
 
 	if (!win_acl_get_file(vfs_dirname(szDirName, Path->Resolved), &wControl.Source)){
 		return(FALSE);
-	}else if (!vfs_acl_init(&wControl, Path->MountId, Mode->Special, &sd)){
+	}else if (!vfs_acl_init(wControl.Source, Path->MountId, Mode->Special, &sd)){
 		WIN_ERR("vfs_acl_init(%ls): %s\n", szDirName, win_strerror(GetLastError()));
 	}else if (vfs_acl_create(&wControl, Mode, 0, &sd)){
 		bResult = link_F_BIND(Path->Resolved, &sa, Target->Resolved);
@@ -239,7 +237,7 @@ BOOL
 disk_access(WIN_NAMEIDATA *Path, ACCESS_MASK Access)
 {
 	BOOL bResult = FALSE;
-	PSECURITY_DESCRIPTOR psd = NULL;	/* LocalFree() sets last error */
+	PSECURITY_DESCRIPTOR psd;
 
 	if (!Access){
 		return(Path->Attribs != -1);
@@ -248,6 +246,6 @@ disk_access(WIN_NAMEIDATA *Path, ACCESS_MASK Access)
 	}else{
 		bResult = VfsAccessCheck(psd, Access);
 	}
-	LocalFree(psd);
+	LocalFree(psd);		/* sets last error */
 	return(bResult);
 }

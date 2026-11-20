@@ -111,7 +111,7 @@ BOOL win_realpath(LPCWSTR Path, DWORD Size, LPWSTR Resolved);
 
 BOOL win_acl_get_file(LPCWSTR FileName, PSECURITY_DESCRIPTOR *Result);
 BOOL win_acl_get_fd(HANDLE Handle, PSECURITY_DESCRIPTOR *Result);
-BOOL win_acl_dup(PSECURITY_DESCRIPTOR Source, PSECURITY_DESCRIPTOR Result);
+BOOL win_acl_init(PSECURITY_DESCRIPTOR Source, PSECURITY_DESCRIPTOR Result);
 
 /* win_pwd.c */
 

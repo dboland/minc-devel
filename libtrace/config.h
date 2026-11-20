@@ -39,7 +39,7 @@
 #include <winerror.h>
 #include <ntsecapi.h>		/* LSA_HANDLE */
 #include <lmcons.h>		/* UNLEN */
-//#include <time.h>
+#include <accctrl.h>		/* SE_OBJECT_TYPE */
 
 #include "win/ntdll.h"
 #include "win_posix.h"

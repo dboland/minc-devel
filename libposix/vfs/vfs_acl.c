@@ -143,7 +143,7 @@ AclSidIsNone(SID8 *Sid)
 /************************************************************/
 
 BOOL 
-vfs_acl_init(WIN_ACL_CONTROL *Control, DWORD MountId, DWORD Mode, PSECURITY_DESCRIPTOR Result)
+vfs_acl_init(PSECURITY_DESCRIPTOR Source, DWORD MountId, DWORD Mode, PSECURITY_DESCRIPTOR Result)
 {
 	BOOL bResult = FALSE;
 	PSID pOwner = NULL;
@@ -151,21 +151,21 @@ vfs_acl_init(WIN_ACL_CONTROL *Control, DWORD MountId, DWORD Mode, PSECURITY_DESC
 	BOOL bOwner, bGroup;
 	DWORD dwType = __Mounts[MountId].DeviceType;
 
-	if (!GetSecurityDescriptorOwner(Control->Source, &pOwner, &bOwner)){
+	if (!GetSecurityDescriptorOwner(Source, &pOwner, &bOwner)){
 		WIN_ERR("GetSecurityDescriptorOwner(): %s\n", win_strerror(GetLastError()));
 	}
-	if (!GetSecurityDescriptorGroup(Control->Source, &pGroup, &bGroup)){
+	if (!GetSecurityDescriptorGroup(Source, &pGroup, &bGroup)){
 		WIN_ERR("GetSecurityDescriptorGroup(): %s\n", win_strerror(GetLastError()));
 	}
 	if (Mode & WIN_S_ISUID){
 		pOwner = &SidAdmins;
 	}else if (dwType != DEV_TYPE_REMOTE){	/* Samba */
-		pOwner = Control->Owner;
+		pOwner = &__Process->UserSid;
 	}
 	if (Mode & WIN_S_ISGID){
 		pGroup = &SidSystem;
 	}else if (dwType != DEV_TYPE_REMOTE){
-		pGroup = Control->Group;
+		pGroup = &__Process->GroupSid;
 	}
 	if (!InitializeSecurityDescriptor(Result, SECURITY_DESCRIPTOR_REVISION)){
 		WIN_ERR("InitializeSecurityDescriptor(): %s\n", win_strerror(GetLastError()));
@@ -185,12 +185,12 @@ vfs_acl_free(WIN_ACL_CONTROL *Control)
 	LocalFree(Control->Source);
 }
 BOOL 
-vfs_acl_create(WIN_ACL_CONTROL *Control, WIN_MODE *Mode, BYTE Flags, PSECURITY_DESCRIPTOR Result)
+vfs_acl_create(WIN_ACL_CONTROL *Control, WIN_MODE *Mode, BYTE AceFlags, PSECURITY_DESCRIPTOR Result)
 {
 	BOOL bResult = FALSE;
 	ACE_PEEK *pEntry;
 	WORD wIndex = 0;
-	PACL paclNew, pAcl = NULL;
+	PACL pAclNew, pAcl = NULL;
 	ACCESS_MASK aMaskNew;
 	ACCESS_ALLOWED_ACE8 aceBuf;
 	BOOL bDefaulted, bPresent;
@@ -202,10 +202,10 @@ vfs_acl_create(WIN_ACL_CONTROL *Control, WIN_MODE *Mode, BYTE Flags, PSECURITY_D
 	}else if (bPresent && pAcl){
 		wIndex = pAcl->AceCount;
 	}
-	paclNew = win_malloc(sizeof(ACL));
-	paclNew->AclRevision = ACL_REVISION;
-	paclNew->AclSize = sizeof(ACL);
-	paclNew->AceCount = 0;
+	pAclNew = win_malloc(sizeof(ACL));
+	pAclNew->AclRevision = ACL_REVISION;
+	pAclNew->AclSize = sizeof(ACL);
+	pAclNew->AceCount = 0;
 	while (wIndex--){
 		GetAce(pAcl, wIndex, (PVOID)&pEntry);
 		dwType = AclOwnerType(pEntry, &dwTypeMask);
@@ -213,7 +213,7 @@ vfs_acl_create(WIN_ACL_CONTROL *Control, WIN_MODE *Mode, BYTE Flags, PSECURITY_D
 		bFlagsNew = pEntry->Header.AceFlags & ~ALL_INHERIT_ACE;
 		if (dwType == WIN_ACL_USER){
 			if (EqualPrefixSid(&pEntry->Sid, __SidMachine)){
-				pEntry = AclDupEntry(pEntry, Control->Owner, &aceBuf);
+				pEntry = AclDupEntry(pEntry, &__Process->UserSid, &aceBuf);
 			}
 			pEntry->Mask = aMaskNew + Mode->User;
 		}else if (dwType == WIN_ACL_GROUP){
@@ -223,10 +223,12 @@ vfs_acl_create(WIN_ACL_CONTROL *Control, WIN_MODE *Mode, BYTE Flags, PSECURITY_D
 		}else if (dwType != WIN_ACL_TYPE_ACCESS){
 			continue;
 		}
-		pEntry->Header.AceFlags = bFlagsNew + Flags;
-		paclNew->AclSize += pEntry->Header.AceSize;
-		if (win_realloc(paclNew->AclSize, paclNew, (PVOID *)&paclNew)){
-			AddAce(paclNew, ACL_REVISION, 0, pEntry, pEntry->Header.AceSize);
+		pEntry->Header.AceFlags = bFlagsNew + AceFlags;
+		pAclNew->AclSize += pEntry->Header.AceSize;
+		if (win_realloc(pAclNew->AclSize, pAclNew, (PVOID *)&pAclNew)){
+			AddAce(pAclNew, ACL_REVISION, 0, pEntry, pEntry->Header.AceSize);
+		}else{
+			break;
 		}
 	}
 	/* When creating files/subfolders in in user's profile tree (git.exe)
@@ -234,18 +236,18 @@ vfs_acl_create(WIN_ACL_CONTROL *Control, WIN_MODE *Mode, BYTE Flags, PSECURITY_D
 	if (!(dwTypeMask & WIN_ACL_OTHER)){
 		aMaskNew = READ_CONTROL | SYNCHRONIZE;
 		aMaskNew |= FILE_READ_ATTRIBUTES | FILE_READ_EA | Mode->Other;
-		AclAddEntry(paclNew, Flags, aMaskNew, &SidAuthenticated);
+		AclAddEntry(pAclNew, AceFlags, aMaskNew, &SidAuthenticated);
 	}
-	if (!SetSecurityDescriptorDacl(Result, bPresent, paclNew, FALSE)){
+	if (!SetSecurityDescriptorDacl(Result, bPresent, pAclNew, FALSE)){
 		WIN_ERR("SetSecurityDescriptorDacl(): %s\n", win_strerror(GetLastError()));
 	}else{
 		bResult = TRUE;
 	}
-	Control->Acl = paclNew;
+	Control->Acl = pAclNew;
 	return(bResult);
 }
 BOOL 
-vfs_acl_chmod(WIN_ACL_CONTROL *Control, WIN_MODE *Mode, PSECURITY_DESCRIPTOR Result)
+vfs_acl_chmod(PSECURITY_DESCRIPTOR Source, WIN_MODE *Mode, PSECURITY_DESCRIPTOR Result)
 {
 	BOOL bResult = FALSE;
 	ACE_PEEK *Info;
@@ -256,7 +258,7 @@ vfs_acl_chmod(WIN_ACL_CONTROL *Control, WIN_MODE *Mode, PSECURITY_DESCRIPTOR Res
 	PACL pAcl = NULL;
 	DWORD dwType, dwTypeMask = 0;
 
-	if (!GetSecurityDescriptorDacl(Control->Source, &bPresent, &pAcl, &bDefaulted)){
+	if (!GetSecurityDescriptorDacl(Source, &bPresent, &pAcl, &bDefaulted)){
 		WIN_ERR("GetSecurityDescriptorDacl(): %s\n", win_strerror(GetLastError()));
 	}else if (bPresent && pAcl){
 		wIndex = pAcl->AceCount;

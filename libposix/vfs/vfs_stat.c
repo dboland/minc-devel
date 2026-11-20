@@ -48,12 +48,13 @@ vfs_fstat(WIN_VNODE *Node, WIN_VATTR *Result)
 		case FS_TYPE_PDO:
 			bResult = pdo_fstat(Node, Result);
 			break;
+		case FS_TYPE_WINSOCK:
 		case FS_TYPE_PIPE:
 			bResult = pipe_fstat(Node, Result);
 			break;
-		case FS_TYPE_WINSOCK:
-			bResult = ws2_fstat(Node, Result);
-			break;
+//		case FS_TYPE_WINSOCK:
+//			bResult = ws2_fstat(Node, Result);
+//			break;
 		default:
 			SetLastError(ERROR_BAD_FILE_TYPE);
 	}
@@ -121,13 +122,13 @@ vfs_mknod(WIN_NAMEIDATA *Path, WIN_MODE *Mode, DWORD DeviceId)
 {
 	BOOL bResult = FALSE;
 	SECURITY_DESCRIPTOR sd;
-	WIN_ACL_CONTROL wControl = {&__Process->UserSid, &__Process->GroupSid, NULL, NULL};
+	WIN_ACL_CONTROL wControl;
 	SECURITY_ATTRIBUTES sa = {sizeof(sa), &sd, FALSE};
 	WCHAR szDirName[WIN_PATH_MAX];
 
 	if (!win_acl_get_file(vfs_dirname(szDirName, Path->Resolved), &wControl.Source)){
 		return(FALSE);
-	}else if (!vfs_acl_init(&wControl, Path->MountId, Mode->Special, &sd)){
+	}else if (!vfs_acl_init(wControl.Source, Path->MountId, Mode->Special, &sd)){
 		WIN_ERR("vfs_acl_init(%s): %s\n", szDirName, win_strerror(GetLastError()));
 	}else if (vfs_acl_create(&wControl, Mode, 0, &sd)){
 		bResult = pdo_F_BIND(Path->Resolved, Mode->FileType, &sa, DeviceId);
@@ -161,7 +162,7 @@ vfs_mkdir(WIN_NAMEIDATA *Path, WIN_MODE *Mode)
 	DWORD dwSize = 0;
 	SECURITY_DESCRIPTOR sd;
 	WCHAR szParent[WIN_PATH_MAX];
-	WIN_ACL_CONTROL wControl = {&__Process->UserSid, &__Process->GroupSid, NULL, NULL};
+	WIN_ACL_CONTROL wControl;
 	SECURITY_ATTRIBUTES sa = {sizeof(sa), &sd, FALSE};
 	BYTE bAceFlags = OBJECT_INHERIT_ACE + CONTAINER_INHERIT_ACE;
 
@@ -170,7 +171,7 @@ vfs_mkdir(WIN_NAMEIDATA *Path, WIN_MODE *Mode)
 	}
 	if (!win_acl_get_file(vfs_dirname(szParent, Path->Resolved), &wControl.Source)){
 		return(FALSE);
-	}else if (!vfs_acl_init(&wControl, Path->MountId, Mode->Special, &sd)){
+	}else if (!vfs_acl_init(wControl.Source, Path->MountId, Mode->Special, &sd)){
 		WIN_ERR("vfs_mkdir(%s): %s\n", szParent, win_strerror(GetLastError()));
 	}else if (vfs_acl_create(&wControl, Mode, bAceFlags, &sd)){
 		bResult = CreateDirectoryW(Path->Resolved, &sa);

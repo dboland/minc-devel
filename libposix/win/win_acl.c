@@ -29,6 +29,7 @@
  */
 
 #include <aclapi.h>
+#include <accctrl.h>	/* SE_OBJECT_TYPE */
 
 /************************************************************/
 
@@ -99,7 +100,7 @@ win_acl_get_fd(HANDLE Handle, PSECURITY_DESCRIPTOR *Result)
 	return(bResult);
 }
 BOOL 
-win_acl_dup(PSECURITY_DESCRIPTOR Source, PSECURITY_DESCRIPTOR Result)
+win_acl_init(PSECURITY_DESCRIPTOR Source, PSECURITY_DESCRIPTOR Result)
 {
 	BOOL bResult = FALSE;
 	PSID pOwner = NULL;
@@ -123,4 +124,3 @@ win_acl_dup(PSECURITY_DESCRIPTOR Source, PSECURITY_DESCRIPTOR Result)
 	}
 	return(bResult);
 }
-
