@@ -37,7 +37,9 @@ link_rename(WIN_NAMEIDATA *Path, WIN_NAMEIDATA *Result)
 {
 	BOOL bResult = FALSE;
 
-	if (Result->Attribs == -1){
+	if (!CloseHandle(Path->Object)){
+		return(FALSE);
+	}else if (Result->Attribs == -1){
 		bResult = MoveFileW(Path->Resolved, Result->Resolved);
 	}else if (Result->FileType != WIN_VLNK){
 		SetLastError(ERROR_FILE_EXISTS);
