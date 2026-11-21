@@ -45,7 +45,7 @@ CFLAGS+= -DSMALL -DJOBS
 #CFLAGS+=-pg
 #OBJECTS+=/usr/lib/gcrt0.o
 
-all: ${TMPDIR} .patch ${PROG}
+all: ${TMPDIR} ${SOURCES} .patch ${PROG}
 
 %.h: ${KSHSRC}/%.h
 	@/bin/cp -u $< $@

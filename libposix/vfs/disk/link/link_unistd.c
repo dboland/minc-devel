@@ -51,5 +51,10 @@ link_rename(WIN_NAMEIDATA *Path, WIN_NAMEIDATA *Result)
 BOOL 
 link_unlink(WIN_NAMEIDATA *Path)
 {
-	return(DeleteFileW(Path->Resolved));
+	BOOL bResult = FALSE;
+
+	if (CloseHandle(Path->Object)){
+		bResult = DeleteFileW(Path->Resolved);
+	}
+	return(bResult);
 }
