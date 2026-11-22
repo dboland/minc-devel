@@ -38,12 +38,12 @@ disk_fstat(WIN_VNODE *Node, WIN_VATTR *Result)
 	BOOL bResult = FALSE;
 
 	switch (Node->FileType){
-		case WIN_VDIR:
-			bResult = dir_fstat(Node, Result);
-			break;
 		case WIN_VREG:
 		case WIN_VLNK:
 			bResult = file_fstat(Node, Result);
+			break;
+		case WIN_VDIR:
+			bResult = dir_fstat(Node, Result);
 			break;
 		default:
 			SetLastError(ERROR_BAD_FILE_TYPE);
@@ -56,11 +56,11 @@ disk_stat(WIN_NAMEIDATA *Path, WIN_VATTR *Result)
 	BOOL bResult = FALSE;
 
 	switch (Path->FileType){
-		case WIN_VDIR:
-			bResult = dir_stat(Path, Result);
-			break;
 		case WIN_VREG:
 			bResult = file_stat(Path, Result);
+			break;
+		case WIN_VDIR:
+			bResult = dir_stat(Path, Result);
 			break;
 		case WIN_VLNK:
 			bResult = link_stat(Path, Result);
@@ -75,7 +75,7 @@ disk_fchmod(WIN_VNODE *Node, WIN_MODE *Mode)
 {
 	BOOL bResult = FALSE;
 
-	if (DiskChmodHandle(Node->Handle, Node->MountId, Mode)){
+	if (disk_F_CHMOD(Node->Handle, Node->MountId, Mode)){
 		bResult = TRUE;
 	}
 	return(bResult);
@@ -94,7 +94,7 @@ disk_chmod(WIN_NAMEIDATA *Path, WIN_MODE *Mode)
 		NULL, OPEN_EXISTING, Path->Attribs, NULL);
 	if (hFile == INVALID_HANDLE_VALUE){
 		return(FALSE);
-	}else if (DiskChmodHandle(hFile, Path->MountId, Mode)){
+	}else if (disk_F_CHMOD(hFile, Path->MountId, Mode)){
 		bResult = CloseHandle(hFile);
 	}
 	return(bResult);

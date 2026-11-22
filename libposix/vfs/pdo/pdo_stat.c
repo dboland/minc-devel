@@ -37,7 +37,7 @@ pdo_fstat(WIN_VNODE *Node, WIN_VATTR *Result)
 {
 	BOOL bResult = FALSE;
 
-	if (VfsStatHandle(Node->Object, Result)){
+	if (DiskStatHandle(Node->Object, Result)){
 		Result->DeviceId = DEV_TYPE_ROOT;
 		Result->Mode.FileType = Node->FileType;
 		Result->RawDeviceId = Node->DeviceId;
@@ -50,7 +50,7 @@ pdo_stat(WIN_NAMEIDATA *Path, WIN_VATTR *Result)
 {
 	BOOL bResult = FALSE;
 
-	if (VfsStatHandle(Path->Object, Result)){
+	if (DiskStatHandle(Path->Object, Result)){
 		Result->DeviceId = DEV_TYPE_ROOT;
 		Result->Mode.FileType = Path->FileType;
 		Result->RawDeviceId = Path->DeviceId;
@@ -63,7 +63,7 @@ pdo_chmod(WIN_NAMEIDATA *Path, WIN_MODE *Mode)
 {
 	BOOL bResult = FALSE;
 
-	if (DiskChmodHandle(Path->Object, Path->MountId, Mode)){
+	if (disk_F_CHMOD(Path->Object, Path->MountId, Mode)){
 		bResult = CloseHandle(Path->Object);
 	}
 	return(bResult);

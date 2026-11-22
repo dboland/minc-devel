@@ -29,8 +29,8 @@
  */
 
 #include "disk_syscall.c"
-#include "link/link.c"
 #include "file/file.c"
+#include "link/link.c"
 #include "disk_namei.c"
 #include "disk_dirent.c"
 #include "directory/directory.c"

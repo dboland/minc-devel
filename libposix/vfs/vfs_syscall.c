@@ -51,39 +51,6 @@ VfsCreateName(LPWSTR Result)
 	return(Result);
 }
 BOOL 
-VfsStatHandle(HANDLE Handle, WIN_VATTR *Result)
-{
-	BOOL bResult = FALSE;
-	PSECURITY_DESCRIPTOR psd;
-
-	if (!win_acl_get_fd(Handle, &psd)){
-		return(FALSE);
-	}else if (GetFileInformationByHandle(Handle, (BY_HANDLE_FILE_INFORMATION *)Result)){
-		bResult = vfs_acl_stat(psd, Result);
-	}else if (ERROR_INVALID_FUNCTION == GetLastError()){	/* Windows devices: COM, AUX (rm.exe) */
-		SetLastError(ERROR_FILE_NOT_FOUND);
-	}else{
-		WIN_ERR("GetFileInformationByHandle(%d): %s\n", Handle, win_strerror(GetLastError()));
-	}
-	LocalFree(psd);
-	return(bResult);
-}
-BOOL 
-VfsStatFile(LPCWSTR FileName, DWORD Attribs, WIN_VATTR *Result)
-{
-	BOOL bResult = FALSE;
-	HANDLE hFile;
-
-	hFile = CreateFileW(FileName, READ_CONTROL, FILE_SHARE_READ, 
-		NULL, OPEN_EXISTING, Attribs, NULL);
-	if (hFile == INVALID_HANDLE_VALUE){
-		return(FALSE);
-	}else if (VfsStatHandle(hFile, Result)){
-		bResult = CloseHandle(hFile);
-	}
-	return(bResult);
-}
-BOOL 
 VfsAccessCheck(PSECURITY_DESCRIPTOR Descriptor, ACCESS_MASK Access)
 {
 	BOOL bResult = FALSE;

@@ -37,7 +37,7 @@ shell_stat(WIN_NAMEIDATA *Path, WIN_VATTR *Result)
 {
 	BOOL bResult = FALSE;
 
-	if (VfsStatFile(Path->Resolved, FILE_ATTRIBUTE_NORMAL, Result)){
+	if (DiskStatFile(Path->Resolved, FILE_ATTRIBUTE_NORMAL, Result)){
 		Result->DeviceId = __Mounts[Path->MountId].DeviceId;
 		Result->Mode.FileType = Path->FileType;
 		bResult = TRUE;

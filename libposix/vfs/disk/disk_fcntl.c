@@ -84,3 +84,22 @@ disk_F_SETLK(WIN_VNODE *Node, DWORD Flags, LARGE_INTEGER *Offset, LARGE_INTEGER 
 	}
 	return(bResult);
 }
+BOOL 
+disk_F_CHMOD(HANDLE Handle, DWORD MountId, WIN_MODE *Mode)
+{
+	BOOL bResult = FALSE;
+	SECURITY_INFORMATION siType = OWNER_SECURITY_INFORMATION \
+		| GROUP_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION;
+	SECURITY_DESCRIPTOR sd;
+	PSECURITY_DESCRIPTOR psd;
+
+	if (!win_acl_get_fd(Handle, &psd)){
+		return(FALSE);
+	}else if (!vfs_acl_init(psd, MountId, Mode->Special, &sd)){
+		WIN_ERR("disk_fchmod(%d): %s\n", Handle, win_strerror(GetLastError()));
+	}else if (vfs_acl_chmod(psd, Mode, &sd)){
+		bResult = SetKernelObjectSecurity(Handle, siType, &sd);
+	}
+	LocalFree(psd);
+	return(bResult);
+}

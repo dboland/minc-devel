@@ -37,7 +37,7 @@ dir_fstat(WIN_VNODE *Node, WIN_VATTR *Result)
 {
 	BOOL bResult = FALSE;
 
-	if (VfsStatHandle(Node->Handle, Result)){
+	if (DiskStatHandle(Node->Handle, Result)){
 		Result->DeviceId = __Mounts[Node->MountId].DeviceId;
 		Result->Mode.FileType = Node->FileType;
 		Result->FileSizeLow += WIN_S_BLKSIZE;	/* WinNT */
@@ -50,7 +50,7 @@ dir_stat(WIN_NAMEIDATA *Path, WIN_VATTR *Result)
 {
 	BOOL bResult = FALSE;
 
-	if (VfsStatFile(Path->Resolved, FILE_FLAG_BACKUP_SEMANTICS, Result)){
+	if (DiskStatFile(Path->Resolved, FILE_FLAG_BACKUP_SEMANTICS, Result)){
 		Result->DeviceId = __Mounts[Path->MountId].DeviceId;
 		Result->Mode.FileType = Path->FileType;
 		Result->FileSizeLow += WIN_S_BLKSIZE;

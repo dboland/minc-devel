@@ -37,7 +37,7 @@ file_fstat(WIN_VNODE *Node, WIN_VATTR *Result)
 {
 	BOOL bResult = FALSE;
 
-	if (VfsStatHandle(Node->Handle, Result)){
+	if (DiskStatHandle(Node->Handle, Result)){
 		Result->DeviceId = __Mounts[Node->MountId].DeviceId;
 		Result->Mode.FileType = Node->FileType;
 		bResult = TRUE;
@@ -49,7 +49,7 @@ file_stat(WIN_NAMEIDATA *Path, WIN_VATTR *Result)
 {
 	BOOL bResult = FALSE;
 
-	if (VfsStatFile(Path->Resolved, FILE_ATTRIBUTE_NORMAL, Result)){
+	if (DiskStatFile(Path->Resolved, FILE_ATTRIBUTE_NORMAL, Result)){
 		Result->DeviceId = __Mounts[Path->MountId].DeviceId;
 		Result->Mode.FileType = Path->FileType;
 		bResult = TRUE;
