@@ -35,9 +35,9 @@
  * is needed for assigning a TokenSessionId and a TokenPrimaryGroup.
  * The "Replace a process level token" (SeAssignPrimaryTokenPrivilege) setting
  * determines which user accounts can call the CreateProcessAsUser() application
- * programming interface (API) so that one service can start another. This
- * privilege is not needed because we match the ACL of the Process with the ACL
- * in the user account's login Token.
+ * programming interface (API) so that one service can start another.
+ * This privilege is not needed if we match the AuthId of the Process with the
+ * AuthId in the user account's login Token.
  */
 
 /************************************************************/
@@ -322,6 +322,7 @@ win_cap_init(WIN_CAP_CONTROL *Result)
 	DWORD dwSessionId = 0;
 	NTSTATUS ntStatus;
 	DWORD dwAccess = TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY;
+	TOKEN_STATISTICS tStats = {0};
 
 	if (!win_cap_get_proc(dwAccess, 0, &hToken)){
 		WIN_ERR("win_cap_get_proc(0x%x): %s\n", dwAccess, win_strerror(GetLastError()));
@@ -331,9 +332,11 @@ win_cap_init(WIN_CAP_CONTROL *Result)
 		WIN_ERR("CapGetPrimary(%d): %s\n", hToken, win_strerror(GetLastError()));
 	}else if (!CapGetPrivileges(hToken, &Result->Privs)){
 		WIN_ERR("CapGetPrivileges(%d): %s\n", hToken, win_strerror(GetLastError()));
+	}else if (!GetTokenInformation(hToken, TokenStatistics, &tStats, sizeof(TOKEN_STATISTICS), &dwSize)){
+		WIN_ERR("GetTokenInformation(TokenStatistics): %s\n", win_strerror(GetLastError()));
 	}else if (win_cap_set_mode(WIN_P_IRX, WIN_P_IRX, &Result->DefaultACL)){
 		Result->Token = hToken;
-		Result->AuthId = __Globals->AuthId;
+		Result->AuthId = tStats.AuthenticationId;
 		Result->SessionId = dwSessionId;
 		Result->Groups = NULL;
 		bResult = TRUE;

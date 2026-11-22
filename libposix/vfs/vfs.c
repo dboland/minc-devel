@@ -102,6 +102,7 @@ BOOL pdo_F_DUPFD(WIN_VNODE *Node, HANDLE Process, DWORD Options, WIN_VNODE *Resu
 #include "vfs_device.c"
 #include "vfs_ktrace.c"
 #include "vfs_syscall.c"
+#include "vfs_conf.c"
 #include "disk/disk.c"
 #include "registry/registry.c"
 #include "drive/drive.c"

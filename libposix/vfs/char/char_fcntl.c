@@ -33,16 +33,22 @@
 /****************************************************/
 
 HANDLE 
-char_F_GETOSFHANDLE(WIN_VNODE *Node, DWORD Index)
+char_F_OSFHANDLE(WIN_VNODE *Node, DWORD Index)
 {
 	HANDLE hResult = NULL;
 
 	switch(Node->DeviceType){
 		case DEV_TYPE_TTY:
-			hResult = con_F_GETOSFHANDLE(TERMINAL(Node->Index), Index);
+		case DEV_TYPE_CONSOLE:
+			hResult = con_F_OSFHANDLE(TERMINAL(Node->Index), Index);
+			break;
+		case DEV_TYPE_NULL:
+		case DEV_TYPE_INPUT:
+		case DEV_TYPE_SCREEN:
+			hResult = Node->Handle;
 			break;
 		default:
-			hResult = Node->Handle;
+			SetLastError(ERROR_BAD_FILE_TYPE);
 	}
 	return(hResult);
 }

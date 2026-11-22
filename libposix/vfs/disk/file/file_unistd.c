@@ -33,6 +33,23 @@
 /****************************************************/
 
 BOOL 
+file_open(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_MODE *Mode, WIN_VNODE *Result)
+{
+	BOOL bResult = FALSE;
+	SID8 sid;
+
+	if (Flags->Creation != OPEN_EXISTING){
+		bResult = DiskCreateFile(Path, Flags, Mode, Result);
+	}else if (Path->Attribs == -1){		/* git.exe */
+		return(FALSE);
+	}else if (Path->Flags & WIN_REQUIREDIR){
+		SetLastError(ERROR_DIRECTORY);
+	}else{
+		bResult = DiskOpenFile(Path, Flags, Result);
+	}
+	return(bResult);
+}
+BOOL 
 file_close(WIN_VNODE *Node)
 {
 	BOOL bResult = FALSE;

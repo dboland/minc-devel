@@ -344,7 +344,7 @@ vfs_acl_stat(PSECURITY_DESCRIPTOR Source, WIN_VATTR *Result)
 	BOOL bResult = TRUE;
 	ACE_PEEK *Info;
 	WORD wIndex = 0;
-	PACL acl = NULL;
+	PACL pAcl = NULL;
 	PSID pOwner, pGroup;
 	BOOL bPresent, bDefaulted;
 	DWORD dwType, dwTypeMask = 0;
@@ -355,17 +355,17 @@ vfs_acl_stat(PSECURITY_DESCRIPTOR Source, WIN_VATTR *Result)
 	if (GetSecurityDescriptorGroup(Source, &pGroup, &bDefaulted)){
 		CopySid(GetLengthSid(pGroup), &Result->GroupSid, pGroup);
 	}
-	if (!GetSecurityDescriptorDacl(Source, &bPresent, &acl, &bDefaulted)){
+	if (!GetSecurityDescriptorDacl(Source, &bPresent, &pAcl, &bDefaulted)){
 		WIN_ERR("GetSecurityDescriptorDacl(): %s\n", win_strerror(GetLastError()));
-	}else if (bPresent && acl){
-		wIndex = acl->AceCount;
+	}else if (bPresent && pAcl){
+		wIndex = pAcl->AceCount;
 	}else{		/* VFAT */
 		Result->Mode.User = WIN_S_IRWX;
 		Result->Mode.Group = WIN_S_IRWX;
 		Result->Mode.Other = WIN_S_IRWX;
 	}
 	while (wIndex--){
-		GetAce(acl, wIndex, (PVOID)&Info);
+		GetAce(pAcl, wIndex, (PVOID)&Info);
 		dwType = AclOwnerType(Info, &dwTypeMask);
 		if (dwType == WIN_ACL_USER){
 			CopySid(GetLengthSid(&Info->Sid), &Result->UserSid, &Info->Sid);

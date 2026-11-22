@@ -47,9 +47,9 @@ To test if this all works, make the kernel first:
 	make kernel
 
 A minimal OpenBSD system consists of the kernel (/bsd.dll), the 
-BSD C library (/usr/lib/libc.so), the boot program (/minc.exe), the Korn shell 
-(/bin/ksh) and some utilities. These will be built by the new 
-system itself. To finish the build:
+BSD C library (/usr/lib/libc.so), the boot program (/minc.exe), 
+the Korn shell (/bin/ksh) and some utilities. These will be built 
+by the new system itself. To finish the build:
 
 	make system
 
@@ -58,11 +58,11 @@ system itself. To finish the build:
 For this step, you need to be **Administrator**. Close the MSYS 
 terminal and open it again as Administrator by right-clicking 
 the MSYS icon on your Desktop. Change to your *minc-devel* 
-directory and run the *mkroot* command:
+directory and run the **mkroot** command:
 
 	./mkroot.sh
 
-**Note**: By default, MinC will be installed in the **C:\minc-release** 
+**Note**: By default, MinC will be installed in the *C:\minc-release* 
 directory. If you want another install location, uncomment and change 
 the *DESTDIR* variable in config.inc. It is not advisable to create 
 the MinC root directory in a location like *Program Files*. File 
@@ -104,20 +104,20 @@ the address bar, like *C:\minc-release*.
 
 ## Step 4: building the GCC compiler
 
-Building the GNU C compiler and build tools for MinC is as simple 
-as running the **configure** and **make** commands. But in reality it 
-is a bit more complicated. You have to provide the OpenBSD headers 
-and import libraries yourself, of which the latter have to be built 
-first. So you immediately run into the *chicken-and-egg* problem.
-Instead, I recommend just installing the pre-compiled build tools 
-which you can find in the *Releases* section on GitHub.
+Building the GNU C compiler and build tools is as simple as 
+running the **configure** and **make** commands. But in reality 
+it is a bit more complicated. You have to provide the OpenBSD 
+headers and import libraries yourself, of which the latter have 
+to be built first. So you immediately run into the *chicken-and-egg* 
+problem. Instead, I recommend just installing the pre-compiled 
+build tools which you can find in the *Releases* section on GitHub.
 
 If you want to know more about cross-compiling, watch Rob Landley's 
 excellent presentation on the topic:
 
 Tutorial: Building the Simplest Possible Linux System - Rob Landley
-https://youtu.be/Sk9TatW9ino
+	https://youtu.be/Sk9TatW9ino
 
 
-Januari 2026,
+November 2026,
 Daniel Boland

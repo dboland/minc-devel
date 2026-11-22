@@ -131,7 +131,7 @@ win_init(WIN_GLOBALS *Globals, HINSTANCE Instance)
 
 	AclInit(&Globals->SidMachine);
 	TimeInit(&Globals->Frequency);
-	CapInit(&Globals->AuthId);
+//	CapInit(&Globals->AuthId);
 
 	win_wcstombs(szRoot, Globals->Root, MAX_PATH);
 	psz = win_stpcpy(Globals->Path, "Path=");

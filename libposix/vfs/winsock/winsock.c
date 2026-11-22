@@ -29,6 +29,7 @@
  */
 
 #include "winsock_syscall.c"
+#include "winsock_conf.c"
 #include "winsock_device.c"
 #include "winsock_filio.c"
 #include "winsock_fcntl.c"

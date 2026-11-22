@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Daniel Boland <dboland@xs4all.nl>.
+ * Copyright (c) 2026 Daniel Boland <dboland@xs4all.nl>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,7 @@
 /****************************************************/
 
 HANDLE 
-con_F_GETOSFHANDLE(WIN_TTY *Terminal, DWORD Index)
+con_F_OSFHANDLE(WIN_TTY *Terminal, DWORD Index)
 {
 	if (!Index){
 		return(Terminal->Input);

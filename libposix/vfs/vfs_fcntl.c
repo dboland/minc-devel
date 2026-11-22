@@ -39,7 +39,6 @@ vfs_F_DUPFD(WIN_VNODE *Node, BOOL CloseExec, WIN_VNODE *Result)
 	HANDLE hProcess = GetCurrentProcess();
 	DWORD dwOptions = DUPLICATE_SAME_ACCESS;
 
-//	win_memcpy(Result, Node, sizeof(WIN_VNODE));
 	*Result = *Node;
 	Result->CloseExec = CloseExec;
 	switch (Node->FSType){
@@ -163,20 +162,23 @@ vfs_F_SETLK(WIN_VNODE *Node, DWORD Flags, LARGE_INTEGER *Offset, LARGE_INTEGER *
 	return(bResult);
 }
 HANDLE 
-vfs_F_GETOSFHANDLE(WIN_VNODE Nodes[], DWORD Index)
+vfs_F_OSFHANDLE(WIN_VNODE Nodes[], DWORD Index)
 {
 	HANDLE hResult = NULL;
 	WIN_VNODE *pwNode = &Nodes[Index];
 
 	switch (pwNode->FSType){
 		case FS_TYPE_CHAR:
-			hResult = char_F_GETOSFHANDLE(pwNode, Index);
+			hResult = char_F_OSFHANDLE(pwNode, Index);
 			break;
 		case FS_TYPE_MAILSLOT:
-			hResult = mail_F_GETOSFHANDLE(pwNode, Index);
+			hResult = mail_F_OSFHANDLE(pwNode, Index);
+			break;
+		case FS_TYPE_DISK:
+			hResult = pwNode->Handle;
 			break;
 		default:
-			hResult = win_F_SETFD(pwNode->Handle, HANDLE_FLAG_INHERIT);
+			SetLastError(ERROR_BAD_FILE_TYPE);
 	}
 	return(hResult);
 }

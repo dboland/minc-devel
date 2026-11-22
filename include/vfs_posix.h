@@ -38,6 +38,7 @@ BOOL vfs_finish(DWORD FileSystem);
 
 /* vfs_unistd.c */
 
+BOOL vfs_open(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_MODE *Mode, WIN_VNODE *Result);
 BOOL vfs_access(WIN_NAMEIDATA *Path, ACCESS_MASK Access);
 BOOL vfs_rename(WIN_NAMEIDATA *Path, WIN_NAMEIDATA *NewPath);
 BOOL vfs_renameat(WIN_VNODE *Node, WIN_NAMEIDATA *Result);
@@ -111,12 +112,11 @@ BOOL vfs_kill_SYS(DWORD CallerId, UINT Message, WPARAM WParam, LPARAM LParam);
 
 /* vfs_fcntl.c */
 
-BOOL vfs_open(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_MODE *Mode, WIN_VNODE *Result);
 BOOL vfs_F_SETLK(WIN_VNODE *Node, DWORD Flags, LARGE_INTEGER *Offset, LARGE_INTEGER *Size);
 BOOL vfs_F_SETFL(WIN_VNODE *Node, WIN_FLAGS *Flags);
 BOOL vfs_F_GETPATH(WIN_VNODE *Node, WIN_NAMEIDATA *Result);
 BOOL vfs_F_DUPFD(WIN_VNODE *Node, BOOL CloseExec, WIN_VNODE *Result);
-HANDLE vfs_F_GETOSFHANDLE(WIN_VNODE Nodes[], DWORD Index);
+HANDLE vfs_F_OSFHANDLE(WIN_VNODE Nodes[], DWORD Index);
 
 /* vfs_mount.c */
 

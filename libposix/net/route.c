@@ -36,11 +36,33 @@
 
 /****************************************************/
 
+PSOCKET_ADDRESS 
+match_prefix(PSOCKET_ADDRESS Address, PIP_ADAPTER_PREFIX Prefix)
+{
+	ULONG ulSize;
+	SOCKADDR *psAddress = Address->lpSockaddr;
+	SOCKADDR *psPrefix;
+
+	while (Prefix){
+		ulSize = (Prefix->PrefixLength / 8) + 2;
+		psPrefix = Prefix->Address.lpSockaddr;
+		if (!memcmp(psAddress->sa_data, psPrefix->sa_data, ulSize)){
+			return(&Prefix->Address);
+		}
+		Prefix = Prefix->Next;
+	}
+	return(NULL);
+}
+
+/****************************************************/
+
 void *
-ifamsg_posix(void *buf, WIN_IFADDRS *Adapter, PSOCKET_ADDRESS Address)
+ifamsg_posix(void *buf, WIN_IFADDRS *Adapter, PSOCKET_ADDRESS Address, PIP_ADAPTER_PREFIX Prefix)
 {
 	struct ifa_msghdr *hdr = buf;
 	UINT uiAddrLen = Address->iSockaddrLength;
+	PSOCKET_ADDRESS psPrefix;
+	UINT uiPrefixLen = uiAddrLen;
 
 	/* This message should include a netmask/prefix socket
 	 * record. Adding bogus socket record until we have a
@@ -57,8 +79,13 @@ ifamsg_posix(void *buf, WIN_IFADDRS *Adapter, PSOCKET_ADDRESS Address)
 	hdr->ifam_flags = Adapter->IfFlags;
 //	hdr->ifam_metric
 	buf += hdr->ifam_hdrlen;
-	saddr_posix(__Process, buf, Address->lpSockaddr, &uiAddrLen);
-	buf += uiAddrLen;
+	if (psPrefix = match_prefix(Address, Prefix)){
+		uiPrefixLen = psPrefix->iSockaddrLength;
+	}else{
+		psPrefix = Address;
+	}
+	saddr_posix(__Process, buf, psPrefix->lpSockaddr, &uiPrefixLen);
+	buf += uiPrefixLen;
 	saddr_posix(__Process, buf, Address->lpSockaddr, &uiAddrLen);
 	buf += uiAddrLen;
 	return(buf);
@@ -109,7 +136,7 @@ ifmsg_posix(void *buf, WIN_IFADDRS *Adapter)
 	buf += hdr->ifm_hdrlen;
 	buf = dladdr_posix(buf, Adapter->IfIndex, Adapter->IfType, Adapter->PhysAddr, Adapter->AddrLen);
 	while (paUnicast){
-		buf = ifamsg_posix(buf, Adapter, &paUnicast->Address);
+		buf = ifamsg_posix(buf, Adapter, &paUnicast->Address, Adapter->Prefix);
 		paUnicast = paUnicast->Next;
 	}
 	return(buf);
@@ -175,13 +202,19 @@ inmsg_posix(void *buf, MIB_IPNETROW *Address)
 	return(buf);
 }
 size_t 
-ifmsg_size(PIP_ADAPTER_UNICAST_ADDRESS Unicast)
+ifmsg_size(PIP_ADAPTER_UNICAST_ADDRESS Unicast, PIP_ADAPTER_PREFIX Prefix)
 {
 	size_t result = IFMSGLEN;
+	PSOCKET_ADDRESS psPrefix;
 
 	while (Unicast){
 		result += sizeof(struct ifa_msghdr);
-		result += (Unicast->Address.iSockaddrLength * 2);
+		result += Unicast->Address.iSockaddrLength;
+		if (psPrefix = match_prefix(&Unicast->Address, Prefix)){
+			result += psPrefix->iSockaddrLength;
+		}else{
+			result += Unicast->Address.iSockaddrLength;
+		}
 		Unicast = Unicast->Next;
 	}
 	return(result);
@@ -207,7 +240,7 @@ route_NET_RT_IFLIST(void *buf, size_t *size)
 		result -= errno_posix(GetLastError());
 	}else while (ws2_getifaddrs(&ifData, &ifInfo)){
 		if (!buf){
-			*size += ifmsg_size(ifInfo.Unicast);
+			*size += ifmsg_size(ifInfo.Unicast, ifInfo.Prefix);
 		}else{
 			buf = ifmsg_posix(buf, &ifInfo);
 		}
