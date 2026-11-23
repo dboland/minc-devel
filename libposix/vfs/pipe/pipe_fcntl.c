@@ -115,3 +115,20 @@ pipe_F_GETPATH(HANDLE Handle, LPWSTR Buffer)
 	LocalFree(puString);
 	return(bResult);
 }
+HANDLE 
+pipe_F_OSFHANDLE(WIN_VNODE *Node, DWORD Index)
+{
+	HANDLE hResult = NULL;
+
+	switch(Node->FileType){
+		case WIN_VFIFO:
+			hResult = win_F_SETFD(Node->Handle, HANDLE_FLAG_INHERIT);
+			break;
+		case WIN_VSOCK:
+			hResult = Node->Handle;
+			break;
+		default:
+			SetLastError(ERROR_BAD_FILE_TYPE);
+	}
+	return(hResult);
+}

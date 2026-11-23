@@ -44,3 +44,4 @@ int tolower(int c);
 int wcscmp(const wchar_t *string1, const wchar_t *string2);
 size_t wcslen(const wchar_t *str);
 int sscanf(const char *str, const char *format, ...);
+int memcmp(const void *b1, const void *b2, size_t len);

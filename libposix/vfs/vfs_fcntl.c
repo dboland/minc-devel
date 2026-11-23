@@ -174,6 +174,9 @@ vfs_F_OSFHANDLE(WIN_VNODE Nodes[], DWORD Index)
 		case FS_TYPE_MAILSLOT:
 			hResult = mail_F_OSFHANDLE(pwNode, Index);
 			break;
+		case FS_TYPE_PIPE:
+			hResult = pipe_F_OSFHANDLE(pwNode, Index);
+			break;
 		case FS_TYPE_DISK:
 			hResult = pwNode->Handle;
 			break;
