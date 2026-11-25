@@ -39,7 +39,7 @@ sys_getdents(call_t call, int fd, void *buf, size_t nbytes)
 	int atflags = AT_SYMLINK_NOFOLLOW;
 	DWORD dwSize = nbytes;
 	WIN_TASK *pwTask = call.Task;
-	WIN_VNODE *pvNode = &pwTask->Node[fd];
+	WIN_VNODE *pvNode = &__Nodes[pwTask->TaskId][fd];
 	WIN_NAMEIDATA wPath = {0};
 
 	if (fd < 0 || fd >= OPEN_MAX){

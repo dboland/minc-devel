@@ -503,6 +503,7 @@ sys_fchown(call_t call, int fd, uid_t owner, gid_t group)
 	SID8 sidUser;
 	SID8 sidGroup;
 	WIN_TASK *pwTask = call.Task;
+	WIN_VNODE *pvNodes = __Nodes[pwTask->TaskId];
 
 	if (!owner){
 		owner = ROOT_UID;
@@ -512,7 +513,7 @@ sys_fchown(call_t call, int fd, uid_t owner, gid_t group)
 	}
 	if (fd < 0 || fd >= OPEN_MAX){
 		result = -EBADF;
-	}else if (!vfs_fchown(pwTask, &pwTask->Node[fd], rid_win(&sidUser, owner), rid_win(&sidGroup, group))){
+	}else if (!vfs_fchown(pwTask, &pvNodes[fd], rid_win(&sidUser, owner), rid_win(&sidGroup, group))){
 		result -= errno_posix(GetLastError());
 	}
 	return(result);

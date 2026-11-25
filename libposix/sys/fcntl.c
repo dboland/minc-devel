@@ -136,9 +136,10 @@ HANDLE
 fd_win(WIN_TASK *Task, int fd)
 {
 	HANDLE hResult = INVALID_HANDLE_VALUE;
+	WIN_VNODE *pvNode = __Nodes[Task->TaskId];
 
 	if (fd > -1 && fd < OPEN_MAX){
-		hResult = Task->Node[fd].Handle;
+		hResult = pvNode[fd].Handle;
 	}
 	return(hResult);
 }
@@ -146,7 +147,7 @@ int
 fd_posix(WIN_TASK *Task, WIN_VNODE *Node, int offset)
 {
 	int fd = offset > 0 ? offset : 0;
-	WIN_VNODE *pvNode = &Task->Node[fd];
+	WIN_VNODE *pvNode = &__Nodes[Task->TaskId][fd];
 
 	while (fd < OPEN_MAX){
 		if (!pvNode->Access){
@@ -268,41 +269,41 @@ sys_fcntl(call_t call, int fd, int cmd, ...)
 	int result = 0;
 	va_list args;
 	WIN_TASK *pwTask = call.Task;
-	WIN_VNODE *vNodes = pwTask->Node;
+	WIN_VNODE *pvNodes = __Nodes[pwTask->TaskId];
 
 	va_start(args, cmd);
 	if (fd < 0 || fd >= OPEN_MAX){
 		result = -EBADF;
 	}else switch (cmd){
 		case F_DUPFD:
-			result = fcntl_F_DUPFD(pwTask, &vNodes[fd], FALSE, va_arg(args, int));
+			result = fcntl_F_DUPFD(pwTask, &pvNodes[fd], FALSE, va_arg(args, int));
 			break;
 		case F_DUPFD_CLOEXEC:
-			result = fcntl_F_DUPFD(pwTask, &vNodes[fd], TRUE, va_arg(args, int));
+			result = fcntl_F_DUPFD(pwTask, &pvNodes[fd], TRUE, va_arg(args, int));
 			break;
 		case F_SETFD:
-			result = fcntl_F_SETFD(&vNodes[fd], va_arg(args, int));
+			result = fcntl_F_SETFD(&pvNodes[fd], va_arg(args, int));
 			break;
 		case F_GETFD:
-			result = fdflags_posix(&vNodes[fd]);
+			result = fdflags_posix(&pvNodes[fd]);
 			break;
 		case F_SETFL:
-			result = fcntl_F_SETFL(pwTask, &vNodes[fd], va_arg(args, int));
+			result = fcntl_F_SETFL(pwTask, &pvNodes[fd], va_arg(args, int));
 			break;
 		case F_GETFL:
-			result = flflags_posix(&vNodes[fd]);
+			result = flflags_posix(&pvNodes[fd]);
 			break;
 		case F_SETLK:		/* makewhatis (mandoc.exe) */
-			result = fcntl_F_SETLK(pwTask, &vNodes[fd], FALSE, va_arg(args, struct flock *));
+			result = fcntl_F_SETLK(pwTask, &pvNodes[fd], FALSE, va_arg(args, struct flock *));
 			break;
 		case F_SETLKW:
-			result = fcntl_F_SETLK(pwTask, &vNodes[fd], TRUE, va_arg(args, struct flock *));
+			result = fcntl_F_SETLK(pwTask, &pvNodes[fd], TRUE, va_arg(args, struct flock *));
 			break;
 		case F_GETLK:
-			result = fcntl_F_GETLK(&vNodes[fd], va_arg(args, struct flock *));
+			result = fcntl_F_GETLK(&pvNodes[fd], va_arg(args, struct flock *));
 			break;
 		case F_SETOWN:		/* see ioctl(2) */
-			result = fcntl_F_SETOWN(pwTask, &vNodes[fd], va_arg(args, int));
+			result = fcntl_F_SETOWN(pwTask, &pvNodes[fd], va_arg(args, int));
 			break;
 		default:
 			result = -EOPNOTSUPP;
@@ -318,6 +319,7 @@ sys_flock(call_t call, int fd, int operation)
 	DWORD dwFlags = 0;
 	LARGE_INTEGER liOffset = {0, 0};
 	LARGE_INTEGER liSize = {0xFFFFFFFF, 0xFFFFFFFF};
+	WIN_VNODE *pvNodes = __Nodes[pwTask->TaskId];
 
 	if (operation & LOCK_EX){
 		dwFlags |= LOCKFILE_EXCLUSIVE_LOCK;
@@ -330,7 +332,7 @@ sys_flock(call_t call, int fd, int operation)
 	}
 	if (fd < 0 || fd >= OPEN_MAX){
 		result = -EBADF;
-	}else if (!vfs_F_SETLK(&pwTask->Node[fd], dwFlags, &liOffset, &liSize)){
+	}else if (!vfs_F_SETLK(&pvNodes[fd], dwFlags, &liOffset, &liSize)){
 		result -= errno_posix(GetLastError());
 	}
 	return(result);

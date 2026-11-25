@@ -117,9 +117,9 @@ proc_init(WIN_SIGPROC SignalProc)
 		pwTask = ProcCreateTask(0);
 		pwTask->Flags |= WIN_PS_SYSTEM;
 		pwTask->FileMask = 0022;
-		vfs_lookup(GetStdHandle(STD_INPUT_HANDLE), &pwTask->Node[0]);
-		vfs_lookup(GetStdHandle(STD_OUTPUT_HANDLE), &pwTask->Node[1]);
-		vfs_lookup(GetStdHandle(STD_ERROR_HANDLE), &pwTask->Node[2]);
+		vfs_lookup(GetStdHandle(STD_INPUT_HANDLE), &__Nodes[pwTask->TaskId][0]);
+		vfs_lookup(GetStdHandle(STD_OUTPUT_HANDLE), &__Nodes[pwTask->TaskId][1]);
+		vfs_lookup(GetStdHandle(STD_ERROR_HANDLE), &__Nodes[pwTask->TaskId][2]);
 		win_getcwd(__Strings[pwTask->TaskId].Path);
 		win_geteuid(&pwTask->UserSid);
 		win_getegid(&pwTask->GroupSid);
@@ -128,7 +128,7 @@ proc_init(WIN_SIGPROC SignalProc)
 	if (proc_setugid(pwTask)){
 		pwTask->IsSetUGid = 1;
 	}
-	/* pwTask will be empty when a daemon detaches (sshd.exe).
+	/* Task record will be empty when a daemon detaches (sshd.exe).
 	 */
 	__Process = *pwTask;
 	__CTTY = TERMINAL(pwTask->TerminalId);

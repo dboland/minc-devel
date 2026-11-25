@@ -46,7 +46,7 @@ pci_ioctl(WIN_TASK *Task, int fd, unsigned long request, va_list args)
 {
 	int result = 0;
 	DWORD wOperation = request & 0xFF;
-	WIN_VNODE *pvNode = &Task->Node[fd];
+	WIN_VNODE *pvNode = &__Nodes[Task->TaskId][fd];
 
 	if (!pvNode->Access){
 		result = -EBADF;

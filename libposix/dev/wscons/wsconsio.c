@@ -52,7 +52,8 @@ int
 wscons_ioctl(WIN_TASK *Task, int fd, unsigned long request, va_list args)
 {
 	int result = 0;
-	WIN_VNODE *pvNode = &Task->Node[fd];
+//	WIN_VNODE *pvNode = &Task->Node[fd];
+	WIN_VNODE *pvNode = &__Nodes[Task->TaskId][fd];
 
 	switch (request){
 		case WSKBDIO_GTYPE:

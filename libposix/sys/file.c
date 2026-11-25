@@ -76,18 +76,18 @@ void *
 file_KERN_FILE_TASK(void *buf, size_t *size, WIN_TASK *Task)
 {
 	int fd = 0;
-	WIN_VNODE *pwNode = Task->Node;
+	WIN_VNODE *pvNode = __Nodes[Task->TaskId];
 
 	if (Task->Flags & WIN_PS_SYSTEM){
 		return(buf);
 	}else while (fd < OPEN_MAX){
-		if (pwNode->Access){
+		if (pvNode->Access){
 			if (buf){
-				buf = kfile_posix(Task, pwNode, buf);
+				buf = kfile_posix(Task, pvNode, buf);
 			}
 			*size += sizeof(struct kinfo_file);
 		}
-		pwNode++;
+		pvNode++;
 		fd++;
 	}
 	return(buf);

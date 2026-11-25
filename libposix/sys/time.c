@@ -276,10 +276,11 @@ sys_futimens(call_t call, int fd, const struct timespec times[2])
 	int result = 0;
 	FILETIME fTime[2];
 	WIN_TASK *pwTask = call.Task;
+	WIN_VNODE *pvNodes = __Nodes[pwTask->TaskId];
 
 	if (fd < 0 || fd >= OPEN_MAX){
 		result = -EBADF;
-	}else if (!disk_futimes(&pwTask->Node[fd], utimespec_win(fTime, times))){
+	}else if (!disk_futimes(&pvNodes[fd], utimespec_win(fTime, times))){
 		result -= errno_posix(GetLastError());
 	}
 	return(result);
@@ -315,10 +316,11 @@ sys_futimes(call_t call, int fd, const struct timeval tv[2])
 	int result = 0;
 	FILETIME fTime[2];
 	WIN_TASK *pwTask = call.Task;
+	WIN_VNODE *pvNodes = __Nodes[pwTask->TaskId];
 
 	if (fd < 0 || fd >= OPEN_MAX){
 		result = -EBADF;
-	}else if (!disk_futimes(&pwTask->Node[fd], utimeval_win(fTime, tv))){
+	}else if (!disk_futimes(&pvNodes[fd], utimeval_win(fTime, tv))){
 		result -= errno_posix(GetLastError());
 	}
 	return(result);

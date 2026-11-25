@@ -70,7 +70,7 @@ sys_getdtablecount(call_t call)
 {
 	int result = 0;
 	WIN_TASK *pwTask = call.Task;
-	WIN_VNODE *pvNode = pwTask->Node;
+	WIN_VNODE *pvNode = __Nodes[pwTask->TaskId];
 	int fd = 0;
 
 	while (fd < OPEN_MAX){
@@ -228,10 +228,11 @@ sys_fsync(call_t call, int fd)
 {
 	int result = 0;
 	WIN_TASK *pwTask = call.Task;
+	WIN_VNODE *pvNodes = __Nodes[pwTask->TaskId];
 
 	if (fd < 0 || fd >= OPEN_MAX){
 		result = -EBADF;
-	}else if (!vfs_fsync(&pwTask->Node[fd])){
+	}else if (!vfs_fsync(&pvNodes[fd])){
 		result -= errno_posix(GetLastError());
 	}else{
 		result = 0;
@@ -419,10 +420,11 @@ sys_ftruncate(call_t call, int fd, off_t length)
 	int result = 0;
 	WIN_TASK *pwTask = call.Task;
 	LARGE_INTEGER liOffset = {length & 0xFFFFFFFF, length >> 32};
+	WIN_VNODE *pvNodes = __Nodes[pwTask->TaskId];
 
 	if (fd < 0 || fd >= OPEN_MAX){
 		result = -EBADF;
-	}else if (!vfs_ftruncate(&pwTask->Node[fd], &liOffset)){
+	}else if (!vfs_ftruncate(&pvNodes[fd], &liOffset)){
 		result -= errno_posix(GetLastError());
 	}
 	return(result);
@@ -468,7 +470,6 @@ sys_open(call_t call, const char *path, int flags, ...)
 	va_list args;
 	WIN_NAMEIDATA wPath = {0};
 
-//	flags |= O_INODE;
 	if (!path[0]){
 		return(-ENOENT);
 	}
@@ -483,7 +484,6 @@ sys_openat(call_t call, int dirfd, const char *path, int flags, ...)
 	int result;
 	va_list args;
 	WIN_NAMEIDATA wPath = {0};
-//	int atflags = AT_INODE;
 	int atflags = 0;
 
 	if (flags & O_NOFOLLOW){
@@ -515,11 +515,12 @@ sys_dup(call_t call, int oldfd)
 {
 	int result = 0;
 	WIN_TASK *pwTask = call.Task;
+	WIN_VNODE *pvNodes = __Nodes[pwTask->TaskId];
 
 	if (oldfd < 0 || oldfd >= OPEN_MAX){
 		result = -EBADF;
 	}else{
-		result = __dup(pwTask, &pwTask->Node[oldfd]);
+		result = __dup(pwTask, &pvNodes[oldfd]);
 	}
 	return(result);
 }
@@ -528,7 +529,7 @@ sys_dup2(call_t call, int oldfd, int newfd)
 {
 	int result = 0;
 	WIN_TASK *pwTask = call.Task;
-	WIN_VNODE *pvNodes = pwTask->Node;
+	WIN_VNODE *pvNodes = __Nodes[pwTask->TaskId];
 
 	if (oldfd < 0 || oldfd >= OPEN_MAX){
 		result = -EBADF;
@@ -550,6 +551,7 @@ sys_lseek(call_t call, int fd, off_t offset, int whence)
 	LARGE_INTEGER liResult;
 	WIN_TASK *pwTask = call.Task;
 	LARGE_INTEGER liOffset = {offset & 0xFFFFFFFF, offset >> 32};
+	WIN_VNODE *pvNodes = __Nodes[pwTask->TaskId];
 
 	if (whence == SEEK_CUR){
 		dwMethod = FILE_CURRENT;
@@ -558,7 +560,7 @@ sys_lseek(call_t call, int fd, off_t offset, int whence)
 	}
 	if (fd < 0 || fd >= OPEN_MAX){
 		result = -EBADF;
-	}else if (!vfs_lseek(&pwTask->Node[fd], &liOffset, dwMethod, &liResult)){
+	}else if (!vfs_lseek(&pvNodes[fd], &liOffset, dwMethod, &liResult)){
 		result -= errno_posix(GetLastError());
 	}else{
 		result = liResult.QuadPart;
@@ -570,10 +572,11 @@ sys_close(call_t call, int fd)
 {
 	int result = 0;
 	WIN_TASK *pwTask = call.Task;
+	WIN_VNODE *pvNodes = __Nodes[pwTask->TaskId];
 
 	if (fd < 0 || fd >= OPEN_MAX){
 		result = -EBADF;
-	}else if (!vfs_close(&pwTask->Node[fd])){
+	}else if (!vfs_close(&pvNodes[fd])){
 		result -= errno_posix(GetLastError());
 	}
 	return(result);
@@ -601,7 +604,7 @@ sys_closefrom(call_t call, int fd)
 	if (fd < 0 || fd >= OPEN_MAX){
 		result = -EBADF;
 	}else{
-		result = __closefrom(pwTask->Node, fd);
+		result = __closefrom(__Nodes[pwTask->TaskId], fd);
 	}
 	return(result);
 }
@@ -612,10 +615,11 @@ sys_read(call_t call, int fd, void *buf, size_t count)
 	DWORD dwResult = -1;		/* WinNT EOF on ReadFile() */
 	DWORD dwCount = count;
 	WIN_TASK *pwTask = call.Task;
+	WIN_VNODE *pvNodes = __Nodes[pwTask->TaskId];
 
 	if (fd < 0 || fd >= OPEN_MAX){
 		result = -EBADF;
-	}else if (!vfs_read(pwTask, &pwTask->Node[fd], buf, dwCount, &dwResult)){
+	}else if (!vfs_read(pwTask, &pvNodes[fd], buf, dwCount, &dwResult)){
 		result -= errno_posix(GetLastError());
 	}else if (dwResult == -1){
 		pwTask->Error = errno_posix(GetLastError());
@@ -633,13 +637,14 @@ sys_write(call_t call, int fd, const void *buf, size_t nbytes)
 	ssize_t result = 0;
 	DWORD dwResult = 0;		/* WinNT EOF on WriteFile() */
 	WIN_TASK *pwTask = call.Task;
+	WIN_VNODE *pvNodes = __Nodes[pwTask->TaskId];
 
 	if (pwTask->TracePoints & KTRFAC_GENIO){
 		ktrace_GENIO(pwTask, fd, UIO_WRITE, buf, nbytes);
 	}
 	if (fd < 0 || fd >= OPEN_MAX){
 		result = -EBADF;
-	}else if (!vfs_write(&pwTask->Node[fd], buf, nbytes, &dwResult)){
+	}else if (!vfs_write(&pvNodes[fd], buf, nbytes, &dwResult)){
 		result -= errno_posix(GetLastError());
 	}else if (!dwResult){
 		pwTask->Error = errno_posix(GetLastError());
@@ -654,12 +659,13 @@ sys_pread(call_t call, int fd, void *buf, size_t nbytes, off_t offset)
 	ssize_t result = 0;
 	DWORD dwResult = 0;		/* WinNT EOF on overlapped ReadFile() */
 	WIN_TASK *pwTask = call.Task;
+	WIN_VNODE *pvNodes = __Nodes[pwTask->TaskId];
 
 	if (offset < 0){
 		result = -EINVAL;
 	}else if (fd < 0 || fd >= OPEN_MAX){
 		result = -EBADF;
-	}else if (!vfs_pread(pwTask, &pwTask->Node[fd], buf, nbytes, offset, &dwResult)){
+	}else if (!vfs_pread(pwTask, &pvNodes[fd], buf, nbytes, offset, &dwResult)){
 		result -= errno_posix(GetLastError());
 	}else{
 		result = dwResult;
@@ -672,12 +678,13 @@ sys_pwrite(call_t call, int fd, const void *buf, size_t nbytes, off_t offset)
 	ssize_t result = 0;
 	DWORD dwResult = -1;
 	WIN_TASK *pwTask = call.Task;
+	WIN_VNODE *pvNodes = __Nodes[pwTask->TaskId];
 
 	if (offset < 0){
 		result = -EINVAL;
 	}else if (fd < 0 || fd >= OPEN_MAX){
 		result = -EBADF;
-	}else if (!vfs_pwrite(&pwTask->Node[fd], buf, nbytes, offset, &dwResult)){
+	}else if (!vfs_pwrite(&pvNodes[fd], buf, nbytes, offset, &dwResult)){
 		result -= errno_posix(GetLastError());
 	}else{
 		result = dwResult;

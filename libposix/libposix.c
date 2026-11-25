@@ -63,8 +63,8 @@ extern WIN_TTY 		*__Terminals;
 extern WIN_PSTRING 	*__Strings;
 extern WIN_MOUNT	*__Mounts;
 extern WIN_GLOBALS	*__Globals;
-extern SID8 		*__SidNone;
 extern SID8 		*__SidMachine;
+extern WIN_VNODE_LIST	*__Nodes;
 
 extern DWORD	 	__TlsIndex;
 extern HANDLE		__Interrupt;
@@ -154,7 +154,7 @@ posix_PROCESS_DETACH(WIN_TASK *Task)
 		if (!vfs_kill_PID(pid_win(Task->ParentId), WM_SIGNAL, CTRL_CHILD_EVENT, Task->TaskId)){
 			proc_orphanize(Task);
 		}
-		vfs_closefrom(Task->Node);
+		vfs_closefrom(__Nodes[Task->TaskId]);
 	}
 	return(TRUE);
 }
@@ -170,7 +170,7 @@ posix_THREAD_DETACH(WIN_TASK *Task)
 		if (!vfs_kill_PID(pid_win(Task->ParentId), WM_SIGNAL, CTRL_CHILD_EVENT, Task->TaskId)){
 			proc_orphanize(Task);
 		}
-		__closefrom(Task->Node, 0);
+		__closefrom(__Nodes[Task->TaskId], 0);
 	}
 	return(TRUE);
 }

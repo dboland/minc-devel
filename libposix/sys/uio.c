@@ -38,12 +38,13 @@ sys_writev(call_t call, int fd, const struct iovec *iov, int iovcnt)
 	ssize_t result = 0;
 	ULONG ulResult;
 	WIN_TASK *pwTask = call.Task;
+	WIN_VNODE *pvNodes = __Nodes[pwTask->TaskId];
 
 	if (iovcnt < 0 || iovcnt >= IOV_MAX){
 		result = -EINVAL;
 	}else if (fd < 0 || fd >= OPEN_MAX){
 		result = -EBADF;
-	}else if (!vfs_writev(&pwTask->Node[fd], (WIN_IOVEC *)iov, iovcnt, &ulResult)){
+	}else if (!vfs_writev(&pvNodes[fd], (WIN_IOVEC *)iov, iovcnt, &ulResult)){
 		result -= errno_posix(GetLastError());
 	}else{
 		result = ulResult;
@@ -56,12 +57,13 @@ sys_readv(call_t call, int fd, const struct iovec *iov, int iovcnt)
 	ssize_t result = 0;
 	ULONG ulResult;
 	WIN_TASK *pwTask = call.Task;
+	WIN_VNODE *pvNodes = __Nodes[pwTask->TaskId];
 
 	if (iovcnt < 0 || iovcnt >= IOV_MAX){
 		result = -EINVAL;
 	}else if (fd < 0 || fd >= OPEN_MAX){
 		result = -EBADF;
-	}else if (!vfs_readv(pwTask, &pwTask->Node[fd], (WIN_IOVEC *)iov, iovcnt, &ulResult)){
+	}else if (!vfs_readv(pwTask, &pvNodes[fd], (WIN_IOVEC *)iov, iovcnt, &ulResult)){
 		result -= errno_posix(GetLastError());
 	}else{
 		result = ulResult;

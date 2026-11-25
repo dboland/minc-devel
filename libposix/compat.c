@@ -36,12 +36,12 @@ runcmd(char *argv[])
 	int result = 0;
 	CHAR szPath[PATH_MAX];
 	WIN_TASK *pwTask = &__Tasks[CURRENT];
-	WIN_VNODE *Nodes = pwTask->Node;
+	WIN_VNODE *pvNodes = __Nodes[pwTask->TaskId];
 	STARTUPINFO si = {0};
 
-	si.hStdInput = vfs_F_OSFHANDLE(Nodes, 0);
-	si.hStdOutput = vfs_F_OSFHANDLE(Nodes, 1);
-	si.hStdError = vfs_F_OSFHANDLE(Nodes, 2);
+	si.hStdInput = vfs_F_OSFHANDLE(pvNodes, 0);
+	si.hStdOutput = vfs_F_OSFHANDLE(pvNodes, 1);
+	si.hStdError = vfs_F_OSFHANDLE(pvNodes, 2);
 	shell_wcstombs(szPath, __Strings[pwTask->TaskId].Path, PATH_MAX);
 	if (!shell_execve(argv_win(pwTask, *argv, argv), szPath, &si)){
 		result -= errno_posix(GetLastError());

@@ -38,7 +38,7 @@ pollfd_win(WIN_TASK *Task, WIN_VNODE *Nodes[], WIN_POLLFD *Info[], struct pollfd
 	nfds_t i = 0;
 	int count = 0;
 	int fd;
-	WIN_VNODE *pNodes = Task->Node;
+	WIN_VNODE *pvNodes = __Nodes[Task->TaskId];
 
 	if (nfds < 0 || nfds > WSA_MAXIMUM_WAIT_EVENTS){
 		return(FALSE);
@@ -47,8 +47,8 @@ pollfd_win(WIN_TASK *Task, WIN_VNODE *Nodes[], WIN_POLLFD *Info[], struct pollfd
 		fds->revents = 0;
 		if (fd >= OPEN_MAX){
 			fds->revents = POLLNVAL;
-		}else if (fd >= 0 && fds->events && pNodes[fd].Access){
-			Nodes[count] = &pNodes[fd];
+		}else if (fd >= 0 && fds->events && pvNodes[fd].Access){
+			Nodes[count] = &pvNodes[fd];
 			Info[count] = (WIN_POLLFD *)fds;
 			count++;
 		}

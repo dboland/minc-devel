@@ -103,7 +103,7 @@ proc_dup(WIN_TASK *Parent, WIN_THREAD_STRUCT *Thread)
 	win_memcpy(ptResult->AtExit, Parent->AtExit, WIN_ATEXIT_MAX * sizeof(WIN_ATEXITPROC));
 	win_memcpy(ptResult->Action, Parent->Action, WIN_NSIG * sizeof(WIN_SIGACTION));
 	win_memcpy(&__Strings[ptResult->TaskId], &__Strings[Parent->TaskId], sizeof(WIN_PSTRING));
-	ProcDupChannels(Parent->Node, ptResult->Node);
+	ProcDupChannels(__Nodes[Parent->TaskId], __Nodes[ptResult->TaskId]);
 	return(ptResult);
 }
 BOOL 
@@ -169,7 +169,7 @@ proc_execve(WIN_TASK *Task, LPSTR Command, PVOID Environ)
 		}else{
 			Task->Handle = pi.hThread;
 		}
-		ProcInheritChannels(Task->Node, pi.hProcess);
+		ProcInheritChannels(__Nodes[Task->TaskId], pi.hProcess);
 		CloseHandle(hThread);
 		CloseHandle(pi.hProcess);
 		/* https://man7.org/linux/man-pages/man2/execve.2.html */

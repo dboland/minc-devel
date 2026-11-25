@@ -49,11 +49,11 @@ int
 mtape_ioctl(WIN_TASK *Task, int fd, unsigned long request, va_list args)
 {
 	int result = 0;
-	WIN_VNODE *pvNode = &Task->Node[fd];
+	WIN_VNODE *pvNodes = __Nodes[Task->TaskId];
 
 	switch (request){
 		case MTIOCGET:
-			result = mtape_MTIOCGET(pvNode, va_arg(args, struct mtget *));
+			result = mtape_MTIOCGET(&pvNodes[fd], va_arg(args, struct mtget *));
 			break;
 		default:
 			result = -EOPNOTSUPP;

@@ -66,7 +66,6 @@ extern SID8 SidUsers;
 extern SID8 SidGuests;
 extern SID8 SidBuiltin;
 extern SID8 SidNull;
-extern SID8 SidPowerUsers;
 
 HANDLE 		__Shared;
 WIN_SIGPROC	__SignalProc;
@@ -91,6 +90,7 @@ WIN_TTY 	*__CTTY;
 CHAR 		*__Escape;
 CHAR		*__Input = __INPUT_BUF;
 CONST WCHAR	*__Clipboard;		/* Clipboard buffer */
+WIN_VNODE_LIST	*__Nodes;
 
 BOOL proc_poll(WIN_TASK *Task);
 BOOL pdo_fstat(WIN_VNODE *Node, WIN_VATTR *Result);
@@ -145,6 +145,7 @@ vfs_PROCESS_ATTACH(HINSTANCE Instance, LPVOID Reserved)
 	__Terminals = __Session->Terminals;
 	__Mounts = __Session->Mounts;
 	__Strings = __Session->Strings;
+	__Nodes = __Session->Nodes;
 	__Globals = __Session->Globals;
 	__SidMachine = &__Globals->SidMachine;
 	__Frequency = &__Globals->Frequency;

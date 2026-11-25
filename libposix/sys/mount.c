@@ -249,7 +249,6 @@ sys_statfs(call_t call, const char *path, struct statfs *buf)
 	int result = 0;
 	WIN_STATVFS fsInfo = {0};
 	WIN_NAMEIDATA wPath = {0};
-//	WIN_TASK *pwTask = call.Task;
 
 	if (!vfs_statfs(path_win(&wPath, path, 0), &fsInfo)){
 		result -= errno_posix(GetLastError());
@@ -265,8 +264,9 @@ sys_fstatfs(call_t call, int fd, struct statfs *buf)
 	WIN_STATVFS fsInfo = {0};
 	WIN_NAMEIDATA wPath = {0};
 	WIN_TASK *pwTask = call.Task;
+	WIN_VNODE *pvNodes = __Nodes[pwTask->TaskId];
 
-	if (!vfs_fstatfs(&pwTask->Node[fd], &fsInfo)){
+	if (!vfs_fstatfs(&pvNodes[fd], &fsInfo)){
 		result -= errno_posix(GetLastError());
 	}else{
 		statfs_posix(buf, &fsInfo);

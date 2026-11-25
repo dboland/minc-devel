@@ -269,10 +269,11 @@ sys_fstat(call_t call, int fd, struct stat *buf)
 	int result = 0;
 	WIN_VATTR wStat = {0};
 	WIN_TASK *pwTask = call.Task;
+	WIN_VNODE *pvNodes = __Nodes[pwTask->TaskId];
 
 	if (fd < 0 || fd >= OPEN_MAX){
 		return(-EBADF);
-	}else if (!vfs_fstat(&pwTask->Node[fd], &wStat)){
+	}else if (!vfs_fstat(&pvNodes[fd], &wStat)){
 		result -= errno_posix(GetLastError());
 	}else{
 		stat_posix(pwTask, buf, &wStat);
@@ -352,10 +353,11 @@ sys_fchmod(call_t call, int fd, mode_t mode)
 	int result = 0;
 	WIN_TASK *pwTask = call.Task;
 	WIN_MODE wMode;
+	WIN_VNODE *pvNodes = __Nodes[pwTask->TaskId];
 
 	if (fd < 0 || fd >= OPEN_MAX){
 		result = -EBADF;
-	}else if (!vfs_fchmod(&pwTask->Node[fd], mode_win(&wMode, mode))){
+	}else if (!vfs_fchmod(&pvNodes[fd], mode_win(&wMode, mode))){
 		result -= errno_posix(GetLastError());
 	}
 	return(result);

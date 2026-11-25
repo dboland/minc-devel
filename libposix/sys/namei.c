@@ -116,6 +116,7 @@ pathat_win(WIN_NAMEIDATA *Result, int dirfd, const char *path, int atflags)
 	size_t size;
 	WIN_TASK *pwTask = &__Tasks[CURRENT];
 	DWORD dwFlags = WIN_FOLLOW;
+	WIN_VNODE *pvNodes = __Nodes[pwTask->TaskId];
 
 	if (pwTask->TracePoints & KTRFAC_NAMEI){
 		ktrace_NAMEI(pwTask, path, strlen(path));
@@ -146,7 +147,7 @@ pathat_win(WIN_NAMEIDATA *Result, int dirfd, const char *path, int atflags)
 	Result->Base = Result->R;
 
 	if (dirfd > 0 && dirfd < OPEN_MAX){
-		vfs_F_GETPATH(&pwTask->Node[dirfd], Result);
+		vfs_F_GETPATH(&pvNodes[dirfd], Result);
 
 	}else if (path[0] == '/'){
 		path = root_win(Result, path);

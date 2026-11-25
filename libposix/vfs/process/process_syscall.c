@@ -36,7 +36,7 @@ WIN_TASK *
 ProcCreateTask(DWORD Offset)
 {
 	WIN_TASK *pwTask = &__Tasks[Offset];
-	DWORD dwAffinity = 0;
+	WIN_VNODE_LIST *pvnList = &__Nodes[Offset];
 
 	while (Offset < WIN_CHILD_MAX){
 		if (!pwTask->Flags){
@@ -49,10 +49,12 @@ ProcCreateTask(DWORD Offset)
 			GetSystemTimeAsFileTime(&pwTask->Started);
 			return(pwTask);
 		}else if (pwTask->Flags & WIN_PS_NOZOMBIE){
+			ZeroMemory(pvnList, sizeof(WIN_VNODE_LIST));
 			ZeroMemory(pwTask, sizeof(WIN_TASK));
 		}
 		Offset++;
 		pwTask++;
+		pvnList++;
 	}
 	WIN_ERR("ProcCreateTask(%d): %s\n", Offset, win_strerror(ERROR_MAX_THRDS_REACHED));
 	vfs_raise(WM_SIGNAL, CTRL_BREAK_EVENT, 0);

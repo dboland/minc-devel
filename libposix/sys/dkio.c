@@ -50,11 +50,11 @@ int
 disk_ioctl(WIN_TASK *Task, int fd, unsigned long request, va_list args)
 {
 	int result = 0;
-	WIN_VNODE *pvNode = &Task->Node[fd];
+	WIN_VNODE *pvNodes = __Nodes[Task->TaskId];
 
 	switch (request){
 		case DIOCGDINFO:
-			result = disk_DIOCGDINFO(pvNode, va_arg(args, struct disklabel *));
+			result = disk_DIOCGDINFO(&pvNodes[fd], va_arg(args, struct disklabel *));
 			break;
 		default:
 			result = -EOPNOTSUPP;
