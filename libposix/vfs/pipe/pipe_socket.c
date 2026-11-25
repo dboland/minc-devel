@@ -73,7 +73,8 @@ pipe_connect(WIN_VNODE *Node, CONST LPSOCKADDR Name, INT Length)
 
 	if (PipeOpenFile((LPWSTR)Name->sa_data, __PipeEvent, Node)){
 		bResult = TRUE;
-//	}else{
+	}else{
+		SetEvent(__PipeEvent);
 //		WIN_ERR("pipe_connect(%ls): %s\n", Name->sa_data, win_strerror(GetLastError()));
 	}
 	return(bResult);

@@ -102,6 +102,7 @@ WIN_TASK *
 proc_init(WIN_SIGPROC SignalProc)
 {
 	STARTUPINFO si = {0};
+	WIN_TASK *pwTask;
 
 	__SignalProc = SignalProc;
 	SetUnhandledExceptionFilter(SigExceptionProc);
@@ -110,25 +111,28 @@ proc_init(WIN_SIGPROC SignalProc)
 //	SetErrorMode(SEM_FAILCRITICALERRORS);
 	GetStartupInfo(&si);
 	if (si.dwFlags & STARTF_PS_EXEC){
-		__Process = &__Tasks[si.dwX];
-		__Process->Flags |= WIN_PS_INEXEC;
+		pwTask = &__Tasks[si.dwX];
+		pwTask->Flags |= WIN_PS_INEXEC;
 	}else{
-		__Process = ProcCreateTask(0);
-		__Process->Flags |= WIN_PS_SYSTEM;
-		__Process->FileMask = 0022;
-		vfs_lookup(GetStdHandle(STD_INPUT_HANDLE), &__Process->Node[0]);
-		vfs_lookup(GetStdHandle(STD_OUTPUT_HANDLE), &__Process->Node[1]);
-		vfs_lookup(GetStdHandle(STD_ERROR_HANDLE), &__Process->Node[2]);
-		win_getcwd(__Strings[__Process->TaskId].Path);
-		win_geteuid(&__Process->UserSid);
-		win_getegid(&__Process->GroupSid);
-		ProcInitLimits(__Process->Limit);
+		pwTask = ProcCreateTask(0);
+		pwTask->Flags |= WIN_PS_SYSTEM;
+		pwTask->FileMask = 0022;
+		vfs_lookup(GetStdHandle(STD_INPUT_HANDLE), &pwTask->Node[0]);
+		vfs_lookup(GetStdHandle(STD_OUTPUT_HANDLE), &pwTask->Node[1]);
+		vfs_lookup(GetStdHandle(STD_ERROR_HANDLE), &pwTask->Node[2]);
+		win_getcwd(__Strings[pwTask->TaskId].Path);
+		win_geteuid(&pwTask->UserSid);
+		win_getegid(&pwTask->GroupSid);
+		ProcInitLimits(pwTask->Limit);
 	}
-	if (proc_setugid(__Process)){
-		__Process->IsSetUGid = 1;
+	if (proc_setugid(pwTask)){
+		pwTask->IsSetUGid = 1;
 	}
-	__CTTY = TERMINAL(__Process->TerminalId);
-	return(__Process);
+	/* pwTask will be empty when a daemon detaches (sshd.exe).
+	 */
+	__Process = *pwTask;
+	__CTTY = TERMINAL(pwTask->TerminalId);
+	return(pwTask);
 }
 DECLSPEC_NORETURN VOID 
 proc_exit(DWORD ExitCode)

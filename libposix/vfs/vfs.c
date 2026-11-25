@@ -79,6 +79,7 @@ HGLOBAL		__Lock;			/* Clipboard lock */
 DWORD		__ThreadCount;
 DWORD 		__TlsIndex;
 DWORD		__Index;		/* index into input buffer */
+WIN_TASK	__Process;
 
 WIN_SESSION	*__Session;
 WIN_TASK	*__Tasks;
@@ -90,17 +91,16 @@ WIN_TTY 	*__CTTY;
 CHAR 		*__Escape;
 CHAR		*__Input = __INPUT_BUF;
 CONST WCHAR	*__Clipboard;		/* Clipboard buffer */
-WIN_TASK	*__Process;
 
 BOOL proc_poll(WIN_TASK *Task);
 BOOL pdo_fstat(WIN_VNODE *Node, WIN_VATTR *Result);
 BOOL pdo_F_DUPFD(WIN_VNODE *Node, HANDLE Process, DWORD Options, WIN_VNODE *Result);
 
-#include "vfs_acl.c"
 #include "vfs_signal.c"
 #include "vfs_libgen.c"
 #include "vfs_device.c"
 #include "vfs_ktrace.c"
+#include "vfs_acl.c"
 #include "vfs_syscall.c"
 #include "vfs_conf.c"
 #include "disk/disk.c"

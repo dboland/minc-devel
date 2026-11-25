@@ -34,10 +34,9 @@
 #include <errno.h>
 #include <pwd.h>
 
-#include "arch_types.h"
-#include "bsd_types.h"
-
 #include <sys/sysctl.h>
+
+#include "arch_types.h"
 
 #define PWDBUF_MAX	255
 

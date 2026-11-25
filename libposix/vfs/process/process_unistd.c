@@ -56,7 +56,8 @@ ProcInheritChannels(WIN_VNODE Nodes[], HANDLE Process)
 		if (Nodes->Access){
 			if (Nodes->CloseExec){
 				vfs_close(Nodes);
-			}else if (!(Nodes->Flags & HANDLE_FLAG_INHERIT)){
+//			}else if (!(Nodes->Flags & HANDLE_FLAG_INHERIT)){
+			}else{
 				vfs_F_INHERIT(Nodes, Process);
 			}
 		}
@@ -176,6 +177,7 @@ proc_execve(WIN_TASK *Task, LPSTR Command, PVOID Environ)
 		ZeroMemory(Task->AtExit, WIN_ATEXIT_MAX * sizeof(WIN_ATEXITPROC));
 		Task->State = WIN_SRUN;
 		Task->Timer = NULL;
+		Task->IsSetUGid = 0;
 		bResult = CloseHandle(hToken);
 	}else{
 		WIN_ERR("CreateProcessAsUser(%s): Handle(%d): %s\n", Command, hToken, win_strerror(GetLastError()));

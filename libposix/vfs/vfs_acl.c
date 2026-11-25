@@ -160,12 +160,12 @@ vfs_acl_init(PSECURITY_DESCRIPTOR Source, DWORD MountId, DWORD Mode, PSECURITY_D
 	if (Mode & WIN_S_ISUID){
 		pOwner = &SidAdmins;
 	}else if (dwType != DEV_TYPE_REMOTE){	/* Samba */
-		pOwner = &__Process->UserSid;
+		pOwner = &__Process.UserSid;
 	}
 	if (Mode & WIN_S_ISGID){
 		pGroup = &SidSystem;
 	}else if (dwType != DEV_TYPE_REMOTE){
-		pGroup = &__Process->GroupSid;
+		pGroup = &__Process.GroupSid;
 	}
 	if (!InitializeSecurityDescriptor(Result, SECURITY_DESCRIPTOR_REVISION)){
 		WIN_ERR("InitializeSecurityDescriptor(): %s\n", win_strerror(GetLastError()));
@@ -213,7 +213,7 @@ vfs_acl_create(WIN_ACL_CONTROL *Control, WIN_MODE *Mode, BYTE AceFlags, PSECURIT
 		bFlagsNew = pEntry->Header.AceFlags & ~ALL_INHERIT_ACE;
 		if (dwType == WIN_ACL_USER){
 			if (EqualPrefixSid(&pEntry->Sid, __SidMachine)){
-				pEntry = AclDupEntry(pEntry, &__Process->UserSid, &aceBuf);
+				pEntry = AclDupEntry(pEntry, &__Process.UserSid, &aceBuf);
 			}
 			pEntry->Mask = aMaskNew + Mode->User;
 		}else if (dwType == WIN_ACL_GROUP){

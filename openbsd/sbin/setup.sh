@@ -32,7 +32,9 @@ echo done.
 
 echo -n "Creating /dev file system... "
 sh /etc/MAKEDEV
-printf "/dev/root\t/\tffs\trw\t0\t0\n" >/etc/fstab
+if ! [ -f /etc/fstab ]; then
+	printf "/dev/root\t/\tffs\trw\t0\t0\n" >/etc/fstab
+fi
 admins_only "/etc/fstab"
 echo done.
 

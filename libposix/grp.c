@@ -146,7 +146,7 @@ grp_GRP_GETGROUPLIST(const char *user, gid_t group, gid_t *groups, int *ngroups)
 	WIN_PWENT pwEntry;
 	WCHAR szAccount[MAX_NAME];
 	WCHAR szName[MAX_NAME];
-	SID8 *psGroups = NULL;
+	SID8 *psRow, *psTable = NULL;
 	SID8 sid;
 	DWORD dwCount = 0;
 	int index = 0;
@@ -159,21 +159,20 @@ grp_GRP_GETGROUPLIST(const char *user, gid_t group, gid_t *groups, int *ngroups)
 		result = -EINVAL;
 	}else if (!win_getpwnam(szAccount, win_getdcnam(szName), &pwEntry)){
 		result -= errno_posix(GetLastError());
-	}else if (!win_getgrouplist(&pwEntry, rid_win(&sid, group), &psGroups, &dwCount)){
+	}else if (!win_getgrouplist(&pwEntry, rid_win(&sid, group), &psTable, &dwCount)){
 		result -= errno_posix(GetLastError());
 	}else if (*ngroups < dwCount){
 		result = -EINVAL;
-	}else while (index < dwCount){
-		next = rid_posix(psGroups);
+	}else for (psRow = psTable; index < dwCount; psRow++){
+		next = rid_posix(psRow);
 		if (next == WHEEL_GID){
 			groups[index] = 0;
 		}else{
 			groups[index] = next;
 		}
-		psGroups++;
 		index++;
 	}
-	win_free(psGroups);
+	win_free(psTable);
 	*ngroups = dwCount;
 	return(result);
 }

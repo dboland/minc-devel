@@ -57,7 +57,6 @@ extern SID8 SidSystem;
 extern SID8 SidUsers;
 extern SID8 SidTrustedInstaller;
 
-extern WIN_TASK		*__Process;
 extern WIN_TASK 	*__Tasks;
 extern WIN_DEV_CLASS 	*__Devices;
 extern WIN_TTY 		*__Terminals;
@@ -70,6 +69,7 @@ extern SID8 		*__SidMachine;
 extern DWORD	 	__TlsIndex;
 extern HANDLE		__Interrupt;
 extern HANDLE		__PipeEvent;
+extern WIN_TASK		__Process;
 
 u_long	__THREAD_FRAME;
 

@@ -35,10 +35,9 @@
 #include <errno.h>
 #include <grp.h>
 
-#include "arch_types.h"
-#include "bsd_types.h"
-
 #include <sys/sysctl.h>
+
+#include "arch_types.h"
 
 #define GRPBUF_MAX	512
 

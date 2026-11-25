@@ -28,6 +28,20 @@
  *
  */
 
+/* OpenBSD system group names */
+
+#define CRONTAB_GID	500000003
+#define AUTH_GID	500000004
+#define DAEMON_UID	500000006
+#define OPERATOR_GID	500000011
+#define TERM_GID	500000013
+#define ROOT_UID	500000018
+#define DAEMON_GID	500000019
+#define NOBODY_GID	521000513
+#define WHEEL_GID	532000544
+#define BIN_GID		532000545
+#define KMEM_GID	WHEEL_GID
+
 /* Flags in WIN_TASK struct */
 
 #define WIN_PS_CONTROLT		0x00000001	/* Process has controlling terminal */
