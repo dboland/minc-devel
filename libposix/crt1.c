@@ -33,14 +33,6 @@
 #include "win_types.h"
 #include "vfs_posix.h"
 
-extern WIN_TASK 	*__Tasks;
-extern WIN_TASK 	*__Process;
-extern DWORD		__TlsIndex;
-
-BOOL posix_PROCESS_DETACH(WIN_TASK *Task);
-BOOL posix_THREAD_ATTACH(WIN_TASK *Task);
-BOOL posix_THREAD_DETACH(WIN_TASK *Task);
-
 BOOL WINAPI 
 DllMainCRTStartup(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
@@ -53,9 +45,9 @@ DllMainCRTStartup(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 		case DLL_PROCESS_DETACH:
 			bResult = posix_PROCESS_DETACH(&__Tasks[CURRENT]);
 			break;
-		case DLL_THREAD_ATTACH:
-			bResult = posix_THREAD_ATTACH(__Process);
-			break;
+//		case DLL_THREAD_ATTACH:
+//			bResult = posix_THREAD_ATTACH(__Process);
+//			break;
 		case DLL_THREAD_DETACH:
 			bResult = posix_THREAD_DETACH(&__Tasks[CURRENT]);
 			break;

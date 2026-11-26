@@ -256,7 +256,9 @@ cmsghdr_posix(WIN_TASK *Task, const struct msghdr *msg)
 int 
 sys_getrtable(call_t call)
 {
-	return(__Process->TaskId);
+	WIN_TASK *pwTask = call.Task;
+
+	return(pwTask->TaskId);
 }
 int 
 sys_socket(call_t call, int family, int type, int protocol)

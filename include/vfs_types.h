@@ -660,6 +660,11 @@ typedef struct _WIN_SESSION {
 	WIN_VNODE_LIST Nodes[WIN_CHILD_MAX];
 } WIN_SESSION;
 
+/* for crt1.c */
+
+extern WIN_TASK 	*__Tasks;
+extern DWORD		__TlsIndex;
+
 /*
  * registry.c
  */

@@ -78,6 +78,8 @@ HGLOBAL		__Lock;			/* Clipboard lock */
 DWORD		__ThreadCount;
 DWORD 		__TlsIndex;
 DWORD		__Index;		/* index into input buffer */
+SID8 		__UserSid;		/* initial user id */
+SID8 		__GroupSid;		/* initial group id */
 
 WIN_SESSION	*__Session;
 WIN_TASK	*__Tasks;

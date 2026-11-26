@@ -188,6 +188,10 @@ BOOL vfs_statvfs(WIN_MOUNT *Mount, WIN_STATVFS *Result);
 
 /****************************************************/
 
+BOOL posix_PROCESS_DETACH(WIN_TASK *Task);
+BOOL posix_THREAD_ATTACH(WIN_TASK *Task);
+BOOL posix_THREAD_DETACH(WIN_TASK *Task);
+
 /* process.c */
 
 WIN_TASK *proc_init(WIN_SIGPROC SignalProc);

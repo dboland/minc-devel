@@ -70,6 +70,8 @@ extern WIN_TASK		*__Process;
 extern DWORD	 	__TlsIndex;
 extern HANDLE		__Interrupt;
 extern HANDLE		__PipeEvent;
+extern SID8 		__UserSid;		/* initial user id */
+extern SID8 		__GroupSid;		/* initial group id */
 
 u_long	__THREAD_FRAME;
 

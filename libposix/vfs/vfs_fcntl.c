@@ -42,6 +42,9 @@ vfs_F_DUPFD(WIN_VNODE *Node, BOOL CloseExec, WIN_VNODE *Result)
 	*Result = *Node;
 	Result->CloseExec = CloseExec;
 	switch (Node->FSType){
+		case FS_TYPE_DISK:
+			bResult = disk_F_DUPFD(Node, hProcess, dwOptions, Result);
+			break;
 		case FS_TYPE_WINSOCK:
 		case FS_TYPE_PIPE:
 			bResult = pipe_F_DUPFD(Node, hProcess, dwOptions, Result);
@@ -53,7 +56,7 @@ vfs_F_DUPFD(WIN_VNODE *Node, BOOL CloseExec, WIN_VNODE *Result)
 			bResult = pdo_F_DUPFD(Node, hProcess, dwOptions, Result);
 			break;
 		default:
-			bResult = disk_F_DUPFD(Node, hProcess, dwOptions, Result);
+			SetLastError(ERROR_BAD_FILE_TYPE);
 	}
 	return(bResult);
 }
@@ -64,6 +67,9 @@ vfs_F_INHERIT(WIN_VNODE *Node, HANDLE Process)
 	DWORD dwOptions = DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE;
 
 	switch (Node->FSType){
+		case FS_TYPE_DISK:
+			bResult = disk_F_DUPFD(Node, Process, dwOptions, Node);
+			break;
 		case FS_TYPE_WINSOCK:
 		case FS_TYPE_PIPE:
 			bResult = pipe_F_DUPFD(Node, Process, dwOptions, Node);
@@ -75,7 +81,7 @@ vfs_F_INHERIT(WIN_VNODE *Node, HANDLE Process)
 			bResult = pdo_F_DUPFD(Node, Process, dwOptions, Node);
 			break;
 		default:
-			bResult = disk_F_DUPFD(Node, Process, dwOptions, Node);
+			SetLastError(ERROR_BAD_FILE_TYPE);
 	}
 	return(bResult);
 }

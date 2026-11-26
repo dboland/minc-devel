@@ -37,11 +37,11 @@ ProcInitLimits(DWORDLONG Limits[])
 {
 	Limits[WIN_RLIMIT_CPU] = WIN_RLIM_INFINITY;
 	Limits[WIN_RLIMIT_FSIZE] = WIN_FSIZE_MAX;
-	Limits[WIN_RLIMIT_DATA] = 0x00100000LL;		/* SizeOfHeapReserve? */
+	Limits[WIN_RLIMIT_DATA] = 0x00100000ULL;	/* SizeOfHeapReserve? */
 	Limits[WIN_RLIMIT_STACK] = WIN_STACKSIZE;
 	Limits[WIN_RLIMIT_CORE] = WIN_RLIM_INFINITY;
-	Limits[WIN_RLIMIT_RSS] = 0x7FFFFFFFLL;		/* ksh.exe ("memory") */
-	Limits[WIN_RLIMIT_MEMLOCK] = 0x7FFFFFFFLL;
+	Limits[WIN_RLIMIT_RSS] = 0x7FFFFFFFULL;		/* ksh.exe ("memory") */
+	Limits[WIN_RLIMIT_MEMLOCK] = 0x7FFFFFFFULL;
 	Limits[WIN_RLIMIT_NPROC] = WIN_CHILD_MAX;
 	Limits[WIN_RLIMIT_NOFILE] = WIN_OPEN_MAX;
 }
@@ -130,6 +130,8 @@ proc_init(WIN_SIGPROC SignalProc)
 	}
 	/* Task record will be empty when a daemon detaches (sshd.exe).
 	 */
+	__UserSid = pwTask->UserSid;
+	__GroupSid = pwTask->GroupSid;
 	__Process = pwTask;
 	__CTTY = TERMINAL(pwTask->TerminalId);
 	return(pwTask);
