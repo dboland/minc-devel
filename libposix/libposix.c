@@ -65,11 +65,11 @@ extern WIN_MOUNT	*__Mounts;
 extern WIN_GLOBALS	*__Globals;
 extern SID8 		*__SidMachine;
 extern WIN_VNODE_LIST	*__Nodes;
+extern WIN_TASK		*__Process;
 
 extern DWORD	 	__TlsIndex;
 extern HANDLE		__Interrupt;
 extern HANDLE		__PipeEvent;
-extern WIN_TASK		__Process;
 
 u_long	__THREAD_FRAME;
 

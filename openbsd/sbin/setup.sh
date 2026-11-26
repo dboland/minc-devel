@@ -16,6 +16,15 @@ admins_only()
 		chmod g+w $file
 	done
 }
+install_conf()
+{
+	for file in `ls /$1/*.dist | sed 's/\.dist//g'`; do
+		if ! [ -f $file ]; then
+			echo "$file.dist -> $file"
+			cp -p "$file.dist" "$file"
+		fi
+	done
+}
 
 echo -n "Creating system directories... "
 mkdir -p /mnt /dev /root /home /tmp
@@ -32,9 +41,7 @@ echo done.
 
 echo -n "Creating /dev file system... "
 sh /etc/MAKEDEV
-if ! [ -f /etc/fstab ]; then
-	printf "/dev/root\t/\tffs\trw\t0\t0\n" >/etc/fstab
-fi
+install_conf "etc"
 admins_only "/etc/fstab"
 echo done.
 
@@ -57,7 +64,7 @@ ln -sn "$WINHOME\Videos" "$HOME/Videos" 2>/dev/null
 ln -sn "$WINHOME\Pictures" "$HOME/Pictures" 2>/dev/null
 ln -sn "$APPDATA" "$HOME/AppData" 2>/dev/null
 if ! [ -f "$HOME/.profile" ]; then
-	echo "mkent resolv 2>/dev/null >/etc/resolv.conf" >"$HOME/.profile"
+	cp /etc/skel/.profile "$HOME/"
 fi
 touch "/var/mail/$USER"
 echo done.

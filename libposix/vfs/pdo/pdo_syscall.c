@@ -39,17 +39,17 @@ PdoOpenFile(WIN_NAMEIDATA *Path, WIN_FLAGS *Flags, WIN_VNODE *Result)
 	WIN_DEVICE *pwDevice = DEVICE(Path->DeviceId);
 
 	if (!pwDevice->Flags){
-		CloseHandle(Path->Object);
+		NtClose(Path->Object);
 	}else{
+		Result->Handle = INVALID_HANDLE_VALUE;
+		Result->Object = Path->Object;
 		Result->DeviceId = Path->DeviceId;
 		Result->FileType = Path->FileType;
+		Result->Attribs = Path->Attribs;
 		Result->DeviceType = pwDevice->DeviceType;
 		Result->Index = pwDevice->Index;
 		Result->Event = pwDevice->Event;
 		Result->FSType = pwDevice->FSType;
-		Result->Attribs = Path->Attribs;
-		Result->Handle = INVALID_HANDLE_VALUE;
-		Result->Object = Path->Object;
 		Result->CloseExec = Flags->CloseExec;
 		Result->Access = win_F_GETFL(Path->Object);
 		Result->Flags = win_F_GETFD(Path->Object);

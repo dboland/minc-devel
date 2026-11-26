@@ -78,7 +78,6 @@ HGLOBAL		__Lock;			/* Clipboard lock */
 DWORD		__ThreadCount;
 DWORD 		__TlsIndex;
 DWORD		__Index;		/* index into input buffer */
-WIN_TASK	__Process;
 
 WIN_SESSION	*__Session;
 WIN_TASK	*__Tasks;
@@ -91,6 +90,7 @@ CHAR 		*__Escape;
 CHAR		*__Input = __INPUT_BUF;
 CONST WCHAR	*__Clipboard;		/* Clipboard buffer */
 WIN_VNODE_LIST	*__Nodes;
+WIN_TASK	*__Process;
 
 BOOL proc_poll(WIN_TASK *Task);
 BOOL pdo_fstat(WIN_VNODE *Node, WIN_VATTR *Result);

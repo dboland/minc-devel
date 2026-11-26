@@ -130,7 +130,7 @@ proc_init(WIN_SIGPROC SignalProc)
 	}
 	/* Task record will be empty when a daemon detaches (sshd.exe).
 	 */
-	__Process = *pwTask;
+	__Process = pwTask;
 	__CTTY = TERMINAL(pwTask->TerminalId);
 	return(pwTask);
 }

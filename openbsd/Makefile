@@ -42,7 +42,7 @@ release:
 	@${MAKE} -C lib release
 	@${MAKE} -C sbin release
 	@${MAKE} -C libexec release
-	
+
 bin-clean:
 	@${MAKE} -C bin clean
 	@${MAKE} -C usr.bin clean

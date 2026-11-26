@@ -136,11 +136,6 @@ mknod /dev/ukbd1 c 8 25
 mknod /dev/ukbd2 c 8 26
 mknod /dev/ukbd3 c 8 27
 
-mknod /dev/comkbd0 c 8 32
-mknod /dev/comkbd1 c 8 33
-mknod /dev/comkbd2 c 8 34
-mknod /dev/comkbd3 c 8 35
-
 # Mouse device #
 
 mknod /dev/wsmouse0 c 9 0
@@ -152,11 +147,6 @@ mknod /dev/ums0 c 9 24
 mknod /dev/ums1 c 9 25
 mknod /dev/ums2 c 9 26
 mknod /dev/ums3 c 9 27
-
-mknod /dev/comms0 c 9 32
-mknod /dev/comms1 c 9 33
-mknod /dev/comms2 c 9 34
-mknod /dev/comms3 c 9 35
 
 # Storage device #
 
@@ -186,6 +176,10 @@ mknod /dev/hd0 b 10 24
 mknod /dev/hd1 b 10 25
 mknod /dev/hd2 b 10 26
 mknod /dev/hd3 b 10 27
+mknod /dev/hd4 b 10 28
+mknod /dev/hd5 b 10 29
+mknod /dev/hd6 b 10 30
+mknod /dev/hd7 b 10 31
 
 mknod /dev/fd0 b 10 32
 mknod /dev/fd1 b 10 33
@@ -203,18 +197,6 @@ mknod /dev/uhub0 c 11 24
 mknod /dev/uhub1 c 11 25
 mknod /dev/uhub2 c 11 26
 mknod /dev/uhub3 c 11 27
-mknod /dev/uhub4 c 11 28
-mknod /dev/uhub5 c 11 29
-mknod /dev/uhub6 c 11 30
-mknod /dev/uhub7 c 11 31
-mknod /dev/uhub8 c 11 32
-mknod /dev/uhub9 c 11 33
-mknod /dev/uhub10 c 11 34
-mknod /dev/uhub11 c 11 35
-mknod /dev/uhub12 c 11 36
-mknod /dev/uhub13 c 11 37
-mknod /dev/uhub14 c 11 38
-mknod /dev/uhub15 c 11 39
 
 mknod /dev/uhci0 c 11 40
 mknod /dev/uhci1 c 11 41

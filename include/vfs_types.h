@@ -525,7 +525,7 @@ typedef struct _WIN_TASK {
 	DWORD MountId;			/* where CWD is mounted */
 	DWORD Processor;
 	DWORD Nice;
-	DWORD Flags;
+	DWORD Flags;			/* execution state flags */
 	DWORD Depth;
 	ULONG SetSize;			/* size of bss section */
 	ULONG DataSize;			/* size of entire data section */
@@ -541,7 +541,7 @@ typedef struct _WIN_TASK {
 	DWORDLONG UserTime;		/* user time in nanoseconds */
 	DWORDLONG IdleTime;		/* idle time in nanoseconds */
 	DWORDLONG InterruptTime;	/* interrupt time in nanoseconds */
-	DWORD State;
+	DWORD State;			/* execution state */
 	DWORD Code;			/* syscall currently running */
 	HANDLE Timer;			/* interval timer */
 	DWORDLONG TimerTicks;		/* in nanoseconds */

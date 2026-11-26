@@ -73,7 +73,7 @@ ifamsg_posix(void *buf, WIN_IFADDRS *Adapter, PSOCKET_ADDRESS Address, PIP_ADAPT
 	hdr->ifam_type = RTM_NEWADDR;
 	hdr->ifam_hdrlen = sizeof(struct ifa_msghdr);
 	hdr->ifam_index = Adapter->IfIndex;
-	hdr->ifam_tableid = __Process.TaskId;
+	hdr->ifam_tableid = __Process->TaskId;
 	/* records added below need to be announced here */
 	hdr->ifam_addrs = RTA_NETMASK | RTA_IFA;
 	hdr->ifam_flags = Adapter->IfFlags;
@@ -84,9 +84,9 @@ ifamsg_posix(void *buf, WIN_IFADDRS *Adapter, PSOCKET_ADDRESS Address, PIP_ADAPT
 	}else{
 		psPrefix = Address;
 	}
-	saddr_posix(&__Process, buf, psPrefix->lpSockaddr, &uiPrefixLen);
+	saddr_posix(__Process, buf, psPrefix->lpSockaddr, &uiPrefixLen);
 	buf += uiPrefixLen;
-	saddr_posix(&__Process, buf, Address->lpSockaddr, &uiAddrLen);
+	saddr_posix(__Process, buf, Address->lpSockaddr, &uiAddrLen);
 	buf += uiAddrLen;
 	return(buf);
 }
@@ -103,7 +103,7 @@ ifmsg_posix(void *buf, WIN_IFADDRS *Adapter)
 	hdr->ifm_type = RTM_IFINFO;
 	hdr->ifm_hdrlen = sizeof(struct if_msghdr);
 	hdr->ifm_index = Adapter->IfIndex;
-	hdr->ifm_tableid = __Process.TaskId;
+	hdr->ifm_tableid = __Process->TaskId;
 	/* announce type of records added below */
 	hdr->ifm_addrs = RTA_IFP | RTA_IFA;
 	hdr->ifm_flags = Adapter->IfFlags;
@@ -153,7 +153,7 @@ rtmsg_posix(void *buf, MIB_IFROW *Interface, MIB_IPFORWARDROW *Address)
 	hdr->rtm_type = RTM_NEWADDR;
 	hdr->rtm_hdrlen = sizeof(struct rt_msghdr);
 	hdr->rtm_index = Address->dwForwardIfIndex;
-	hdr->rtm_tableid = __Process.TaskId;
+	hdr->rtm_tableid = __Process->TaskId;
 //	hdr->rtm_priority
 //	hdr->rtm_mpls
 	/* address types added below */
@@ -190,7 +190,7 @@ inmsg_posix(void *buf, MIB_IPNETROW *Address)
 	hdr->ifam_type = RTM_NEWADDR;
 	hdr->ifam_hdrlen = sizeof(struct ifa_msghdr);
 	hdr->ifam_index = Address->dwIndex;
-	hdr->ifam_tableid = __Process.TaskId;
+	hdr->ifam_tableid = __Process->TaskId;
 	hdr->ifam_addrs = RTA_IFP | RTA_IFA;
 	if (Address->dwType == MIB_IPNET_TYPE_DYNAMIC){
 		hdr->ifam_flags = IFA_ROUTE;
