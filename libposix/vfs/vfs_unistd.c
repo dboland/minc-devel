@@ -57,6 +57,9 @@ vfs_close(WIN_VNODE *Node)
 	if (!Node->Handle){		/* vfs_dup2() */
 		bResult = TRUE;
 	}else switch (Node->FSType){
+		case FS_TYPE_DISK:
+			bResult = disk_close(Node);
+			break;
 		case FS_TYPE_PIPE:
 			bResult = pipe_close(Node);
 			break;
@@ -66,11 +69,12 @@ vfs_close(WIN_VNODE *Node)
 		case FS_TYPE_CHAR:
 			bResult = char_close(Node);
 			break;
+		case FS_TYPE_MAILSLOT:
 		case FS_TYPE_PDO:
 			bResult = pdo_close(Node);
 			break;
 		default:
-			bResult = disk_close(Node);
+			SetLastError(ERROR_BAD_FILE_TYPE);
 	}
 	return(bResult);
 }

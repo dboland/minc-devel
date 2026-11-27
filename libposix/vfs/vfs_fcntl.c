@@ -52,6 +52,7 @@ vfs_F_DUPFD(WIN_VNODE *Node, BOOL CloseExec, WIN_VNODE *Result)
 		case FS_TYPE_CHAR:
 			bResult = char_F_DUPFD(Node, hProcess, dwOptions, Result);
 			break;
+		case FS_TYPE_MAILSLOT:
 		case FS_TYPE_PDO:
 			bResult = pdo_F_DUPFD(Node, hProcess, dwOptions, Result);
 			break;
@@ -77,6 +78,7 @@ vfs_F_INHERIT(WIN_VNODE *Node, HANDLE Process)
 		case FS_TYPE_CHAR:
 			bResult = char_F_DUPFD(Node, Process, dwOptions, Node);
 			break;
+		case FS_TYPE_MAILSLOT:
 		case FS_TYPE_PDO:
 			bResult = pdo_F_DUPFD(Node, Process, dwOptions, Node);
 			break;
@@ -192,7 +194,7 @@ vfs_F_OSFHANDLE(WIN_VNODE Nodes[], DWORD Index)
 	return(hResult);
 }
 BOOL 
-vfs_F_NAMEI(WIN_NAMEIDATA *Path, DWORD Flags, HANDLE *Result)
+vfs_F_NAMEI(WIN_NAMEIDATA *Path, DWORD Flags)
 {
 	BOOL bResult = FALSE;
 	DWORD dwSize;
