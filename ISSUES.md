@@ -66,11 +66,30 @@ choosing *Properties* and clicking the *Options* tab.
 The openpty() API is fully functional, but I implemented pseudo 
 terminals in the wrong file system (MAILSLOT). Mailslots are ideal 
 to implement virtual file systems in Windows because they support 
-hierarchical file names and unlimited buffering.
+hierarchical file names and unlimited buffering, but for PTY's it 
+is too sluggish.
 
 I am planning to re-implement pseudo terminals as sockets (named 
 pipes) in the PIPE file system with limited buffering, which speeds 
 up a Pseudo TTY.
+
+Anyway, if you like to use the *xterm* feature of the Windows Console 
+(Vista and onwards) I implemented to test the openpty() API, you can 
+create a Shortcut to the *minc.exe* executable by right-clicking it 
+and choosing **Create Shortcut**. Rename the Shortcut to 'XTerm' and 
+move it to your Desktop.
+
+Now, right-click the *XTerm* Shortcut and choose **Properties**. You 
+will see a textbox containing the command to start MinC. Add the 
+parameters to start as an X Terminal, like so:
+
+	C:\MinC\minc.exe xterm -h
+
+The *-h* flag is for starting in your *home* directory. Note that 
+pasting text into the X Terminal can only be done by copying some 
+text and right-clicking the mouse. There is a facility for pasting 
+text using the keyboard (Shift+Insert), but I did not implement it 
+yet. Create an issue if you want it working.
 
 ## Mounting
 
@@ -87,7 +106,7 @@ process overly complex. We need mounting to be rock-solid. Installing
 MinC is done by the administrator, which hides the network shares on 
 Vista (and onwards) distros. So if you want to access all mounted 
 drives, use the **mkent** program to generate the file system table 
-(/etc/fstab).
+(/etc/fstab) for you.
 
 ## Hard Links
 

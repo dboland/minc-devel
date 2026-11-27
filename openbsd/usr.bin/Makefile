@@ -118,6 +118,11 @@ install: ${DESTDIR} ${OBJECTS} xinstall
 	@${MAKE} -C make install
 	@${MAKE} -C kdump install
 
+release-clean:
+	/bin/rm -f xinstall.o
+
+release: release-clean all
+
 clean:
 	/bin/rm -f *.exe *.o
 	${MAKE} -C make clean

@@ -23,6 +23,9 @@ https://minc.commandlinerevolution.nl/english/home.html
 
 ## Why developers use MinC over WSL/Cygwin
 
+One of my sponsors was willing to summarize the reasons 
+he is fond of this project:
+
 * It's a Unix environment, without the need for a whole GNU 
 userland. I appreciate GNU's efforts but I greatly prefer 
 BSD and Solaris style environments to them.
