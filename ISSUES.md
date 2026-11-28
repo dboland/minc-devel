@@ -73,11 +73,11 @@ I am planning to re-implement pseudo terminals as sockets (named
 pipes) in the PIPE file system with limited buffering, which speeds 
 up a Pseudo TTY.
 
-Anyway, if you like to use the *xterm* feature of the Windows Console 
-(Vista and onwards) I implemented to test the openpty() API, you can 
-create a Shortcut to the *minc.exe* executable by right-clicking it 
-and choosing **Create Shortcut**. Rename the Shortcut to 'XTerm' and 
-move it to your Desktop.
+Anyway, if you like to try out the *xterm* feature of the Windows 
+Console (Vista and onwards) I implemented to test the openpty() API, 
+you can create a Shortcut to the *minc.exe* executable by right-clicking 
+it and choosing **Create Shortcut**. Rename the Shortcut to 'XTerm' 
+and move it to your Desktop.
 
 Now, right-click the *XTerm* Shortcut and choose **Properties**. You 
 will see a textbox containing the command to start MinC. Add the 
@@ -123,6 +123,8 @@ this API, you can use it to show the real numbers with the **df**
 
 	df -h
 
+The *-h* flag is for getting 'human readable' output.
+
 ## Networking
 
 Only the "read" part of networking has been implemented, so you 
@@ -136,5 +138,5 @@ priority at the moment. Create an issue if you need to have one
 of them implemented.
 
 
-August 2026,
+November 2026,
 Daniel Boland

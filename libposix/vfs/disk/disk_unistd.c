@@ -218,19 +218,18 @@ BOOL
 disk_symlink(WIN_NAMEIDATA *Path, WIN_MODE *Mode, WIN_NAMEIDATA *Target)
 {
 	BOOL bResult = FALSE;
-	SECURITY_DESCRIPTOR sd;
-	WIN_ACL_CONTROL wControl;
-	SECURITY_ATTRIBUTES sa = {sizeof(sa), &sd, FALSE};
-	WCHAR szDirName[WIN_PATH_MAX];
 
-	if (!win_acl_get_file(vfs_dirname(szDirName, Path->Resolved), &wControl.Source)){
-		return(FALSE);
-	}else if (!vfs_acl_init(wControl.Source, Path->MountId, Mode->Special, &sd)){
-		WIN_ERR("vfs_acl_init(%ls): %s\n", szDirName, win_strerror(GetLastError()));
-	}else if (vfs_acl_create(&wControl, Mode, 0, &sd)){
-		bResult = link_F_BIND(Path->Resolved, &sa, Target->Resolved);
+	switch (Path->FileType){
+		case WIN_VDIR:
+		case WIN_VREG:
+			bResult = file_symlink(Path, Mode, Target);
+			break;
+		case WIN_VLNK:
+			bResult = link_symlink(Path, Mode, Target);
+			break;
+		default:
+			SetLastError(ERROR_BAD_FILE_TYPE);
 	}
-	vfs_acl_free(&wControl);
 	return(bResult);
 }
 BOOL 

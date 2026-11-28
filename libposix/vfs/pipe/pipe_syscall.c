@@ -68,7 +68,7 @@ PipeOpenFile(LPCWSTR Name, HANDLE Event, WIN_VNODE *Result)
 	DWORD dwShare = FILE_SHARE_WRITE + FILE_SHARE_READ;
 	WCHAR szPath[MAX_PATH] = L"\\\\.\\PIPE\\";
 	DWORD dwAttribs = FILE_ATTRIBUTE_NORMAL;
-	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, FALSE};
+	SECURITY_ATTRIBUTES sa = {sizeof(sa), NULL, TRUE};
 	HANDLE hResult;
 
 	hResult = CreateFileW(win_wcscat(szPath, Name), aMask, dwShare, NULL, 

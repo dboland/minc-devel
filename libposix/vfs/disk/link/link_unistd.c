@@ -60,3 +60,16 @@ link_unlink(WIN_NAMEIDATA *Path)
 	}
 	return(bResult);
 }
+BOOL 
+link_symlink(WIN_NAMEIDATA *Path, WIN_MODE *Mode, WIN_NAMEIDATA *Target)
+{
+	BOOL bResult = FALSE;
+
+	/* Polymorphism is the true power of Object Oriented
+	 * Programming (tar.exe)
+	 */
+	if (CloseHandle(Path->Object)){
+		SetLastError(ERROR_FILE_EXISTS);
+	}
+	return(bResult);
+}
