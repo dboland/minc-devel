@@ -35,4 +35,5 @@ ${ETCDEST}/profile:
 ${ETCDEST}/ttys:
 	${INSTALL} ttys ${ETCDEST}/
 
-install: ${ETCDEST} ${FILES}
+install: ${ETCDEST} ${FILES} ${DISTFILES}
+	${INSTALL} *.dist ${ETCDEST}/
