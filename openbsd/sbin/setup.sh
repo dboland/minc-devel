@@ -20,7 +20,6 @@ install_conf()
 {
 	for file in `ls /$1/*.dist | sed 's/\.dist//g'`; do
 		if ! [ -f $file ]; then
-			echo "$file.dist -> $file"
 			cp -p "$file.dist" "$file"
 		fi
 	done
